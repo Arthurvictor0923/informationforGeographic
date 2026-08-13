@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>河图·地理信息平台 — 专题地图</title>
+<link rel="stylesheet" href="tailwind.css">
+<link rel="stylesheet" href="common.css">
+</head>
+<body class="bg-page-bg text-gray-800 text-sm h-screen overflow-hidden flex flex-col">
+
+<!-- ============================================================ -->
+<!-- MAIN APP SHELL                                               -->
+<!-- ============================================================ -->
+<div id="appShell" class="h-full flex flex-col">
+
+  <!-- HEADER -->
+  <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between flex-shrink-0 z-30 px-5">
+    <div class="flex items-center">
+      <div class="flex items-center gap-2 mr-6">
+        <div class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-base">河</div>
+        <span class="text-base font-semibold text-brand">河图·地理信息平台</span>
+      </div>
+      <nav id="topNav" class="flex items-center h-16 gap-0.5">
+        <a href="index.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
+        </a>
+        <a href="地图服务.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg> 地图服务
+        </a>
+        <a href="要素图层.html" data-module="layer" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg> 要素图层
+        </a>
+        <a href="专题地图.html" data-module="map" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 专题地图
+        </a>
+        <a href="任务中心.html" data-module="task" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> 任务中心
+        </a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <button id="emptyToggleBtn" onclick="toggleEmptyState()" class="text-gray-400 hover:text-orange-500 text-xs flex items-center gap-1 transition-colors" title="切换当前模块空状态 / 有数据，用于验证空状态引导设计"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg> 空状态</button>
+      <div class="w-8 h-8 rounded-full bg-[#f56a00] text-white flex items-center justify-center font-semibold text-sm">张</div>
+      <span class="text-gray-700 text-sm">张建国</span>
+      <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">业务人员</span>
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- SIDEBAR -->
+    <aside class="w-60 bg-page-bg border-r border-gray-100 flex flex-col flex-shrink-0">
+      <div class="p-3 border-b border-gray-100">
+        <div class="relative">
+          <svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" placeholder="搜索..." class="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 focus:bg-white transition-all">
+        </div>
+      </div>
+      <div id="sidebarContent" class="flex-1 overflow-y-auto scroll-thin p-2"></div>
+    </aside>
+
+    <!-- MAIN -->
+    <main id="mainContent" class="flex-1 overflow-hidden flex flex-col min-w-0"></main>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODALS & OVERLAYS（模块专属；detailModal / moveModal / 通知 / 地图查看器由 common.js 注入） -->
+<!-- ============================================================ -->
+
+<!-- CREATE MAP MODAL (replaces 场景模板: 创建地图表单, aligned with real encapsulated project) -->
+<div id="createMapModal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
+  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 680px;">
+    <div class="px-6 py-4 border-b border-line flex items-center justify-between">
+      <h2 class="text-base font-semibold text-gray-900"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 创建专题地图</h2>
+      <button onclick="closeWizard('createMapModal')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">地图名称 <span class="text-red-400">*</span></label>
+        <input type="text" id="cmName" placeholder="例如：XX农场耕地监测一张图" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">地图编码</label>
+          <input type="text" id="cmCode" placeholder="系统自动生成，可留空" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-gray-50 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">坐标系</label>
+          <select id="cmCrs" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
+            <option>Web 墨卡托（EPSG:3857）</option>
+            <option>中国大地坐标（EPSG:4490）</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">组织机构</label>
+          <select id="cmOrg" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
+            <option>北大荒农垦集团有限公司</option>
+            <option>八五六农场</option>
+            <option>鹤山农场</option>
+            <option>竞山农场</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">渲染引擎</label>
+          <select id="cmEngine" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
+            <option>二维（2D）</option>
+            <option>三维（3D）</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">标签</label>
+          <select id="cmTag" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
+            <option>耕地监测</option>
+            <option>水利</option>
+            <option>遥感</option>
+            <option>行政</option>
+            <option>驾驶舱</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">图标</label>
+          <div class="flex items-center gap-2 px-3 py-2.5 border border-line rounded-lg bg-gray-50">
+            <span class="text-xl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg></span>
+            <span class="text-xs text-gray-400">默认图标，可在详情中更换</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">地图描述 <span class="text-gray-400 text-xs font-normal">（选填）</span></label>
+        <textarea id="cmDesc" rows="2" placeholder="简单描述这张地图的用途，方便同事查找" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 resize-none"></textarea>
+      </div>
+      <div class="bg-gray-50 border border-line rounded-lg p-3 text-xs text-gray-500">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 创建后进入地图设计页，自由添加要素图层、底图、图例，再发布为一张图 / 大屏 / 驾驶舱。
+      </div>
+    </div>
+    <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50">
+      <span class="text-xs text-gray-400">带 <span class="text-red-400">*</span> 为必填项</span>
+      <div class="flex items-center gap-3">
+        <button onclick="closeWizard('createMapModal')" class="px-4 py-1.5 text-gray-500 hover:text-gray-700 text-sm">取消</button>
+        <button onclick="confirmCreateMap()" class="px-4 py-1.5 bg-brand hover:bg-brand-hover text-white rounded text-sm font-medium transition-colors"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 确认创建</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+// ── 专题地图：确认创建 ─────────────────────────────────
+function confirmCreateMap() {
+  const name = (document.getElementById('cmName').value || '').trim();
+  if (!name) {
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请先填写地图名称');
+    return;
+  }
+  closeWizard('createMapModal');
+  if (!notified.map) {
+    notified.map = true;
+  }
+  showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m12 2 2.4 7.4H22l-6 4.3 2.3 7.3L12 16.7 5.7 21l2.3-7.3-6-4.3h7.6z"/></svg>', `✅ 专题地图「<strong>${name}</strong>」创建成功！正在打开地图设计器…`);
+  openEditorPrototype();
+  // 重置表单
+  document.getElementById('cmName').value = '';
+  document.getElementById('cmCode').value = '';
+  document.getElementById('cmDesc').value = '';
+}
+
+// ── 专题地图：编辑 / 设计 ──────────────────────────────
+function openMapDesign(action, title) {
+  if (action === 'edit') {
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', '正在打开「' + title + '」的编辑配置（原型模拟）');
+  } else {
+    openMapViewer(title); // 设计 = 打开地图查看器
+  }
+}
+
+// ── 初始化 ─────────────────────────────────────────────
+document.getElementById('appShell').classList.remove('hidden');
+activeModule = 'map';
+switchModule('map');
+showWelcomeIfNeeded();
+</script>
+</body>
+</html>

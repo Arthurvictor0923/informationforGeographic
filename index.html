@@ -3,333 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>交互原型</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        brand: '#2f54eb',
-        'brand-dark': '#1c39bb',
-        'brand-light': '#f0f5ff',
-        'page-bg': '#f5f6f8',
-        panel: '#ffffff',
-        line: '#e8e8e8',
-        muted: '#8c8c8c',
-        success: '#52c41a',
-        warning: '#faad14',
-      }
-    }
-  }
-}
-</script>
-<style>
-/* ── Design System ───────────────────────────────────── */
-:root {
-  --brand: #2f54eb;
-  --brand-hover: #1c39bb;
-  --brand-light: #f0f5ff;
-  --brand-50: #e8eeff;
-  --brand-100: #d0ddfe;
-  --brand-500: #2f54eb;
-  --brand-600: #1c39bb;
-  --success: #52c41a;
-  --success-light: #f6ffed;
-  --warning: #faad14;
-  --warning-light: #fffbe6;
-  --danger: #ff4d4f;
-  --danger-light: #fff2f0;
-  --text: #1f1f1f;
-  --text-secondary: #595959;
-  --text-muted: #8c8c8c;
-  --text-placeholder: #bfbfbf;
-  --bg-page: #f5f6f8;
-  --bg-panel: #ffffff;
-  --bg-hover: #fafafa;
-  --border: #e8e8e8;
-  --border-light: #f0f0f0;
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
-  --shadow-xs: 0 1px 2px rgba(0,0,0,.03);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.06);
-  --shadow: 0 4px 12px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
-  --shadow-md: 0 8px 24px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
-  --shadow-lg: 0 16px 40px rgba(0,0,0,.1), 0 4px 12px rgba(0,0,0,.05);
-  --shadow-xl: 0 24px 56px rgba(0,0,0,.12), 0 8px 20px rgba(0,0,0,.06);
-  --transition: .2s cubic-bezier(.4,0,.2,1);
-  --transition-slow: .35s cubic-bezier(.4,0,.2,1);
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* ── Scrollbar ──────────────────────────────────────── */
-.scroll-thin::-webkit-scrollbar { width: 5px; height: 5px; }
-.scroll-thin::-webkit-scrollbar-track { background: transparent; }
-.scroll-thin::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 10px; }
-.scroll-thin::-webkit-scrollbar-thumb:hover { background: #bfbfbf; }
-
-/* ── Animations ─────────────────────────────────────── */
-.fade-in { animation: fadeIn .3s var(--transition); }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-.slide-up { animation: slideUp .3s var(--transition); }
-@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-.scale-in { animation: scaleIn .25s var(--transition); }
-@keyframes scaleIn { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
-
-/* ── Card Design ────────────────────────────────────── */
-.card-hover {
-  transition: transform .25s var(--transition), box-shadow .25s var(--transition), border-color .25s var(--transition);
-  border: 1px solid var(--border);
-}
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: #d0d5e0;
-}
-.card-hover:active { transform: translateY(-1px); }
-
-/* ── Step Indicator ─────────────────────────────────── */
-.step-dot { transition: all var(--transition); }
-.step-dot.active { background: var(--brand); box-shadow: 0 0 0 4px rgba(47,84,235,.12); }
-.step-dot.done { background: var(--success); }
-
-/* ── Notification ───────────────────────────────────── */
-.notif-enter {
-  animation: notifIn .4s cubic-bezier(.34,1.56,.64,1);
-  box-shadow: var(--shadow-lg);
-}
-@keyframes notifIn { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
-
-/* ── Wizard ─────────────────────────────────────────── */
-.wizard-step { display: none; }
-.wizard-step.active { display: block; animation: fadeIn .25s var(--transition); }
-
-/* ── Drawer ─────────────────────────────────────────── */
-.drawer-in { animation: drawerIn .3s var(--transition); }
-@keyframes drawerIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-/* ── Workflow Bar ───────────────────────────────────── */
-.wf-dot { transition: all var(--transition-slow); }
-.wf-step-btn {
-  transition: all var(--transition);
-  border-radius: var(--radius);
-}
-.wf-step-btn:hover:not(.active):not(.done) { background: #fff; border-color: #d0d5e0 !important; }
-.wf-step-btn.active {
-  background: #fff;
-  border-color: #b7c8f0 !important;
-  box-shadow: 0 2px 8px rgba(47,84,235,.08), 0 1px 2px rgba(47,84,235,.06);
-}
-.wf-step-btn.active .wf-dot {
-  background: var(--brand);
-  color: #fff;
-  box-shadow: 0 0 0 5px rgba(47,84,235,.14);
-  animation: wfPulse 2.5s infinite;
-}
-.wf-step-btn.active span:last-child { color: var(--brand); font-weight: 600; }
-@keyframes wfPulse {
-  0%, 100% { box-shadow: 0 0 0 5px rgba(47,84,235,.14); }
-  50% { box-shadow: 0 0 0 10px rgba(47,84,235,0); }
-}
-.wf-step-btn.done { background: var(--success-light); border-color: #b7eb8f !important; }
-.wf-step-btn.done .wf-dot { background: var(--success); color: #fff; }
-.wf-step-btn.done span:last-child { color: var(--success); }
-.wf-step-btn.pending .wf-dot { background: #f0f1f3; color: #a0a4ab; }
-.wf-step-btn.pending span:last-child { color: #a0a4ab; }
-#workflowBar.celebrated {
-  background: linear-gradient(135deg, #f6ffed 0%, #fafcf9 40%, #fff 60%, #f6ffed 100%);
-  border-color: #b7eb8f;
-}
-
-/* ── Navigation ─────────────────────────────────────── */
-.nav-btn {
-  position: relative;
-  transition: color var(--transition), background var(--transition);
-  border-radius: var(--radius-sm);
-}
-.nav-btn:hover { background: rgba(47,84,235,.04); }
-.nav-btn .active-bar {
-  position: absolute;
-  bottom: 0;
-  left: 8px;
-  right: 8px;
-  height: 3px;
-  background: var(--brand);
-  border-radius: 3px 3px 0 0;
-  animation: navBarIn .25s var(--transition);
-}
-@keyframes navBarIn { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-
-/* ── Buttons (global refinements) ───────────────────── */
-button {
-  transition: all var(--transition);
-  cursor: pointer;
-}
-button:active { transform: scale(.98); }
-
-/* ── Form Elements ──────────────────────────────────── */
-input[type="text"],
-input[type="search"],
-input:not([type]),
-textarea,
-select {
-  transition: border-color var(--transition), box-shadow var(--transition);
-}
-input[type="text"]:focus,
-input[type="search"]:focus,
-input:not([type]):focus,
-textarea:focus,
-select:focus {
-  border-color: var(--brand) !important;
-  box-shadow: 0 0 0 3px rgba(47,84,235,.08) !important;
-  outline: none;
-}
-input[type="checkbox"] {
-  accent-color: var(--brand);
-}
-input[type="checkbox"]:focus {
-  box-shadow: 0 0 0 3px rgba(47,84,235,.12);
-}
-
-/* ── Modal Backdrop ─────────────────────────────────── */
-.fixed.inset-0.z-50.flex.items-center.justify-center {
-  backdrop-filter: blur(2px);
-}
-
-/* ── Tree / Sidebar ─────────────────────────────────── */
-#sidebarContent .rounded-md {
-  transition: all var(--transition);
-  border-radius: var(--radius-sm);
-}
-#sidebarContent .rounded-md:hover {
-  background: rgba(47,84,235,.04);
-}
-
-/* ── Empty State ────────────────────────────────────── */
-.empty-state-icon {
-  filter: grayscale(.15);
-  opacity: .85;
-}
-
-/* ── Tag / Badge ────────────────────────────────────── */
-.tag-pill {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .01em;
-}
-
-/* ── Card Thumbnail ─────────────────────────────────── */
-.card-thumb {
-  position: relative;
-  overflow: hidden;
-}
-.card-thumb::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0) 60%, rgba(0,0,0,.03) 100%);
-  pointer-events: none;
-}
-
-/* ── Glass Effect for overlays ──────────────────────── */
-.glass-panel {
-  background: rgba(255,255,255,.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-</style>
+<title>河图·地理信息平台 — 数据资产</title>
+<link rel="stylesheet" href="tailwind.css">
+<link rel="stylesheet" href="common.css">
 </head>
 <body class="bg-page-bg text-gray-800 text-sm h-screen overflow-hidden flex flex-col">
 
 <!-- ============================================================ -->
 <!-- MAIN APP SHELL                                               -->
 <!-- ============================================================ -->
-<div id="appShell" class="hidden h-full flex flex-col">
+<div id="appShell" class="h-full flex flex-col">
 
   <!-- HEADER -->
-  <header class="h-14 bg-white/95 backdrop-blur-sm border-b border-gray-100 flex items-center justify-between flex-shrink-0 z-30 px-5 shadow-sm">
+  <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between flex-shrink-0 z-30 px-5">
     <div class="flex items-center">
       <div class="flex items-center gap-2 mr-6">
         <div class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-base">河</div>
-        <span class="text-base font-semibold text-gray-900">河图·地理信息平台</span>
+        <span class="text-base font-semibold text-brand">河图·地理信息平台</span>
       </div>
-      <nav id="topNav" class="flex items-center h-14 gap-0.5">
-        <button data-module="data" class="nav-btn px-3.5 h-14 text-gray-600 hover:text-brand relative font-medium transition-colors text-sm flex items-center gap-1.5" onclick="switchModule('data')">
-          📦 数据资产
-          <span class="text-[10px] text-muted font-normal hidden lg:inline">· 管理原始数据</span>
-        </button>
-        <button data-module="service" class="nav-btn px-3.5 h-14 text-gray-600 hover:text-brand relative font-medium transition-colors text-sm flex items-center gap-1.5" onclick="switchModule('service')">
-          📡 地图服务
-          <span class="text-[10px] text-muted font-normal hidden lg:inline">· 在线地图图层</span>
-        </button>
-        <button data-module="layer" class="nav-btn px-3.5 h-14 text-gray-600 hover:text-brand relative font-medium transition-colors text-sm flex items-center gap-1.5" onclick="switchModule('layer')">
-          📑 要素图层
-          <span class="text-[10px] text-muted font-normal hidden lg:inline">· 聚合服务，构建地图</span>
-        </button>
-        <button data-module="map" class="nav-btn px-3.5 h-14 text-gray-600 hover:text-brand relative font-medium transition-colors text-sm flex items-center gap-1.5" onclick="switchModule('map')">
-          🗺️ 专题地图
-          <span class="text-[10px] text-muted font-normal hidden lg:inline">· 一张图·大屏·驾驶舱</span>
-        </button>
+      <nav id="topNav" class="flex items-center h-16 gap-0.5">
+        <a href="index.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
+        </a>
+        <a href="地图服务.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg> 地图服务
+        </a>
+        <a href="要素图层.html" data-module="layer" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg> 要素图层
+        </a>
+        <a href="专题地图.html" data-module="map" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 专题地图
+        </a>
+        <a href="任务中心.html" data-module="task" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> 任务中心
+        </a>
       </nav>
     </div>
     <div class="flex items-center gap-3">
-      <button id="emptyToggleBtn" onclick="toggleEmptyState()" class="text-gray-400 hover:text-orange-500 text-xs flex items-center gap-1 transition-colors" title="切换当前模块空状态 / 有数据，用于验证空状态引导设计">📭 空状态</button>
-      <button onclick="openHelpPanel()" class="text-gray-400 hover:text-brand text-xs flex items-center gap-1" title="帮助">❓ 帮助</button>
-          <button id="wfReopenBtn" onclick="wfReopen()" class="hidden text-brand hover:text-brand-dark text-xs font-medium flex items-center gap-1" title="显示制图引导">🗺️ 引导</button>
-      <div class="w-7 h-7 rounded-full bg-brand/10 text-brand flex items-center justify-center font-semibold text-xs">张</div>
+      <button id="emptyToggleBtn" onclick="toggleEmptyState()" class="text-gray-400 hover:text-orange-500 text-xs flex items-center gap-1 transition-colors" title="切换当前模块空状态 / 有数据，用于验证空状态引导设计"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg> 空状态</button>
+      <div class="w-8 h-8 rounded-full bg-[#f56a00] text-white flex items-center justify-center font-semibold text-sm">张</div>
       <span class="text-gray-700 text-sm">张建国</span>
       <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">业务人员</span>
     </div>
   </header>
 
-  <!-- WORKFLOW BAR (prominent horizontal, below header) -->
-  <div id="workflowBar" class="hidden bg-gradient-to-r from-blue-50/90 via-white to-blue-50/90 border-b border-blue-100 px-5 py-4 shadow-sm">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-1.5">
-        <span class="text-sm font-bold text-gray-800 mr-1">🗺️ 制图导航</span>
-        <span class="text-gray-300 text-lg leading-none -mt-px">›</span>
-        <button data-wf-step="0" data-module="data" onclick="wfGoStep(0)" class="wf-step-btn flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all border border-transparent hover:bg-white hover:border-blue-200 hover:shadow-sm">
-          <span class="wf-dot w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 bg-gray-200 text-gray-500">①</span>
-          <span class="text-sm text-gray-600 font-medium">上传数据</span>
-        </button>
-        <span class="text-gray-300 text-sm px-1">→</span>
-        <button data-wf-step="1" data-module="service" onclick="wfGoStep(1)" class="wf-step-btn flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all border border-transparent hover:bg-white hover:border-blue-200 hover:shadow-sm">
-          <span class="wf-dot w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 bg-gray-200 text-gray-500">②</span>
-          <span class="text-sm text-gray-600 font-medium">发布服务</span>
-        </button>
-        <span class="text-gray-300 text-sm px-1">→</span>
-        <button data-wf-step="2" data-module="layer" onclick="wfGoStep(2)" class="wf-step-btn flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all border border-transparent hover:bg-white hover:border-blue-200 hover:shadow-sm">
-          <span class="wf-dot w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 bg-gray-200 text-gray-500">③</span>
-          <span class="text-sm text-gray-600 font-medium">构建图层</span>
-        </button>
-        <span class="text-gray-300 text-sm px-1">→</span>
-        <button data-wf-step="3" data-module="map" onclick="wfGoStep(3)" class="wf-step-btn flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all border border-transparent hover:bg-white hover:border-blue-200 hover:shadow-sm">
-          <span class="wf-dot w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 bg-gray-200 text-gray-500">④</span>
-          <span class="text-sm text-gray-600 font-medium">生成地图</span>
-        </button>
-      </div>
-      <div class="flex items-center gap-3">
-        <span id="wfCelebration" class="hidden text-green-600 font-bold text-xs">🎉 全部完成</span>
-        <button onclick="wfDismiss()" class="text-gray-400 hover:text-gray-600 text-sm leading-none ml-1" title="关闭引导">✕</button>
-      </div>
-    </div>
-  </div>
-  <!-- FIRST-VISIT TOOLTIP -->
-  <div id="wfTooltip" class="hidden fixed z-50 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg whitespace-nowrap fade-in pointer-events-none">👆 按需进入任一步骤即可，不必依次完成四步</div>
-
   <!-- BODY -->
   <div class="flex flex-1 overflow-hidden">
     <!-- SIDEBAR -->
-    <aside class="w-56 bg-white border-r border-gray-100 flex flex-col flex-shrink-0">
+    <aside class="w-60 bg-page-bg border-r border-gray-100 flex flex-col flex-shrink-0">
       <div class="p-3 border-b border-gray-100">
         <div class="relative">
           <svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -345,15 +66,14 @@ input[type="checkbox"]:focus {
 </div>
 
 <!-- ============================================================ -->
-<!-- MODALS & OVERLAYS                                            -->
+<!-- MODALS & OVERLAYS（模块专属；detailModal / moveModal / 通知 / 地图查看器由 common.js 注入） -->
 <!-- ============================================================ -->
-
 
 <!-- UPLOAD WIZARD MODAL -->
 <div id="uploadWizard" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
   <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 640px;">
     <div class="px-6 py-4 border-b border-line flex items-center justify-between">
-      <h2 class="text-base font-semibold text-gray-900">📦 上传数据</h2>
+      <h2 class="text-base font-semibold text-gray-900"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 上传数据</h2>
       <button onclick="closeWizard('uploadWizard')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
     </div>
 
@@ -380,19 +100,19 @@ input[type="checkbox"]:focus {
       <div class="wizard-step active" id="wizPanel1">
         <p class="text-gray-500 text-sm mb-5">选择你要上传的数据类型——</p>
         <div class="grid grid-cols-3 gap-4 mb-4">
-          <button onclick="wizardEntryType='file';wizardGoTo(2)" class="border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded-xl p-5 text-center transition-all group">
-            <div class="text-3xl mb-2">📁</div>
-            <div class="font-semibold text-gray-800 group-hover:text-brand">上传文件</div>
+          <button onclick="wizardEntryType='file';wizardGoTo(2)" class="border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded p-5 text-center transition-all group">
+            <div class="text-3xl mb-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+            <div class="font-semibold text-gray-800 group-hover:text-brand-hover">上传文件</div>
             <div class="text-xs text-gray-500 mt-1">Excel表格 / 卫星影像<br>地理数据文件 / 压缩包</div>
           </button>
-          <button onclick="wizardEntryType='db';wizardGoTo(2)" class="border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded-xl p-5 text-center transition-all group">
-            <div class="text-3xl mb-2">🗄️</div>
-            <div class="font-semibold text-gray-800 group-hover:text-brand">连接数据库</div>
+          <button onclick="wizardEntryType='db';wizardGoTo(2)" class="border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded p-5 text-center transition-all group">
+            <div class="text-3xl mb-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg></div>
+            <div class="font-semibold text-gray-800 group-hover:text-brand-hover">连接数据库</div>
             <div class="text-xs text-gray-500 mt-1">大数据平台已同步的表<br>直接选取即可</div>
           </button>
-          <button onclick="wizardEntryType='draw';wizardGoTo(2)" class="border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded-xl p-5 text-center transition-all group">
-            <div class="text-3xl mb-2">✏️</div>
-            <div class="font-semibold text-gray-800 group-hover:text-brand">在线绘制</div>
+          <button onclick="wizardEntryType='draw';wizardGoTo(2)" class="border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded p-5 text-center transition-all group">
+            <div class="text-3xl mb-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></div>
+            <div class="font-semibold text-gray-800 group-hover:text-brand-hover">在线绘制</div>
             <div class="text-xs text-gray-500 mt-1">在地图上画范围<br>直接保存为数据</div>
           </button>
         </div>
@@ -406,21 +126,21 @@ input[type="checkbox"]:focus {
         <p class="text-gray-500 text-sm mb-4">系统已自动识别你的数据信息——</p>
         <div class="space-y-3">
           <div class="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-3">
-            <span class="text-green-500 text-lg">✅</span>
+            <span class="text-green-500 text-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></span>
             <div>
               <div class="text-sm font-medium text-gray-800">文件类型</div>
               <div class="text-xs text-green-700">已识别为 <strong>表格数据</strong>（<span id="wizEntryDesc">Excel格式，含经纬度坐标列</span>）</div>
             </div>
           </div>
           <div class="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-3">
-            <span class="text-green-500 text-lg">✅</span>
+            <span class="text-green-500 text-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></span>
             <div>
               <div class="text-sm font-medium text-gray-800">坐标系</div>
               <div class="text-xs text-green-700">已识别为 <strong>全球标准坐标</strong>（系统自动识别，无需手动选择）</div>
             </div>
           </div>
           <div class="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-3">
-            <span class="text-green-500 text-lg">✅</span>
+            <span class="text-green-500 text-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></span>
             <div>
               <div class="text-sm font-medium text-gray-800">数据范围</div>
               <div class="text-xs text-green-700">东经 125.22° ~ 125.89°，北纬 48.92° ~ 49.15°（覆盖XX农场全域）</div>
@@ -439,8 +159,8 @@ input[type="checkbox"]:focus {
           </div>
         </div>
         <div class="mt-4">
-          <button onclick="document.getElementById('wizAdvanced').classList.toggle('hidden')" class="text-xs text-gray-500 hover:text-brand flex items-center gap-1">
-            ⚙️ 高级设置（手动修改坐标系等）
+          <button onclick="document.getElementById('wizAdvanced').classList.toggle('hidden')" class="text-xs text-gray-500 hover:text-brand-hover flex items-center gap-1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> 高级设置（手动修改坐标系等）
           </button>
           <div id="wizAdvanced" class="hidden mt-2 bg-gray-50 border border-line rounded-lg p-3 text-xs text-gray-500">
             这里保留技术选项给管理员使用。一般用户不需要修改。
@@ -460,13 +180,13 @@ input[type="checkbox"]:focus {
             <label class="block text-sm font-medium text-gray-700 mb-1.5">业务标签 <span class="text-red-400">*</span></label>
             <select class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white">
               <option>请选择业务场景</option>
-              <option selected>🌾 耕地</option>
-              <option>💧 水利</option>
-              <option>🛰️ 遥感</option>
-              <option>🚜 农机</option>
-              <option>🐄 畜牧</option>
-              <option>🏛️ 行政</option>
-              <option>📊 其他</option>
+              <option selected>耕地</option>
+              <option>水利</option>
+              <option>遥感</option>
+              <option>农机</option>
+              <option>畜牧</option>
+              <option>行政</option>
+              <option>其他</option>
             </select>
           </div>
           <div>
@@ -478,432 +198,65 @@ input[type="checkbox"]:focus {
     </div>
 
     <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50">
-      <button id="wizPrev" onclick="wizardPrev()" class="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm hidden">← 上一步</button>
+      <button id="wizPrev" onclick="wizardPrev()" class="px-4 py-1.5 text-gray-500 hover:text-gray-700 text-sm hidden">← 上一步</button>
       <div></div>
       <div class="flex items-center gap-3">
-        <button onclick="closeWizard('uploadWizard')" class="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm">取消</button>
-        <button id="wizNext" onclick="wizardNext()" class="px-5 py-2 bg-brand hover:bg-brand-dark text-white rounded-lg text-sm font-medium transition-colors">下一步 →</button>
-        <button id="wizFinish" onclick="finishUpload()" class="px-5 py-2 bg-success hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors hidden">✅ 确认上传</button>
+        <button onclick="closeWizard('uploadWizard')" class="px-4 py-1.5 text-gray-500 hover:text-gray-700 text-sm">取消</button>
+        <button id="wizNext" onclick="wizardNext()" class="px-4 py-1.5 bg-brand hover:bg-brand-hover text-white rounded text-sm font-medium transition-colors">下一步 →</button>
+        <button id="wizFinish" onclick="finishUpload()" class="px-5 py-1.5 bg-success hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 确认上传</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ONE-CLICK PUBLISH MODAL -->
+<!-- PUBLISH SERVICE MODAL (aligned with S-04 card-based selection) -->
 <div id="publishModal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
-  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 560px;">
+  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 680px;">
     <div class="px-6 py-4 border-b border-line flex items-center justify-between">
-      <h2 class="text-base font-semibold text-gray-900">📡 发布为地图服务</h2>
+      <h2 class="text-base font-semibold text-gray-900"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg> 发布为地图服务</h2>
       <button onclick="closeWizard('publishModal')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
     </div>
     <div class="p-6 space-y-4">
+      <!-- Data source info -->
       <div class="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
-        <span class="text-xl">📦</span>
+        <span class="text-xl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg></span>
         <div>
           <div class="text-sm font-medium text-gray-800">数据：XX农场2026年夏季耕地调查</div>
           <div class="text-xs text-gray-500">表格数据 · 刚刚上传</div>
         </div>
       </div>
 
-      <div class="bg-blue-50 border-2 border-brand/20 rounded-xl p-4">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="text-lg">🎯</span>
-          <span class="font-semibold text-gray-800">系统推荐：可查询地图服务</span>
-        </div>
-        <div class="space-y-1.5 text-sm text-gray-600 ml-7">
-          <div class="flex items-center gap-2"><span class="text-green-500 text-xs">✓</span> 可以在线浏览地图</div>
-          <div class="flex items-center gap-2"><span class="text-green-500 text-xs">✓</span> 可以点击每个地块查看详情（名称、面积、作物等字段）</div>
-          <div class="flex items-center gap-2"><span class="text-green-500 text-xs">✓</span> 其他地图和要素图层可以调用这个服务</div>
+      <!-- Service type cards -->
+      <div>
+        <div class="text-sm font-medium text-gray-700 mb-2">选择服务类型 <span class="text-xs text-muted font-normal">— 点击卡片查看说明</span></div>
+        <div class="grid grid-cols-3 gap-2" id="publishTypeCards">
+          <!-- Rendered by renderPublishCards() -->
         </div>
       </div>
 
+      <!-- Service description (updates on card click) -->
+      <div id="publishDescArea" class="bg-brand-light border border-brand/20 rounded-lg p-4">
+        <!-- Rendered by updatePublishDesc() -->
+      </div>
+
+      <!-- Service-specific options (shown only for WMTS/MVT/REAL_MVT) -->
+      <div id="publishOptionsArea">
+        <!-- Rendered by updatePublishOptions() -->
+      </div>
+
+      <!-- Service title -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1.5">服务标题</label>
-        <input type="text" value="XX农场2026年夏季耕地调查" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+        <input type="text" id="publishTitle" value="XX农场2026年夏季耕地调查" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
         <p class="text-xs text-gray-400 mt-1">默认为数据名称，可以修改。这个名字会显示在列表和服务详情中。</p>
       </div>
-
-      <button onclick="document.getElementById('publishAdvanced').classList.toggle('hidden')" class="text-xs text-gray-500 hover:text-brand flex items-center gap-1">
-        ⚙️ 高级设置
-      </button>
-      <div id="publishAdvanced" class="hidden bg-gray-50 border border-line rounded-lg p-3 space-y-3 text-sm">
-        <div class="flex items-center gap-3">
-          <span class="text-gray-500 w-20 flex-shrink-0">服务类型：</span>
-          <select class="flex-1 px-2 py-1.5 border border-line rounded text-xs bg-white">
-            <option>可查询地图服务 · 推荐</option>
-            <option>流畅矢量服务</option>
-            <option>标准地图服务</option>
-            <option>影像瓦片服务</option>
-            <option>实时矢量服务</option>
-          </select>
-          <span class="text-gray-400 cursor-help" title="表格数据推荐使用可查询或流畅矢量服务，点击地块可以弹出详情信息">?</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="text-gray-500 w-20 flex-shrink-0">坐标系：</span>
-          <select class="flex-1 px-2 py-1.5 border border-line rounded text-xs bg-white">
-            <option>全球标准坐标</option>
-            <option>中国大地坐标</option>
-          </select>
-        </div>
-      </div>
     </div>
     <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50">
-      <span class="text-xs text-gray-400">💡 只需点一下"确认发布"，系统自动处理所有技术细节</span>
+      <span class="text-xs text-gray-400" id="publishFooterHint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 表格数据推荐 <b>WFS</b>——每行数据可作为一个可点击查询的地图要素</span>
       <div class="flex items-center gap-3">
-        <button onclick="closeWizard('publishModal')" class="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm">取消</button>
-        <button onclick="confirmPublish()" class="px-6 py-2 bg-brand hover:bg-brand-dark text-white rounded-lg text-sm font-medium transition-colors">🚀 确认发布</button>
+        <button onclick="closeWizard('publishModal')" class="px-4 py-1.5 text-gray-500 hover:text-gray-700 text-sm">取消</button>
+        <button onclick="confirmPublish()" class="px-4 py-1.5 bg-brand hover:bg-brand-hover text-white rounded text-sm font-medium transition-colors"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/></svg> 确认发布</button>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- LAYER CREATION WIZARD (aligned with S-16 要素图层新增地图) -->
-<div id="layerWizard" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
-  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 720px; max-height: 90vh; display: flex; flex-direction: column;">
-    <div class="px-6 py-4 border-b border-line flex items-center justify-between shrink-0">
-      <h2 class="text-base font-semibold text-gray-900" id="lwTitle">📑 创建要素图层</h2>
-      <button onclick="closeWizard('layerWizard')" class="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
-    </div>
-    <div class="p-6 space-y-4 overflow-y-auto scroll-thin flex-1">
-      <!-- Row 1: 图层名称 + 图层编码 -->
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">图层名称 <span class="text-red-400">*</span></label>
-          <input type="text" id="lwName" placeholder="例如：XX农场耕地监测图层" value="XX农场耕地监测要素图层" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">图层编码 <span class="text-red-400">*</span></label>
-          <input type="text" id="lwCode" placeholder="系统自动生成，可留空" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-gray-50 text-gray-500 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
-        </div>
-      </div>
-      <!-- Row 2: 坐标系(自动推导) + 组织机构 -->
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">坐标系 <span class="text-[11px] text-gray-400 font-normal">（自动推导）</span></label>
-          <div id="lwCrsDisplay" class="flex items-center gap-2 px-3 py-2.5 border border-line rounded-lg bg-gray-50 text-sm transition-colors">
-            <span id="lwCrsIcon">🌐</span>
-            <span id="lwCrsText" class="text-gray-500">选择服务后自动确定</span>
-          </div>
-          <p class="text-[11px] text-gray-400 mt-1">由已选服务的坐标系自动推导，不允许混用不同坐标系</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">组织机构 <span class="text-red-400">*</span></label>
-          <select id="lwOrg" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
-            <option>北大荒农垦集团有限公司</option>
-            <option>八五六农场</option>
-            <option>鹤山农场</option>
-            <option>竞山农场</option>
-            <option>二龙山农场</option>
-          </select>
-        </div>
-      </div>
-      <!-- Row 3: 图层类型 + 渲染引擎 -->
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">图层类型 <span class="text-red-400">*</span></label>
-          <div id="lwTypeWrap" class="flex flex-wrap items-center gap-1.5 px-3 py-2 border border-line rounded-lg bg-white min-h-[42px] cursor-pointer focus-within:border-brand focus-within:ring-1 focus-within:ring-brand/20" onclick="document.getElementById('lwTypeSelect').focus()">
-            <span id="lwTypeTag" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-brand-light text-brand">矢量图层 <button onclick="event.stopPropagation();removeLwTypeTag()" class="text-brand hover:text-brand-dark ml-0.5">&times;</button></span>
-            <select id="lwTypeSelect" class="flex-1 border-0 bg-transparent text-sm focus:outline-none min-w-[80px]" onchange="addLwTypeTag(this.value);this.value=''">
-              <option value="" disabled selected>+ 添加类型</option>
-              <option>矢量图层</option>
-              <option>栅格图层</option>
-              <option>三维图层</option>
-              <option>聚合图层</option>
-              <option>热力图层</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">渲染引擎 <span class="text-red-400">*</span></label>
-          <select id="lwEngine" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
-            <option>二维（2D）</option>
-            <option>三维（3D）</option>
-          </select>
-        </div>
-      </div>
-      <!-- Row 4: 标签 + 图标 -->
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">地图标签</label>
-          <div class="flex items-center gap-1.5">
-            <select id="lwTagSelect" class="flex-1 px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand" onchange="addLwTag(this.value);this.value=''">
-              <option value="" selected>选择标签...</option>
-              <option>🌾 耕地监测</option>
-              <option>💧 水利</option>
-              <option>🛰️ 遥感</option>
-              <option>🏛️ 行政</option>
-              <option>📊 驾驶舱</option>
-              <option>🌱 长势</option>
-              <option>🧪 测试</option>
-            </select>
-          </div>
-          <div id="lwTags" class="flex flex-wrap gap-1.5 mt-2"></div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">地图图标</label>
-          <div class="flex items-center gap-2">
-            <div class="flex items-center gap-2 px-3 py-2.5 border border-line rounded-lg bg-gray-50 flex-1 cursor-pointer" onclick="cycleLwIcon()">
-              <span id="lwIconDisplay" class="text-xl">🗺️</span>
-              <span id="lwIconLabel" class="text-xs text-gray-400">默认图标，点击切换</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Service selection (tree structure) -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">选择地图服务 <span class="text-red-400">*</span></label>
-        <div class="border border-line rounded-xl overflow-hidden">
-          <div class="p-3 bg-gray-50 border-b border-line">
-            <input type="text" placeholder="🔍 搜索已发布的服务..." class="w-full px-3 py-1.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand" oninput="filterLayerServiceTree(this.value)">
-          </div>
-          <div id="lwServiceTree" class="max-h-56 overflow-y-auto scroll-thin p-2"></div>
-        </div>
-        <div class="mt-2 flex items-center gap-2">
-          <span class="text-xs text-gray-500">已选：<strong id="lwSvcCount" class="text-brand">0</strong> 个服务</span>
-          <span id="lwSvcHint" class="text-xs text-orange-500 hidden">⚠️ 请至少选择 1 个服务</span>
-        </div>
-      </div>
-      <!-- Preview button -->
-      <div class="flex items-center gap-3">
-        <button onclick="openLayerPreview()" class="px-4 py-2.5 border border-brand text-brand hover:bg-brand-light rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5">
-          🔍 预览服务叠加效果
-        </button>
-        <span class="text-xs text-gray-400">点击预览已选服务在地图上的叠加效果</span>
-      </div>
-      <!-- 描述 -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">描述 <span class="text-gray-400 text-xs font-normal">（选填）</span></label>
-        <textarea id="lwDesc" rows="2" placeholder="简单描述这个要素图层的用途，方便同事查找和使用" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 resize-none"></textarea>
-      </div>
-    </div>
-    <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50 shrink-0">
-      <span class="text-xs text-gray-400">带 <span class="text-red-400">*</span> 为必填项</span>
-      <div class="flex items-center gap-3">
-        <button onclick="closeWizard('layerWizard')" class="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm transition-colors">取消</button>
-        <button onclick="confirmLayer()" class="px-5 py-2 bg-brand hover:bg-brand-dark text-white rounded-lg text-sm font-medium transition-colors">确认创建</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- LAYER PREVIEW POPUP -->
-<div id="layerPreviewPopup" class="fixed inset-0 z-[60] hidden flex items-center justify-center" style="background: rgba(0,0,0,.5);">
-  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden scale-in" style="width: 820px;">
-    <div class="px-6 py-4 border-b border-line flex items-center justify-between">
-      <div>
-        <h3 class="text-base font-semibold text-gray-900">🗺️ 服务叠加预览</h3>
-        <p id="lpvSubtitle" class="text-xs text-gray-500 mt-0.5">已选 0 个服务</p>
-      </div>
-      <button onclick="closeLayerPreview()" class="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
-    </div>
-    <div class="relative">
-      <div id="lpvMapArea" class="h-80 flex items-center justify-center text-gray-400 text-sm relative" style="background: linear-gradient(135deg, #e8f4f8 0%, #d4e8f0 30%, #c8dce8 60%, #b8d4e0 100%);">
-        <div class="text-center z-10">
-          <div class="text-5xl mb-3">🗺️</div>
-          <div class="text-sm font-medium text-gray-600 mb-1">已选服务叠加预览</div>
-          <div class="text-xs text-gray-500" id="lpvServiceList">尚未选择任何服务</div>
-        </div>
-        <!-- Fake map grid -->
-        <div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(0deg, #2f54eb, #2f54eb 1px, transparent 1px, transparent 40px), repeating-linear-gradient(90deg, #2f54eb, #2f54eb 1px, transparent 1px, transparent 40px);"></div>
-        <!-- Fake annotation markers -->
-        <div id="lpvMarkers" class="absolute inset-0 z-20"></div>
-      </div>
-    </div>
-    <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50">
-      <span class="text-xs text-gray-400">💡 此预览仅为服务叠加示意，实际渲染效果以地图设计页为准</span>
-      <button onclick="closeLayerPreview()" class="px-4 py-2 bg-brand hover:bg-brand-dark text-white rounded-lg text-sm font-medium transition-colors">关闭预览</button>
-    </div>
-  </div>
-</div>
-
-<!-- CREATE MAP MODAL (replaces 场景模板: 创建地图表单, aligned with real encapsulated project) -->
-<div id="createMapModal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
-  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 680px;">
-    <div class="px-6 py-4 border-b border-line flex items-center justify-between">
-      <h2 class="text-base font-semibold text-gray-900">🗺️ 创建专题地图</h2>
-      <button onclick="closeWizard('createMapModal')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
-    </div>
-    <div class="p-6 space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">地图名称 <span class="text-red-400">*</span></label>
-        <input type="text" id="cmName" placeholder="例如：XX农场耕地监测一张图" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">地图编码</label>
-          <input type="text" id="cmCode" placeholder="系统自动生成，可留空" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-gray-50 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">坐标系</label>
-          <select id="cmCrs" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
-            <option>Web 墨卡托（EPSG:3857）</option>
-            <option>中国大地坐标（EPSG:4490）</option>
-          </select>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">组织机构</label>
-          <select id="cmOrg" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
-            <option>北大荒农垦集团有限公司</option>
-            <option>八五六农场</option>
-            <option>鹤山农场</option>
-            <option>竞山农场</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">渲染引擎</label>
-          <select id="cmEngine" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
-            <option>二维（2D）</option>
-            <option>三维（3D）</option>
-          </select>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">标签</label>
-          <select id="cmTag" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
-            <option>🌾 耕地监测</option>
-            <option>💧 水利</option>
-            <option>🛰️ 遥感</option>
-            <option>🏛️ 行政</option>
-            <option>📊 驾驶舱</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">图标</label>
-          <div class="flex items-center gap-2 px-3 py-2.5 border border-line rounded-lg bg-gray-50">
-            <span class="text-xl">🗺️</span>
-            <span class="text-xs text-gray-400">默认图标，可在详情中更换</span>
-          </div>
-        </div>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">地图描述 <span class="text-gray-400 text-xs font-normal">（选填）</span></label>
-        <textarea id="cmDesc" rows="2" placeholder="简单描述这张地图的用途，方便同事查找" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 resize-none"></textarea>
-      </div>
-      <div class="bg-gray-50 border border-line rounded-lg p-3 text-xs text-gray-500">
-        💡 创建后进入地图设计页，自由添加要素图层、底图、图例，再发布为一张图 / 大屏 / 驾驶舱。
-      </div>
-    </div>
-    <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50">
-      <span class="text-xs text-gray-400">带 <span class="text-red-400">*</span> 为必填项</span>
-      <div class="flex items-center gap-3">
-        <button onclick="closeWizard('createMapModal')" class="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm">取消</button>
-        <button onclick="confirmCreateMap()" class="px-5 py-2 bg-brand hover:bg-brand-dark text-white rounded-lg text-sm font-medium transition-colors">✅ 确认创建</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- REGISTER SERVICE MODAL -->
-<div id="registerServiceModal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
-  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 640px;">
-    <div class="px-6 py-4 border-b border-line flex items-center justify-between">
-      <h2 class="text-base font-semibold text-gray-900">🌐 注册外部地图服务</h2>
-      <button onclick="closeWizard('registerServiceModal')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
-    </div>
-    <div class="p-6">
-      <p class="text-gray-500 text-sm mb-5">选择你的服务来源——系统会自动帮你处理技术细节。</p>
-
-      <!-- 入口 1：注册我的服务器 -->
-      <div id="regSrcServer" onclick="selectRegisterSource('server')" class="border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded-xl p-5 mb-4 cursor-pointer transition-all">
-        <div class="flex items-center gap-4">
-          <span class="text-3xl">🖥️</span>
-          <div class="flex-1">
-            <div class="font-semibold text-gray-800">注册我的服务器</div>
-            <div class="text-xs text-gray-500 mt-1">输入服务器地址，系统自动探测服务类型（支持 ArcGIS / GeoServer / IServer）</div>
-          </div>
-          <span id="regRadioServer" class="w-5 h-5 rounded-full border-2 border-gray-300 flex-shrink-0"></span>
-        </div>
-      </div>
-
-      <!-- 入口 2：使用在线底图 -->
-      <div id="regSrcOnline" onclick="selectRegisterSource('online')" class="border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded-xl p-5 mb-4 cursor-pointer transition-all">
-        <div class="flex items-center gap-4">
-          <span class="text-3xl">🌐</span>
-          <div class="flex-1">
-            <div class="font-semibold text-gray-800">使用在线底图</div>
-            <div class="text-xs text-gray-500 mt-1">直接使用公共地图平台作为底图，无需自己部署服务器</div>
-          </div>
-          <span id="regRadioOnline" class="w-5 h-5 rounded-full border-2 border-gray-300 flex-shrink-0"></span>
-        </div>
-      </div>
-
-      <!-- 详情：注册我的服务器 -->
-      <div id="regServerDetail" class="hidden mt-1 bg-gray-50 border border-line rounded-xl p-4 space-y-3 fade-in">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">服务器地址 <span class="text-red-400">*</span></label>
-          <div class="flex gap-2">
-            <input id="regServerUrl" type="text" placeholder="例如：http://192.168.1.100:8080/geoserver" class="flex-1 px-3 py-2 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
-            <button onclick="probeServer()" class="px-4 py-2 bg-white border border-line rounded-lg text-sm text-gray-600 hover:border-brand hover:text-brand transition-colors flex-shrink-0">🔍 自动探测</button>
-          </div>
-        </div>
-        <div id="regProbeResult" class="hidden flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-3">
-          <span class="text-green-500 text-lg">✅</span>
-          <div>
-            <div class="text-sm font-medium text-gray-800">已识别服务类型</div>
-            <div class="text-xs text-green-700">标准地图服务 · 从你的服务器检测到 4 个可用服务</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 详情：使用在线底图 -->
-      <div id="regOnlineDetail" class="hidden mt-1 bg-gray-50 border border-line rounded-xl p-4 space-y-3 fade-in">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">选择平台 <span class="text-red-400">*</span></label>
-          <select id="regOnlineSelect" onchange="setRegNext(!!this.value)" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
-            <option value="">请选择平台</option>
-            <option value="tdt">🗺️ 天地图（权威底图，覆盖全国）</option>
-            <option value="baidu">🧭 百度地图（适合城市区域展示）</option>
-            <option value="amap">🗺️ 高德地图（适合城市区域展示）</option>
-            <option value="cg">🛰️ 长光卫星（最新卫星影像）</option>
-          </select>
-          <p class="text-xs text-gray-400 mt-1.5">选择后系统自动完成注册配置，一般用户无需改动任何参数</p>
-        </div>
-      </div>
-    </div>
-    <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50">
-      <span class="text-xs text-gray-400">💡 注册后可在「要素图层」中作为底图或叠加层使用</span>
-      <div class="flex items-center gap-3">
-        <button onclick="closeWizard('registerServiceModal')" class="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm">取消</button>
-        <button id="regNextBtn" onclick="finishRegister()" class="px-5 py-2 bg-brand hover:bg-brand-dark text-white rounded-lg text-sm font-medium transition-colors" disabled style="opacity:.4;cursor:not-allowed">🚀 确认注册</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- CARD DETAIL MODAL (per-module: data=S-05, service=S-11, layer=S-19, map=S-26) -->
-<div id="detailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
-  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 820px; max-height: 90vh;">
-    <!-- Header with tabs -->
-    <div class="px-6 py-3 border-b border-line flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <h2 class="text-base font-semibold text-gray-900 truncate" id="dtHeaderTitle" style="max-width: 360px;">详细信息</h2>
-        <div id="dtTabs" class="flex items-center gap-0.5"></div>
-      </div>
-      <button onclick="closeWizard('detailModal')" class="text-gray-400 hover:text-gray-600 text-lg flex-shrink-0">✕</button>
-    </div>
-    <!-- Content: left-right split -->
-    <div class="flex overflow-y-auto" style="max-height: 60vh;" id="dtContent"></div>
-    <!-- Bottom action bar -->
-    <div class="px-6 py-3 border-t border-line flex items-center justify-between bg-gray-50" id="dtActions"></div>
-  </div>
-</div>
-
-<!-- MOVE CARD MODAL -->
-<div id="moveModal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
-  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 420px;">
-    <div class="px-6 py-4 border-b border-line flex items-center justify-between">
-      <h2 class="text-base font-semibold text-gray-900">📦 移动数据</h2>
-      <button onclick="closeWizard('moveModal')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
-    </div>
-    <div class="p-6">
-      <p class="text-sm text-gray-500 mb-4">将 <strong id="mvTitle" class="text-gray-800">「数据」</strong> 移动到目标分类：</p>
-      <div id="mvTargets" class="space-y-1"></div>
-    </div>
-    <div class="px-6 py-4 border-t border-line flex items-center justify-end bg-gray-50">
-      <button onclick="closeWizard('moveModal')" class="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm">取消</button>
     </div>
   </div>
 </div>
@@ -912,25 +265,25 @@ input[type="checkbox"]:focus {
 <div id="updateModal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
   <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 520px;">
     <div class="px-6 py-4 border-b border-line flex items-center justify-between">
-      <h2 class="text-base font-semibold text-gray-900" id="updateModalTitle">📤 更新数据</h2>
+      <h2 class="text-base font-semibold text-gray-900" id="updateModalTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 更新数据</h2>
       <button onclick="closeWizard('updateModal')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
     </div>
     <div class="p-6 space-y-4">
       <div class="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
-        <span class="text-xl">📦</span>
+        <span class="text-xl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg></span>
         <div>
           <div class="text-sm font-medium text-gray-800" id="updTitle">数据名称</div>
           <div class="text-xs text-gray-500">上传新的数据文件将覆盖原数据</div>
         </div>
       </div>
-      <div id="updDrop" onclick="document.getElementById('updFile').click()" class="border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand-light rounded-xl p-6 text-center cursor-pointer transition-all">
-        <div class="text-3xl mb-2">📁</div>
+      <div id="updDrop" onclick="document.getElementById('updFile').click()" class="border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand-light rounded p-6 text-center cursor-pointer transition-all">
+        <div class="text-3xl mb-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
         <div class="text-sm text-gray-600">点击上传或者拖拽到这里</div>
         <div class="text-xs text-gray-400 mt-1">支持的文件格式：.csv</div>
       </div>
       <input id="updFile" type="file" accept=".csv" class="hidden" onchange="selectUpdateFile(this)">
       <div id="updFileInfo" class="hidden flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-3">
-        <span class="text-green-500 text-lg">✅</span>
+        <span class="text-green-500 text-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></span>
         <div>
           <div class="text-sm font-medium text-gray-800" id="updFileName">未选择文件</div>
           <div class="text-xs text-green-700">已选择，系统将自动校验字段并更新</div>
@@ -938,739 +291,21 @@ input[type="checkbox"]:focus {
       </div>
     </div>
     <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50">
-      <span class="text-xs text-gray-400">💡 更新会保留历史版本，可在详情中查看</span>
+      <span class="text-xs text-gray-400"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 更新会保留历史版本，可在详情中查看</span>
       <div class="flex items-center gap-3">
-        <button onclick="closeWizard('updateModal')" class="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm">取消</button>
-        <button id="updConfirm" onclick="confirmUpdate()" class="px-5 py-2 bg-success hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors" disabled style="opacity:.4;cursor:not-allowed">✅ 确认更新</button>
+        <button onclick="closeWizard('updateModal')" class="px-4 py-1.5 text-gray-500 hover:text-gray-700 text-sm">取消</button>
+        <button id="updConfirm" onclick="confirmUpdate()" class="px-5 py-2 bg-success hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors" disabled style="opacity:.4;cursor:not-allowed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 确认更新</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SUCCESS NOTIFICATION CONTAINER -->
-<div id="notificationStack" class="fixed top-16 right-4 z-[70] space-y-2" style="width: 380px;"></div>
-
-<!-- MAP VIEWER OVERLAY (S-12: service preview with CRS switcher; S-18: layer 2D; S-25: theme map 3D) -->
-<div id="mapViewerOverlay" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.55);">
-  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 960px; max-height: 92vh;">
-    <div class="px-6 py-3 border-b border-line flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <h2 class="text-base font-semibold text-gray-900" id="mapViewerTitle">🗺️ 地图预览</h2>
-        <span id="mvBadge" class="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">2D 平面</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <!-- CRS Switcher (for service preview) -->
-        <div id="crsSwitcher" class="hidden flex items-center gap-0 bg-gray-100 rounded-lg p-0.5">
-          <button onclick="switchCRS('cgcs2000')" id="crsCGCS2000" class="px-2.5 py-1 text-xs rounded-md transition-colors bg-white text-gray-800 font-medium shadow-sm">CGCS2000</button>
-          <button onclick="switchCRS('webmercator')" id="crsWebMercator" class="px-2.5 py-1 text-xs rounded-md transition-colors text-gray-500">Web 墨卡托</button>
-        </div>
-        <button onclick="document.getElementById('mapViewerOverlay').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
-      </div>
-    </div>
-    <div class="p-5 space-y-3">
-      <div id="mapViewerContent">
-        <div class="text-center text-gray-500 mb-3">
-          <span class="font-semibold text-gray-800" id="mvMapName">地图名称</span>
-          <span class="mx-2 text-gray-300">|</span>
-          <span class="text-xs" id="mvLayers">图层：耕地边界、遥感底图</span>
-        </div>
-        <!-- Simulated map area -->
-        <div class="relative rounded-xl overflow-hidden" id="mvCanvas" style="height: 420px; background: linear-gradient(135deg, #1a2a1a 0%, #2d4a2d 20%, #1e3a1e 40%, #2a4a2a 60%, #1a301a 80%, #223322 100%);">
-          <!-- Grid overlay -->
-          <svg class="absolute inset-0 w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg">
-            <defs><pattern id="mapGrid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="#88cc88" stroke-width="0.5"/></pattern></defs>
-            <rect width="100%" height="100%" fill="url(#mapGrid)"/>
-          </svg>
-          <!-- Coordinate labels -->
-          <div class="absolute top-2 left-3 text-green-400/60 text-[10px] font-mono">125.22°E</div>
-          <div class="absolute top-2 right-3 text-green-400/60 text-[10px] font-mono">125.89°E</div>
-          <div class="absolute bottom-8 left-3 text-green-400/60 text-[10px] font-mono">48.92°N</div>
-          <div class="absolute bottom-8 right-3 text-green-400/60 text-[10px] font-mono">49.15°N</div>
-          <!-- Simulated plot polygons -->
-          <svg class="absolute inset-0 w-full h-full" viewBox="0 0 900 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="150,100 280,90 310,180 180,200 120,160" fill="rgba(47,84,235,0.25)" stroke="#2f54eb" stroke-width="1.5" class="cursor-pointer" onclick="plotClickNotify('地块A-01','大豆','120.5亩')"/>
-            <polygon points="350,120 480,110 500,200 380,210 340,170" fill="rgba(47,84,235,0.25)" stroke="#2f54eb" stroke-width="1.5" class="cursor-pointer" onclick="plotClickNotify('地块A-02','水稻','85.3亩')"/>
-            <polygon points="500,80 630,70 660,160 530,180 490,130" fill="rgba(82,196,26,0.25)" stroke="#52c41a" stroke-width="1.5" class="cursor-pointer" onclick="plotClickNotify('地块B-01','玉米','210.0亩')"/>
-            <polygon points="200,220 350,210 380,300 230,310 180,270" fill="rgba(82,196,26,0.2)" stroke="#52c41a" stroke-width="1" class="cursor-pointer" onclick="plotClickNotify('地块C-01','小麦','95.0亩')"/>
-            <polygon points="550,230 700,220 720,320 580,330 540,280" fill="rgba(250,173,20,0.2)" stroke="#faad14" stroke-width="1" class="cursor-pointer" onclick="plotClickNotify('地块C-02','高粱','150.0亩')"/>
-          </svg>
-          <!-- Center title overlay -->
-          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div class="text-center bg-black/40 backdrop-blur-sm rounded-xl px-6 py-3">
-              <div class="text-white font-semibold text-lg" id="mvCenterTitle">XX农场耕地监测一张图</div>
-              <div class="text-green-300 text-xs mt-1">点击地块查看详情</div>
-            </div>
-          </div>
-          <!-- Legend -->
-          <div class="absolute bottom-3 right-3 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2 text-[10px] space-y-1">
-            <div class="flex items-center gap-1.5 text-white/80"><span class="w-3 h-3 rounded-sm inline-block" style="background:rgba(47,84,235,0.5);border:1px solid #2f54eb;"></span> 耕地地块</div>
-            <div class="flex items-center gap-1.5 text-white/80"><span class="w-3 h-3 rounded-sm inline-block" style="background:rgba(82,196,26,0.45);border:1px solid #52c41a;"></span> 种植区域</div>
-            <div class="flex items-center gap-1.5 text-white/80"><span class="w-3 h-3 rounded-sm inline-block" style="background:rgba(250,173,20,0.4);border:1px solid #faad14;"></span> 其他作物</div>
-          </div>
-          <!-- Status bar (S-20/27) -->
-          <div class="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-3 py-1 flex items-center gap-4 text-[10px] font-mono text-green-300/80">
-            <span>经度: 125.52°</span><span>纬度: 49.05°</span><span>层级: 3</span><span id="mv3dAngle" class="hidden">航向角: 0°</span><span id="mv3dPitch" class="hidden">俯仰角: 45°</span>
-          </div>
-        </div>
-        <div class="flex items-center justify-between mt-2 text-xs text-gray-500">
-          <span id="mvTip">💡 提示：这是概念预览，实际地图支持缩放、旋转、图层切换等交互</span>
-          <span class="bg-gray-100 px-2 py-0.5 rounded" id="mvModeTag">模拟预览</span>
-        </div>
-      </div>
-    </div>
-    <div class="px-5 py-3 border-t border-line bg-gray-50 flex items-center justify-end gap-3">
-      <button onclick="document.getElementById('mapViewerOverlay').classList.add('hidden')" class="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm">关闭</button>
-      <button onclick="document.getElementById('mapViewerOverlay').classList.add('hidden');showNotification('🗺️','已跳转到地图设计页（原型模拟）')" class="px-5 py-2 bg-brand hover:bg-brand-dark text-white rounded-lg text-sm font-medium transition-colors">✏️ 进入地图设计</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================ -->
-<!-- SCRIPTS                                                      -->
-<!-- ============================================================ -->
+<script src="common.js"></script>
 <script>
-// ── State ────────────────────────────────────────────────
+// ── 数据资产：上传向导（wizardStep / wizardEntryType 为模块状态，从原单文件抽出） ──
 let wizardStep = 1;
 let wizardEntryType = 'file'; // 'file' | 'db' | 'draw'
-let activeModule = 'data';
-let notified = { upload: false, publish: false, layer: false, map: false };
 
-// ── 空状态 / 有数据 切换 ──────────────────────────────
-const _cardsBackup = {};
-function toggleEmptyState() {
-  const m = activeModule;
-  const cfg = moduleConfigs[m];
-  const btn = document.getElementById('emptyToggleBtn');
-  if (_cardsBackup[m]) {
-    // 恢复数据
-    cfg.cards = _cardsBackup[m];
-    delete _cardsBackup[m];
-    if (btn) { btn.innerHTML = '📭 空状态'; btn.title = '切换为无数据状态，预览空状态引导卡片'; }
-    showNotification('📋', '已恢复「' + cfg.title + '」的真实数据（' + cfg.cards.length + ' 张卡片）');
-  } else {
-    // 备份并清空
-    _cardsBackup[m] = cfg.cards;
-    cfg.cards = [];
-    if (btn) { btn.innerHTML = '📋 有数据'; btn.title = '恢复真实数据'; }
-    showNotification('📭', '已切换到「' + cfg.title + '」的空状态 — 可验证空状态引导卡片设计');
-  }
-  applyFilter();
-}
-
-// ── Help Panel ──────────────────────────────────────────
-function openHelpPanel() {
-  const panel = document.getElementById('helpPanel');
-  if (panel) { panel.classList.remove('hidden'); return; }
-  const div = document.createElement('div');
-  div.id = 'helpPanel';
-  div.className = 'fixed top-0 right-0 bottom-0 z-50 bg-white shadow-2xl drawer-in flex flex-col overflow-hidden';
-  div.style.width = '400px';
-  div.innerHTML = `<div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
-    <span class="text-lg font-bold text-gray-900">需要帮助？</span>
-    <button onclick="document.getElementById('helpPanel').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
-  </div>
-  <div class="flex-1 overflow-y-auto p-5 space-y-3 text-base">
-    <details class="bg-gray-50 rounded-xl p-4" open><summary class="font-semibold text-gray-800 cursor-pointer">怎么查看地图？</summary><p class="mt-2 text-gray-600">点击导航栏的「专题地图」，打开一张已发布的地图。在地图上点击彩色地块，就能看到作物、面积等详细信息。</p></details>
-    <details class="bg-gray-50 rounded-xl p-4"><summary class="font-semibold text-gray-800 cursor-pointer">怎么上传数据？</summary><p class="mt-2 text-gray-600">进入「数据资产」模块，点击右上角「上传数据」按钮。选择文件、起个名字、确认上传——三步就好。系统会自动帮你把数据变成在线地图。</p></details>
-    <details class="bg-gray-50 rounded-xl p-4"><summary class="font-semibold text-gray-800 cursor-pointer">怎么更新已有的数据？</summary><p class="mt-2 text-gray-600">在「数据资产」里找到你要更新的数据，点击卡片打开详情，再点击「替换文件」按钮，选择新文件上传即可。历史版本会自动保留。</p></details>
-    <details class="bg-gray-50 rounded-xl p-4"><summary class="font-semibold text-gray-800 cursor-pointer">遇到问题联系谁？</summary><p class="mt-2 text-gray-600">请联系平台管理员：<strong>张工</strong><br>电话：0451-XXXX-XXXX</p></details>
-  </div>
-  <div class="px-5 py-4 border-t border-line flex items-center justify-between bg-gray-50 flex-shrink-0">
-    <button onclick="resetLocalMemory()" class="px-3 py-2 text-xs text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="清除引导记忆，下次刷新可重新看到欢迎弹窗">🗑️ 清除本地记忆</button>
-    <button onclick="document.getElementById('helpPanel').classList.add('hidden')" class="px-5 py-3 bg-brand hover:bg-brand-dark text-white rounded-xl text-base font-medium transition-colors">知道了</button>
-  </div>`;
-  document.body.appendChild(div);
-  // Click outside to close
-  div.addEventListener('click', function(e) { if (e.target === div) div.classList.add('hidden'); });
-}
-
-// ── Reset Local Memory ──────────────────────────────────
-function resetLocalMemory() {
-  try { ['hetu_wf_progress','hetu_wf_dismissed','hetu_welcome_seen','hetu_module_tips'].forEach(k => localStorage.removeItem(k)); } catch(e) {}
-  const panel = document.getElementById('helpPanel');
-  if (panel) panel.classList.add('hidden');
-  location.reload();
-}
-
-// ── Welcome Modal (first visit) ──────────────────────────
-const WELCOME_KEY = 'hetu_welcome_seen';
-function showWelcomeIfNeeded() {
-  let seen = false;
-  try { seen = localStorage.getItem(WELCOME_KEY) === '1'; } catch(e) {}
-  if (seen) return;
-  const modal = document.createElement('div');
-  modal.id = 'welcomeModal';
-  modal.className = 'fixed inset-0 z-50 flex items-center justify-center';
-  modal.style.background = 'rgba(0,0,0,.45)';
-  modal.innerHTML = `<div class="bg-white rounded-2xl shadow-xl p-8 scale-in text-center" style="width:540px">
-    <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-blue-200">🗺️</div>
-    <h2 class="text-2xl font-bold text-gray-900 mb-2">欢迎使用河图</h2>
-    <p class="text-base text-gray-500 mb-8">这里是管理空间数据、生成在线地图的地方。<br>选一个开始吧——</p>
-    <div class="grid grid-cols-2 gap-4 mb-6">
-      <div onclick="closeWelcomeThen('map')" class="border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded-2xl p-6 cursor-pointer transition-all text-center hover:shadow-md hover:-translate-y-0.5">
-        <div class="text-4xl mb-3">🗺️</div>
-        <div class="text-base font-semibold text-gray-800 mb-1">查看地图</div>
-        <div class="text-sm text-gray-500">打开已发布的地图，点击地块查看详细信息</div>
-      </div>
-      <div onclick="closeWelcomeThen('data')" class="border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded-2xl p-6 cursor-pointer transition-all text-center hover:shadow-md hover:-translate-y-0.5">
-        <div class="text-4xl mb-3">📤</div>
-        <div class="text-base font-semibold text-gray-800 mb-1">上传数据</div>
-        <div class="text-sm text-gray-500">导入Excel表格或卫星影像，系统自动生成地图</div>
-      </div>
-    </div>
-    <button onclick="closeWelcomeThen(null)" class="text-gray-400 hover:text-gray-600 text-sm underline transition-colors">稍后再说</button>
-  </div>`;
-  document.body.appendChild(modal);
-}
-function closeWelcomeThen(module) {
-  try { localStorage.setItem(WELCOME_KEY, '1'); } catch(e) {}
-  const m = document.getElementById('welcomeModal'); if (m) m.remove();
-  if (module) switchModule(module);
-  if (module === 'map') {
-    // Viewing maps is the endpoint, not part of the creation workflow — dismiss the bar
-    wfDismiss();
-  }
-}
-
-// ── Floating Workflow Widget ─────────────────────────────
-const WF_STEPS = [
-  { key:'upload',  label:'📤 上传数据', module:'data',    dot:'①' },
-  { key:'publish', label:'🚀 发布服务', module:'service', dot:'②' },
-  { key:'layer',   label:'📑 构建图层', module:'layer',   dot:'③' },
-  { key:'map',     label:'🗺️ 生成地图', module:'map',     dot:'④' }
-];
-const WF_PROGRESS_KEY = 'hetu_wf_progress';
-const WF_DISMISSED_KEY = 'hetu_wf_dismissed';
-
-function wfGetProgress() {
-  try { return JSON.parse(localStorage.getItem(WF_PROGRESS_KEY)) || {}; } catch(e) {}
-  return {};
-}
-function wfSaveProgress(prog) {
-  try { localStorage.setItem(WF_PROGRESS_KEY, JSON.stringify(prog)); } catch(e) {}
-}
-function wfCurrentStep() {
-  const p = wfGetProgress();
-  for (let i = 0; i < WF_STEPS.length; i++) { if (!p[WF_STEPS[i].key]) return i; }
-  return -1;
-}
-
-function wfRender() {
-  const bar = document.getElementById('workflowBar');
-  if (!bar || bar.classList.contains('hidden')) return;
-  const progress = wfGetProgress();
-  const cur = wfCurrentStep();
-  const allDone = cur === -1;
-
-  WF_STEPS.forEach((s,i) => {
-    const btn = document.querySelector(`[data-wf-step="${i}"]`);
-    if (!btn) return;
-    const dot = btn.querySelector('.wf-dot');
-    btn.classList.remove('active','done','pending');
-    if (progress[s.key]) {
-      btn.classList.add('done');
-      if (dot) dot.textContent = '✓';
-    } else if (i === cur) {
-      btn.classList.add('active');
-      if (dot) dot.textContent = s.dot;
-    } else {
-      btn.classList.add('pending');
-      if (dot) dot.textContent = s.dot;
-    }
-  });
-
-  // Celebration
-  document.getElementById('wfCelebration').classList.toggle('hidden', !allDone);
-  bar.classList.toggle('celebrated', allDone);
-}
-
-function wfGoStep(idx) {
-  if (idx >= 0 && idx < WF_STEPS.length) switchModule(WF_STEPS[idx].module);
-}
-function wfDismiss() {
-  document.getElementById('workflowBar').classList.add('hidden');
-  document.getElementById('wfReopenBtn').classList.remove('hidden');
-  document.getElementById('wfTooltip').classList.add('hidden');
-  try { localStorage.setItem(WF_DISMISSED_KEY, '1'); } catch(e) {}
-}
-function wfReopen() {
-  document.getElementById('workflowBar').classList.remove('hidden');
-  document.getElementById('wfReopenBtn').classList.add('hidden');
-  try { localStorage.removeItem(WF_DISMISSED_KEY); } catch(e) {}
-  wfRender();
-}
-function wfUpdateProgress() {
-  const stored = wfGetProgress();
-  WF_STEPS.forEach(s => { if (notified[s.key]) stored[s.key] = true; });
-  wfSaveProgress(stored);
-  wfRender();
-}
-function wfShowTooltip() {
-  const tip = document.getElementById('wfTooltip');
-  const bar = document.getElementById('workflowBar');
-  if (!tip || !bar || bar.classList.contains('hidden')) return;
-  const r = bar.getBoundingClientRect();
-  tip.style.left = (r.left + r.width/2) + 'px';
-  tip.style.top = (r.bottom + 8) + 'px';
-  tip.style.transform = 'translateX(-50%)';
-  tip.classList.remove('hidden');
-  setTimeout(() => tip.classList.add('hidden'), 6000);
-}
-function wfInit() {
-  const bar = document.getElementById('workflowBar');
-  const btn = document.getElementById('wfReopenBtn');
-  if (!bar) return;
-  let dismissed = false;
-  try { dismissed = localStorage.getItem(WF_DISMISSED_KEY) === '1'; } catch(e) {}
-  if (dismissed) {
-    bar.classList.add('hidden');
-    if (btn) btn.classList.remove('hidden');
-  } else {
-    bar.classList.remove('hidden');
-    if (btn) btn.classList.add('hidden');
-    const allEmpty = WF_STEPS.every(s => !wfGetProgress()[s.key]);
-    if (allEmpty) setTimeout(wfShowTooltip, 800);
-  }
-  wfRender();
-}
-
-// ── Per-Module Contextual Tips ────────────────────────────
-const MODULE_TIP_KEY = 'hetu_module_tips';
-const MODULE_TIPS = {
-  data:   { icon:'📦', title:'数据资产', desc:'这里是所有原始数据的管理中心。上传 Excel 表格、卫星影像等数据文件，管理好后即可发布为在线地图服务。' },
-  service:{ icon:'📡', title:'地图服务', desc:'把上传的数据发布成标准在线地图服务，选择最适合的发布方式，让数据可以在网页地图上展示和查询。' },
-  layer:  { icon:'📑', title:'要素图层', desc:'将多个地图服务聚合为一个要素图层，调整叠加顺序与显示样式，形成可复用的业务地图单元。' },
-  map:    { icon:'🗺️', title:'专题地图', desc:'创建地图，将组合好的要素图层制作成可分享的专题地图。支持一张图、大屏展示、驾驶舱三种模式。' }
-};
-function getModuleTipsDismissed() {
-  try { return JSON.parse(localStorage.getItem(MODULE_TIP_KEY)) || {}; } catch(e) { return {}; }
-}
-function showModuleTip(module) {
-  const info = MODULE_TIPS[module];
-  if (!info) return;
-  const dismissed = getModuleTipsDismissed();
-  if (dismissed[module]) return;
-  const existing = document.getElementById('moduleTip');
-  if (existing) existing.remove();
-  const tip = document.createElement('div');
-  tip.id = 'moduleTip';
-  tip.className = 'fixed z-40 bg-white rounded-2xl shadow-xl border border-blue-100 p-4 fade-in';
-  tip.style.cssText = 'top:120px; right:24px; width:288px;';
-  tip.innerHTML = `<div class="flex items-start gap-3">
-    <div class="text-2xl">${info.icon}</div>
-    <div class="flex-1 min-w-0">
-      <div class="font-bold text-gray-800 text-sm mb-1">${info.title}</div>
-      <div class="text-xs text-gray-500 leading-relaxed mb-3">${info.desc}</div>
-      <button onclick="dismissModuleTip('${module}')" class="px-3 py-1.5 bg-brand text-white rounded-lg text-xs font-medium hover:bg-brand-dark transition-colors">知道了</button>
-    </div>
-    <button onclick="dismissModuleTip('${module}')" class="text-gray-300 hover:text-gray-500 text-sm leading-none">✕</button>
-  </div>`;
-  document.body.appendChild(tip);
-}
-function dismissModuleTip(module) {
-  const dismissed = getModuleTipsDismissed();
-  dismissed[module] = true;
-  try { localStorage.setItem(MODULE_TIP_KEY, JSON.stringify(dismissed)); } catch(e) {}
-  const tip = document.getElementById('moduleTip');
-  if (tip) tip.remove();
-}
-function removeModuleTip() {
-  const tip = document.getElementById('moduleTip');
-  if (tip) tip.remove();
-}
-
-// ── Module Switching ────────────────────────────────────
-// ── 列表筛选状态（左侧数据组织 ↔ 右侧筛选 联动）────────
-let uiFilter = { tree: '*', treePath: '', kw: '', type: '全部', mine: false };
-
-const moduleTrees = {
-  data: [
-    {name:'全部数据', open:true, filter:'*', children:[
-      {name:'基础地理信息数据', open:true, children:[
-        {name:'poi', filter:'基础'},
-        {name:'道路21', filter:'道路'},
-        {name:'分类1354', filter:'分类'},
-        {name:'yxx测试', filter:'测试'},
-        {name:'lc测试', filter:'测试'},
-        {name:'基础数据', filter:'基础'},
-        {name:'hqj_测试分组', filter:'测试'},
-        {name:'0726测试', filter:'测试'},
-      ]},
-      {name:'🌾 耕地', filter:'耕地'},
-      {name:'🛰️ 遥感', filter:'遥感'},
-      {name:'💧 水利', filter:'水利'},
-      {name:'🏛️ 行政', filter:'行政'},
-      {name:'🧪 测试数据', filter:'测试'}
-    ]}
-  ],
-  service: [
-    {name:'全部数据', open:true, filter:'*', children:[
-      {name:'🗺️ 地图图层（底图/展示）', open:true, children:[
-        {name:'全部', filter:'map'},
-        {name:'遥感影像', filter:'遥感'},
-        {name:'在线底图', filter:'外部'},
-      ]},
-      {name:'📊 数据图层（查询/分析）', open:true, children:[
-        {name:'全部', filter:'data'},
-        {name:'耕地业务', filter:'耕地'},
-        {name:'行政区划', filter:'底图'},
-      ]},
-      {name:'🧪 测试数据', filter:'测试'}
-    ]}
-  ],
-  layer: [
-    {name:'全部要素图层', open:true, filter:'*', children:[
-      {name:'基础数据', filter:'基础'},
-      {name:'北大荒资源一张图', filter:'耕地'},
-      {name:'八五六资源一张图', open:true, children:[
-        {name:'测试大地图', filter:'测试'},
-        {name:'hk', filter:'测试'},
-        {name:'yxx测试目录', open:true, children:[
-          {name:'分类12', filter:'测试'},
-          {name:'分类13331', filter:'测试'},
-          {name:'多级子目录1', filter:'测试'},
-        ]},
-      ]},
-      {name:'zc测试目录', filter:'测试'},
-      {name:'⭐ 我的要素图层', filter:'mine'}
-    ]}
-  ],
-  map: [
-    {name:'全部专题地图', open:true, filter:'*', children:[
-      {name:'北安项目', open:true, children:[
-        {name:'aa', filter:'耕地监测'},
-      ]},
-      {name:'鹤山农场项目', open:true, children:[
-        {name:'AA', filter:'耕地监测'},
-        {name:'北大荒自有资产', filter:'自然资源'},
-        {name:'物联网', filter:'驾驶舱'},
-        {name:'Hk2', filter:'测试'},
-      ]},
-      {name:'竞山农场项目', open:true, children:[
-        {name:'S1', filter:'耕地监测'},
-        {name:'S2', filter:'水利'},
-        {name:'S53', filter:'自然资源'},
-      ]},
-    ]}
-  ]
-};
-
-// 全局卡片存储（支持删除持久化）
-const moduleConfigs = {
-  data: {
-    title: '数据资产', subtitle: '管理原始数据', total: 1026, btnLabel: '上传数据', btnAction: "document.getElementById('uploadWizard').classList.remove('hidden')",
-    cards: [
-      {title:'populated_places',sub:'表格数据 · 3天前上传',tag:'表格数据',cat:'基础',type:'表格数据',fmt:'CSV/EXCEL',mine:true,thumb:'from-green-100 to-green-200',icon:'📊'},
-      {title:'xx_bdh_growth-index_0731',sub:'影像图片 · 27.3 MB · 已发布',tag:'影像图片',cat:'遥感',type:'影像图片',fmt:'GeoTIFF',mine:true,thumb:'from-purple-100 to-purple-200',icon:'🛰️'},
-      {title:'中晚稻_2025_wgs84_接备',sub:'影像图片 · 已发布为服务',tag:'影像图片',cat:'遥感',type:'影像图片',fmt:'GeoTIFF',mine:false,thumb:'from-blue-100 to-blue-200',icon:'🛰️'},
-      {title:'二龙山农场_for_grassland',sub:'数据库查询 · 已关联2个服务',tag:'数据库查询',cat:'耕地',type:'数据库查询',fmt:'DbSQL',mine:true,thumb:'from-orange-100 to-orange-200',icon:'🗄️'},
-      {title:'宗地权属调查_2026Q3',sub:'数据库表 · 待发布',tag:'数据库表',cat:'耕地',type:'数据库表',fmt:'DbTable',mine:true,thumb:'from-cyan-100 to-cyan-200',icon:'🗄️'},
-      {title:'0bbe5c2e_water_sys_0731',sub:'数据库表 · 已发布为服务',tag:'数据库表',cat:'水利',type:'数据库表',fmt:'DbTable',mine:false,thumb:'from-teal-100 to-teal-200',icon:'💧'},
-    ]
-  },
-  service: {
-    title: '地图服务', subtitle: '在线地图图层', total: 36005, btnLabel: '注册服务', btnAction: "document.getElementById('registerServiceModal').classList.remove('hidden')",
-    totalPages: 2401,
-    cards: [
-      {title:'大豆长势遥感（七级）',sub:'可查询地图服务 · 2026-08-05 · 夏莹发布',tag:'可查询地图服务',cat:'耕地',type:'可查询地图服务',fmt:'Web地图服务',mine:true,thumb:'from-green-300 to-green-400',icon:'📡',layerCategory:'data',crs:'中国大地坐标',timeSeries:[
-        {v:'2026-Q2（七级）',date:'2026-08-05',sub:'可查询地图服务 · 2026-08-05 · 夏莹发布'},
-        {v:'2026-Q1（五级）',date:'2026-05-12',sub:'可查询地图服务 · 2026-05-12 · 夏莹发布'},
-        {v:'2025-Q4（三级）',date:'2025-11-20',sub:'可查询地图服务 · 2025-11-20 · 聂聪发布'},
-      ],tsActive:0},
-      {title:'北大荒行政区划边界',sub:'流畅矢量服务 · 平台预置 · 引用8个图层',tag:'流畅矢量服务',cat:'底图',type:'流畅矢量服务',fmt:'Web地图服务',mine:false,thumb:'from-blue-300 to-blue-400',icon:'🗺️',layerCategory:'data',crs:'中国大地坐标'},
-      {title:'中晚稻遥感影像_2025',sub:'标准地图服务 · 适合做底图',tag:'标准地图服务',cat:'底图',type:'标准地图服务',fmt:'Web地图服务',mine:false,thumb:'from-purple-300 to-purple-400',icon:'🛰️',layerCategory:'map',crs:'Web墨卡托'},
-      {title:'天地图矢量底图',sub:'在线底图（外部注册）· 互联网服务',tag:'在线底图',cat:'外部',type:'在线底图',fmt:'Web地图服务',mine:false,thumb:'from-gray-300 to-gray-400',icon:'🌐',layerCategory:'map',crs:'Web墨卡托'},
-      {title:'耕地种植-全量问题线索',sub:'流畅矢量服务 · 外部注册 · 被2个专题引用',tag:'流畅矢量服务',cat:'耕地',type:'流畅矢量服务',fmt:'Web地图服务',mine:false,thumb:'from-cyan-300 to-cyan-400',icon:'📡',layerCategory:'data',crs:'中国大地坐标',timeSeries:[
-        {v:'2026-08 最新',date:'2026-08-03',sub:'流畅矢量服务 · 2026-08-03 · 被2个专题引用'},
-        {v:'2026-07',date:'2026-07-15',sub:'流畅矢量服务 · 2026-07-15 · 被3个专题引用'},
-        {v:'2026-06',date:'2026-06-28',sub:'流畅矢量服务 · 2026-06-28 · 被1个专题引用'},
-      ],tsActive:0},
-      {title:'二龙山农场草地边界',sub:'标准地图服务 · 仅浏览查看',tag:'标准地图服务',cat:'遥感',type:'标准地图服务',fmt:'Web地图服务',mine:true,thumb:'from-teal-300 to-teal-400',icon:'📡',layerCategory:'map',crs:'Web墨卡托'},
-    ]
-  },
-  layer: {
-    title: '要素图层', subtitle: '聚合服务，构建地图', total: 731, btnLabel: '创建要素图层', btnAction: "resetLayerWizard();document.getElementById('layerWizard').classList.remove('hidden')",
-    cards: [
-      {title:'耕地种植-全量问题线索',sub:'被3个专题引用 · 2026-07-22',tag:'耕地',cat:'耕地',type:'要素图层',svcCount:1,mine:true,thumb:'from-green-300 to-green-400',icon:'📑'},
-      {title:'北大荒资源一张图',sub:'平台预置 · 被12个专题引用',tag:'基础',cat:'基础',type:'要素图层',svcCount:3,mine:false,thumb:'from-blue-300 to-blue-400',icon:'🗺️'},
-      {title:'八五六农场数字底图',sub:'被5个专题引用 · 2026-07-15',tag:'耕地',cat:'耕地',type:'要素图层',svcCount:4,mine:false,thumb:'from-purple-300 to-purple-400',icon:'📑'},
-      {title:'空图层',sub:'0个服务 · 空壳图层',tag:'测试',cat:'测试',type:'要素图层',svcCount:0,mine:true,thumb:'from-gray-200 to-gray-300',icon:'⚠️',empty:true},
-      {title:'测试hxl',sub:'被1个专题引用',tag:'测试',cat:'测试',type:'要素图层',svcCount:1,mine:true,thumb:'from-gray-300 to-gray-400',icon:'🧪'},
-      {title:'灌溉水系组合',sub:'被2个专题引用 · 2026-06-20',tag:'水利',cat:'水利',type:'要素图层',svcCount:1,mine:true,thumb:'from-cyan-300 to-cyan-400',icon:'💧'},
-    ]
-  },
-  map: {
-    title: '专题地图', subtitle: '一张图 · 大屏 · 驾驶舱', total: 582, btnLabel: '创建专题图', btnAction: "document.getElementById('createMapModal').classList.remove('hidden')",
-    cards: [
-      {title:'耕地种植用途管理平台',sub:'3个要素图层 · 2026-08-07',tag:'耕地监测',cat:'耕地监测',type:'专题地图',layerCount:3,mine:true,thumb:'from-green-300 to-green-400',icon:'🗺️'},
-      {title:'平台端-全量问题线索',sub:'2个要素图层 · 已发布',tag:'耕地监测',cat:'耕地监测',type:'专题地图',layerCount:2,mine:false,thumb:'from-blue-300 to-blue-400',icon:'🗺️'},
-      {title:'鹤山农场数字指挥中心',sub:'5个要素图层 · 已发布',tag:'驾驶舱',cat:'驾驶舱',type:'专题地图',layerCount:5,mine:false,thumb:'from-purple-300 to-purple-400',icon:'📊'},
-      {title:'调试专题地图角色组件',sub:'4个要素图层 · yangzinxin',tag:'测试',cat:'测试',type:'专题地图',layerCount:4,mine:true,thumb:'from-orange-300 to-orange-400',icon:'🧪'},
-      {title:'智慧水利指挥平台',sub:'3个要素图层 · 已发布',tag:'水利',cat:'水利',type:'专题地图',layerCount:3,mine:true,thumb:'from-cyan-300 to-cyan-400',icon:'💧'},
-      {title:'大屏_业务协同',sub:'3个要素图层 · 已发布',tag:'驾驶舱',cat:'驾驶舱',type:'专题地图',layerCount:3,mine:false,thumb:'from-indigo-300 to-indigo-400',icon:'📊'},
-    ]
-  }
-};
-
-function applyFilter() {
-  const m = activeModule;
-  document.getElementById('sidebarContent').innerHTML = renderTree(moduleTrees[m] || moduleTrees.data);
-  document.getElementById('mainContent').innerHTML = renderMain(m);
-}
-
-function selectTree(filter, path) {
-  uiFilter.tree = filter || '*';
-  uiFilter.treePath = path || '';
-  applyFilter();
-}
-
-function setKeyword(v) {
-  uiFilter.kw = v;
-  const pos = (() => { const el = document.getElementById('mainSearch'); return el ? el.selectionStart : null; })();
-  document.getElementById('mainContent').innerHTML = renderMain(activeModule);
-  const n = document.getElementById('mainSearch');
-  if (n && pos !== null) { n.focus(); n.setSelectionRange(pos, pos); }
-}
-
-function setTypeFilter(v) {
-  uiFilter.type = v;
-  document.getElementById('mainContent').innerHTML = renderMain(activeModule);
-}
-
-function setOnlyMine(checked) {
-  uiFilter.mine = checked;
-  document.getElementById('mainContent').innerHTML = renderMain(activeModule);
-}
-
-function matchCard(c) {
-  if (uiFilter.tree && uiFilter.tree !== '*' && uiFilter.tree !== 'mine') {
-    // 地图服务：图层分类筛选
-    if (uiFilter.tree === 'map' && c.layerCategory !== 'map') return false;
-    if (uiFilter.tree === 'data' && c.layerCategory !== 'data') return false;
-    // 常规 cat/type 筛选（非 map/data 的 filter 值走这里）
-    if (uiFilter.tree !== 'map' && uiFilter.tree !== 'data' && c.cat !== uiFilter.tree && c.type !== uiFilter.tree) return false;
-  }
-  if (uiFilter.tree === 'mine' && !c.mine) return false;
-  if (uiFilter.type !== '全部' && c.type !== uiFilter.type) return false;
-  if (uiFilter.mine && !c.mine) return false;
-  if (uiFilter.kw) {
-    const hay = (c.title + ' ' + c.sub + ' ' + (c.tag || '')).toLowerCase();
-    if (!hay.includes(uiFilter.kw.toLowerCase())) return false;
-  }
-  return true;
-}
-
-function switchModule(m) {
-  activeModule = m;
-  uiFilter = { tree: '*', treePath: '', kw: '', type: '全部', mine: false };
-  // Update nav
-  document.querySelectorAll('.nav-btn').forEach(b => {
-    b.classList.remove('text-brand');
-    const bar = b.querySelector('.active-bar');
-    if (bar) bar.remove();
-    if (b.dataset.module === m) {
-      b.classList.add('text-brand');
-      const span = document.createElement('span');
-      span.className = 'active-bar absolute bottom-0 left-0 right-0 h-0.5 bg-brand';
-      b.appendChild(span);
-    }
-  });
-
-  // Remove existing tip silently (user didn't click "知道了")
-  removeModuleTip();
-
-  // Update sidebar
-  const tree = moduleTrees[m] || moduleTrees.data;
-  document.getElementById('sidebarContent').innerHTML = renderTree(tree);
-
-  // Update main
-  document.getElementById('mainContent').innerHTML = renderMain(m);
-
-  // Sync empty-toggle button state for the new module
-  const btn = document.getElementById('emptyToggleBtn');
-  if (btn) {
-    if (_cardsBackup[m]) {
-      btn.innerHTML = '📋 有数据'; btn.title = '恢复真实数据';
-    } else {
-      btn.innerHTML = '📭 空状态'; btn.title = '切换为无数据状态，预览空状态引导卡片';
-    }
-  }
-
-  // Show contextual module tip
-  setTimeout(() => showModuleTip(m), 400);
-}
-
-// Track expanded state for tree nodes
-const treeExpanded = {};
-function renderTree(nodes, level=0, basePath='') {
-  return nodes.map(n => {
-    const hasChildren = n.children && n.children.length;
-    const indent = level * 16 + 8;
-    const nodePath = basePath ? basePath + '/' + n.name : n.name;
-    const isActive = n.filter && nodePath === uiFilter.treePath;
-    const nodeId = activeModule + '_' + n.name + '_' + level;
-    const isExpanded = treeExpanded[nodeId] !== false; // default expanded
-    // 根节点「全部」高亮当无明确选中路径时
-    const showActive = isActive || (n.filter === '*' && !uiFilter.treePath);
-    return `<div>
-      <div class="flex items-center py-1.5 px-2 rounded-md cursor-pointer text-sm transition-colors ${showActive ? 'bg-brand-light text-brand font-medium' : 'hover:bg-gray-50'}" style="padding-left:${indent}px" data-tree-filter="${n.filter || ''}" ${n.filter ? `onclick="selectTree('${n.filter.replace(/'/g,"\\'")}','${nodePath.replace(/'/g,"\\'")}')"` : hasChildren ? `onclick="toggleTreeNode('${nodeId}')"` : ''}>
-        ${hasChildren ? `<span class="text-[10px] text-gray-400 mr-1.5" id="treeArrow_${nodeId}">${isExpanded ? '▼' : '▶'}</span>` : `<span class="w-4 mr-1.5"></span>`}
-        <span class="truncate ${showActive ? 'text-brand' : 'text-gray-700'}">${n.name}</span>
-        ${showActive ? `<span class="ml-auto text-[10px] text-brand">✓</span>` : ''}
-      </div>
-      ${hasChildren ? `<div id="treeChildren_${nodeId}" class="${isExpanded ? '' : 'hidden'}">${renderTree(n.children, level+1, nodePath)}</div>` : ''}
-    </div>`;
-  }).join('');
-}
-function toggleTreeNode(nodeId) {
-  treeExpanded[nodeId] = treeExpanded[nodeId] === false; // toggle
-  const arrow = document.getElementById('treeArrow_' + nodeId);
-  const children = document.getElementById('treeChildren_' + nodeId);
-  if (arrow && children) {
-    const nowExpanded = treeExpanded[nodeId] !== false;
-    arrow.textContent = nowExpanded ? '▼' : '▶';
-    children.classList.toggle('hidden', !nowExpanded);
-  }
-}
-
-function renderMain(m) {
-  const cfg = moduleConfigs[m];
-  const cards = cfg.cards.filter(matchCard);
-  cardReg = cards;
-  const cfgTypes = [...new Set(cfg.cards.map(c => c.type))];
-
-  return `<div class="flex-1 flex flex-col min-h-0">
-    <div class="px-5 py-4 flex items-center justify-between flex-shrink-0">
-      <div class="flex items-center gap-3">
-        <h1 class="text-lg font-bold text-gray-900">${cfg.title}</h1>
-        <span class="text-xs text-muted bg-gray-100 px-2.5 py-1 rounded-full font-medium">${cfg.subtitle}</span>
-        ${(m==='service' ? `<span class="text-xs text-gray-400">共 ${cfg.total} 条 · ${cfg.totalPages||'?'} 页</span>`
-        : m==='data' ? `<span class="text-xs text-gray-400">共 ${cfg.total} 条 · 69 页</span>`
-        : m==='layer' ? `<span class="text-xs text-gray-400">共 ${cfg.total} 条 · 49 页</span>`
-        : `<span class="text-xs text-gray-400">共 ${cfg.total} 条 · 39 页</span>`)}
-        <span class="text-gray-300">| 筛选得 ${cards.length} 条</span>
-      </div>
-      <div class="flex items-center gap-3">
-        <label class="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer">
-          <input type="checkbox" ${uiFilter.mine ? 'checked' : ''} onchange="setOnlyMine(this.checked)" class="rounded border-gray-300 text-brand focus:ring-brand"> 仅看我创建的
-        </label>
-        ${m==='service' ? `<select onchange="sortServiceCards(this.value)" class="px-2 py-2 bg-white border border-line rounded-lg text-xs text-gray-500 focus:outline-none focus:border-brand"><option value="time">按时间排序 ▼</option><option value="name">按名称排序</option><option value="refs">按引用次数排序</option></select>` : ''}
-        <div class="relative">
-          <svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          <input id="mainSearch" type="text" placeholder="输入关键字" value="${uiFilter.kw}" oninput="setKeyword(this.value)" class="pl-9 pr-3 py-2 bg-white border border-line rounded-lg text-sm w-56 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
-        </div>
-        <select onchange="setTypeFilter(this.value)" class="px-2 py-2 bg-white border border-line rounded-lg text-sm text-gray-600 focus:outline-none focus:border-brand">
-          <option value="全部">全部类型 ▾</option>
-          ${cfgTypes.map(t => `<option value="${t}" ${uiFilter.type === t ? 'selected' : ''}>${t}</option>`).join('')}
-        </select>
-        <button onclick="${cfg.btnAction}" class="px-5 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-xl text-sm font-semibold flex items-center gap-1.5 transition-all shadow-sm hover:shadow-md active:scale-95">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-          ${cfg.btnLabel}
-        </button>
-      </div>
-    </div>
-    <div class="flex-1 overflow-y-auto scroll-thin px-5 pb-5">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        ${cards.length ? cards.map((c, idx) => `
-          <div data-idx="${idx}" class="card-hover relative bg-panel rounded-xl overflow-hidden cursor-pointer group" onclick="openCardDetail(${idx})">
-            <div class="h-28 bg-gradient-to-br ${c.thumb} flex items-center justify-center text-4xl overflow-hidden relative card-thumb">
-              <span class="text-4xl relative z-10 drop-shadow-sm">${c.icon}</span>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent"></div>
-              <span class="text-4xl">${c.icon}</span>
-              ${m === 'data' ? `
-              <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <button onclick="event.stopPropagation();updateCard('${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow">📤 更新</button>
-                <button onclick="event.stopPropagation();document.getElementById('publishModal').classList.remove('hidden')" class="flex-1 px-3 py-1.5 bg-brand hover:bg-brand-dark text-white rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow-md">🚀 发布</button>
-              </div>
-              ` : m === 'service' ? `
-              <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <button onclick="event.stopPropagation();copyServiceUrl('${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow">🔗 复制地址</button>
-              </div>
-              ` : m === 'layer' ? `
-              <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <button onclick="event.stopPropagation();openLayerDesign('edit','${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow">✏️ 编辑</button>
-                <button onclick="event.stopPropagation();openLayerDesign('design','${c.title}')" class="flex-1 px-3 py-1.5 bg-brand hover:bg-brand-dark text-white rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow-md">🎨 设计</button>
-              </div>
-              ` : m === 'map' ? `
-              <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <button onclick="event.stopPropagation();openMapDesign('edit','${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow">✏️ 编辑</button>
-                <button onclick="event.stopPropagation();openMapDesign('design','${c.title}')" class="flex-1 px-3 py-1.5 bg-brand hover:bg-brand-dark text-white rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow-md">🎨 设计</button>
-              </div>
-              ` : ''}
-            </div>
-            <div class="p-3.5">
-              <h3 class="font-semibold text-gray-900 truncate text-sm mb-2" title="${c.title}">${c.title}</h3>
-              <div class="flex items-center gap-2 text-xs text-muted">
-                ${m === 'data' ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 font-medium border border-gray-200">${c.type}</span><span class="truncate">${c.sub}</span>`
-                : m === 'service' ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-medium border border-blue-100">${c.type}</span><span class="truncate">${c.sub}</span>`
-                : m === 'layer' ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md ${c.svcCount === 0 ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : 'bg-green-50 text-green-700 border border-green-100'} font-medium">包含${c.svcCount}个服务</span><span class="truncate">${c.sub}</span>`
-                : m === 'map' ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md ${c.layerCount === 0 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-purple-50 text-purple-700 border border-purple-100'} font-medium">包含${c.layerCount}个要素图层</span><span class="truncate">${c.sub}</span>`
-                : `<span>${c.sub}</span>`}
-              </div>
-            </div>
-            <!-- 卡片操作：详情 / 移动 / 删除 -->
-            <div class="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <button onclick="toggleCardMenu(event,'${idx}')" class="w-7 h-7 text-sm flex items-center justify-center bg-white/90 hover:bg-white rounded-lg font-medium shadow-sm border border-gray-200 hover:border-gray-300 hover:shadow transition-all" title="操作">⋯</button>
-              <div id="cardMenu-${idx}" class="card-menu hidden absolute right-0 top-full mt-1 w-32 bg-white border border-line rounded-lg shadow-lg py-1 z-30">
-                <button onclick="cardAction(event,'detail','${idx}')" class="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">👁️ 查看详情</button>
-                ${m !== 'service' ? `<button onclick="cardAction(event,'move','${idx}')" class="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">📤 移动到</button>` : ''}
-                <button onclick="cardAction(event,'delete','${idx}')" class="w-full text-left px-3 py-1.5 text-sm text-red-500 hover:bg-red-50">🗑️ 删除</button>
-              </div>
-              <div id="cardConfirm-${idx}" class="card-confirm hidden absolute right-0 top-full mt-1 w-56 bg-white border border-red-200 rounded-lg shadow-lg p-3 z-30">
-                <div class="text-sm text-gray-800 mb-1">确认删除「<span class="font-medium">${c.title}</span>」？</div>
-                <div class="text-xs text-gray-400 mb-3">删除后不可恢复</div>
-                <div class="flex justify-end gap-2">
-                  <button onclick="closeCardConfirm(event,'${idx}')" class="px-3 py-1 text-xs border border-line rounded text-gray-600 hover:border-brand">取消</button>
-                  <button onclick="confirmDeleteCard(event,'${idx}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">确认删除</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `).join('') : (cfg.cards.length === 0 ? (m==='data' ? `
-          <div class="col-span-full text-center py-20">
-            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-4xl shadow-sm">📦</div>
-            <div class="text-gray-800 font-semibold text-base mb-2">还没有上传数据</div>
-            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">这里是你存放所有空间数据的地方。上传 Excel 表格、卫星影像、地理数据文件——发布后变成在线地图服务。</div>
-            <button onclick="${cfg.btnAction}" class="px-6 py-3 text-sm bg-brand hover:bg-brand-dark text-white rounded-xl font-medium transition-all shadow-sm hover:shadow-md active:scale-95">📤 上传第一份数据</button>
-          </div>`
-        : m==='service' ? `
-          <div class="col-span-full text-center py-20">
-            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-cyan-50 to-blue-50 flex items-center justify-center text-4xl shadow-sm">📡</div>
-            <div class="text-gray-800 font-semibold text-base mb-2">还没有可用的地图服务</div>
-            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">地图服务是在线可访问的地图图层。从「数据资产」上传并发布，或从外部服务器注册。</div>
-            <div class="flex items-center justify-center gap-3">
-              <button onclick="switchModule('data')" class="px-5 py-2.5 text-sm border-2 border-gray-200 hover:border-brand text-gray-600 hover:text-brand rounded-xl font-medium transition-all hover:shadow-sm">📦 去上传数据</button>
-              <button onclick="${cfg.btnAction}" class="px-5 py-2.5 text-sm bg-brand hover:bg-brand-dark text-white rounded-xl font-medium transition-all shadow-sm hover:shadow-md active:scale-95">🌐 注册外部服务</button>
-            </div>
-          </div>`
-        : m==='layer' ? `
-          <div class="col-span-full text-center py-20">
-            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center text-4xl shadow-sm">📑</div>
-            <div class="text-gray-800 font-semibold text-base mb-2">还没有要素图层</div>
-            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">要素图层是把多个地图服务叠加在一起的可复用单元。创建后可以在专题地图中反复使用。</div>
-            <button onclick="${cfg.btnAction}" class="px-6 py-3 text-sm bg-brand hover:bg-brand-dark text-white rounded-xl font-medium transition-all shadow-sm hover:shadow-md active:scale-95">➕ 创建第一个要素图层</button>
-          </div>`
-        : `
-          <div class="col-span-full text-center py-20">
-            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center text-4xl shadow-sm">🗺️</div>
-            <div class="text-gray-800 font-semibold text-base mb-2">还没有专题地图</div>
-            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">专题地图是最终成品——一张图、大屏、驾驶舱。创建一张专题地图开始。</div>
-            <button onclick="${cfg.btnAction}" class="px-6 py-3 text-sm bg-brand hover:bg-brand-dark text-white rounded-xl font-medium transition-all shadow-sm hover:shadow-md active:scale-95">🎨 创建专题地图</button>
-          </div>`
-        ) : `
-          <div class="col-span-full text-center py-20">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gray-100 flex items-center justify-center text-3xl">🔍</div>
-            <div class="text-gray-700 font-semibold text-base mb-1">没有符合条件的结果</div>
-            <div class="text-gray-400 text-sm mb-5">试试调整左侧分类、清空搜索词或更换筛选条件</div>
-            <button onclick="uiFilter={tree:'*',treePath:'',kw:'',type:'全部',mine:false};applyFilter()" class="px-5 py-2.5 text-sm text-brand bg-brand-light hover:bg-brand-50 border border-brand/20 rounded-xl font-medium transition-all">🔄 重置全部筛选</button>
-          </div>
-        `)}
-      </div>
-    </div>
-  </div>`;
-}
-
-// ── Wizard Logic ────────────────────────────────────────
 function wizardNext() {
   if (wizardStep >= 3) return;
   document.getElementById('wizPanel'+wizardStep).classList.remove('active');
@@ -1718,829 +353,120 @@ function updateWizardUI() {
 
 function finishUpload() {
   closeWizard('uploadWizard');
+  const name = (document.querySelector('#wizPanel3 input') || {}).value || 'XX农场2026年夏季耕地调查';
+  // 新增「入库中」数据卡片 + 入库任务（中间态：入库完成后自动转「待发布」，失败转「入库失败」）
+  moduleConfigs.data.cards.unshift({ title:name, sub:'表格数据 · 入库中', tag:'表格数据', cat:'耕地', type:'表格数据', fmt:'CSV/EXCEL', mine:true, status:'入库中', svcCount:0, thumb:'from-green-100 to-green-200', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>' });
+  publishTarget = name;
+  const _ov = getDataStatusOverrides(); _ov[name] = '入库中'; saveDataStatusOverrides(_ov);
+  addTask({ type:'data', title:'入库：' + name, target:name });
   wizardStep = 1;
   document.getElementById('wizPanel2').classList.remove('active');
   document.getElementById('wizPanel3').classList.remove('active');
   document.getElementById('wizPanel1').classList.add('active');
   updateWizardUI();
+  document.getElementById('mainContent').innerHTML = renderMain('data');
   if (!notified.upload) {
-    notified.upload = true; wfUpdateProgress();
-    showNotification('✅', '数据上传成功！如需继续，可一键发布为地图服务<button onclick="document.getElementById(\'publishModal\').classList.remove(\'hidden\')" class="text-brand underline font-medium ml-2">发布 →</button>');
+    notified.upload = true;
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>', '✅ 数据上传成功！下一步：把它<strong>发布成地图服务</strong>，就能在地图上用。<button onclick="document.getElementById(\'publishModal\').classList.remove(\'hidden\')" class="text-brand underline font-medium ml-2">一键发布 →</button>');
   }
 }
+
+
+// ── 数据资产：发布服务弹窗 (S-04 aligned) ────────────────
+const PUBLISH_SERVICE_TYPES = [
+  { key:'WMS',  label:'WMS', summary:'动态图片，慢但灵活', chName:'网络地图服务', desc:'WMS 是一种通过 HTTP 请求向客户端返回地理空间数据可视化地图的服务。它将地理数据（如矢量或栅格数据）渲染为 PNG、JPEG 等图片格式，支持叠加多层地图数据。' },
+  { key:'WMTS', label:'WMTS', summary:'预切图片，快但固定', chName:'网络地图瓦片服务', desc:'WMTS 是一种高效的地图服务模式，基于预生成的地图切片（Tile）提供服务。它将地图按不同比例尺（层级）和网格划分成固定尺寸的小块（如 256×256 像素），提前渲染并存储在服务器。', options:{ '切片格式':['PNG','JPEG'], '切片网格':['GoogleMapsCompatible','GlobalCRS84Scale','GlobalCRS84Pixel'] } },
+  { key:'WFS',  label:'WFS', summary:'传输原始数据，可编辑', chName:'网络要素服务', desc:'WFS 是一种面向地理空间要素数据的网络服务，专注于矢量数据的传输与交互。它支持通过 HTTP 请求获取、插入、更新或删除地理要素（如点、线、面），返回的是原始数据而非图片，常见格式包括 GML、JSON、GeoJSON 等。' },
+  { key:'MVT',  label:'MVT', summary:'轻量且样式可变', chName:'矢量瓦片', desc:'MVT 是一种基于矢量数据的地图切片服务，核心是将地理空间矢量要素（点、线、面）编码为二进制格式的矢量切片（Vector Tile），通过网络传输并在客户端动态渲染为地图。', options:{ '执行策略':['默认','高性能','低延迟'], '输出字段':['名称','面积','作物类型','产量','行政区划'], '切片网格':['GoogleMapsCompatible','GlobalCRS84Scale'], '切片参数':['默认','自定义'] } },
+  { key:'REAL_MVT', label:'实时 MVT', summary:'实时更新的矢量瓦片', chName:'实时矢量瓦片', desc:'实时 MVT 服务是动态 MVT 服务的极致形态，聚焦于亚秒级至分钟级的数据更新频率，专为需要实时动态矢量数据展示与交互的场景设计。', options:{ '输出字段':['名称','面积','作物类型','产量','行政区划'], '切片网格':['GoogleMapsCompatible','GlobalCRS84Scale'] } },
+];
+let publishSelectedType = 'WFS'; // default recommendation for CSV/Excel
+
+function renderPublishCards() {
+  const container = document.getElementById('publishTypeCards');
+  if (!container) return;
+  container.innerHTML = PUBLISH_SERVICE_TYPES.map(t => {
+    const isRec = t.key === publishSelectedType;
+    const isSel = t.key === publishSelectedType;
+    return '<div onclick="selectPublishType(\'' + t.key + '\')" class="publish-card cursor-pointer rounded-lg border-2 p-3 text-center transition-all hover:shadow-sm ' + (isSel ? 'border-brand bg-brand-light shadow-sm' : 'border-gray-200 bg-white hover:border-brand') + '">'
+      + (isRec ? '<div class="text-[10px] bg-amber-100 text-amber-700 rounded-full px-1.5 py-0.5 inline-block mb-1 font-medium"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> 推荐</div>' : '')
+      + '<div class="text-sm font-bold text-gray-800">' + t.label + '</div>'
+      + '<div class="text-[11px] text-gray-500 mt-0.5 leading-tight">' + t.summary + '</div>'
+      + '</div>';
+  }).join('');
+  updatePublishDesc();
+  updatePublishOptions();
+}
+
+function selectPublishType(key) {
+  publishSelectedType = key;
+  // Re-render cards to update selected state
+  const items = document.querySelectorAll('#publishTypeCards > div');
+  PUBLISH_SERVICE_TYPES.forEach((t, i) => {
+    const card = items[i];
+    if (!card) return;
+    const isSel = t.key === key;
+    card.className = 'publish-card cursor-pointer rounded-lg border-2 p-3 text-center transition-all hover:shadow-sm ' + (isSel ? 'border-brand bg-brand-light shadow-sm' : 'border-gray-200 bg-white hover:border-brand');
+  });
+  updatePublishDesc();
+  updatePublishOptions();
+}
+
+function updatePublishDesc() {
+  const area = document.getElementById('publishDescArea');
+  if (!area) return;
+  const t = PUBLISH_SERVICE_TYPES.find(s => s.key === publishSelectedType);
+  if (!t) return;
+  area.innerHTML = '<div class="text-sm font-semibold text-gray-800 mb-1">' + t.label + ' · ' + t.chName + '</div>'
+    + '<div class="text-xs text-gray-600 leading-relaxed">' + t.desc + '</div>';
+}
+
+function updatePublishOptions() {
+  const area = document.getElementById('publishOptionsArea');
+  if (!area) return;
+  const t = PUBLISH_SERVICE_TYPES.find(s => s.key === publishSelectedType);
+  if (!t || !t.options) { area.innerHTML = ''; return; }
+  let html = '<div class="bg-gray-50 border border-line rounded-lg p-3 space-y-2 text-sm">'
+    + '<div class="text-xs font-medium text-gray-500 mb-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> ' + t.label + ' 专属选项</div>';
+  Object.keys(t.options).forEach(optName => {
+    const vals = t.options[optName];
+    if (vals.length <= 3) {
+      // Radio-style
+      html += '<div class="flex items-center gap-2"><span class="text-xs text-gray-600 w-16 shrink-0">' + optName + '</span>';
+      vals.forEach((v, vi) => {
+        html += '<label class="flex items-center gap-1 text-xs text-gray-700 cursor-pointer"><input type="radio" name="opt_' + optName + '" value="' + v + '" ' + (vi === 0 ? 'checked' : '') + ' class="text-brand"> ' + v + '</label>';
+      });
+      html += '</div>';
+    } else {
+      // Checkbox for multi-select (输出字段)
+      html += '<div><span class="text-xs text-gray-600 block mb-1">' + optName + '</span><div class="flex flex-wrap gap-1">';
+      vals.forEach((v, vi) => {
+        html += '<label class="flex items-center gap-1 text-xs text-gray-700 bg-white border border-line rounded px-2 py-0.5 cursor-pointer hover:border-brand"><input type="checkbox" value="' + v + '" ' + (vi < 3 ? 'checked' : '') + ' class="text-brand"> ' + v + '</label>';
+      });
+      html += '</div></div>';
+    }
+  });
+  html += '</div>';
+  area.innerHTML = html;
+}
+
+// Render publish cards on page load
+setTimeout(renderPublishCards, 100);
 
 function confirmPublish() {
   closeWizard('publishModal');
+  const title = publishTarget || (document.getElementById('publishTitle') || {}).value || 'XX农场2026年夏季耕地调查';
+  addTask({ type:'service', title:'发布服务：' + title, target:title });
   if (!notified.publish) {
-    notified.publish = true; wfUpdateProgress();
-    showNotification('✅', '服务发布成功！如需继续，可创建要素图层<button onclick="switchModule(\'layer\');setTimeout(()=>{resetLayerWizard();document.getElementById(\'layerWizard\').classList.remove(\'hidden\')},400)" class="text-brand underline font-medium ml-2">创建 →</button>');
+    notified.publish = true;
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>', '✅ 已提交发布任务，数据将变成「地图服务」。发布完成会自动通知你。<button onclick="goModule(\'task\')" class="text-brand underline font-medium ml-2">查看进度 →</button>');
   }
 }
 
-function confirmLayer() {
-  const name = (document.getElementById('lwName').value || '').trim();
-  const code = (document.getElementById('lwCode').value || '').trim();
-  if (!name) {
-    showNotification('⚠️', '请先填写图层名称');
-    return;
-  }
-  if (!code) {
-    showNotification('⚠️', '请先填写图层编码');
-    return;
-  }
-  const checked = getLwSelectedServices();
-  if (checked.length === 0) {
-    document.getElementById('lwSvcHint').classList.remove('hidden');
-    showNotification('⚠️', '请至少选择一个地图服务');
-    return;
-  }
-  document.getElementById('lwSvcHint').classList.add('hidden');
-  closeWizard('layerWizard');
-  if (!notified.layer) {
-    notified.layer = true; wfUpdateProgress();
-    showNotification('✅', '要素图层「' + name + '」创建成功！如需继续，可创建专题地图<button onclick="switchModule(\'map\');setTimeout(()=>document.getElementById(\'createMapModal\').classList.remove(\'hidden\'),400)" class="text-brand underline font-medium ml-2">创建 →</button>');
-  }
-}
-
-function confirmCreateMap() {
-  const name = (document.getElementById('cmName').value || '').trim();
-  if (!name) {
-    showNotification('⚠️', '请先填写地图名称');
-    return;
-  }
-  closeWizard('createMapModal');
-  if (!notified.map) {
-    notified.map = true; wfUpdateProgress();
-  }
-  showNotification('🎉', `<strong>${name}</strong> 创建成功！可在地图设计页中添加要素图层。<button onclick="openMapViewer('${name.replace(/'/g,"\\'")}')" class="text-brand underline font-medium ml-2">🗺️ 打开地图设计 →</button><br><span class="text-xs text-gray-400 mt-1">也可稍后在「专题地图」列表里找到它继续编辑。</span>`);
-  // 重置表单
-  document.getElementById('cmName').value = '';
-  document.getElementById('cmCode').value = '';
-  document.getElementById('cmDesc').value = '';
-}
-
-// ── 要素图层创建：服务树 ────────────────────────────────
-let lwSelectedServices = {};
-let lwServiceTreeData = [];
-
-function buildLayerServiceTreeData() {
-  // Build tree from moduleConfigs.service.cards, mirroring the service sidebar
-  const cards = moduleConfigs.service.cards;
-  const mapServices = cards.filter(c => c.layerCategory === 'map');
-  const dataServices = cards.filter(c => c.layerCategory === 'data');
-
-  // Group by cat within each layerCategory
-  function groupByCat(list) {
-    const groups = {};
-    list.forEach(c => {
-      const cat = c.cat || '其他';
-      if (!groups[cat]) groups[cat] = [];
-      groups[cat].push(c);
-    });
-    return groups;
-  }
-
-  const mapGroups = groupByCat(mapServices);
-  const dataGroups = groupByCat(dataServices);
-
-  const tree = [
-    {
-      name: '🗺️ 地图图层（底图/展示）',
-      id: 'lw_map',
-      open: true,
-      children: Object.keys(mapGroups).map(cat => ({
-        name: catLabel(cat),
-        id: 'lw_map_' + cat,
-        open: true,
-        services: mapGroups[cat]
-      }))
-    },
-    {
-      name: '📊 数据图层（查询/分析）',
-      id: 'lw_dt',
-      open: true,
-      children: Object.keys(dataGroups).map(cat => ({
-        name: catLabel(cat),
-        id: 'lw_dt_' + cat,
-        open: true,
-        services: dataGroups[cat]
-      }))
-    }
-  ];
-  return tree;
-
-  function catLabel(cat) {
-    const map = { '遥感': '🛰️ 遥感影像', '外部': '🌐 在线底图', '耕地': '🌾 耕地业务', '底图': '🏛️ 行政区划' };
-    return map[cat] || ('📂 ' + cat);
-  }
-}
-
-function renderLayerServiceTree(filterText) {
-  lwServiceTreeData = buildLayerServiceTreeData();
-  const container = document.getElementById('lwServiceTree');
-  if (!container) return;
-  let html = '';
-  function renderNodes(nodes, level) {
-    nodes.forEach(node => {
-      if (node.children) {
-        // Category node with expand/collapse
-        const isOpen = typeof node.open !== 'undefined' ? node.open : true;
-        html += '<div class="lw-tree-cat" style="padding-left:' + (level * 16) + 'px">';
-        html += '<div class="flex items-center gap-1.5 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer text-sm font-medium text-gray-700" onclick="toggleLwTreeNode(this, \'' + node.id + '\')">';
-        html += '<span class="text-[10px] w-3 text-center transition-transform lw-arrow' + (isOpen ? ' rotate-90' : '') + '">▶</span>';
-        html += '<span>' + node.name + '</span>';
-        html += '</div>';
-        html += '<div class="lw-tree-children' + (isOpen ? '' : ' hidden') + '">';
-        renderNodes(node.children, level + 1);
-        html += '</div>';
-        html += '</div>';
-      } else if (node.services) {
-        // Leaf node with service checkboxes
-        html += '<div class="lw-tree-leaf" style="padding-left:' + (level * 16) + 'px">';
-        html += '<div class="flex items-center gap-1.5 py-1 px-2 rounded-lg hover:bg-gray-50 cursor-pointer text-xs font-medium text-gray-600" onclick="toggleLwTreeNode(this, \'' + node.id + '\')">';
-        html += '<span class="text-[10px] w-3 text-center transition-transform lw-arrow' + (node.open !== false ? ' rotate-90' : '') + '">▶</span>';
-        html += '<span>' + node.name + ' <span class="text-gray-400 font-normal">(' + node.services.length + ')</span></span>';
-        html += '</div>';
-        html += '<div class="lw-tree-children' + (node.open !== false ? '' : ' hidden') + '">';
-        node.services.forEach(svc => {
-          const checked = lwSelectedServices[svc.title] ? 'checked' : '';
-          const match = !filterText || svc.title.includes(filterText) || (svc.type || '').includes(filterText) || (svc.cat || '').includes(filterText);
-          html += '<label class="flex items-center gap-2 py-1.5 px-2 hover:bg-gray-50 cursor-pointer text-sm' + (match ? '' : ' hidden') + '" style="padding-left:' + ((level + 1) * 16) + 'px">';
-          html += '<input type="checkbox" ' + checked + ' onchange="toggleLwService(this, \'' + svc.title.replace(/'/g, "\'") + '\')" class="rounded border-gray-300 text-brand focus:ring-brand/30">';
-          html += '<span class="flex-1 text-gray-800 truncate">' + svc.title + '</span>';
-          html += '<span class="text-[10px] text-gray-400 shrink-0">' + (svc.type || '') + '</span>';
-          html += '<span class="text-[10px] shrink-0 ml-1 px-1 rounded ' + (svc.crs === '中国大地坐标' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600') + '">' + (svc.crs || '') + '</span>';
-          html += '</label>';
-        });
-        html += '</div>';
-        html += '</div>';
-      }
-    });
-  }
-  renderNodes(lwServiceTreeData, 0);
-  container.innerHTML = html;
-  updateLwSelectedCount();
-}
-
-function toggleLwTreeNode(el, nodeId) {
-  const children = el.parentElement.querySelector('.lw-tree-children');
-  const arrow = el.querySelector('.lw-arrow');
-  if (children) {
-    children.classList.toggle('hidden');
-    if (arrow) arrow.classList.toggle('rotate-90');
-  }
-}
-
-function toggleLwService(cb, title) {
-  if (cb.checked) {
-    // Check CRS compatibility
-    const allCards = moduleConfigs.service.cards;
-    const thisCard = allCards.find(c => c.title === title);
-    const thisCrs = thisCard ? (thisCard.crs || '未知') : '未知';
-    const selected = getLwSelectedServices();
-    if (selected.length > 0) {
-      const firstTitle = selected[0];
-      const firstCard = allCards.find(c => c.title === firstTitle);
-      const activeCrs = firstCard ? (firstCard.crs || '未知') : '未知';
-      if (thisCrs !== activeCrs) {
-        cb.checked = false;
-        showNotification('⚠️', '不允许混用不同坐标系的服务：已选「<strong>' + activeCrs + '</strong>」，而「' + title + '」的坐标系是「<strong>' + thisCrs + '</strong>」');
-        return;
-      }
-    }
-    lwSelectedServices[title] = true;
-  } else {
-    delete lwSelectedServices[title];
-  }
-  updateLwSelectedCount();
-  updateLwCrsDisplay();
-}
-
-function getLwSelectedServices() {
-  return Object.keys(lwSelectedServices).filter(k => lwSelectedServices[k]);
-}
-
-function updateLwSelectedCount() {
-  const count = getLwSelectedServices().length;
-  const el = document.getElementById('lwSvcCount');
-  const hint = document.getElementById('lwSvcHint');
-  if (el) el.textContent = count;
-  if (hint) {
-    if (count === 0) hint.classList.remove('hidden');
-    else hint.classList.add('hidden');
-  }
-  updateLwCrsDisplay();
-}
-
-function updateLwCrsDisplay() {
-  const selected = getLwSelectedServices();
-  const icon = document.getElementById('lwCrsIcon');
-  const text = document.getElementById('lwCrsText');
-  const display = document.getElementById('lwCrsDisplay');
-  if (!text || !display) return;
-  if (selected.length === 0) {
-    if (icon) { icon.textContent = '🌐'; icon.className = 'text-gray-400'; }
-    text.textContent = '选择服务后自动确定';
-    text.className = 'text-gray-500';
-    display.className = display.className.replace(' border-green-300 bg-green-50', '');
-    if (!display.className.includes(' bg-gray-50')) display.className += ' bg-gray-50';
-  } else {
-    const allCards = moduleConfigs.service.cards;
-    const firstCard = allCards.find(c => c.title === selected[0]);
-    const crs = firstCard ? (firstCard.crs || '未知') : '未知';
-    const sameCount = selected.filter(t => {
-      const c = allCards.find(x => x.title === t);
-      return c && (c.crs || '未知') === crs;
-    }).length;
-    if (icon) { icon.textContent = '📍'; icon.className = 'text-brand'; }
-    text.textContent = crs + '（' + sameCount + ' 个服务统一）';
-    text.className = 'text-brand font-medium text-sm';
-    display.className = display.className.replace(' bg-gray-50', '').replace(' border-line', ' border-green-300 bg-green-50');
-  }
-}
-
-function filterLayerServiceTree(text) {
-  renderLayerServiceTree(text.trim());
-}
-
-// Auto-init service tree when wizard opens
-(function() {
-  const origOpen = document.getElementById('layerWizard');
-  if (origOpen) {
-    // Hook into the wizard opening via MutationObserver on class
-    const observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-          if (!document.getElementById('layerWizard').classList.contains('hidden')) {
-            renderLayerServiceTree();
-          }
-        }
-      });
-    });
-    observer.observe(origOpen, { attributes: true });
-  }
-})();
-
-// ── 图层标签管理 ──────────────────────────────────────
-let lwTags = [];
-
-function addLwTag(val) {
-  if (!val || lwTags.includes(val)) return;
-  lwTags.push(val);
-  renderLwTags();
-}
-
-function removeLwTag(idx) {
-  lwTags.splice(idx, 1);
-  renderLwTags();
-}
-
-function renderLwTags() {
-  const container = document.getElementById('lwTags');
-  if (!container) return;
-  container.innerHTML = lwTags.map((t, i) =>
-    '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-brand-light text-brand">' +
-    t + ' <button onclick="removeLwTag(' + i + ')" class="text-brand hover:text-brand-dark">&times;</button></span>'
-  ).join('');
-}
-
-// ── 图层类型标签 ──────────────────────────────────────
-let lwTypeTags = ['矢量图层'];
-
-function addLwTypeTag(val) {
-  if (!val || lwTypeTags.length >= 3) return;
-  lwTypeTags.push(val);
-  renderLwTypeTags();
-}
-
-function removeLwTypeTag(idx) {
-  if (lwTypeTags.length <= 1) return;
-  if (typeof idx === 'number') lwTypeTags.splice(idx, 1);
-  else lwTypeTags.pop();
-  renderLwTypeTags();
-}
-
-function renderLwTypeTags() {
-  const wrap = document.getElementById('lwTypeWrap');
-  const select = document.getElementById('lwTypeSelect');
-  if (!wrap || !select) return;
-  let tagsHtml = lwTypeTags.map((t, i) =>
-    '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-brand-light text-brand">' +
-    t + ' <button onclick="event.stopPropagation();removeLwTypeTag(' + i + ')" class="text-brand hover:text-brand-dark ml-0.5">&times;</button></span>'
-  ).join('');
-  // Insert tags before the select
-  const existing = wrap.querySelectorAll('.lw-type-tag');
-  existing.forEach(e => e.remove());
-  const tagContainer = document.createElement('span');
-  tagContainer.innerHTML = tagsHtml;
-  tagContainer.className = 'lw-type-tag-contents';
-  wrap.insertBefore(tagContainer, select);
-}
-
-// ── 图标切换 ───────────────────────────────────────────
-const lwIcons = ['🗺️', '📑', '🌐', '🛰️', '📊', '💧', '🌾', '🏛️', '🔍'];
-let lwIconIdx = 0;
-
-function cycleLwIcon() {
-  lwIconIdx = (lwIconIdx + 1) % lwIcons.length;
-  const display = document.getElementById('lwIconDisplay');
-  const label = document.getElementById('lwIconLabel');
-  if (display) display.textContent = lwIcons[lwIconIdx];
-  if (label) label.textContent = lwIcons[lwIconIdx] === '🗺️' ? '默认图标，点击切换' : '已选择图标';
-}
-
-// ── 预览弹窗 ───────────────────────────────────────────
-function openLayerPreview() {
-  const selected = getLwSelectedServices();
-  const popup = document.getElementById('layerPreviewPopup');
-  const subtitle = document.getElementById('lpvSubtitle');
-  const list = document.getElementById('lpvServiceList');
-  const markers = document.getElementById('lpvMarkers');
-
-  if (!popup) return;
-
-  if (subtitle) subtitle.textContent = '已选 ' + selected.length + ' 个服务';
-  if (list) {
-    if (selected.length === 0) {
-      list.textContent = '尚未选择任何服务';
-    } else {
-      list.innerHTML = selected.map(s => '<span class="inline-block px-2 py-0.5 bg-white/70 rounded text-xs text-gray-700 m-0.5 shadow-sm">' + s + '</span>').join('');
-    }
-  }
-
-  // Generate fake markers for selected services
-  if (markers) {
-    if (selected.length > 0) {
-      const positions = [
-        { top: '25%', left: '30%' }, { top: '40%', left: '55%' }, { top: '60%', left: '25%' },
-        { top: '20%', left: '65%' }, { top: '55%', left: '70%' }, { top: '35%', left: '45%' },
-      ];
-      markers.innerHTML = selected.map((s, i) => {
-        const pos = positions[i % positions.length];
-        return '<div class="absolute flex flex-col items-center" style="top:' + pos.top + ';left:' + pos.left + ';transform:translate(-50%,-50%)">' +
-          '<div class="w-4 h-4 rounded-full bg-brand shadow-md border-2 border-white animate-pulse"></div>' +
-          '<div class="mt-1 px-1.5 py-0.5 bg-white/90 rounded text-[10px] text-gray-700 shadow-sm whitespace-nowrap max-w-[120px] truncate">' + s + '</div>' +
-          '</div>';
-      }).join('');
-    } else {
-      markers.innerHTML = '';
-    }
-  }
-
-  popup.classList.remove('hidden');
-}
-
-function closeLayerPreview() {
-  const popup = document.getElementById('layerPreviewPopup');
-  if (popup) popup.classList.add('hidden');
-}
-
-// Reset layer wizard state when opened
-function resetLayerWizard() {
-  lwSelectedServices = {};
-  lwTags = [];
-  lwTypeTags = ['矢量图层'];
-  lwIconIdx = 0;
-  const nameInput = document.getElementById('lwName');
-  const codeInput = document.getElementById('lwCode');
-  const descInput = document.getElementById('lwDesc');
-  const iconDisplay = document.getElementById('lwIconDisplay');
-  const iconLabel = document.getElementById('lwIconLabel');
-  if (nameInput) nameInput.value = 'XX农场耕地监测要素图层';
-  if (codeInput) codeInput.value = '';
-  if (descInput) descInput.value = '';
-  if (iconDisplay) iconDisplay.textContent = '🗺️';
-  if (iconLabel) iconLabel.textContent = '默认图标，点击切换';
-  document.getElementById('lwTitle').textContent = '📑 创建要素图层';
-  renderLwTags();
-  renderLwTypeTags();
-  renderLayerServiceTree();
-  updateLwSelectedCount();
-  updateLwCrsDisplay();
-  document.getElementById('lwSvcHint').classList.add('hidden');
-}
-
-
-function closeWizard(id) {
-  document.getElementById(id).classList.add('hidden');
-}
-
-// ── Register Service (Layer 3 · 白话入口) ──────────────
-let regSource = null;
-let regProbed = false;
-
-function selectRegisterSource(src) {
-  regSource = src;
-  const srv = document.getElementById('regSrcServer');
-  const onl = document.getElementById('regSrcOnline');
-  srv.className = 'border-2 rounded-xl p-5 mb-4 cursor-pointer transition-all flex items-center gap-4 ' + (src === 'server' ? 'border-brand bg-brand-light' : 'border-gray-200 hover:border-brand hover:bg-brand-light');
-  onl.className = 'border-2 rounded-xl p-5 mb-4 cursor-pointer transition-all flex items-center gap-4 ' + (src === 'online' ? 'border-brand bg-brand-light' : 'border-gray-200 hover:border-brand hover:bg-brand-light');
-  document.getElementById('regRadioServer').className = 'w-5 h-5 rounded-full flex-shrink-0 ' + (src === 'server' ? 'border-4 border-brand' : 'border-2 border-gray-300');
-  document.getElementById('regRadioOnline').className = 'w-5 h-5 rounded-full flex-shrink-0 ' + (src === 'online' ? 'border-4 border-brand' : 'border-2 border-gray-300');
-  document.getElementById('regServerDetail').classList.toggle('hidden', src !== 'server');
-  document.getElementById('regOnlineDetail').classList.toggle('hidden', src !== 'online');
-  if (src === 'server') setRegNext(regProbed);
-  if (src === 'online') setRegNext(!!document.getElementById('regOnlineSelect').value);
-}
-
-function setRegNext(enabled) {
-  const btn = document.getElementById('regNextBtn');
-  btn.disabled = !enabled;
-  btn.style.opacity = enabled ? '1' : '.4';
-  btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
-}
-
-function probeServer() {
-  const url = document.getElementById('regServerUrl').value.trim();
-  if (!url) { showNotification('⚠️', '请输入服务器地址后再探测'); return; }
-  regProbed = true;
-  document.getElementById('regProbeResult').classList.remove('hidden');
-  setRegNext(true);
-  showNotification('🔍', '已自动识别：标准地图服务 · 从你的服务器检测到 4 个可用服务');
-}
-
-function finishRegister() {
-  const name = regSource === 'server'
-    ? '注册的服务器服务'
-    : (document.getElementById('regOnlineSelect').selectedOptions[0]?.text.split('（')[0] || '在线底图');
-  closeWizard('registerServiceModal');
-  // 重置弹窗状态
-  regSource = null; regProbed = false;
-  document.getElementById('regProbeResult').classList.add('hidden');
-  document.getElementById('regServerUrl').value = '';
-  document.getElementById('regOnlineSelect').value = '';
-  setRegNext(false);
-  showNotification('✅', '外部服务注册成功！<span class="text-gray-400 text-xs">已加入地图服务列表</span><button onclick="switchModule(\'layer\');setTimeout(()=>{resetLayerWizard();document.getElementById(\'layerWizard\').classList.remove(\'hidden\')},400)" class="text-brand underline font-medium ml-2">在要素图层中使用 →</button>');
-}
-
-// ── 卡片操作：详情 / 移动 / 删除 ───────────────────────
-let cardReg = [];
-let dtCard = null, dtModule = null;
-
-function switchDetailTab(idx) {
-  if (!dtCard) return;
-  const m = dtModule;
-  const tabCount = (m === 'data' || m === 'service') ? 3 : 2;
-  const tabLabels = (m === 'data') ? ['🟢 数据信息','📊 数据预览','⚙️ 数据设置']
-    : (m === 'service') ? ['🟢 服务信息','📊 服务预览','⚙️ 服务设置']
-    : ['🟢 地图信息','📊 可视化'];
-  // Update tab styling
-  document.getElementById('dtTabs').innerHTML = tabLabels.map((l,i) =>
-    `<span class="px-3 py-1.5 text-xs rounded-t-md cursor-pointer transition-colors ${i===idx ? 'bg-white text-brand font-medium border-b-2 border-brand' : 'text-gray-500 hover:text-gray-700'}" onclick="switchDetailTab(${i})">${l}</span>`
-  ).join('');
-  document.getElementById('dtContent').innerHTML = renderDetailContent(dtCard, m, idx);
-  // Update actions bar for tab context
-  updateDetailActions(dtCard, m, idx);
-}
-
-function renderDetailContent(card, m, tabIdx) {
-  const rightHTML = renderDetailRight(card, m);
-  if (tabIdx === 0) {
-    return `<div class="w-3/5 p-5 border-r border-line overflow-y-auto">${renderDetailInfo(card, m)}</div>
-     <div class="w-2/5 bg-gray-50/50 overflow-y-auto">${rightHTML}</div>`;
-  } else if (tabIdx === 1) {
-    return renderDetailPreview(card, m);
-  } else {
-    return renderDetailSettings(card, m);
-  }
-}
-
-function renderDetailRight(card, m) {
-  return `<div class="p-4 space-y-4">
-    <div><span class="text-xs text-gray-400 block mb-1">${m==='data'?'数据源信息':'所属目录'}</span>
-      ${m==='data'?`<div class="text-sm text-gray-700">${card.title}.tif</div>`
-      :`<select class="w-full px-2 py-1.5 border border-line rounded text-xs bg-white text-gray-700"><option>${card.cat||'请选择'}</option></select>`}
-    </div>
-    <div><span class="text-xs text-gray-400 block mb-1">组织机构</span>
-      <select class="w-full px-2 py-1.5 border border-line rounded text-xs bg-white text-gray-700"><option>北大荒农垦集团有限公司(86)</option></select>
-    </div>
-    <div><span class="text-xs text-gray-400 block mb-1">标签</span>
-      <div class="flex flex-wrap gap-1"><span class="px-2 py-0.5 bg-gray-100 rounded text-[10px] text-gray-600">${card.tag}</span><span class="px-2 py-0.5 bg-blue-50 rounded text-[10px] text-blue-600 cursor-pointer">+</span></div>
-    </div>
-    <div><span class="text-xs text-gray-400 block mb-1">创建信息</span>
-      <div class="text-sm text-gray-700">${card.mine?'张建国':(m==='map'?'yangzinxin':'聂聪')}<span class="text-xs text-gray-400 ml-2">${m==='service'?'发布人':''}</span></div>
-    </div>
-  </div>`;
-}
-
-function renderDetailPreview(card, m) {
-  const is3D = m === 'map';
-  const hasCRS = m === 'service';
-  return `<div class="flex-1 flex flex-col">
-    ${hasCRS ? `<div class="px-5 py-2 border-b border-line flex items-center gap-3">
-      <span class="text-xs text-gray-500">坐标系：</span>
-      <span class="text-xs bg-white text-gray-800 font-medium px-2 py-1 rounded shadow-sm border border-line cursor-pointer" onclick="this.className='text-xs bg-white text-gray-800 font-medium px-2 py-1 rounded shadow-sm border border-line';this.nextElementSibling.className='text-xs text-gray-500 px-2 py-1 cursor-pointer'">CGCS2000</span>
-      <span class="text-xs text-gray-500 px-2 py-1 cursor-pointer" onclick="this.className='text-xs bg-white text-gray-800 font-medium px-2 py-1 rounded shadow-sm border border-line';this.previousElementSibling.className='text-xs text-gray-500 px-2 py-1 cursor-pointer'">Web 墨卡托</span>
-    </div>` : ''}
-    <div class="flex-1 relative m-5 rounded-xl overflow-hidden" style="min-height: 320px; background: ${is3D ? 'radial-gradient(ellipse at 50% 55%, #1a3a5c 0%, #0d2137 40%, #0a1628 100%)' : 'linear-gradient(135deg, #c8dce8 0%, #d4e4f0 20%, #b8d4e8 40%, #c8dce0 60%, #d0e0ec 80%, #c0d8e8 100%)'};">
-      <svg class="absolute inset-0 w-full h-full opacity-15" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="pvGrid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="${is3D?'#4488cc':'#8899aa'}" stroke-width="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#pvGrid)"/></svg>
-      <div class="absolute inset-0 flex items-center justify-center">
-        <div class="text-center">
-          <div class="text-5xl mb-3">${is3D ? '🌍' : '🗺️'}</div>
-          <div class="text-white font-semibold text-base bg-black/40 backdrop-blur-sm rounded-lg px-4 py-2">${card.title}</div>
-          <div class="text-white/60 text-xs mt-2">${is3D ? '3D 地球视角 · 可旋转/缩放' : '2D 平面预览 · 支持缩放/平移'}</div>
-          ${is3D ? '<div class="text-white/50 text-[10px] mt-1 font-mono">航向角: 0° | 俯仰角: 45° | 层级: 3</div>' : ''}
-        </div>
-      </div>
-      <div class="absolute bottom-3 right-3 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2 text-[10px] space-y-1">
-        <div class="flex items-center gap-1.5 text-white/80"><span class="w-3 h-3 rounded-sm inline-block" style="background:rgba(47,84,235,0.5);border:1px solid #2f54eb;"></span> 数据图层</div>
-        <div class="flex items-center gap-1.5 text-white/80"><span class="w-3 h-3 rounded-sm inline-block" style="background:rgba(82,196,26,0.45);border:1px solid #52c41a;"></span> 参考底图</div>
-      </div>
-      <div class="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-3 py-1 flex items-center gap-4 text-[10px] font-mono text-green-300/80">
-        <span>经度: 125.52°</span><span>纬度: 49.05°</span><span>层级: 3</span>${is3D ? '<span>航向角: 0°</span><span>俯仰角: 45°</span>' : ''}
-      </div>
-    </div>
-    <div class="px-5 pb-4 text-xs text-gray-400">💡 这是概念预览。实际系统中支持鼠标拖拽平移、滚轮缩放、点击地块查看详情等交互。</div>
-  </div>`;
-}
-
-function renderDetailSettings(card, m) {
-  if (m === 'data') {
-    return `<div class="w-3/5 p-5 border-r border-line overflow-y-auto space-y-5">
-      <div>
-        <h4 class="text-sm font-semibold text-gray-800 mb-3">设置空间范围</h4>
-        <p class="text-xs text-gray-500 mb-3">在地图上拖拽矩形框设定数据的空间范围（Bounding Box），用于索引和快速定位。</p>
-        <div class="rounded-xl overflow-hidden relative" style="height: 200px; background: linear-gradient(135deg, #1a3020 0%, #2d4a30 20%, #1e3a25 40%, #2a4a30 60%, #1a3020 80%, #223325 100%);">
-          <div class="absolute top-3 left-0 right-0 text-center text-[10px] font-mono text-green-300/70">minx:122.999728 miny:43.256032 maxx:135.132664 maxy:50.552285</div>
-          <div class="absolute top-10 left-8 right-8 bottom-6 border-2 border-green-400/60 rounded-sm"></div>
-        </div>
-        <div class="flex gap-2 mt-3"><button class="px-4 py-2 border border-line rounded-lg text-sm text-gray-600 bg-white hover:border-brand">取消</button><button class="px-4 py-2 bg-brand hover:bg-brand-dark text-white rounded-lg text-sm font-medium">保存</button></div>
-      </div>
-      <div class="border-t border-line pt-4">
-        <h4 class="text-sm font-semibold text-gray-800 mb-2">数据源信息</h4>
-        <div class="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 font-mono">${card.title}.tif</div>
-      </div>
-    </div>
-    <div class="w-2/5 bg-gray-50/50 overflow-y-auto">${renderDetailRight(card, m)}</div>`;
-  } else if (m === 'service') {
-    return `<div class="w-3/5 p-5 border-r border-line overflow-y-auto space-y-5">
-      <div>
-        <h4 class="text-sm font-semibold text-gray-800 mb-3">默认展示区域</h4>
-        <p class="text-xs text-gray-500 mb-3">设置服务的初始视图范围（如果没有）或者设置兴趣区域。</p>
-        <button class="px-4 py-2 border border-line rounded-lg text-sm text-gray-600 bg-white hover:border-brand">设置初始范围</button>
-      </div>
-      <div class="border-t border-line pt-4">
-        <h4 class="text-sm font-semibold text-gray-800 mb-2">数据更新频率</h4>
-        <p class="text-xs text-gray-500 mb-2">根据数据的变化频率，设置客户端自动刷新服务频率。适用于高频刷新场景。</p>
-        <select class="px-3 py-2 border border-line rounded-lg text-sm bg-white text-gray-700"><option>请选择</option><option>不自动更新</option><option>每小时更新</option><option>每10分钟更新</option><option>实时更新</option></select>
-      </div>
-    </div>
-    <div class="w-2/5 bg-gray-50/50 overflow-y-auto">${renderDetailRight(card, m)}</div>`;
-  } else {
-    return `<div class="w-3/5 p-5 border-r border-line overflow-y-auto flex items-center justify-center text-center">
-      <div><div class="text-3xl mb-3">⚙️</div><div class="text-sm text-gray-500">${m==='layer'?'要素图层':'专题地图'}的高级设置</div><div class="text-xs text-gray-400 mt-1">坐标系、渲染引擎等配置项<br>在实际系统中通过地图设计页完成</div></div>
-    </div>
-    <div class="w-2/5 bg-gray-50/50 overflow-y-auto">${renderDetailRight(card, m)}</div>`;
-  }
-}
-
-function updateDetailActions(card, m, tabIdx) {
-  if (tabIdx !== 0) {
-    document.getElementById('dtActions').innerHTML = `<div></div><div class="flex items-center gap-2">
-      <button onclick="switchDetailTab(0)" class="px-4 py-2 border border-line rounded-lg text-sm text-gray-600 hover:border-brand bg-white transition-colors">← 返回信息</button>
-    </div>`;
-    return;
-  }
-  let actionsHTML = '';
-  if (m === 'data') {
-    actionsHTML = `<div></div><div class="flex items-center gap-2">
-      <button onclick="closeWizard('detailModal');updateCard('${card.title}')" class="px-4 py-2 border border-line rounded-lg text-sm text-gray-700 hover:border-brand hover:text-brand bg-white transition-colors">↻ 更新数据</button>
-      <button onclick="closeWizard('detailModal');document.getElementById('publishModal').classList.remove('hidden')" class="px-4 py-2 bg-brand hover:bg-brand-dark text-white rounded-lg text-sm font-medium transition-colors">🚀 发布服务</button>
-      <button onclick="closeWizard('detailModal');showNotification('🗑️','已删除「${card.title}」')" class="px-4 py-2 border border-line rounded-lg text-sm text-red-500 hover:bg-red-50 bg-white transition-colors">🗑️ 删除</button>
-    </div>`;
-  } else if (m === 'service') {
-    actionsHTML = `<div></div><div class="flex items-center gap-2">
-      <button onclick="closeWizard('detailModal')" class="px-4 py-2 border border-line rounded-lg text-sm text-gray-700 hover:border-brand hover:text-brand bg-white transition-colors">⊕ 元数据</button>
-      <button onclick="closeWizard('detailModal')" class="px-4 py-2 border border-line rounded-lg text-sm text-gray-700 hover:border-brand hover:text-brand bg-white transition-colors">✏️ 更新服务</button>
-      <button onclick="closeWizard('detailModal');showNotification('🗑️','已删除「${card.title}」')" class="px-4 py-2 border border-line rounded-lg text-sm text-red-500 hover:bg-red-50 bg-white transition-colors">🗑️ 删除</button>
-    </div>`;
-  } else {
-    actionsHTML = `<div></div><div class="flex items-center gap-2">
-      <button onclick="closeWizard('detailModal');openMapViewer('${card.title}')" class="px-4 py-2 border border-line rounded-lg text-sm text-gray-700 hover:border-brand hover:text-brand bg-white transition-colors">▶ 预览</button>
-      <button onclick="closeWizard('detailModal');${m==='layer'?"openLayerDesign('edit','"+card.title+"')":"openMapDesign('edit','"+card.title+"')"}" class="px-4 py-2 bg-brand hover:bg-brand-dark text-white rounded-lg text-sm font-medium transition-colors">✏️ 设计</button>
-      <button onclick="closeWizard('detailModal');showNotification('🗑️','已删除「${card.title}」')" class="px-4 py-2 border border-line rounded-lg text-sm text-red-500 hover:bg-red-50 bg-white transition-colors">🗑️ 删除</button>
-    </div>`;
-  }
-  document.getElementById('dtActions').innerHTML = actionsHTML;
-}
-
-function renderDetailInfo(card, m) {
-  const created = card.mine ? '2026-08-07 14:22:32' : '2026-07-22 14:39:56';
-  // Detail rendering
-  let html = '';
-  if (m === 'data') {
-    html = `
-    <div class="flex gap-3 mb-4">
-      <div class="w-32 h-24 rounded-lg bg-gradient-to-br ${card.thumb} flex items-center justify-center text-3xl flex-shrink-0 relative group"><span>${card.icon}</span><div class="absolute bottom-0 inset-x-0 bg-black/40 text-white text-[10px] text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">更换封面</div></div>
-      <div class="space-y-1.5 min-w-0 flex-1">
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">数据名称</span><span class="text-sm text-gray-800">${card.title}</span><span class="text-gray-300 cursor-pointer">✏️</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">数据ID</span><span class="text-xs text-gray-500 font-mono">2083032276753817601</span><span class="text-gray-300 cursor-pointer" title="复制">📋</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">数据格式</span><span class="text-sm text-gray-800">${card.type}</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">数据大小</span><span class="text-sm text-gray-800">27.3 MB</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">数据描述</span><span class="text-sm text-gray-400">暂无描述</span><span class="text-gray-300 cursor-pointer">✏️</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">预览地址</span><span class="text-xs text-blue-600 underline font-mono truncate">/geospatial/dataPreview?id=208303...</span><span class="text-gray-300 cursor-pointer">👁️</span><span class="text-gray-300 cursor-pointer">📋</span></div>
-      </div>
-    </div>
-    <div class="border-t border-line pt-3 mb-3"><span class="text-xs font-semibold text-gray-700">空间信息</span></div>
-    <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
-      <div><span class="text-gray-400">要素类型</span> <span class="text-gray-700 ml-2">栅格</span></div><div><span class="text-gray-400">坐标系</span> <span class="text-gray-700 ml-2">全球标准坐标 (EPSG:3857)</span></div>
-      <div><span class="text-gray-400">波段数</span> <span class="text-gray-700 ml-2">1</span></div><div><span class="text-gray-400">行数</span> <span class="text-gray-700 ml-2">73,909</span></div>
-      <div class="col-span-2"><span class="text-gray-400">列数</span> <span class="text-gray-700 ml-2">89,914</span></div>
-      <div class="col-span-2"><span class="text-gray-400">数据覆盖范围</span> <span class="text-xs text-gray-500 ml-2 font-mono">[13696267.078, 5351146.39, 15042899.395, 6542476.977]</span></div>
-      <div class="col-span-2"><span class="text-gray-400">视图范围</span> <span class="text-xs text-gray-500 ml-2 font-mono">[122.999728, 43.256832, 135.132664, 50.552285]</span></div>
-    </div>
-    <div class="border-t border-line pt-3 mt-3"><span class="text-xs font-semibold text-gray-700">时间信息</span></div>
-    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs mt-1">
-      <div><span class="text-gray-400">创建时间</span> <span class="text-gray-700 ml-2">2026-07-31 11:29:30</span></div>
-      <div><span class="text-gray-400">更新时间</span> <span class="text-gray-700 ml-2">2026-07-31 11:35:01</span></div>
-    </div>`;
-  } else if (m === 'service') {
-    html = `
-    <div class="flex gap-3 mb-4">
-      <div class="w-32 h-24 rounded-lg bg-gradient-to-br ${card.thumb} flex items-center justify-center text-3xl flex-shrink-0 relative group"><span>${card.icon}</span><div class="absolute bottom-0 inset-x-0 bg-black/40 text-white text-[10px] text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">更换封面</div></div>
-      <div class="space-y-1.5 min-w-0 flex-1">
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">服务名称</span><span class="text-sm text-gray-800 truncate">${card.title}</span><span class="text-gray-300 cursor-pointer flex-shrink-0">✏️</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">服务ID</span><span class="text-xs text-gray-500 font-mono">2085612539814596609</span><span class="text-gray-300 cursor-pointer" title="复制">📋</span></div>
-        ${card.timeSeries ? `<div class="flex items-start gap-2"><span class="text-xs text-gray-400 w-16 mt-0.5">数据版本</span><div class="flex items-center gap-1 flex-wrap">${card.timeSeries.map((ts, tsi) => `<button onclick="switchDetailVersion('${tsi}')" class="px-2.5 py-1 text-[11px] rounded-md transition-all font-medium ${tsi === (card.tsActive||0) ? 'bg-brand text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'}">${ts.v}</button>`).join('')}</div></div>` : ''}
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">服务类型</span><span class="text-sm text-gray-800">${card.type}</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">地理类型</span><span class="text-sm text-gray-800">图层服务</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">服务描述</span><span class="text-sm text-gray-400">暂无描述</span><span class="text-gray-300 cursor-pointer">✏️</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">预览地址</span><span class="text-xs text-blue-600 underline font-mono truncate">/geospatial/...</span><span class="text-gray-300 cursor-pointer">👁️</span><span class="text-gray-300 cursor-pointer">📋</span></div>
-      </div>
-    </div>
-    <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
-      <div class="text-xs font-semibold text-amber-800 mb-2">🔗 服务地址（双投影）</div>
-      <div class="space-y-1.5 text-xs">
-        <div class="flex items-center gap-2"><span class="text-gray-500 font-mono text-[10px] w-16">全球标准</span><span class="text-gray-600 font-mono text-[10px] truncate flex-1">http://10.11.14.211:30879/geoservercloud-api/tiff/wms?...srs=EPSG:3857...</span><span class="text-gray-300 cursor-pointer flex-shrink-0" title="复制">📋</span></div>
-        <div class="flex items-center gap-2"><span class="text-gray-500 font-mono text-[10px] w-16">中国大地</span><span class="text-gray-600 font-mono text-[10px] truncate flex-1">http://10.11.14.211:30879/geoservercloud-api/tiff/wms?...srs=EPSG:4490...</span><span class="text-gray-300 cursor-pointer flex-shrink-0" title="复制">📋</span></div>
-      </div>
-    </div>
-    <div class="border-t border-line pt-3 mb-3"><span class="text-xs font-semibold text-gray-700">空间信息</span></div>
-    <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
-      <div><span class="text-gray-400">坐标系</span> <span class="text-gray-700 ml-2">EPSG:32653</span></div><div><span class="text-gray-400">坐标单位</span> <span class="text-gray-700 ml-2">米</span></div>
-      <div class="col-span-2"><span class="text-gray-400">数据覆盖范围</span> <span class="text-xs text-gray-500 ml-2 font-mono">[132.515308, 47.048309, 133.188937, 47.494281]</span></div>
-    </div>
-    <div class="border-t border-line pt-3 mt-3"><span class="text-xs font-semibold text-gray-700">时间信息</span></div>
-    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs mt-1">
-      <div><span class="text-gray-400">创建时间</span> <span class="text-gray-700 ml-2">2026-08-07 14:22:32</span></div>
-      <div><span class="text-gray-400">更新时间</span> <span class="text-gray-700 ml-2">2026-08-07 14:22:32</span></div>
-    </div>`;
-  } else if (m === 'layer') {
-    html = `
-    <div class="flex gap-3 mb-4">
-      <div class="w-32 h-24 rounded-lg bg-gradient-to-br ${card.thumb} flex items-center justify-center text-3xl flex-shrink-0 relative group"><span>${card.icon}</span><div class="absolute bottom-0 inset-x-0 bg-black/40 text-white text-[10px] text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">更换封面</div></div>
-      <div class="space-y-1.5 min-w-0 flex-1">
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">图层名称</span><span class="text-sm text-gray-800">${card.title}</span><span class="text-gray-300 cursor-pointer">✏️</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">图层编号</span><span class="text-xs text-gray-500 font-mono">${card.title.includes('耕地')?'gengdizhongzhi_...':'empty_layer'}</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">图层用途</span><span class="text-sm text-gray-800">资源 · 二维展示</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">图层描述</span><span class="text-sm text-gray-400">暂无描述</span><span class="text-gray-300 cursor-pointer">✏️</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">预览地址</span><span class="text-xs text-blue-600 underline font-mono truncate">/geospatial/mapPreview?id=...</span><span class="text-gray-300 cursor-pointer">👁️</span><span class="text-gray-300 cursor-pointer">📋</span></div>
-      </div>
-    </div>
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-      <div class="text-xs font-semibold text-blue-800 mb-1">🔗 服务地址 <span class="text-[10px] text-blue-500 font-normal ml-1">（含 bigMapId，供上游系统嵌入）</span></div>
-      <div class="text-[10px] text-blue-600 font-mono break-all">/geospatial-api/mapResourceCheck/getMapResourceStyle?mapIds=...&bigMapId=...&srsName=EPSG:4490</div>
-      <span class="text-gray-300 cursor-pointer float-right" title="复制">📋</span>
-    </div>
-    <div class="border-t border-line pt-3 mb-3"><span class="text-xs font-semibold text-gray-700">空间信息</span></div>
-    <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
-      <div><span class="text-gray-400">坐标系</span> <span class="text-gray-700 ml-2">中国大地坐标 (EPSG:4490)</span></div><div><span class="text-gray-400">坐标单位</span> <span class="text-gray-700 ml-2">度</span></div>
-    </div>
-    <div class="border-t border-line pt-3 mt-3"><span class="text-xs font-semibold text-gray-700">关联服务列表</span></div>
-    <div class="mt-1 bg-gray-50 rounded-lg p-2 flex items-center gap-2 text-xs">
-      <div class="w-8 h-8 rounded bg-gray-300 flex-shrink-0"></div>
-      <div class="flex-1"><div class="text-gray-800 font-medium">STORAGE_RECORD_12345843</div><div class="text-gray-400">流畅矢量服务 (MVT) · 服务数量:1</div></div>
-      <span class="text-gray-400 cursor-pointer">⟩</span>
-    </div>
-    <div class="border-t border-line pt-3 mt-3"><span class="text-xs font-semibold text-gray-700">时间信息</span></div>
-    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs mt-1">
-      <div><span class="text-gray-400">创建时间</span> <span class="text-gray-700 ml-2">${created}</span></div>
-      <div><span class="text-gray-400">更新时间</span> <span class="text-gray-700 ml-2">${created}</span></div>
-    </div>`;
-  } else { // map
-    html = `
-    <div class="flex gap-3 mb-4">
-      <div class="w-32 h-24 rounded-lg bg-gradient-to-br ${card.thumb} flex items-center justify-center text-3xl flex-shrink-0 relative group"><span>${card.icon}</span><div class="absolute bottom-0 inset-x-0 bg-black/40 text-white text-[10px] text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">更换封面</div></div>
-      <div class="space-y-1.5 min-w-0 flex-1">
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">地图名称</span><span class="text-sm text-gray-800">${card.title}</span><span class="text-gray-300 cursor-pointer">✏️</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">地图编码</span><span class="text-xs text-gray-500 font-mono">${card.title.includes('debug')?'debug-map-role':'gengdi_...'}</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">地图ID</span><span class="text-xs text-gray-500 font-mono">2081981061599846401</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">地图类型</span><span class="text-sm text-gray-800">专题 · 渲染引擎 2d</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">地图描述</span><span class="text-sm text-gray-400">暂无描述</span><span class="text-gray-300 cursor-pointer">✏️</span></div>
-        <div class="flex items-center gap-2"><span class="text-xs text-gray-400 w-16">预览地址</span><span class="text-xs text-blue-600 underline font-mono truncate">/geospatial/mapPreview?id=208198...</span><span class="text-gray-300 cursor-pointer">👁️</span><span class="text-gray-300 cursor-pointer">📋</span></div>
-      </div>
-    </div>
-    <div class="bg-purple-50 border border-purple-200 rounded-lg p-3 mb-3">
-      <div class="text-xs font-semibold text-purple-800 mb-1">🔗 服务地址 <span class="text-[10px] text-purple-500 font-normal ml-1">（参数 mapIds 复数，供大屏/驾驶舱 API 嵌入）</span></div>
-      <div class="text-[10px] text-purple-600 font-mono break-all">/geospatial-api/mapResourceCheck/getMapResourceStyle?mapIds=2081981061599846401&srsName=EPSG:3857</div>
-      <span class="text-gray-300 cursor-pointer float-right" title="复制">📋</span>
-    </div>
-    <div class="border-t border-line pt-3 mb-3"><span class="text-xs font-semibold text-gray-700">空间信息</span></div>
-    <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
-      <div><span class="text-gray-400">坐标系</span> <span class="text-gray-700 ml-2">全球标准坐标 (EPSG:3857)</span></div><div><span class="text-gray-400">坐标单位</span> <span class="text-gray-700 ml-2">米</span></div>
-    </div>
-    <div class="border-t border-line pt-3 mt-3"><span class="text-xs font-semibold text-gray-700">关联要素图层列表</span></div>
-    <div class="mt-1 bg-gray-50 rounded-lg p-2 flex items-center gap-2 text-xs">
-      <div class="w-8 h-8 rounded bg-gray-300 flex-shrink-0"></div>
-      <div class="flex-1"><div class="text-gray-800 font-medium">${card.layerCount === 0 ? '空图层' : '耕地种植监测组合'}</div><div class="text-gray-400">服务数量:${card.layerCount || 0}</div></div>
-      <span class="text-gray-400 cursor-pointer">⟩</span>
-    </div>
-    <div class="border-t border-line pt-3 mt-3"><span class="text-xs font-semibold text-gray-700">时间信息</span></div>
-    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs mt-1">
-      <div><span class="text-gray-400">创建时间</span> <span class="text-gray-700 ml-2">2026-07-28 13:52:21</span></div>
-      <div><span class="text-gray-400">更新时间</span> <span class="text-gray-700 ml-2">2026-07-30 18:15:52</span></div>
-    </div>`;
-  }
-  return html;
-}
-
-function toggleCardMenu(e, idx) {
-  e.stopPropagation();
-  document.querySelectorAll('.card-menu').forEach(m => m.classList.add('hidden'));
-  document.querySelectorAll('.card-confirm').forEach(m => m.classList.add('hidden'));
-  document.getElementById('cardMenu-' + idx).classList.toggle('hidden');
-}
-
-function cardAction(e, action, idx) {
-  e.stopPropagation();
-  document.querySelectorAll('.card-menu').forEach(m => m.classList.add('hidden'));
-  const card = cardReg[idx];
-  if (!card) return;
-  if (action === 'detail') openDetailModal(card);
-  else if (action === 'move') openMoveModal(card.title);
-  else if (action === 'delete') document.getElementById('cardConfirm-' + idx).classList.remove('hidden');
-}
-
-// 数据资产卡片本体点击 → 进入数据详情
-function openCardDetail(idx) {
-  const card = cardReg[idx];
-  if (card) openDetailModal(card);
-}
-
-function openDetailModal(card) {
-  dtCard = card;
-  dtModule = activeModule;
-  const m = activeModule;
-  const moduleNames = { data: '📋 数据详情', service: '📋 服务信息查看', layer: '📋 地图信息查看', map: '📋 地图信息查看' };
-  document.getElementById('dtHeaderTitle').textContent = card.title;
-  const modal = document.getElementById('detailModal');
-  const inner = modal.querySelector('.bg-white');
-  inner.style.width = '820px';
-  modal.classList.remove('hidden');
-  switchDetailTab(0);
-}
-
-function openMoveModal(title) {
-  const tree = moduleTrees[activeModule] || moduleTrees.data;
-  const targets = [];
-  const collect = (nodes) => nodes.forEach(n => {
-    if (n.filter && n.filter !== '*' && n.filter !== 'mine') targets.push(n.name);
-    if (n.children) collect(n.children);
-  });
-  collect(tree);
-  document.getElementById('mvTitle').textContent = title;
-  document.getElementById('mvTargets').innerHTML = targets.length ? targets.map(t =>
-    `<button onclick="doMove(event, this)" class="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-brand-light hover:text-brand transition-colors">${t}</button>`
-  ).join('') : `<div class="text-xs text-gray-400 text-center py-4">暂无其他分类</div>`;
-  document.getElementById('moveModal').classList.remove('hidden');
-}
-
-function doMove(e, btn) {
-  e.stopPropagation();
-  const title = document.getElementById('mvTitle').textContent;
-  const target = btn.textContent.trim();
-  closeWizard('moveModal');
-  showNotification('📦', '「' + title + '」已移动到「' + target + '」');
-}
-
-function closeCardConfirm(e, idx) {
-  e.stopPropagation();
-  document.getElementById('cardConfirm-' + idx).classList.add('hidden');
-}
-
-function confirmDeleteCard(e, idx) {
-  e.stopPropagation();
-  const card = cardReg[idx];
-  const title = card ? card.title : '';
-  // 从持久存储中移除
-  const store = moduleConfigs[activeModule];
-  const storeIdx = store.cards.findIndex(c => c.title === title);
-  if (storeIdx !== -1) store.cards.splice(storeIdx, 1);
-  // 关闭气泡并重新渲染
-  document.querySelectorAll('.card-menu, .card-confirm').forEach(m => m.classList.add('hidden'));
-  document.getElementById('mainContent').innerHTML = renderMain(activeModule);
-  showNotification('🗑️', '「' + title + '」已删除');
-}
-
-// 点击空白处关闭所有卡片菜单与确认气泡
-document.addEventListener('click', () => {
-  document.querySelectorAll('.card-menu, .card-confirm').forEach(m => m.classList.add('hidden'));
-});
-
-// ── 数据更新（卡片 hover → 更新 → 上传 CSV）──────────
+// ── 数据资产：更新数据 ─────────────────────────────────
 function updateCard(title) {
   document.getElementById('updTitle').textContent = title;
-  document.getElementById('updateModalTitle').textContent = '📤 更新数据 — ' + title;
+  document.getElementById('updateModalTitle').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 更新数据 — ' + title;
   document.getElementById('updateModal').classList.remove('hidden');
 }
 
@@ -2566,210 +492,22 @@ function confirmUpdate() {
   btn.disabled = true;
   btn.style.opacity = '.4';
   btn.style.cursor = 'not-allowed';
-  showNotification('✅', '数据更新成功！<span class="text-gray-400 text-xs">已用新文件覆盖原数据，历史版本已保留</span>');
+  showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>', '数据更新成功！<span class="text-gray-400 text-xs">已用新文件覆盖原数据，历史版本已保留</span>');
 }
 
-// ── 地图服务：排序卡片 ─────────────────────────────────
-function sortServiceCards(by) {
-  const store = moduleConfigs.service;
-  if (by === 'name') {
-    store.cards.sort((a, b) => a.title.localeCompare(b.title, 'zh'));
-  } else if (by === 'refs') {
-    store.cards.sort((a, b) => (b.sub.match(/引用(\d+)/)?.[1]||0) - (a.sub.match(/引用(\d+)/)?.[1]||0));
-  } else {
-    // time: restore default order (by mine first, then as defined)
-    store.cards.sort((a, b) => (b.mine ? 1 : 0) - (a.mine ? 1 : 0));
-  }
-  document.getElementById('mainContent').innerHTML = renderMain('service');
-}
-
-// ── 地图服务：时序版本切换 ─────────────────────────────
-function switchServiceVersion(idx, tsi) {
-  const card = moduleConfigs.service.cards[idx];
-  if (!card || !card.timeSeries || !card.timeSeries[tsi]) return;
-  card.tsActive = tsi;
-  const ts = card.timeSeries[tsi];
-  card.sub = ts.sub;
-  document.getElementById('mainContent').innerHTML = renderMain(activeModule);
-}
-
-// ── 地图服务：详情内时序版本切换 ───────────────────────
-function switchDetailVersion(tsi) {
-  tsi = parseInt(tsi);
-  if (!dtCard || !dtCard.timeSeries || !dtCard.timeSeries[tsi]) return;
-  dtCard.tsActive = tsi;
-  const ts = dtCard.timeSeries[tsi];
-  dtCard.sub = ts.sub;
-  // 同步更新 moduleConfigs 中的卡片
-  const card = moduleConfigs.service.cards.find(c => c.title === dtCard.title);
-  if (card) { card.tsActive = tsi; card.sub = ts.sub; }
-  switchDetailTab(0);
-}
-
-// ── 地图服务：复制地址 ─────────────────────────────────
-function copyServiceUrl(title) {
-  const url = 'http://maps.hetu.example.com/service/' + encodeURIComponent(title);
-  const ta = document.createElement('textarea');
-  ta.value = url;
-  ta.style.position = 'fixed';
-  ta.style.opacity = '0';
-  document.body.appendChild(ta);
-  ta.select();
-  try {
-    document.execCommand('copy');
-    showNotification('🔗', '服务地址已复制，可直接分享给同事使用<br><span class="text-xs text-gray-400">' + url + '</span>');
-  } catch (e) {
-    showNotification('🔗', '服务地址：' + url);
-  }
-  document.body.removeChild(ta);
-}
-
-// ── 要素图层：编辑 / 设计 ──────────────────────────────
-function openLayerDesign(action, title) {
-  if (action === 'edit') {
-    document.getElementById('lwTitle').textContent = '📑 编辑要素图层';
-    const nameInput = document.getElementById('lwName');
-    if (nameInput) nameInput.value = title;
-    document.getElementById('layerWizard').classList.remove('hidden');
-    renderLayerServiceTree();
-  } else {
-    openMapViewer(title); // 设计 = 打开图层叠加预览
-  }
-}
-
-// ── 专题地图：编辑 / 设计 ──────────────────────────────
-function openMapDesign(action, title) {
-  if (action === 'edit') {
-    showNotification('✏️', '正在打开「' + title + '」的编辑配置（原型模拟）');
-  } else {
-    openMapViewer(title); // 设计 = 打开地图查看器
-  }
-}
-
-// ── Notification System ─────────────────────────────────
-function showNotification(icon, message) {
-  const stack = document.getElementById('notificationStack');
-  const id = 'notif_' + Date.now();
-  const el = document.createElement('div');
-  el.id = id;
-  el.className = 'notif-enter bg-white border border-gray-100 rounded-2xl shadow-xl p-4 flex items-start gap-3 text-sm backdrop-blur-sm';
-  el.innerHTML = `
-    <span class="text-xl flex-shrink-0">${icon}</span>
-    <div class="flex-1">${message}</div>
-    <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600 flex-shrink-0">✕</button>
-  `;
-  stack.appendChild(el);
-  setTimeout(() => { if (el.parentElement) el.remove(); }, 8000);
-}
-
-// ── Plot click notification (replaces native alert) ──────────
-function plotClickNotify(plotId, crop, area) {
-  const msg = `${plotId}：${crop} · ${area}`;
-  showNotification('🌾', msg);
-}
-
-// ── Init ────────────────────────────────────────────────
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    ['uploadWizard','publishModal','layerWizard','createMapModal','detailModal','moveModal','registerServiceModal','updateModal','layerPreviewPopup'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.classList.add('hidden');
-    });
-  }
-});
-
-// ── Map Viewer (S-12 service with CRS switcher / S-18 layer 2D / S-25 theme 3D) ──
-let mvContext = null; // { module: 'service'|'layer'|'map', title: '' }
-function openMapViewer(title, moduleOverride) {
-  const m = moduleOverride || activeModule;
-  mvContext = { module: m, title: title };
-  const overlay = document.getElementById('mapViewerOverlay');
-  document.getElementById('mvMapName').textContent = title;
-  document.getElementById('mvCenterTitle').textContent = title;
-
-  const layerMap = {
-    'XX农场耕地监测一张图': '耕地边界、遥感底图、作物分布',
-    '建三江资源一张图': '行政区划、遥感底图、宗地边界、林地、湿地',
-    '八五六数字指挥中心': '遥感底图、宗地边界、农机轨迹、产量网格',
-    '智慧水利指挥平台': '水利设施、水系网络、遥感底图',
-    '耕地种植用途管理平台': '耕地边界、遥感底图、宗地边界',
-  };
-  document.getElementById('mvLayers').textContent = (m==='service'?'服务：':'图层：') + (layerMap[title] || '耕地边界、遥感底图');
-
-  // Per-module differentiation
-  const crsSwitcher = document.getElementById('crsSwitcher');
-  const angle3d = document.getElementById('mv3dAngle');
-  const pitch3d = document.getElementById('mv3dPitch');
-  const badge = document.getElementById('mvBadge');
-  const tip = document.getElementById('mvTip');
-  const modeTag = document.getElementById('mvModeTag');
-  const canvas = document.getElementById('mvCanvas');
-
-  if (m === 'service') {
-    // S-12: Service preview with CRS switcher
-    crsSwitcher.classList.remove('hidden');
-    angle3d.classList.add('hidden');
-    pitch3d.classList.add('hidden');
-    badge.textContent = 'WMS 服务预览';
-    badge.className = 'text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full';
-    tip.textContent = '💡 切换 CGCS2000 / Web墨卡托 查看双投影渲染效果';
-    modeTag.textContent = '坐标系：CGCS2000';
-    document.getElementById('crsCGCS2000').textContent = 'CGCS2000';
-    document.getElementById('crsWebMercator').textContent = 'Web 墨卡托';
-    canvas.style.background = 'linear-gradient(135deg, #1a3020 0%, #2d4a30 20%, #1e3a25 40%, #2a4a30 60%, #1a3020 80%, #223325 100%)';
-    document.getElementById('crsCGCS2000').className = 'px-2.5 py-1 text-xs rounded-md transition-colors bg-white text-gray-800 font-medium shadow-sm';
-    document.getElementById('crsWebMercator').className = 'px-2.5 py-1 text-xs rounded-md transition-colors text-gray-500';
-  } else if (m === 'map') {
-    // S-25/27: Theme map with 3D globe
-    crsSwitcher.classList.add('hidden');
-    angle3d.classList.remove('hidden');
-    pitch3d.classList.remove('hidden');
-    badge.textContent = '3D 地球视角';
-    badge.className = 'text-[10px] bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full';
-    tip.textContent = '💡 3D 地球视角——旋转查看球面地形，要素图层树在左侧面板显示';
-    modeTag.textContent = '3D 渲染 · EPSG:3857';
-    canvas.style.background = 'radial-gradient(ellipse at 50% 55%, #1a3a5c 0%, #0d2137 40%, #0a1628 100%)';
-  } else {
-    // S-18/20: Layer 2D flat map
-    crsSwitcher.classList.add('hidden');
-    angle3d.classList.add('hidden');
-    pitch3d.classList.add('hidden');
-    badge.textContent = '2D 平面';
-    badge.className = 'text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full';
-    tip.textContent = '💡 2D 平面地图——左侧面板提供添加/数据/底图/图例/设置工具';
-    modeTag.textContent = '2D 渲染 · EPSG:4490';
-    canvas.style.background = 'linear-gradient(135deg, #c8dce8 0%, #d4e4f0 20%, #b8d4e8 40%, #c8dce0 60%, #d0e0ec 80%, #c0d8e8 100%)';
-  }
-  overlay.classList.remove('hidden');
-}
-
-function switchCRS(crs) {
-  const btnCGCS = document.getElementById('crsCGCS2000');
-  const btnWeb = document.getElementById('crsWebMercator');
-  const tag = document.getElementById('mvModeTag');
-  if (crs === 'cgcs2000') {
-    btnCGCS.className = 'px-2.5 py-1 text-xs rounded-md transition-colors bg-white text-gray-800 font-medium shadow-sm';
-    btnWeb.className = 'px-2.5 py-1 text-xs rounded-md transition-colors text-gray-500';
-    tag.textContent = '坐标系：CGCS2000';
-  } else {
-    btnWeb.className = 'px-2.5 py-1 text-xs rounded-md transition-colors bg-white text-gray-800 font-medium shadow-sm';
-    btnCGCS.className = 'px-2.5 py-1 text-xs rounded-md transition-colors text-gray-500';
-    tag.textContent = '坐标系：Web 墨卡托';
-  }
-}
-
+// ── 初始化 ─────────────────────────────────────────────
 document.getElementById('appShell').classList.remove('hidden');
+activeModule = 'data';
 switchModule('data');
 showWelcomeIfNeeded();
-wfInit();
 
-console.log('✅ 河图·易用性优化产物原型 已就绪');
-console.log('  📋 引导系统 — 工作流引导条 + ❓ 帮助面板 + 通知链');
-console.log('  📦 数据资产 — 白话术语 + 三步上传向导');
-console.log('  📡 地图服务 — 在线地图图层管理');
-console.log('  📑 要素图层 — 服务叠加 + 复用组合');
-console.log('  🗺️ 专题地图 — 创建地图表单');
-console.log('  💬 成功反馈链 — 每步完成后引导下一步');
+// 从任务中心「查看结果」跳转而来：自动打开对应数据的详情
+(function openPendingDetail() {
+  const t = consumePendingDetail();
+  if (!t) return;
+  const card = moduleConfigs.data.cards.find(c => c.title === t);
+  if (card) openDetailModal(card);
+})();
 </script>
-
 </body>
 </html>

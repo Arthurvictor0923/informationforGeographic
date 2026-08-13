@@ -1,0 +1,222 @@
+/* ── Design System ───────────────────────────────────── */
+:root {
+  --brand: #2bbaa0;
+  --brand-hover: #1cd6b4;
+  --brand-active: #0f947c;
+  --brand-light: #d7efe4;
+  --brand-50: #b4edcf;
+  --brand-100: #b4edcf;
+  --brand-500: #1cd6b4;
+  --brand-600: #2bbaa0;
+  --success: #52c41a;
+  --success-light: #f6ffed;
+  --warning: #faad14;
+  --warning-light: #fffbe6;
+  --danger: #ff4d4f;
+  --danger-light: #fff2f0;
+  --text: #333333;
+  --text-secondary: #595959;
+  --text-muted: #999999;
+  --text-placeholder: #bfbfbf;
+  --bg-page: #f9fafb;
+  --bg-panel: #ffffff;
+  --bg-hover: #fafafa;
+  --border: #f0f0f0;
+  --border-light: #f0f0f0;
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 8px;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,.03);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.06);
+  --shadow: 0 4px 12px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
+  --shadow-md: 0 8px 24px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,.1), 0 4px 12px rgba(0,0,0,.05);
+  --shadow-xl: 0 24px 56px rgba(0,0,0,.12), 0 8px 20px rgba(0,0,0,.06);
+  --transition: .2s cubic-bezier(.4,0,.2,1);
+  --transition-slow: .35s cubic-bezier(.4,0,.2,1);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ──────────────────────────────────────── */
+.scroll-thin::-webkit-scrollbar { width: 5px; height: 5px; }
+.scroll-thin::-webkit-scrollbar-track { background: transparent; }
+.scroll-thin::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 10px; }
+.scroll-thin::-webkit-scrollbar-thumb:hover { background: #bfbfbf; }
+
+/* ── Animations ─────────────────────────────────────── */
+.fade-in { animation: fadeIn .3s var(--transition); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.slide-up { animation: slideUp .3s var(--transition); }
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.scale-in { animation: scaleIn .25s var(--transition); }
+@keyframes scaleIn { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
+
+/* ── Card Design ────────────────────────────────────── */
+.card-hover {
+  transition: transform .2s var(--transition), box-shadow .2s var(--transition), border-color .2s var(--transition);
+  border: 1px solid var(--border);
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.08);
+  border-color: #b4edcf;
+}
+.card-hover:active { transform: translateY(-1px); }
+
+/* ── Step Indicator ─────────────────────────────────── */
+.step-dot { transition: all var(--transition); }
+.step-dot.active { background: var(--brand); box-shadow: 0 0 0 4px rgba(43,186,160,.12); }
+.step-dot.done { background: var(--success); }
+
+/* ── Notification ───────────────────────────────────── */
+.notif-enter {
+  animation: notifIn .4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: var(--shadow-lg);
+}
+@keyframes notifIn { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ── Wizard ─────────────────────────────────────────── */
+.wizard-step { display: none; }
+.wizard-step.active { display: block; animation: fadeIn .25s var(--transition); }
+
+/* ── Drawer ─────────────────────────────────────────── */
+.drawer-in { animation: drawerIn .3s var(--transition); }
+@keyframes drawerIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+/* ── Navigation ─────────────────────────────────────── */
+.nav-btn {
+  position: relative;
+  transition: color var(--transition), background var(--transition);
+  border-radius: var(--radius-sm);
+}
+.nav-btn:hover { background: transparent; color: var(--brand-hover); }
+.nav-btn.active { color: var(--brand-hover) !important; font-weight: 600; }
+.nav-btn .active-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--brand-hover);
+  border-radius: 2px 2px 0 0;
+  animation: navBarIn .25s var(--transition);
+}
+@keyframes navBarIn { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* ── Buttons (global refinements) ───────────────────── */
+button {
+  transition: all var(--transition);
+  cursor: pointer;
+}
+button:active { transform: scale(.98); }
+
+/* ── Form Elements ──────────────────────────────────── */
+input[type="text"],
+input[type="search"],
+input:not([type]),
+textarea,
+select {
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+input[type="text"]:focus,
+input[type="search"]:focus,
+input:not([type]):focus,
+textarea:focus,
+select:focus {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 3px rgba(43,186,160,.08) !important;
+  outline: none;
+}
+input[type="checkbox"] {
+  accent-color: var(--brand);
+}
+input[type="checkbox"]:focus {
+  box-shadow: 0 0 0 3px rgba(43,186,160,.12);
+}
+
+/* ── Modal Backdrop ─────────────────────────────────── */
+.fixed.inset-0.z-50.flex.items-center.justify-center {
+  backdrop-filter: blur(2px);
+}
+
+/* ── Tree / Sidebar ─────────────────────────────────── */
+#sidebarContent .rounded-md {
+  transition: all var(--transition);
+  border-radius: var(--radius-sm);
+}
+#sidebarContent .rounded-md:hover {
+  background: rgba(43,186,160,.04);
+}
+
+/* ── Empty State ────────────────────────────────────── */
+.empty-state-icon {
+  filter: grayscale(.15);
+  opacity: .85;
+}
+
+/* ── Tag / Badge ────────────────────────────────────── */
+.tag-pill {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
+
+/* ── Card Thumbnail ─────────────────────────────────── */
+.card-thumb {
+  position: relative;
+  overflow: hidden;
+}
+.card-thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 60%, rgba(0,0,0,.03) 100%);
+  pointer-events: none;
+}
+
+/* ── Glass Effect for overlays ──────────────────────── */
+.glass-panel {
+  background: rgba(255,255,255,.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── 筛选切换（对齐原始平台 data-view-filterswtich）── */
+.filter-swtich {
+  width: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: rgba(0,0,0,.88);
+  font-size: 14px;
+  background: none;
+  border: none;
+  padding: 0;
+  flex-shrink: 0;
+}
+.filter-swtich .filter-chev { transition: transform .2s ease; }
+.filter-swtich-active { color: #2bbaa0; }
+.filter-swtich-active .filter-chev { transform: rotate(180deg); }
+
+/* 筛选面板内的下拉框（对齐原始 data-view-filter 内 ant-select）*/
+.filter-select {
+  min-width: 96px;
+  padding: 4px 12px;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  color: rgba(0,0,0,.88);
+  cursor: pointer;
+  transition: border-color .2s ease;
+}
+.filter-select:hover { border-color: #2bbaa0; }
+.filter-select:focus { outline: none; border-color: #2bbaa0; }

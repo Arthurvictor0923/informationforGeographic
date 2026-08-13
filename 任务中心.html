@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>河图·地理信息平台 — 任务中心</title>
+<link rel="stylesheet" href="tailwind.css">
+<link rel="stylesheet" href="common.css">
+</head>
+<body class="bg-page-bg text-gray-800 text-sm h-screen overflow-hidden flex flex-col">
+
+<!-- ============================================================ -->
+<!-- MAIN APP SHELL                                               -->
+<!-- ============================================================ -->
+<div id="appShell" class="h-full flex flex-col">
+
+  <!-- HEADER -->
+  <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between flex-shrink-0 z-30 px-5">
+    <div class="flex items-center">
+      <div class="flex items-center gap-2 mr-6">
+        <div class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-base">河</div>
+        <span class="text-base font-semibold text-brand">河图·地理信息平台</span>
+      </div>
+      <nav id="topNav" class="flex items-center h-16 gap-0.5">
+        <a href="index.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
+        </a>
+        <a href="地图服务.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg> 地图服务
+        </a>
+        <a href="要素图层.html" data-module="layer" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg> 要素图层
+        </a>
+        <a href="专题地图.html" data-module="map" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 专题地图
+        </a>
+        <a href="任务中心.html" data-module="task" class="nav-btn active px-3.5 h-16 text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> 任务中心
+          <span class="active-bar"></span>
+        </a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <button id="emptyToggleBtn" onclick="toggleTaskEmptyState()" class="text-gray-400 hover:text-orange-500 text-xs flex items-center gap-1 transition-colors" title="切换当前模块空状态 / 有数据，用于验证空状态引导设计"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg> 空状态</button>
+      <div class="w-8 h-8 rounded-full bg-[#f56a00] text-white flex items-center justify-center font-semibold text-sm">张</div>
+      <span class="text-gray-700 text-sm">张建国</span>
+      <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">业务人员</span>
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <main id="taskMain" class="flex-1 overflow-hidden flex flex-col min-w-0"></main>
+</div>
+
+<script src="common.js"></script>
+<script>
+// ── 任务中心：列表信息页（与四个模块页同一套工具栏 + 筛选面板 + 列表）──
+let taskFilter = { status: '全部', type: '全部', kw: '', sort: 'time', order: 'desc' };
+const TASK_PAGE_SIZE = 10;
+let taskPage = 1;
+let __taskEmptyPreview = false;
+
+function matchTask(t) {
+  if (taskFilter.status !== '全部') {
+    if (taskFilter.status === 'processing') {
+      if (t.status !== 'queued' && t.status !== 'running') return false;
+    } else if (t.status !== taskFilter.status) {
+      return false;
+    }
+  }
+  if (taskFilter.type !== '全部' && t.type !== taskFilter.type) return false;
+  if (taskFilter.kw) {
+    const hay = (t.title + ' ' + (t.target || '')).toLowerCase();
+    if (!hay.includes(taskFilter.kw.toLowerCase())) return false;
+  }
+  return true;
+}
+
+function setTaskStatusFilter(v) { taskFilter.status = v; taskPage = 1; renderTaskCenter(); }
+function setTaskTypeFilter(v) { taskFilter.type = v; taskPage = 1; renderTaskCenter(); }
+function setTaskSort(v) { taskFilter.sort = v; taskPage = 1; renderTaskCenter(); }
+function toggleTaskOrder() { taskFilter.order = taskFilter.order === 'asc' ? 'desc' : 'asc'; taskPage = 1; renderTaskCenter(); }
+
+// 排序：与「筛选」平级的分段控件（非下拉框）+ 升/降序切换
+function taskSortControlHTML() {
+  const opts = [
+    { key: 'time', label: '时间' },
+    { key: 'status', label: '状态' },
+    { key: 'name', label: '名称' },
+  ];
+  const seg = '<div class="inline-flex items-center bg-gray-100 rounded-lg p-0.5">'
+    + opts.map(o => '<button onclick="setTaskSort(\'' + o.key + '\')" class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors ' + (taskFilter.sort === o.key ? 'bg-white text-brand-dark shadow-sm' : 'text-gray-500 hover:text-gray-700') + '">' + o.label + '</button>').join('')
+    + '</div>';
+  const desc = taskFilter.order !== 'asc';
+  const arrow = desc
+    ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18"/><path d="M12 9v12m0 0-5-5m5 5 5-5"/></svg>'
+    : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 18h18"/><path d="M12 15V3m0 0-5 5m5-5 5 5"/></svg>';
+  return seg
+    + '<button onclick="toggleTaskOrder()" title="' + (desc ? '当前降序，点击切换为升序' : '当前升序，点击切换为降序') + '" class="w-8 h-8 flex items-center justify-center rounded-lg border border-line text-gray-500 hover:border-brand hover:text-brand-dark transition-colors">' + arrow + '</button>';
+}
+function setTaskKeyword(v) {
+  taskFilter.kw = v;
+  taskPage = 1;
+  const el = document.getElementById('taskSearch');
+  const pos = el ? el.selectionStart : null;
+  renderTaskCenter();
+  const n = document.getElementById('taskSearch');
+  if (n && pos !== null) { n.focus(); n.setSelectionRange(pos, pos); }
+}
+
+// 状态列：仅显示状态标签（不展示进度条）；失败额外展示原因
+function taskStatusCell(t) {
+  if (t.status === 'failed') {
+    return taskStatusChip('failed')
+      + '<div class="text-[11px] text-red-400 mt-0.5 truncate" title="' + (t.reason || '') + '">' + (t.reason || '处理过程中发生未知错误') + '</div>';
+  }
+  return taskStatusChip(t.status);
+}
+
+function taskCenterRowHTML(t) {
+  const typeChip = t.type === 'data'
+    ? '<span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[11px] font-medium">入库</span>'
+    : '<span class="px-2 py-0.5 rounded bg-brand-light text-brand-dark text-[11px] font-medium">发布</span>';
+  const actions =
+    '<div class="flex items-center justify-end gap-2">'
+    + '<button onclick="viewTaskLog(\'' + t.id + '\')" class="px-3 py-1 border border-line text-gray-600 hover:border-brand hover:text-brand-dark rounded text-xs font-medium transition-colors">日志</button>'
+    + (t.status === 'failed' ? '<button onclick="retryTask(\'' + t.id + '\')" class="px-3 py-1 bg-brand hover:bg-brand-hover text-white rounded text-xs font-medium transition-colors">重试</button>' : '')
+    + (t.status === 'success' ? '<button onclick="jumpTaskResult(\'' + t.id + '\')" class="px-3 py-1 bg-brand hover:bg-brand-hover text-white rounded text-xs font-medium transition-colors">查看结果</button>' : '')
+    + '</div>';
+  return '<tr class="border-t border-gray-100 hover:bg-gray-50 transition-colors">'
+    + '<td class="px-4 py-3"><div class="flex items-center gap-2">' + typeChip + '<span class="text-sm font-medium text-gray-800">' + t.title + '</span></div></td>'
+    + '<td class="px-4 py-3">' + taskStatusCell(t) + '</td>'
+    + '<td class="px-4 py-3 text-gray-500">' + t.createdAt + '</td>'
+    + '<td class="px-4 py-3">' + actions + '</td>'
+    + '</tr>';
+}
+
+function sortTasks(list) {
+  const arr = list.slice();
+  const dir = taskFilter.order === 'asc' ? 1 : -1;
+  if (taskFilter.sort === 'name') {
+    return arr.sort((a, b) => dir * a.title.localeCompare(b.title, 'zh'));
+  }
+  if (taskFilter.sort === 'status') {
+    const order = { running: 0, queued: 1, failed: 2, success: 3 };
+    return arr.sort((a, b) => dir * ((order[a.status] ?? 4) - (order[b.status] ?? 4)));
+  }
+  // 提交时间：desc 最新在前，asc 最早在前
+  return arr.sort((a, b) => dir * (a.createdAt || '').localeCompare(b.createdAt || ''));
+}
+
+function renderTaskList() {
+  const all = sortTasks(getTasks().filter(matchTask));
+  const total = all.length;
+  const totalPages = Math.max(1, Math.ceil(total / TASK_PAGE_SIZE));
+  taskPage = Math.min(Math.max(1, taskPage), totalPages);
+  const pageItems = all.slice((taskPage - 1) * TASK_PAGE_SIZE, taskPage * TASK_PAGE_SIZE);
+  const el = document.getElementById('taskList');
+  if (!el) return;
+  const cnt = document.getElementById('taskCount');
+  if (cnt) cnt.textContent = '共 ' + total + ' 条';
+  if (!total) {
+    el.innerHTML = '<tr><td colspan="4" class="px-4 py-16 text-center text-gray-400"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:2.5em;height:2.5em;margin:0 auto;display:block"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg><div class="mt-2">暂无任务</div></td></tr>';
+  } else {
+    el.innerHTML = pageItems.map(taskCenterRowHTML).join('');
+  }
+  const pg = document.getElementById('taskPager');
+  if (pg) pg.innerHTML = renderTaskPager(total, totalPages, taskPage);
+}
+
+function setTaskPage(p) {
+  taskPage = p;
+  renderTaskList();
+}
+
+function renderTaskPager(total, totalPages, cur) {
+  if (totalPages <= 1) return '';
+  const nums = [];
+  const push = p => { if (!nums.includes(p)) nums.push(p); };
+  push(1);
+  for (let p = cur - 2; p <= cur + 2; p++) if (p >= 1 && p <= totalPages) push(p);
+  push(totalPages);
+  nums.sort((a, b) => a - b);
+  let pages = '';
+  let prev = 0;
+  nums.forEach(p => {
+    if (p - prev > 1) pages += '<span class="w-8 h-8 flex items-center justify-center text-gray-400 text-sm">…</span>';
+    pages += '<button onclick="setTaskPage(' + p + ')" class="w-8 h-8 rounded-md text-sm flex items-center justify-center transition-colors ' + (p === cur ? 'bg-[#1cd6b4] text-white font-medium' : 'bg-white text-gray-700 hover:text-brand-hover hover:bg-brand-light border border-line') + '">' + p + '</button>';
+    prev = p;
+  });
+  return '<div class="flex items-center justify-between px-4 py-3 border-t border-gray-100">'
+    + '<span class="text-sm text-gray-500">共 ' + total + ' 条 · 第 ' + cur + ' / ' + totalPages + ' 页</span>'
+    + '<div class="flex items-center gap-1">'
+    + '<button onclick="setTaskPage(' + (cur - 1) + ')" ' + (cur === 1 ? 'disabled' : '') + ' class="w-8 h-8 rounded-md text-sm flex items-center justify-center text-gray-500 hover:text-brand-hover hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">‹</button>'
+    + pages
+    + '<button onclick="setTaskPage(' + (cur + 1) + ')" ' + (cur === totalPages ? 'disabled' : '') + ' class="w-8 h-8 rounded-md text-sm flex items-center justify-center text-gray-500 hover:text-brand-hover hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">›</button>'
+    + '</div></div>';
+}
+
+function renderTaskCenter() {
+  const all = getTasks().filter(matchTask);
+  const showEmpty = all.length === 0 || __taskEmptyPreview;
+  const chevron = '<svg class="filter-chev" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.52861 5.52876C3.78896 5.26841 4.21107 5.26841 4.47141 5.52876L8.00001 9.05735L11.5286 5.52876C11.789 5.26841 12.2111 5.26841 12.4714 5.52876C12.7318 5.78911 12.7318 6.21122 12.4714 6.47157L8.47141 10.4716C8.21107 10.7319 7.78896 10.7319 7.52861 10.4716L3.52861 6.47157C3.26826 6.21122 3.26826 5.78911 3.52861 5.52876Z" fill="currentColor" fill-opacity="0.88"/></svg>';
+  document.getElementById('taskMain').innerHTML =
+    '<div class="flex-1 flex flex-col min-h-0">'
+    + '<div class="px-6 pt-6 pb-4 flex items-center justify-between flex-shrink-0">'
+    + '<div class="flex items-center gap-3">'
+    + '<h1 class="text-lg font-bold text-gray-900">任务中心</h1>'
+    + '<span class="text-xs text-muted bg-gray-100 px-2.5 py-1 rounded-full font-medium">我的任务</span>'
+    + '<span class="text-xs text-gray-400" id="taskCount">共 ' + (showEmpty ? 0 : all.length) + ' 条</span>'
+    + '</div>'
+    + '<div class="flex items-center gap-3">'
+    + '<div class="relative">'
+    + '<svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>'
+    + '<input id="taskSearch" type="text" placeholder="搜索任务名称" value="' + taskFilter.kw + '" oninput="setTaskKeyword(this.value)" class="pl-9 pr-3 py-2 bg-white border border-line rounded-lg text-sm w-60 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">'
+    + '</div>'
+    + '<div class="flex items-center gap-2">'
+    + '<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4 4 4m6 4v12m0 0 4-4m-4 4-4-4"/></svg>'
+    + taskSortControlHTML()
+    + '</div>'
+    + '<button id="filterToggle" onclick="toggleFilterPanel()" class="filter-swtich ' + (filterOpen ? 'filter-swtich-active' : '') + '" title="筛选"><span>筛选</span>' + chevron + '</button>'
+    + '</div>'
+    + '</div>'
+    + '<div id="filterPanel" class="px-6 flex-shrink-0 ' + (filterOpen ? '' : 'hidden') + '">'
+    + '<div class="flex flex-wrap items-center gap-x-4 gap-y-2 pb-4 border-b border-gray-100">'
+    + '<select onchange="setTaskStatusFilter(this.value)" class="filter-select"><option value="全部" ' + (taskFilter.status === '全部' ? 'selected' : '') + '>全部状态</option><option value="processing" ' + (taskFilter.status === 'processing' ? 'selected' : '') + '>处理中</option><option value="success" ' + (taskFilter.status === 'success' ? 'selected' : '') + '>成功</option><option value="failed" ' + (taskFilter.status === 'failed' ? 'selected' : '') + '>失败</option></select>'
+    + '<select onchange="setTaskTypeFilter(this.value)" class="filter-select"><option value="全部" ' + (taskFilter.type === '全部' ? 'selected' : '') + '>全部类型</option><option value="data" ' + (taskFilter.type === 'data' ? 'selected' : '') + '>入库</option><option value="service" ' + (taskFilter.type === 'service' ? 'selected' : '') + '>发布</option></select>'
+    + '</div>'
+    + '</div>'
+    + '<div class="flex-1 overflow-y-auto scroll-thin px-6 pb-6">'
+    + (showEmpty
+        ? '<div class="bg-white border border-line rounded-xl overflow-hidden py-8">' + emptyTaskCardHTML() + '</div>'
+        : '<div class="bg-white border border-line rounded-xl overflow-hidden">'
+          + '<table class="w-full text-sm">'
+          + '<thead><tr class="bg-gray-50 text-gray-500 text-xs">'
+          + '<th class="text-left px-4 py-3 font-medium">任务名称</th>'
+          + '<th class="text-left px-4 py-3 font-medium w-64">状态</th>'
+          + '<th class="text-left px-4 py-3 font-medium w-24">提交时间</th>'
+          + '<th class="text-right px-4 py-3 font-medium w-64">操作</th>'
+          + '</tr></thead>'
+          + '<tbody id="taskList"></tbody>'
+          + '</table>'
+          + '<div id="taskPager"></div>'
+          + '</div>')
+    + '</div>'
+    + '</div>';
+  if (!showEmpty) renderTaskList();
+}
+
+function emptyTaskCardHTML() {
+  return ''
+    + '<div class="text-center py-16">'
+    + '<div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-brand-light to-brand-light flex items-center justify-center text-4xl shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>'
+    + '<div class="text-gray-800 font-semibold text-base mb-2">还没有任务</div>'
+    + '<div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">数据入库、服务发布都是后台异步任务。上传数据或发布服务后，任务会自动出现在这里——可随时查看进度、重试失败任务、跳转到产物。</div>'
+    + '<button onclick="goModule(\'data\')" class="px-4 py-1.5 text-sm bg-brand hover:bg-brand-hover text-white rounded font-medium transition-all shadow-sm hover:shadow-md active:scale-95"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 去上传数据</button>'
+    + '</div>';
+}
+function toggleTaskEmptyState() {
+  __taskEmptyPreview = !__taskEmptyPreview;
+  const b = document.getElementById('emptyToggleBtn');
+  if (b) b.innerHTML = __taskEmptyPreview
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> 有数据'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg> 空状态';
+  renderTaskCenter();
+}
+
+// ── 初始化 ─────────────────────────────────────────────
+renderTaskCenter();
+</script>
+</body>
+</html>
