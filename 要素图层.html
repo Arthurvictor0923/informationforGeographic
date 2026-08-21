@@ -15,14 +15,14 @@
 <div id="appShell" class="h-full flex flex-col">
 
   <!-- HEADER -->
-  <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between flex-shrink-0 z-30 px-5">
+  <header class="h-16 flex items-center justify-between flex-shrink-0 z-30 px-5">
     <div class="flex items-center">
       <div class="flex items-center gap-2 mr-6">
         <div class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-base">河</div>
         <span class="text-base font-semibold text-brand">河图·地理信息平台</span>
       </div>
       <nav id="topNav" class="flex items-center h-16 gap-0.5">
-        <a href="index.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+        <a href="数据资产.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
         </a>
         <a href="地图服务.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
@@ -34,13 +34,16 @@
         <a href="专题地图.html" data-module="map" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 专题地图
         </a>
+        <a href="制图规范原型.html" data-module="spec" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M12 22a10 10 0 1 1 10-10c0 1.7-1.3 3-3 3h-2.5a2.5 2.5 0 0 0-1.9 4.1c.6.7.4 1.9-.6 1.9Z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="11" cy="7.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/></svg> 制图规范
+        </a>
         <a href="任务中心.html" data-module="task" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> 任务中心
         </a>
       </nav>
     </div>
     <div class="flex items-center gap-3">
-      <button id="emptyToggleBtn" onclick="toggleEmptyState()" class="text-gray-400 hover:text-orange-500 text-xs flex items-center gap-1 transition-colors" title="切换当前模块空状态 / 有数据，用于验证空状态引导设计"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg> 空状态</button>
+      <button id="emptyToggleBtn" onclick="toggleEmptyState()" class="btn btn-sm btn-text" title="切换当前模块空状态 / 有数据，用于验证空状态引导设计"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg> 空状态</button>
       <div class="w-8 h-8 rounded-full bg-[#f56a00] text-white flex items-center justify-center font-semibold text-sm">张</div>
       <span class="text-gray-700 text-sm">张建国</span>
       <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">业务人员</span>
@@ -48,9 +51,9 @@
   </header>
 
   <!-- BODY -->
-  <div class="flex flex-1 overflow-hidden">
+  <div class="flex flex-1 overflow-hidden gap-3 p-3">
     <!-- SIDEBAR -->
-    <aside class="w-60 bg-page-bg border-r border-gray-100 flex flex-col flex-shrink-0">
+    <aside class="w-72 bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden flex flex-col flex-shrink-0">
       <div class="p-3 border-b border-gray-100">
         <div class="relative">
           <svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -61,7 +64,7 @@
     </aside>
 
     <!-- MAIN -->
-    <main id="mainContent" class="flex-1 overflow-hidden flex flex-col min-w-0"></main>
+    <main id="mainContent" class="flex-1 bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden flex flex-col min-w-0"></main>
   </div>
 </div>
 
@@ -74,7 +77,7 @@
   <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 720px; max-height: 90vh; display: flex; flex-direction: column;">
     <div class="px-6 py-4 border-b border-line flex items-center justify-between shrink-0">
       <h2 class="text-base font-semibold text-gray-900" id="lwTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg> 创建要素图层</h2>
-      <button onclick="closeWizard('layerWizard')" class="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+      <button onclick="closeWizard('layerWizard')" class="btn btn-icon btn-md btn-text">✕</button>
     </div>
     <div class="p-6 space-y-4 overflow-y-auto scroll-thin flex-1">
       <!-- Row 1: 图层名称 + 图层编码 -->
@@ -114,13 +117,12 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">图层类型 <span class="text-red-400">*</span></label>
           <div id="lwTypeWrap" class="flex flex-wrap items-center gap-1.5 px-3 py-2 border border-line rounded-lg bg-white min-h-[42px] cursor-pointer focus-within:border-brand focus-within:ring-1 focus-within:ring-brand/20" onclick="document.getElementById('lwTypeSelect').focus()">
-            <span id="lwTypeTag" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-brand-light text-brand">矢量图层 <button onclick="event.stopPropagation();removeLwTypeTag()" class="text-brand hover:text-brand-dark ml-0.5">&times;</button></span>
+            <span id="lwTypeTag" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-brand-light text-brand">矢量图层 <button onclick="event.stopPropagation();removeLwTypeTag()" class="btn btn-icon btn-sm btn-text">&times;</button></span>
             <select id="lwTypeSelect" class="flex-1 border-0 bg-transparent text-sm focus:outline-none min-w-[80px]" onchange="addLwTypeTag(this.value);this.value=''">
               <option value="" disabled selected>+ 添加类型</option>
               <option>矢量图层</option>
               <option>栅格图层</option>
               <option>三维图层</option>
-              <option>聚合图层</option>
               <option>热力图层</option>
             </select>
           </div>
@@ -146,7 +148,7 @@
               <option>行政</option>
               <option>驾驶舱</option>
               <option>长势</option>
-              <option>测试</option>
+              <option>权属</option>
             </select>
           </div>
           <div id="lwTags" class="flex flex-wrap gap-1.5 mt-2"></div>
@@ -161,29 +163,55 @@
           </div>
         </div>
       </div>
-      <!-- Service selection (tree structure) -->
+      <!-- 主体数据（08-17 决策：要素图层=单一数据的制图表达，先选主体数据唯一） -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">选择地图服务 <span class="text-red-400">*</span></label>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">主体数据 <span class="text-red-400">*</span> <span class="text-[11px] text-gray-400 font-normal">（要素图层 = 一份主体数据的制图表达）</span></label>
+        <select id="lwMainData" onchange="onLwMainDataChange(this.value)" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
+          <option value="">请选择主体数据...</option>
+        </select>
+        <p class="text-[11px] text-gray-400 mt-1">选定主体数据后，下方仅可选择<b>该数据衍生的服务</b>；不同数据的服务不可混用。</p>
+      </div>
+      <!-- Service selection (tree structure, constrained to main data's derived services) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">选择该数据的表达服务 <span class="text-red-400">*</span> <span class="text-[11px] text-gray-400 font-normal">（主服务：保持原样 / 取描边 / 取中心点）</span></label>
         <div class="border border-line rounded-lg overflow-hidden">
           <div class="p-3 bg-gray-50 border-b border-line">
             <div class="relative flex items-center">
             <span class="absolute left-3 text-gray-400 pointer-events-none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
-            <input type="text" placeholder="搜索已发布的服务..." class="w-full pl-8 pr-3 py-1.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand" oninput="filterLayerServiceTree(this.value)">
+            <input type="text" placeholder="搜索该数据的衍生服务..." class="w-full pl-8 pr-3 py-1.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand" oninput="filterLayerServiceTree(this.value)">
           </div>
           </div>
           <div id="lwServiceTree" class="max-h-56 overflow-y-auto scroll-thin p-2"></div>
         </div>
         <div class="mt-2 flex items-center gap-2">
           <span class="text-xs text-gray-500">已选：<strong id="lwSvcCount" class="text-brand">0</strong> 个服务</span>
-          <span id="lwSvcHint" class="text-xs text-orange-500 hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> 请至少选择 1 个服务</span>
+          <span id="lwSvcHint" class="text-xs text-orange-500 hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> 请先选择主体数据，再选择该数据衍生的表达服务</span>
+        </div>
+      </div>
+      <!-- 辅助表达层（标注/符号，仅可引用同一主体数据衍生服务） -->
+      <div id="lwAuxWrap">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">辅助表达层 <span class="text-[11px] text-gray-400 font-normal">（标注 / 符号 / 描边，选填）</span></label>
+        <div id="lwAuxList" class="border border-line rounded-lg p-3 min-h-[64px] bg-gray-50/50 text-xs text-gray-400">请先选择主体数据——辅助表达层仅可引用同一主体数据衍生的服务</div>
+      </div>
+      <!-- 基础样式与颜色（一步创建：预览基础样式 + 选基础颜色） -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">基础样式与颜色</label>
+        <div class="border border-line rounded-lg p-3 flex items-center gap-3" style="flex-wrap:wrap;">
+          <div style="width:96px;height:64px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #f0f0f0;flex-shrink:0;background:linear-gradient(135deg,#eef2f5 0%,#dde6ec 100%);">
+            <div id="lwStyleShape" style="width:56px;height:32px;border-radius:4px;background:#2bbaa0;"></div>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div class="text-xs text-gray-500 mb-2">选择基础颜色（进入设计页后可精细调整）</div>
+            <div id="lwColorSwatches" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"></div>
+          </div>
         </div>
       </div>
       <!-- Preview button -->
       <div class="flex items-center gap-3">
-        <button onclick="openLayerPreview()" class="px-4 py-2.5 border border-brand text-brand hover:bg-brand-light rounded text-sm font-medium transition-colors flex items-center gap-1.5">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> 预览服务叠加效果
+        <button onclick="openLayerPreview()" class="btn btn-md btn-outline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> 预览表达效果
         </button>
-        <span class="text-xs text-gray-400">点击预览已选服务在地图上的叠加效果</span>
+        <span class="text-xs text-gray-400">点击预览主体数据及其表达服务在地图上的渲染效果</span>
       </div>
       <!-- 描述 -->
       <div>
@@ -194,8 +222,8 @@
     <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50 shrink-0">
       <span class="text-xs text-gray-400">带 <span class="text-red-400">*</span> 为必填项</span>
       <div class="flex items-center gap-3">
-        <button onclick="closeWizard('layerWizard')" class="px-4 py-1.5 text-gray-500 hover:text-gray-700 text-sm transition-colors">取消</button>
-        <button onclick="confirmLayer()" class="px-4 py-1.5 bg-brand hover:bg-brand-hover text-white rounded text-sm font-medium transition-colors">确认创建</button>
+        <button onclick="closeWizard('layerWizard')" class="btn btn-md btn-text">取消</button>
+        <button onclick="confirmLayer()" class="btn btn-md btn-primary">确认创建</button>
       </div>
     </div>
   </div>
@@ -206,16 +234,16 @@
   <div class="bg-white rounded-2xl shadow-2xl overflow-hidden scale-in" style="width: 820px;">
     <div class="px-6 py-4 border-b border-line flex items-center justify-between">
       <div>
-        <h3 class="text-base font-semibold text-gray-900"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 服务叠加预览</h3>
-        <p id="lpvSubtitle" class="text-xs text-gray-500 mt-0.5">已选 0 个服务</p>
+        <h3 class="text-base font-semibold text-gray-900"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 要素图层表达预览</h3>
+        <p id="lpvSubtitle" class="text-xs text-gray-500 mt-0.5">主体数据：<span id="lpvMainDataName">未选择</span> · 已选 <span id="lpvSvcCountLabel">0</span> 个表达服务</p>
       </div>
-      <button onclick="closeLayerPreview()" class="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+      <button onclick="closeLayerPreview()" class="btn btn-icon btn-md btn-text">✕</button>
     </div>
     <div class="relative">
       <div id="lpvMapArea" class="h-80 flex items-center justify-center text-gray-400 text-sm relative" style="background: linear-gradient(135deg, #e8f4f8 0%, #d4e8f0 30%, #c8dce8 60%, #b8d4e0 100%);">
         <div class="text-center z-10">
           <div class="text-5xl mb-3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg></div>
-          <div class="text-sm font-medium text-gray-600 mb-1">已选服务叠加预览</div>
+          <div class="text-sm font-medium text-gray-600 mb-1">已选表达服务渲染预览</div>
           <div class="text-xs text-gray-500" id="lpvServiceList">尚未选择任何服务</div>
         </div>
         <!-- Fake map grid -->
@@ -225,8 +253,8 @@
       </div>
     </div>
     <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50">
-      <span class="text-xs text-gray-400"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 此预览仅为服务叠加示意，实际渲染效果以地图设计页为准</span>
-      <button onclick="closeLayerPreview()" class="px-4 py-1.5 bg-brand hover:bg-brand-hover text-white rounded text-sm font-medium transition-colors">关闭预览</button>
+      <span class="text-xs text-gray-400"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 此预览为主体数据表达效果示意，实际渲染效果以地图设计页为准</span>
+      <button onclick="closeLayerPreview()" class="btn btn-md btn-primary">关闭预览</button>
     </div>
   </div>
 </div>
@@ -237,6 +265,7 @@
 function confirmLayer() {
   const name = (document.getElementById('lwName').value || '').trim();
   const code = (document.getElementById('lwCode').value || '').trim();
+  const mainData = (document.getElementById('lwMainData') || {}).value || '';
   if (!name) {
     showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请先填写图层名称');
     return;
@@ -245,68 +274,137 @@ function confirmLayer() {
     showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请先填写图层编码');
     return;
   }
+  if (!mainData) {
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请先选择主体数据——要素图层是这份数据的制图表达');
+    return;
+  }
   const checked = getLwSelectedServices();
   if (checked.length === 0) {
     document.getElementById('lwSvcHint').classList.remove('hidden');
-    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请至少选择一个地图服务');
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请至少选择一个该数据衍生的表达服务');
     return;
   }
   document.getElementById('lwSvcHint').classList.add('hidden');
   closeWizard('layerWizard');
   if (!notified.layer) {
     notified.layer = true;
-    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>', '图层组合「' + name + '」创建成功！下一步：用它生成一张<strong>专题地图</strong>（一张图/大屏）。<button onclick="openEditorPrototype()" class="text-brand underline font-medium ml-2">创建专题地图 →</button>');
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>', '要素图层「' + name + '」创建成功！它以「' + mainData + '」为主体数据，<strong>已打开设计器</strong>完善样式表达；完成后再把图层组织进<strong>专题地图</strong>（一张图/大屏）。<button onclick="goModule(\'map\')" class="text-brand underline font-medium ml-2">去专题地图 →</button>');
+    openLayerEditor(name); // 创建完成元数据后 → 进入要素图层编辑器
   }
 }
 
-// ── 要素图层创建：服务树 ────────────────────────────────
+// ── 要素图层创建：主体数据 + 服务树（08-17 决策：单一数据制图表达）──
 let lwSelectedServices = {};
 let lwServiceTreeData = [];
+let lwMainDataTitle = '';
+let lwAuxServices = {};
+
+// 主体数据 → 衍生服务匹配（assetRef 精确关联；无关联则按名称前缀兜底）
+function getLwDerivedServices(dataTitle) {
+  if (!dataTitle) return [];
+  const cards = moduleConfigs.service.cards || [];
+  return cards.filter(svc => {
+    if (svc.assetRef && svc.assetRef === dataTitle) return true;
+    const a = (svc.title || '').replace(/_/g, '').toLowerCase();
+    const b = dataTitle.replace(/_/g, '').toLowerCase();
+    return (a && b && (a.startsWith(b) || b.startsWith(a)));
+  });
+}
+
+// 主体数据下拉填充（数据资产卡片）
+function initLwMainData() {
+  const sel = document.getElementById('lwMainData');
+  if (!sel) return;
+  const cards = moduleConfigs.data.cards || [];
+  sel.innerHTML = '<option value="">请选择主体数据...</option>'
+    + cards.map(c => '<option value="' + c.title.replace(/"/g, '&quot;') + '">' + c.title + ' <span class="text-gray-400">（' + (c.type || '') + '）</span></option>').join('');
+}
+
+// 主体数据切换 → 重置服务选择 + 重建树 + 渲染辅助层 + 更新坐标系
+function onLwMainDataChange(val) {
+  lwMainDataTitle = val || '';
+  lwSelectedServices = {};
+  lwAuxServices = {};
+  renderLayerServiceTree();
+  renderLwAuxList();
+  updateLwSelectedCount();
+  updateLwCrsDisplay();
+  if (val && !getLwDerivedServices(val).length) {
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '「' + val + '」尚未发布衍生服务，请先在「数据资产」中发布后再来创建要素图层');
+  }
+}
+
+// 辅助表达层（标注/符号/描边）：仅列同一主体数据衍生服务
+function renderLwAuxList() {
+  const wrap = document.getElementById('lwAuxList');
+  if (!wrap) return;
+  if (!lwMainDataTitle) {
+    wrap.innerHTML = '<div class="text-xs text-gray-400">请先选择主体数据——辅助表达层仅可引用同一主体数据衍生的服务</div>';
+    return;
+  }
+  const derived = getLwDerivedServices(lwMainDataTitle);
+  if (!derived.length) {
+    wrap.innerHTML = '<div class="text-xs text-gray-400">该数据暂无衍生服务，辅助表达层留空即可（进入设计页后可补充）</div>';
+    return;
+  }
+  wrap.innerHTML = derived.map(svc => {
+    const checked = lwAuxServices[svc.title] ? 'checked' : '';
+    return '<label class="flex items-center gap-2 py-1.5 px-1 hover:bg-white rounded cursor-pointer text-sm">'
+      + '<input type="checkbox" ' + checked + ' onchange="toggleLwAux(this, \'' + svc.title.replace(/'/g, "\\'") + '\')" class="rounded border-gray-300 text-brand focus:ring-brand/30">'
+      + '<span class="flex-1 text-gray-700 truncate">' + svc.title + '</span>'
+      + '<span class="text-[10px] text-gray-400 shrink-0">' + (svc.type || '') + '</span>'
+      + '</label>';
+  }).join('');
+}
+
+function toggleLwAux(cb, title) {
+  if (cb.checked) lwAuxServices[title] = true;
+  else delete lwAuxServices[title];
+}
 
 function buildLayerServiceTreeData() {
-  // Build tree from moduleConfigs.service.cards, mirroring the service sidebar
-  const cards = moduleConfigs.service.cards;
-  const mapServices = cards.filter(c => c.layerCategory === 'map');
-  const dataServices = cards.filter(c => c.layerCategory === 'data');
-
-  // Group by cat within each layerCategory
-  function groupByCat(list) {
+  // 08-17 决策：只展示主体数据衍生的服务（assetRef/名称关联），其余服务不出现在树中
+  const derived = getLwDerivedServices(lwMainDataTitle);
+  if (!lwMainDataTitle || !derived.length) return [];
+  // 按 serviceRole × cat 分组（业务/底图两段，服务模块同口径）
+  function groupBy(role) {
     const groups = {};
-    list.forEach(c => {
+    derived.filter(c => (c.serviceRole || '业务') === role).forEach(c => {
       const cat = c.cat || '其他';
       if (!groups[cat]) groups[cat] = [];
       groups[cat].push(c);
     });
     return groups;
   }
-
-  const mapGroups = groupByCat(mapServices);
-  const dataGroups = groupByCat(dataServices);
-
-  const tree = [
-    {
-      name: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 地图图层（底图/展示）',
-      id: 'lw_map',
+  const bizGroups = groupBy('业务');
+  const baseGroups = groupBy('底图');
+  const tree = [];
+  if (Object.keys(bizGroups).length) {
+    tree.push({
+      name: '业务服务（' + lwMainDataTitle + ' 衍生）',
+      id: 'lw_biz',
       open: true,
-      children: Object.keys(mapGroups).map(cat => ({
+      children: Object.keys(bizGroups).map(cat => ({
         name: catLabel(cat),
-        id: 'lw_map_' + cat,
+        id: 'lw_biz_' + cat,
         open: true,
-        services: mapGroups[cat]
+        services: bizGroups[cat]
       }))
-    },
-    {
-      name: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> 数据图层（查询/分析）',
-      id: 'lw_dt',
+    });
+  }
+  if (Object.keys(baseGroups).length) {
+    tree.push({
+      name: '底图服务（' + lwMainDataTitle + ' 衍生）',
+      id: 'lw_base',
       open: true,
-      children: Object.keys(dataGroups).map(cat => ({
+      children: Object.keys(baseGroups).map(cat => ({
         name: catLabel(cat),
-        id: 'lw_dt_' + cat,
+        id: 'lw_base_' + cat,
         open: true,
-        services: dataGroups[cat]
+        services: baseGroups[cat]
       }))
-    }
-  ];
+    });
+  }
   return tree;
 
   function catLabel(cat) {
@@ -319,6 +417,16 @@ function renderLayerServiceTree(filterText) {
   lwServiceTreeData = buildLayerServiceTreeData();
   const container = document.getElementById('lwServiceTree');
   if (!container) return;
+  if (!lwMainDataTitle) {
+    container.innerHTML = '<div class="text-xs text-gray-400 text-center py-8">请先选择<b>主体数据</b>，此处将列出该数据衍生的表达服务</div>';
+    updateLwSelectedCount();
+    return;
+  }
+  if (!lwServiceTreeData.length) {
+    container.innerHTML = '<div class="text-xs text-gray-400 text-center py-8">「' + lwMainDataTitle + '」暂无衍生服务<br><span class="text-[10px]">请先在「数据资产」中把该数据发布为地图服务</span></div>';
+    updateLwSelectedCount();
+    return;
+  }
   let html = '';
   function renderNodes(nodes, level) {
     nodes.forEach(node => {
@@ -452,7 +560,8 @@ function filterLayerServiceTree(text) {
       mutations.forEach(function(mutation) {
         if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
           if (!document.getElementById('layerWizard').classList.contains('hidden')) {
-            renderLayerServiceTree();
+            if (typeof resetLayerWizard === 'function') resetLayerWizard();
+            else { initLwMainData(); renderLayerServiceTree(); renderLwAuxList(); renderLwColorSwatches(); }
           }
         }
       });
@@ -480,7 +589,7 @@ function renderLwTags() {
   if (!container) return;
   container.innerHTML = lwTags.map((t, i) =>
     '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-brand-light text-brand">' +
-    t + ' <button onclick="removeLwTag(' + i + ')" class="text-brand hover:text-brand-dark">&times;</button></span>'
+    t + ' <button onclick="removeLwTag(' + i + ')" class="btn btn-icon btn-sm btn-text">&times;</button></span>'
   ).join('');
 }
 
@@ -506,7 +615,7 @@ function renderLwTypeTags() {
   if (!wrap || !select) return;
   let tagsHtml = lwTypeTags.map((t, i) =>
     '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-brand-light text-brand">' +
-    t + ' <button onclick="event.stopPropagation();removeLwTypeTag(' + i + ')" class="text-brand hover:text-brand-dark ml-0.5">&times;</button></span>'
+    t + ' <button onclick="event.stopPropagation();removeLwTypeTag(' + i + ')" class="btn btn-icon btn-sm btn-text">&times;</button></span>'
   ).join('');
   // Insert tags before the select
   const existing = wrap.querySelectorAll('.lw-type-tag');
@@ -539,10 +648,14 @@ function openLayerPreview() {
 
   if (!popup) return;
 
-  if (subtitle) subtitle.textContent = '已选 ' + selected.length + ' 个服务';
+  const mainName = document.getElementById('lpvMainDataName');
+  if (mainName) mainName.textContent = lwMainDataTitle || '未选择';
+  const svcCountLabel = document.getElementById('lpvSvcCountLabel');
+  if (svcCountLabel) svcCountLabel.textContent = selected.length;
+  if (subtitle) subtitle.textContent = '主体数据：' + (lwMainDataTitle || '未选择') + ' · 已选 ' + selected.length + ' 个表达服务';
   if (list) {
     if (selected.length === 0) {
-      list.textContent = '尚未选择任何服务';
+      list.textContent = '尚未选择任何表达服务';
     } else {
       list.innerHTML = selected.map(s => '<span class="inline-block px-2 py-0.5 bg-white/70 rounded text-xs text-gray-700 m-0.5 shadow-sm">' + s + '</span>').join('');
     }
@@ -575,9 +688,30 @@ function closeLayerPreview() {
   if (popup) popup.classList.add('hidden');
 }
 
+// ── 基础样式与颜色 ─────────────────────────────────────
+const LW_BASE_COLORS = ['#2bbaa0', '#1677ff', '#fa8c16', '#52c41a', '#722ed1', '#f5222d'];
+let lwBaseColor = LW_BASE_COLORS[0];
+
+function renderLwColorSwatches() {
+  const wrap = document.getElementById('lwColorSwatches');
+  if (!wrap) return;
+  wrap.innerHTML = LW_BASE_COLORS.map(c =>
+    '<button type="button" onclick="selectLwBaseColor(\'' + c + '\')" style="width:32px;height:32px;border-radius:9999px;background:' + c + ';border:2px solid ' + (c === lwBaseColor ? '#0f947c' : 'transparent') + ';transform:scale(' + (c === lwBaseColor ? '1.15' : '1') + ');transition:transform .15s ease,border-color .15s ease;cursor:pointer;" title="' + c + '"></button>'
+  ).join('');
+  const shape = document.getElementById('lwStyleShape');
+  if (shape) shape.style.background = lwBaseColor;
+}
+
+function selectLwBaseColor(c) {
+  lwBaseColor = c;
+  renderLwColorSwatches();
+}
+
 // Reset layer wizard state when opened
 function resetLayerWizard() {
   lwSelectedServices = {};
+  lwAuxServices = {};
+  lwMainDataTitle = '';
   lwTags = [];
   lwTypeTags = ['矢量图层'];
   lwIconIdx = 0;
@@ -586,6 +720,8 @@ function resetLayerWizard() {
   const descInput = document.getElementById('lwDesc');
   const iconDisplay = document.getElementById('lwIconDisplay');
   const iconLabel = document.getElementById('lwIconLabel');
+  const mainDataSel = document.getElementById('lwMainData');
+  if (mainDataSel) mainDataSel.value = '';
   if (nameInput) nameInput.value = 'XX农场耕地监测要素图层';
   if (codeInput) codeInput.value = '';
   if (descInput) descInput.value = '';
@@ -594,7 +730,9 @@ function resetLayerWizard() {
   document.getElementById('lwTitle').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg> 创建要素图层';
   renderLwTags();
   renderLwTypeTags();
+  initLwMainData();
   renderLayerServiceTree();
+  renderLwAuxList();
   updateLwSelectedCount();
   updateLwCrsDisplay();
   document.getElementById('lwSvcHint').classList.add('hidden');
@@ -607,9 +745,11 @@ function openLayerDesign(action, title) {
     const nameInput = document.getElementById('lwName');
     if (nameInput) nameInput.value = title;
     document.getElementById('layerWizard').classList.remove('hidden');
+    initLwMainData();
     renderLayerServiceTree();
+    renderLwAuxList();
   } else {
-    openMapViewer(title); // 设计 = 打开图层叠加预览
+    openMapViewer(title); // 设计 = 打开图层表达预览
   }
 }
 

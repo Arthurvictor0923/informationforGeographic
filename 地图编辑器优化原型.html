@@ -13,7 +13,8 @@
   --brand: #2bbaa0;
   --brand-hover: #1cd6b4;
   --brand-active: #0f947c;
-  --brand-bg: rgba(43,186,160,0.06);
+  --brand-bg: rgba(43,186,160,0.06);     /* 弱态(如 hover)：近透明 */
+  --brand-bg-solid: #e2f6f1;             /* 选中/当前态：实心浅品牌底，避免"变透明" */
   --brand-bg-hover: rgba(43,186,160,0.12);
   --brand-border: rgba(43,186,160,0.25);
   --brand-outline: rgba(43,186,160,0.15);
@@ -603,23 +604,6 @@ input { font-family: inherit; }
 .legend-row .lg-swatch { width:16px; height:12px; border-radius:2px; border:1px solid var(--gray-300); flex-shrink:0; }
 .legend-row .lg-type { font-size:10px; color:var(--gray-400); margin-left:auto; }
 
-/* ── Sort row ── */
-.sort-row {
-  display:flex; align-items:center; padding:8px var(--sp-lg); gap:var(--sp-sm); font-size:13px;
-  transition:background var(--t-fast) var(--ease-in-out);
-}
-.sort-row:hover { background:var(--gray-25); }
-.sort-row .sr-drag { color:var(--gray-300); cursor:grab; font-size:11px; flex-shrink:0; }
-.sort-row .sr-name { flex:1; }
-.sort-row .sr-tag { font-size:10px; color:var(--gray-400); background:var(--gray-100); padding:1px 7px; border-radius:var(--r-full); }
-.sort-row { cursor:default; }
-.sort-row:active { cursor:grabbing; }
-.sort-row .sr-drag:hover { color:var(--gray-600); }
-/* 拖拽排序状态 */
-.sort-row.dragging { opacity:0.4; }
-.sort-row.drop-before { box-shadow: inset 0 2px 0 0 var(--brand); }
-.sort-row.drop-after  { box-shadow: inset 0 -2px 0 0 var(--brand); }
-
 /* ========================================================================
    MODAL
    ======================================================================== */
@@ -691,25 +675,50 @@ input { font-family: inherit; }
 @keyframes toastIn { from { transform:translateX(120%); opacity:0; } to { transform:translateX(0); opacity:1; } }
 
 /* ========================================================================
-   ORDER PANEL — 置顶声明 (pin row)
+   LAYER PANEL — 图层树（制图表达 · 渲染顺序）
+   图层节点上下 = 整层渲染叠放；表达层子节点 = 该图层内表达叠放
    ======================================================================== */
-.pin-row {
-  display:flex; align-items:center; gap:6px;
-  padding:3px var(--sp-lg); font-size:11px;
-  background:var(--brand-bg); border-bottom:1px solid var(--gray-100);
+.layer-tree { padding:var(--sp-xs) 0; }
+.layer-node { border-bottom:1px solid var(--gray-100); }
+.layer-node:last-child { border-bottom:none; }
+.lt-row {
+  display:flex; align-items:center; gap:6px; padding:8px var(--sp-lg) 8px var(--sp-md);
+  cursor:pointer; font-size:13px; color:var(--gray-700); font-weight:500; user-select:none;
+  border-left:3px solid transparent; transition:background var(--t-fast) var(--ease-in-out);
+  position:relative;
 }
-.pin-row .pin-label { color:var(--gray-500); }
-.pin-row .pin-name { color:var(--brand-active); font-weight:600; }
-.pin-row .pin-name.empty { color:var(--gray-400); font-weight:400; }
-
-/* ========================================================================
-   ORDER PANEL — 分类折叠（收起时标题显示置顶图层名）
-   ======================================================================== */
-#pnl-order .order-pin-mini {
-  display:none; margin-left:auto; font-size:11px; color:var(--gray-400); font-weight:400;
+.lt-row:hover { background:var(--gray-25); }
+.lt-row .lt-arrow {
+  width:14px; text-align:center; font-size:9px; color:var(--gray-400); flex-shrink:0;
+  transition:transform var(--t-fast) var(--ease-in-out); cursor:pointer;
 }
-#pnl-order > .sec.order-sec.collapsed > .sec-title .order-pin-mini { display:inline; }
-#pnl-order .order-pin-mini.empty { color:var(--gray-300); }
+.lt-row .lt-arrow.open { transform:rotate(90deg); }
+.lt-row .lt-drag, .lt-sub .lt-drag { color:var(--gray-300); cursor:grab; font-size:9px; flex-shrink:0; letter-spacing:1px; line-height:1; }
+.lt-row .lt-drag:hover, .lt-sub .lt-drag:hover { color:var(--gray-500); }
+.lt-row .lt-icon, .lt-sub .lt-icon { font-size:13px; flex-shrink:0; opacity:0.75; }
+.lt-row .lt-name, .lt-sub .lt-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.lt-row .lt-eye {
+  color:var(--gray-400); padding:3px; border-radius:var(--r-sm); border:none; background:transparent;
+  font-size:13px; cursor:pointer; line-height:1; transition:all var(--t-fast) var(--ease-in-out); flex-shrink:0;
+}
+.lt-row .lt-eye:hover { color:var(--brand); background:var(--brand-bg); }
+.lt-row .lt-eye.off { opacity:0.3; color:var(--gray-400); }
+.layer-node.selected > .lt-row { background:var(--brand-bg-solid); border-left-color:var(--brand); }
+.layer-node.selected > .lt-row .lt-name { color:var(--brand-active); font-weight:600; }
+.lt-subs { padding:0 0 4px; }
+.lt-sub {
+  display:flex; align-items:center; gap:6px; padding:6px var(--sp-lg) 6px 34px;
+  cursor:pointer; font-size:12px; color:var(--gray-500); user-select:none;
+  border-left:3px solid transparent; transition:background var(--t-fast) var(--ease-in-out);
+}
+.lt-sub:hover { background:var(--gray-25); }
+.lt-sub.selected { background:var(--brand-bg-solid); border-left-color:var(--brand); }
+.lt-sub.selected .lt-name { color:var(--brand-active); font-weight:600; }
+.lt-sub .lt-kind { font-size:10px; color:var(--gray-400); background:var(--gray-100); padding:0 6px; border-radius:var(--r-full); flex-shrink:0; }
+/* 拖拽排序状态 */
+.lt-row.dragging, .lt-sub.dragging { opacity:0.4; }
+.lt-row.drop-before, .lt-sub.drop-before { box-shadow: inset 0 2px 0 0 var(--brand); }
+.lt-row.drop-after, .lt-sub.drop-after { box-shadow: inset 0 -2px 0 0 var(--brand); }
 
 /* ========================================================================
    STYLE PANEL — 渲染方式卡片 (render card)
@@ -867,6 +876,27 @@ input { font-family: inherit; }
 .preset-card .st-svg { width:100%; height:54px; display:block; }
 .preset-card .pc-name { font-size:12px; font-weight:500; color:var(--gray-800); text-align:center; }
 .preset-card .pc-meta { font-size:10px; color:var(--gray-400); text-align:center; }
+
+/* ── 雪碧图组：预设选取 + 使用当前雪碧图内符号（不做上传/图标库管理） ── */
+.sprite-pill {
+  display:inline-flex; align-items:center; gap:6px; padding:3px 10px;
+  border:1px solid var(--brand); border-radius:var(--r-full); color:var(--brand-active);
+  background:var(--brand-bg); font-size:12px; font-weight:600;
+}
+.sprite-symbol-grid {
+  display:grid; grid-template-columns:repeat(6,1fr); gap:8px; padding:4px 0 2px;
+}
+.sprite-sym {
+  display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 2px;
+  border:1px solid var(--gray-200); border-radius:var(--r-md); background:var(--white);
+  cursor:pointer; transition:all var(--t-fast) var(--ease-in-out);
+}
+.sprite-sym:hover { border-color:var(--brand); background:var(--brand-bg); }
+.sprite-sym.active { border-color:var(--brand); background:var(--brand-bg); box-shadow:0 0 0 2px var(--brand-outline); }
+.sprite-sym .sym-glyph { font-size:18px; line-height:1; }
+.sprite-sym .sym-name { font-size:9px; color:var(--gray-500); text-align:center; white-space:nowrap; }
+.sprite-sym.active .sym-name { color:var(--brand-active); font-weight:600; }
+.sprite-hint { font-size:10px; color:var(--gray-400); margin-top:4px; text-align:center; }
 
 /* ── Collapsible section（样式模板：默认折叠） ── */
 .sec.collapsible > .sec-title { cursor:pointer; user-select:none; }
@@ -1050,6 +1080,161 @@ input { font-family: inherit; }
 .mb-sm { margin-bottom:var(--sp-sm); }
 .gap-sm { gap:var(--sp-sm); }
 .flex-1 { flex:1; }
+
+/* ========================================================================
+   TIMELINE COMPONENT（时序组件：时间滑轨）
+   ======================================================================== */
+/* ── 时序面板 ── */
+.tl-panel-note {
+  margin:var(--sp-md) var(--sp-lg) 0; padding:var(--sp-sm) var(--sp-md);
+  border-radius:var(--r-md); background:var(--brand-bg); border:1px solid var(--brand-border);
+  font-size:var(--text-sm); color:var(--brand-active); line-height:var(--lh-relaxed);
+}
+.tl-list { padding:var(--sp-sm) var(--sp-lg) 0; display:flex; flex-direction:column; gap:6px; }
+.tl-item {
+  display:flex; align-items:center; gap:6px; padding:6px 8px;
+  border:1px solid var(--gray-200); border-radius:var(--r-md); background:var(--white);
+  font-size:var(--text-base); transition:all var(--t-fast) var(--ease-in-out);
+}
+.tl-item.current { border-color:var(--brand); background:var(--brand-bg-solid); box-shadow:var(--shadow-xs); }
+.tl-item .tl-rank { font-family:var(--font-mono); font-size:10px; color:var(--gray-400); width:14px; text-align:center; flex-shrink:0; }
+.tl-item .tl-ic { font-size:13px; opacity:0.75; flex-shrink:0; }
+.tl-item .tl-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500; color:var(--gray-800); }
+.tl-item .tl-time {
+  font-size:10px; color:var(--brand-active); background:var(--brand-bg-solid);
+  border:1px solid var(--brand-border); border-radius:var(--r-full); padding:0 7px;
+  line-height:1.7; white-space:nowrap; flex-shrink:0;
+}
+.tl-item .tl-move { display:flex; flex-direction:column; gap:1px; flex-shrink:0; }
+.tl-item .tl-move button {
+  border:none; background:transparent; color:var(--gray-400); font-size:9px; line-height:1;
+  padding:2px 3px; border-radius:var(--r-sm); cursor:pointer; transition:all var(--t-fast) var(--ease-in-out);
+}
+.tl-item .tl-move button:hover { color:var(--brand); background:var(--brand-bg); }
+.tl-item .tl-move button[disabled] { opacity:0.25; cursor:not-allowed; }
+.tl-item .tl-eye, .tl-item .tl-del {
+  color:var(--gray-400); padding:2px 4px; border-radius:var(--r-sm); border:none; background:transparent;
+  font-size:13px; cursor:pointer; line-height:1; flex-shrink:0; transition:all var(--t-fast) var(--ease-in-out);
+}
+.tl-item .tl-eye:hover { color:var(--brand); background:var(--brand-bg); }
+.tl-item .tl-eye.off { opacity:0.3; }
+.tl-item .tl-del { color:var(--gray-300); }
+.tl-item .tl-del:hover { color:var(--error); background:var(--error-bg); }
+.tl-time-input {
+  width:118px; height:22px; padding:0 6px; font-size:11px; flex-shrink:0;
+  border:1px solid var(--brand-border); border-radius:var(--r-sm);
+  background:var(--brand-bg-solid); color:var(--brand-active); font-family:var(--font-mono);
+}
+.tl-time-input:focus { outline:2px solid var(--brand-outline); }
+.tl-empty {
+  padding:var(--sp-xl) var(--sp-lg); text-align:center; color:var(--gray-400);
+  font-size:var(--text-sm); line-height:var(--lh-relaxed);
+}
+.tl-add-btn { margin:var(--sp-md) var(--sp-lg) var(--sp-xs); }
+.tl-inline-label { font-size:11px; color:var(--gray-400); line-height:var(--lh-relaxed); padding:0 var(--sp-lg); }
+.tl-settings .sec-row .input:disabled { background:var(--gray-50); color:var(--gray-400); cursor:not-allowed; }
+
+/* ── 底部时间滑轨条 ── */
+.timeline-bar {
+  position:absolute; left:var(--sp-lg); right:auto; bottom:var(--sp-md);
+  max-width:560px; width:max-content;
+  height:44px; z-index:30; display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.96); border:1px solid var(--gray-200); border-radius:var(--r-xl);
+  box-shadow:var(--shadow-lg); padding:0 var(--sp-md);
+  animation:tlBarIn var(--t-normal) var(--ease-out);
+}
+.timeline-bar.hidden { display:none; }
+@keyframes tlBarIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.tl-btn {
+  width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+  border:none; background:transparent; color:var(--gray-500); font-size:14px; cursor:pointer;
+  border-radius:var(--r-md); flex-shrink:0; transition:all var(--t-fast) var(--ease-in-out);
+}
+.tl-btn:hover { background:var(--brand-bg); color:var(--brand); }
+.tl-btn.primary { background:var(--brand); color:var(--white); border-radius:var(--r-full); width:32px; height:32px; }
+.tl-btn.primary:hover { background:var(--brand-hover); color:var(--white); }
+.tl-track {
+  flex:1; height:6px; background:var(--gray-200); border-radius:var(--r-full);
+  position:relative; cursor:pointer; min-width:80px;
+}
+.tl-track-fill {
+  position:absolute; left:0; top:0; bottom:0; width:0%;
+  background:var(--brand); border-radius:var(--r-full); transition:width var(--t-fast) var(--ease-in-out);
+}
+.tl-dot {
+  position:absolute; top:50%; transform:translate(-50%,-50%); width:8px; height:8px;
+  border-radius:50%; background:var(--white); border:2px solid var(--gray-300);
+  pointer-events:none; transition:all var(--t-fast) var(--ease-in-out);
+}
+.tl-dot.on { border-color:var(--brand); background:var(--brand); }
+.tl-dot.cur { border-color:var(--brand); background:var(--white); box-shadow:0 0 0 3px var(--brand-outline); }
+.tl-thumb {
+  position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:14px;
+  border-radius:50%; background:var(--white); border:2px solid var(--brand); box-shadow:var(--shadow-xs);
+  pointer-events:none; transition:left var(--t-fast) var(--ease-in-out);
+}
+.tl-label { font-family:var(--font-mono); font-size:12px; color:var(--gray-700); white-space:nowrap; flex-shrink:0; min-width:104px; text-align:center; }
+.tl-range { font-size:10px; color:var(--gray-400); white-space:nowrap; flex-shrink:0; }
+.tl-status { font-size:10px; color:var(--brand-active); white-space:nowrap; flex-shrink:0; max-width:150px; overflow:hidden; text-overflow:ellipsis; }
+
+/* ── 画布时段提示 ── */
+.tl-canvas-hint {
+  position:absolute; top:var(--sp-md); left:50%; transform:translateX(-50%);
+  background:rgba(255,255,255,0.95); border:1px solid var(--brand-border); color:var(--brand-active);
+  border-radius:var(--r-full); padding:4px 14px; font-size:12px; font-weight:500;
+  box-shadow:var(--shadow-md); z-index:25; pointer-events:none; white-space:nowrap;
+  animation:tlBarIn var(--t-fast) var(--ease-out);
+}
+.tl-canvas-hint.hidden { display:none; }
+
+/* ── 数据/图层树中「当前时序时段」条目标识（与时序播放联动，刻意区别于图层选中态）── */
+#pnl-data .lt-row.tl-current,
+#pnl-data .lt-sub.tl-current {
+  outline:1px dashed #d97706; outline-offset:-1px;
+  color:#b45309;
+}
+#pnl-data .lt-row.tl-current > .lt-name::after,
+#pnl-data .lt-sub.tl-current > .lt-name::after {
+  content:' 🕐 当前时点'; font-size:10px; color:#d97706;
+}
+
+/* ── 时序画布浮层（右侧工具条 🕐 按钮 + 其左侧弹出的时序配置浮层） ── */
+.map-toolbar .mt-btn.active { border-color:var(--brand); background:var(--brand-bg-solid); color:var(--brand); box-shadow:var(--shadow-sm); }
+.tl-float-panel {
+  position:absolute; top:50%; transform:translateY(-50%); right:68px; z-index:35;
+  width:336px; max-width:calc(100% - 88px); max-height:calc(100% - 40px); overflow-y:auto;
+  background:var(--white); border:1px solid var(--gray-200); border-radius:var(--r-lg);
+  box-shadow:var(--shadow-xl); animation:fadeIn var(--t-normal) var(--ease-out);
+}
+.tl-float-panel.hidden { display:none; }
+.tl-scene-tabs { display:flex; gap:6px; margin:var(--sp-md) var(--sp-lg) 0; }
+.tl-scene-tab {
+  flex:1; padding:6px 8px; font-size:12px; font-weight:500; color:var(--gray-500);
+  background:var(--gray-25); border:1px solid var(--gray-200); border-radius:var(--r-md);
+  cursor:pointer; transition:all var(--t-fast) var(--ease-in-out);
+}
+.tl-scene-tab:hover { color:var(--brand); border-color:var(--brand-border); }
+.tl-scene-tab.active { color:var(--brand-active); background:var(--brand-bg-solid); border-color:var(--brand); font-weight:600; }
+.tl-scene-tabs + .sec { margin-top:var(--sp-md); }
+.tlf-hd {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:var(--sp-md) var(--sp-lg); border-bottom:1px solid var(--gray-100);
+  font-weight:600; font-size:var(--text-base); color:var(--gray-900);
+}
+.tlf-body { padding-bottom:var(--sp-sm); }
+.tlf-note {
+  margin:var(--sp-md) var(--sp-lg); padding:var(--sp-sm) var(--sp-md);
+  border-radius:var(--r-md); background:var(--brand-bg); border:1px solid var(--brand-border);
+  font-size:var(--text-sm); color:var(--brand-active); line-height:var(--lh-relaxed);
+}
+.tlf-label-line {
+  font-size:11px; color:var(--gray-400); line-height:var(--lh-relaxed);
+  padding:var(--sp-xs) var(--sp-lg) var(--sp-md);
+}
+.tlf-foot {
+  font-size:11px; color:var(--gray-400); line-height:var(--lh-relaxed);
+  padding:var(--sp-sm) var(--sp-lg) var(--sp-md); border-top:1px solid var(--gray-100);
+}
 </style>
 <!-- 天地图真实底图：Leaflet 渲染库（仅渲染层，瓦片数据来自天地图官方服务，合规） -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
@@ -1079,11 +1264,8 @@ input { font-family: inherit; }
     <div class="left-container">
       <!-- Tab bar -->
       <div class="left-tabs">
-        <button class="left-tab active" data-ltab="data" onclick="switchLeftTab('data')" data-tip-right="数据（图层管理）">
-          <span class="lt-icon">📑</span><span class="lt-label">数据</span>
-        </button>
-        <button class="left-tab" data-ltab="order" onclick="switchLeftTab('order')" data-tip-right="顺序（渲染叠放）">
-          <span class="lt-icon">🔀</span><span class="lt-label">顺序</span>
+        <button class="left-tab active" data-ltab="data" onclick="switchLeftTab('data')" data-tip-right="图层（制图表达 · 渲染顺序）">
+          <span class="lt-icon">🗺</span><span class="lt-label">图层</span>
         </button>
         <button class="left-tab" data-ltab="basemap" onclick="switchLeftTab('basemap')" data-tip-right="底图">
           <span class="lt-icon">🗺</span><span class="lt-label">底图</span>
@@ -1102,7 +1284,7 @@ input { font-family: inherit; }
       <div class="left-panel" id="leftPanel">
         <!-- DATA -->
         <div class="pnl-body" id="pnl-data">
-          <div class="pnl-header"><span>📑 数据资源</span><span class="pnl-hint">图层组织管理</span></div>
+          <div class="pnl-header"><span>🗺 图层</span><span class="pnl-hint">制图表达 · 渲染顺序（上=顶，拖拽调序）</span></div>
           <div class="pnl-toolbar">
             <div class="input-wrap" style="flex:1; min-width:0;">
               <span class="input-icon">🔍</span>
@@ -1111,171 +1293,135 @@ input { font-family: inherit; }
             <button class="btn btn-sm primary" onclick="openAddModal()">＋ 添加图层</button>
           </div>
 
-          <!-- ══ 树状结构（独立滚动区）══ -->
-          <div class="pnl-tree-scroll">
+          <!-- ══ 图层树（制图表达 · 渲染顺序）══ -->
+          <div class="info-banner">图层节点上下 = <b>整层渲染顺序</b>（上 = 顶）；每个图层下含其<b>表达层</b>（填充 / 标注 / 符号 / 描边 / 栅格），可直接拖拽调叠放。</div>
+          <div class="layer-tree" id="layerTree" style="flex:1; min-height:0; overflow-y:auto; overflow-x:hidden;">
 
-          <!-- ══ 顶级：专题图 ══ -->
-          <div class="tree-group">
-            <div class="tree-grp-header tree-root" onclick="toggleTreeGroup('theme')">
-              <span class="tgh-arrow open" id="arr-theme">▶</span><span class="tgh-icon">🗂</span>专题图
-              <span class="tgh-count" style="margin-left:6px">建三江一张图</span>
-              <span class="tgh-acts">
-                <button class="th-btn" onclick="event.stopPropagation();expandAllGroups()" data-tip="全部展开">展开</button>
-                <button class="th-btn" onclick="event.stopPropagation();collapseAllGroups()" data-tip="全部收起">收起</button>
-              </span>
+            <!-- 基础矢量（服务源 + 填充 + 标注 + 符号） -->
+            <div class="layer-node selected" id="ltn-jichu">
+              <div class="lt-row" onclick="selectLayerNode(this,'基础矢量','🗺','参考')">
+                <span class="lt-arrow open" onclick="event.stopPropagation();toggleLayerSubs(this)">▶</span>
+                <span class="lt-drag">⋮⋮</span><span class="lt-icon">🗺</span><span class="lt-name">基础矢量</span>
+                <span class="tag tag-default">参考</span>
+                <button class="lt-eye" onclick="event.stopPropagation();toggleEye(this)" data-tip="可见性">👁</button>
+              </div>
+              <div class="lt-subs">
+                <div class="lt-sub" onclick="selectLayerSub(this,'基础矢量 WMS','服务','props')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">🔌</span><span class="lt-name">基础矢量 WMS</span><span class="lt-kind">服务</span>
+                </div>
+                <div class="lt-sub" onclick="selectLayerSub(this,'填充 基础矢量','填充','style')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">▦</span><span class="lt-name">填充 基础矢量</span><span class="lt-kind">填充</span>
+                </div>
+                <div class="lt-sub" onclick="selectLayerSub(this,'标注 农场名称','标注','anno')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">✏</span><span class="lt-name">标注 农场名称</span><span class="lt-kind">标注</span>
+                </div>
+                <div class="lt-sub" onclick="selectLayerSub(this,'符号 监测站点符号','符号','symbol')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">⬤</span><span class="lt-name">符号 监测站点符号</span><span class="lt-kind">符号</span>
+                </div>
+                <div class="lt-sub" onclick="selectLayerSub(this,'符号 井房符号','符号','symbol')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">⬤</span><span class="lt-name">符号 井房符号</span><span class="lt-kind">符号</span>
+                </div>
+                <div class="lt-sub" onclick="selectLayerSub(this,'符号 泵站符号','符号','symbol')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">⬤</span><span class="lt-name">符号 泵站符号</span><span class="lt-kind">符号</span>
+                </div>
+              </div>
             </div>
-            <div id="grp-theme">
 
-              <!-- 底图项（无服务叶子节点） -->
-              <div class="tree-group">
-                <div class="tree-grp-header" onclick="toggleTreeGroup('basemap')" style="padding-left:24px">
-                  <span class="tgh-arrow open" id="arr-basemap">▶</span><span class="tgh-icon">🗺</span>底图项
+            <!-- 耕地地块（服务源 + 填充 + 标注） -->
+            <div class="layer-node" id="ltn-cultivated">
+              <div class="lt-row" onclick="selectLayerNode(this,'耕地地块','🗺','面')">
+                <span class="lt-arrow open" onclick="event.stopPropagation();toggleLayerSubs(this)">▶</span>
+                <span class="lt-drag">⋮⋮</span><span class="lt-icon">🗺</span><span class="lt-name">耕地地块</span>
+                <span class="tag tag-default">面</span>
+                <button class="lt-eye" onclick="event.stopPropagation();toggleEye(this)" data-tip="可见性">👁</button>
+              </div>
+              <div class="lt-subs">
+                <div class="lt-sub" onclick="selectLayerSub(this,'耕地地块 WMS','服务','props')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">🔌</span><span class="lt-name">耕地地块 WMS</span><span class="lt-kind">服务</span>
                 </div>
-                <div id="grp-basemap">
-                  <!-- 文件分类 -->
-                  <div class="tree-group">
-                    <div class="tree-grp-header" onclick="toggleTreeGroup('bm-cat')" style="padding-left:40px">
-                      <span class="tgh-arrow open" id="arr-bm-cat">▶</span><span class="tgh-icon">📁</span>影像底图
-                    </div>
-                    <div id="grp-bm-cat">
-                      <!-- 图层（底图无服务叶子，直接作为叶子展示） -->
-                      <div class="tree-row" style="padding-left:56px">
-                        <span class="tr-icon">🖼</span><span class="tr-name" style="color:var(--brand);font-weight:500">遥感影像（当前）</span>
-                        <span class="tag tag-brand">底图</span>
-                      </div>
-                    </div>
-                  </div>
+                <div class="lt-sub" onclick="selectLayerSub(this,'填充 耕地地块','填充','style')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">▦</span><span class="lt-name">填充 耕地地块</span><span class="lt-kind">填充</span>
+                </div>
+                <div class="lt-sub" onclick="selectLayerSub(this,'标注 地块编号','标注','anno')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">✏</span><span class="lt-name">标注 地块编号</span><span class="lt-kind">标注</span>
                 </div>
               </div>
-
-              <!-- 主体服务 -->
-              <div class="tree-group">
-                <div class="tree-grp-header" onclick="toggleTreeGroup('subject')" style="padding-left:24px">
-                  <span class="tgh-arrow open" id="arr-subject">▶</span><span class="tgh-icon">🏠</span>主体服务
-                  <button class="th-add" onclick="event.stopPropagation();newCategory('主体服务')" data-tip="新建分类">＋</button>
-                </div>
-                <div id="grp-subject">
-                  <div class="tree-group">
-                    <div class="tree-grp-header" onclick="toggleTreeGroup('subj-cat')" style="padding-left:40px">
-                      <span class="tgh-arrow open" id="arr-subj-cat">▶</span><span class="tgh-icon">📁</span>基础地理
-                    </div>
-                    <div id="grp-subj-cat">
-                      <!-- 图层（可折叠 → 服务叶子） -->
-                      <div class="tree-group">
-                        <div class="tree-grp-header layer-group selected" style="padding-left:56px" onclick="selectLayerFromHeader(this,'基础矢量','🗺','参考','lg-jichu')">
-                          <span class="tgh-arrow open" id="arr-lg-jichu" onclick="event.stopPropagation();toggleTreeGroup('lg-jichu')">▶</span>
-                          <span class="drag-knob">⋮⋮</span><span class="tr-icon">🗺</span><span class="tr-name">基础矢量</span>
-                          <span class="tag tag-default" style="margin-right:auto">参考</span>
-                          <span class="tr-actions">
-                            <button class="tr-eye" onclick="event.stopPropagation();toggleEye(this)" data-tip="可见性">👁</button>
-                            <button class="tr-more" onclick="event.stopPropagation();openMoreMenu(this)" data-tip="更多操作">⋯</button>
-                          </span>
-                        </div>
-                        <div id="grp-lg-jichu">
-                          <div class="tree-row svc-leaf" onclick="selectService(this,'基础矢量 WMS')" style="padding-left:72px">
-                            <span class="tr-icon">🔌</span><span class="tr-name">基础矢量 WMS</span>
-                            <span class="tag tag-default" style="margin-right:auto">EPSG:3857</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 表达服务 -->
-              <div class="tree-group">
-                <div class="tree-grp-header" onclick="toggleTreeGroup('expr')" style="padding-left:24px">
-                  <span class="tgh-arrow open" id="arr-expr">▶</span><span class="tgh-icon">📊</span>表达服务
-                  <span class="tgh-count" style="margin-left:6px">4项</span>
-                  <button class="th-add" onclick="event.stopPropagation();newCategory('表达服务')" data-tip="新建分类">＋</button>
-                </div>
-                <div id="grp-expr">
-                  <div class="tree-group">
-                    <div class="tree-grp-header" onclick="toggleTreeGroup('expr-cat')" style="padding-left:40px">
-                      <span class="tgh-arrow open" id="arr-expr-cat">▶</span><span class="tgh-icon">📁</span>农业专题
-                    </div>
-                    <div id="grp-expr-cat">
-                      <!-- 耕地地块（可折叠 → 服务叶子） -->
-                      <div class="tree-group">
-                        <div class="tree-grp-header layer-group" style="padding-left:56px" onclick="selectLayerFromHeader(this,'耕地地块','🗺','填充','lg-cultivated')">
-                          <span class="tgh-arrow open" id="arr-lg-cultivated" onclick="event.stopPropagation();toggleTreeGroup('lg-cultivated')">▶</span>
-                          <span class="drag-knob">⋮⋮</span><span class="tr-icon">🗺</span><span class="tr-name">耕地地块</span>
-                          <span class="tag tag-green" style="margin-right:auto">填充</span>
-                          <span class="tr-actions">
-                            <button class="tr-eye" onclick="event.stopPropagation();toggleEye(this)" data-tip="可见性">👁</button>
-                            <button class="tr-more" onclick="event.stopPropagation();openMoreMenu(this)" data-tip="更多操作">⋯</button>
-                          </span>
-                        </div>
-                        <div id="grp-lg-cultivated">
-                          <div class="tree-row svc-leaf" onclick="selectService(this,'耕地地块 WMS')" style="padding-left:72px">
-                            <span class="tr-icon">🔌</span><span class="tr-name">耕地地块 WMS</span>
-                            <span class="tag tag-default" style="margin-right:auto">EPSG:3857</span>
-                          </div>
-                        </div>
-                      </div>
-                      <!-- 作物长势 -->
-                      <div class="tree-group">
-                        <div class="tree-grp-header layer-group" style="padding-left:56px" onclick="selectLayerFromHeader(this,'作物长势','🌾','填充','lg-zuowu')">
-                          <span class="tgh-arrow open" id="arr-lg-zuowu" onclick="event.stopPropagation();toggleTreeGroup('lg-zuowu')">▶</span>
-                          <span class="drag-knob">⋮⋮</span><span class="tr-icon">🌾</span><span class="tr-name">作物长势</span>
-                          <span class="tag tag-green" style="margin-right:auto">填充</span>
-                          <span class="tr-actions">
-                            <button class="tr-eye" onclick="event.stopPropagation();toggleEye(this)" data-tip="可见性">👁</button>
-                            <button class="tr-more" onclick="event.stopPropagation();openMoreMenu(this)" data-tip="更多操作">⋯</button>
-                          </span>
-                        </div>
-                        <div id="grp-lg-zuowu">
-                          <div class="tree-row svc-leaf" onclick="selectService(this,'作物长势 WMS')" style="padding-left:72px">
-                            <span class="tr-icon">🔌</span><span class="tr-name">作物长势 WMS</span>
-                            <span class="tag tag-default" style="margin-right:auto">EPSG:3857</span>
-                          </div>
-                        </div>
-                      </div>
-                      <!-- 土壤类型 -->
-                      <div class="tree-group">
-                        <div class="tree-grp-header layer-group" style="padding-left:56px" onclick="selectLayerFromHeader(this,'土壤类型','🟫','填充','lg-turang')">
-                          <span class="tgh-arrow open" id="arr-lg-turang" onclick="event.stopPropagation();toggleTreeGroup('lg-turang')">▶</span>
-                          <span class="drag-knob">⋮⋮</span><span class="tr-icon">🟫</span><span class="tr-name">土壤类型</span>
-                          <span class="tag tag-green" style="margin-right:auto">填充</span>
-                          <span class="tr-actions">
-                            <button class="tr-eye" onclick="event.stopPropagation();toggleEye(this)" data-tip="可见性">👁</button>
-                            <button class="tr-more" onclick="event.stopPropagation();openMoreMenu(this)" data-tip="更多操作">⋯</button>
-                          </span>
-                        </div>
-                        <div id="grp-lg-turang">
-                          <div class="tree-row svc-leaf" onclick="selectService(this,'土壤类型 WMS')" style="padding-left:72px">
-                            <span class="tr-icon">🔌</span><span class="tr-name">土壤类型 WMS</span>
-                            <span class="tag tag-default" style="margin-right:auto">EPSG:3857</span>
-                          </div>
-                        </div>
-                      </div>
-                      <!-- 灌排渠系 -->
-                      <div class="tree-group">
-                        <div class="tree-grp-header layer-group" style="padding-left:56px" onclick="selectLayerFromHeader(this,'灌排渠系','〰','描边','lg-guanpai')">
-                          <span class="tgh-arrow open" id="arr-lg-guanpai" onclick="event.stopPropagation();toggleTreeGroup('lg-guanpai')">▶</span>
-                          <span class="drag-knob">⋮⋮</span><span class="tr-icon">〰</span><span class="tr-name">灌排渠系</span>
-                          <span class="tag tag-orange" style="margin-right:auto">描边</span>
-                          <span class="tr-actions">
-                            <button class="tr-eye" onclick="event.stopPropagation();toggleEye(this)" data-tip="可见性">👁</button>
-                            <button class="tr-more" onclick="event.stopPropagation();openMoreMenu(this)" data-tip="更多操作">⋯</button>
-                          </span>
-                        </div>
-                        <div id="grp-lg-guanpai">
-                          <div class="tree-row svc-leaf" onclick="selectService(this,'灌排渠系 WMS')" style="padding-left:72px">
-                            <span class="tr-icon">🔌</span><span class="tr-name">灌排渠系 WMS</span>
-                            <span class="tag tag-default" style="margin-right:auto">EPSG:3857</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </div>
-          </div>
-          </div><!-- /pnl-tree-scroll -->
+
+            <!-- 作物长势（服务源 + 填充） -->
+            <div class="layer-node" id="ltn-zuowu">
+              <div class="lt-row" onclick="selectLayerNode(this,'作物长势','🌾','面')">
+                <span class="lt-arrow open" onclick="event.stopPropagation();toggleLayerSubs(this)">▶</span>
+                <span class="lt-drag">⋮⋮</span><span class="lt-icon">🌾</span><span class="lt-name">作物长势</span>
+                <span class="tag tag-default">面</span>
+                <button class="lt-eye" onclick="event.stopPropagation();toggleEye(this)" data-tip="可见性">👁</button>
+              </div>
+              <div class="lt-subs">
+                <div class="lt-sub" onclick="selectLayerSub(this,'作物长势 WMS','服务','props')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">🔌</span><span class="lt-name">作物长势 WMS</span><span class="lt-kind">服务</span>
+                </div>
+                <div class="lt-sub" onclick="selectLayerSub(this,'填充 作物长势','填充','style')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">▦</span><span class="lt-name">填充 作物长势</span><span class="lt-kind">填充</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 土壤类型（服务源 + 填充） -->
+            <div class="layer-node" id="ltn-turang">
+              <div class="lt-row" onclick="selectLayerNode(this,'土壤类型','🟫','面')">
+                <span class="lt-arrow open" onclick="event.stopPropagation();toggleLayerSubs(this)">▶</span>
+                <span class="lt-drag">⋮⋮</span><span class="lt-icon">🟫</span><span class="lt-name">土壤类型</span>
+                <span class="tag tag-default">面</span>
+                <button class="lt-eye" onclick="event.stopPropagation();toggleEye(this)" data-tip="可见性">👁</button>
+              </div>
+              <div class="lt-subs">
+                <div class="lt-sub" onclick="selectLayerSub(this,'土壤类型 WMS','服务','props')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">🔌</span><span class="lt-name">土壤类型 WMS</span><span class="lt-kind">服务</span>
+                </div>
+                <div class="lt-sub" onclick="selectLayerSub(this,'填充 土壤类型','填充','style')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">▦</span><span class="lt-name">填充 土壤类型</span><span class="lt-kind">填充</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 灌排渠系（服务源 + 描边 + 标注） -->
+            <div class="layer-node" id="ltn-guanpai">
+              <div class="lt-row" onclick="selectLayerNode(this,'灌排渠系','〰','线')">
+                <span class="lt-arrow open" onclick="event.stopPropagation();toggleLayerSubs(this)">▶</span>
+                <span class="lt-drag">⋮⋮</span><span class="lt-icon">〰</span><span class="lt-name">灌排渠系</span>
+                <span class="tag tag-default">线</span>
+                <button class="lt-eye" onclick="event.stopPropagation();toggleEye(this)" data-tip="可见性">👁</button>
+              </div>
+              <div class="lt-subs">
+                <div class="lt-sub" onclick="selectLayerSub(this,'灌排渠系 WMS','服务','props')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">🔌</span><span class="lt-name">灌排渠系 WMS</span><span class="lt-kind">服务</span>
+                </div>
+                <div class="lt-sub" onclick="selectLayerSub(this,'描边 灌排渠系','描边','style')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">〰</span><span class="lt-name">描边 灌排渠系</span><span class="lt-kind">描边</span>
+                </div>
+                <div class="lt-sub" onclick="selectLayerSub(this,'标注 灌区名称','标注','anno')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">✏</span><span class="lt-name">标注 灌区名称</span><span class="lt-kind">标注</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 遥感影像（底图 · 栅格） -->
+            <div class="layer-node" id="ltn-yaogan">
+              <div class="lt-row" onclick="selectLayerNode(this,'遥感影像','🖼','栅格')">
+                <span class="lt-arrow open" onclick="event.stopPropagation();toggleLayerSubs(this)">▶</span>
+                <span class="lt-drag">⋮⋮</span><span class="lt-icon">🖼</span><span class="lt-name">遥感影像</span>
+                <span class="tag tag-default">栅格</span>
+                <span class="tag tag-brand">底图</span>
+                <button class="lt-eye" onclick="event.stopPropagation();toggleEye(this)" data-tip="可见性">👁</button>
+              </div>
+              <div class="lt-subs">
+                <div class="lt-sub" onclick="selectLayerSub(this,'栅格 遥感影像','栅格','style')">
+                  <span class="lt-drag">⋮⋮</span><span class="lt-icon">🖼</span><span class="lt-name">栅格 遥感影像</span><span class="lt-kind">栅格</span>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /layerTree -->
 
           <div class="layer-detail" id="layerDetail">
             <div class="ld-hd">📋 图层详情<span class="ld-name" id="ldName">基础矢量</span></div>
@@ -1289,75 +1435,7 @@ input { font-family: inherit; }
             </div>
           </div>
           <div class="pnl-footer">
-            💡 <b>此处调整数据组织顺序</b>（服务归属与分组）。调整地图<b>渲染叠放顺序</b>请切换到左侧「顺序」页签。
-          </div>
-        </div>
-
-        <!-- ORDER -->
-        <div class="pnl-body hidden" id="pnl-order">
-          <div class="pnl-header"><span>🔀 图层顺序</span><span class="pnl-hint">渲染叠放管理</span></div>
-          <div class="info-banner">调整各渲染类型的图层叠放顺序。上方图层覆盖下方图层。</div>
-          <div class="sec collapsible order-sec">
-            <div class="sec-title" onclick="toggleOrderSec(this.closest('.sec'))">
-              <span class="tgh-arrow" style="transform:rotate(90deg)">▶</span>标注
-              <span class="sec-count" style="font-weight:400;font-size:11px;color:var(--gray-400)">3 项</span>
-              <span class="order-pin-mini">置顶：农场名称标注</span>
-            </div>
-            <div class="sec-collapse">
-              <div class="pin-row"><span class="pin-label">当前置顶</span><span class="pin-name">农场名称标注</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">农场名称标注</span><span class="sr-tag">文字</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">地块编号标注</span><span class="sr-tag">文字</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">灌区名称标注</span><span class="sr-tag">文字</span></div>
-            </div>
-          </div>
-          <div class="sec collapsible order-sec">
-            <div class="sec-title" onclick="toggleOrderSec(this.closest('.sec'))">
-              <span class="tgh-arrow" style="transform:rotate(90deg)">▶</span>符号
-              <span class="sec-count" style="font-weight:400;font-size:11px;color:var(--gray-400)">3 项</span>
-              <span class="order-pin-mini">置顶：监测站点符号</span>
-            </div>
-            <div class="sec-collapse">
-              <div class="pin-row"><span class="pin-label">当前置顶</span><span class="pin-name">监测站点符号</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">监测站点符号</span><span class="sr-tag">点</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">井房符号</span><span class="sr-tag">点</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">泵站符号</span><span class="sr-tag">点</span></div>
-            </div>
-          </div>
-          <div class="sec collapsible order-sec">
-            <div class="sec-title" onclick="toggleOrderSec(this.closest('.sec'))">
-              <span class="tgh-arrow" style="transform:rotate(90deg)">▶</span>描边
-              <span class="sec-count" style="font-weight:400;font-size:11px;color:var(--gray-400)">1 项</span>
-              <span class="order-pin-mini">置顶：灌排渠系</span>
-            </div>
-            <div class="sec-collapse">
-              <div class="pin-row"><span class="pin-label">当前置顶</span><span class="pin-name">灌排渠系</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">灌排渠系</span><span class="sr-tag">轮廓</span></div>
-            </div>
-          </div>
-          <div class="sec collapsible order-sec">
-            <div class="sec-title" onclick="toggleOrderSec(this.closest('.sec'))">
-              <span class="tgh-arrow" style="transform:rotate(90deg)">▶</span>填充
-              <span class="sec-count" style="font-weight:400;font-size:11px;color:var(--gray-400)">4 项</span>
-              <span class="order-pin-mini">置顶：基础矢量</span>
-            </div>
-            <div class="sec-collapse">
-              <div class="pin-row"><span class="pin-label">当前置顶</span><span class="pin-name">基础矢量</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">基础矢量</span><span class="sr-tag">填充</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">耕地地块</span><span class="sr-tag">填充</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">作物长势</span><span class="sr-tag">填充</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">土壤类型</span><span class="sr-tag">填充</span></div>
-            </div>
-          </div>
-          <div class="sec collapsible order-sec">
-            <div class="sec-title" onclick="toggleOrderSec(this.closest('.sec'))">
-              <span class="tgh-arrow" style="transform:rotate(90deg)">▶</span>栅格
-              <span class="sec-count" style="font-weight:400;font-size:11px;color:var(--gray-400)">1 项</span>
-              <span class="order-pin-mini">置顶：遥感影像</span>
-            </div>
-            <div class="sec-collapse">
-              <div class="pin-row"><span class="pin-label">当前置顶</span><span class="pin-name">遥感影像</span></div>
-              <div class="sort-row"><span class="sr-drag">⋮⋮</span><span class="sr-name">遥感影像</span><span class="sr-tag">栅格</span></div>
-            </div>
+            💡 <b>图层</b>：图层节点上下拖拽调整渲染顺序（上 = 顶）；每个图层下含其表达层（填充 / 标注 / 符号 / 描边 / 栅格），表达层子行拖拽调图层内叠放。
           </div>
         </div>
 
@@ -1506,6 +1584,93 @@ input { font-family: inherit; }
         <button class="mt-btn" data-tip="缩小" onclick="event.stopPropagation();zoomMap(-1)">➖</button>
         <span class="mt-sep"></span>
         <button class="mt-btn" data-tip="图例框 · 右下角实时渲染" onclick="event.stopPropagation();toggleLegendBox()">📋</button>
+        <span class="mt-sep"></span>
+        <button class="mt-btn" id="tlFloatingBtn" data-tip-left="时序（时间滑轨播放）" aria-label="时序" onclick="event.stopPropagation();toggleTimelineFloating()">🕐</button>
+      </div>
+
+      <!-- Timeline floating panel（从右侧工具条弹出的时序配置浮层，替代最早独立右上角按钮） -->
+      <div class="tl-float-panel hidden" id="tlFloatingPanel">
+        <div class="tlf-hd">
+          <span>⏱ 时序 · 时间滑轨播放</span>
+          <button class="icon-btn sm" onclick="toggleTimelineFloating(false)" title="收起">✕</button>
+        </div>
+        <div class="tlf-body">
+          <div class="tl-scene-tabs">
+            <button class="tl-scene-tab active" data-scene="B" onclick="switchTLScene('B')">场景B · 多图层顺序</button>
+            <button class="tl-scene-tab" data-scene="A" onclick="switchTLScene('A')">场景A · 单数据时序</button>
+          </div>
+
+          <div class="sec" id="tlSceneB">
+            <div class="sec-title">⏱ 编排图层顺序 <span class="sec-count" id="tlCount" style="font-weight:400;font-size:11px;color:var(--gray-400)">0 项</span></div>
+            <div class="tlf-label-line">▲▼ 定先后；每行「时间标签」可编辑；👁 参与播放；✕ 移出序列。</div>
+            <button class="btn btn-sm primary btn-block tl-add-btn" onclick="pickTimelineSource()">＋ 从图层 / 服务选择加入</button>
+          </div>
+
+          <div class="sec" id="tlSceneA" style="display:none">
+            <div class="sec-title">🕐 单数据 · 发布时点</div>
+            <div class="tlf-label-line">选动态图层 → 按其「数据发布时点」生成播放（服务恒最新，期=发布时切分）；播放时真实切换地图数据。</div>
+            <div style="padding:0 var(--sp-lg) var(--sp-sm)">
+              <select class="select" id="tlSceneALayer" style="width:100%;height:30px" onchange="setSceneALayer(this.value)">
+                <option value="">— 请选择动态图层 —</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tl-list" id="tlList"></div>
+
+          <div class="sec tl-settings">
+            <div class="sec-title">⏳ 时间轴设置</div>
+            <div class="sec-row">
+              <span class="sec-label">起止时间</span>
+              <div class="sec-value">
+                <input class="input text-mono" id="tlStart" style="width:74px;height:24px;font-size:11px" placeholder="自动" onchange="syncTimelineRange()" />
+                <span style="color:var(--gray-400)">~</span>
+                <input class="input text-mono" id="tlEnd" style="width:74px;height:24px;font-size:11px" placeholder="自动" onchange="syncTimelineRange()" />
+              </div>
+            </div>
+            <div class="sec-row">
+              <span class="sec-label">自动</span>
+              <div class="sec-value">
+                <span class="switch on" id="tlAutoRange" onclick="toggleTimelineAuto()" title="按条目时间标签自动排序起止"></span>
+                <span style="font-size:11px;color:var(--gray-400)">按各条目时间标签排序</span>
+              </div>
+            </div>
+            <div class="sec-row">
+              <span class="sec-label">播放间隔</span>
+              <div class="sec-value">
+                <input class="input text-mono" id="tlSpeed" type="number" min="200" step="100" value="1500" style="width:70px;height:24px;font-size:11px" onchange="setTimelineSpeed(this.value)" />
+                <span style="font-size:11px;color:var(--gray-400)">ms / 步</span>
+              </div>
+            </div>
+            <div class="sec-row">
+              <span class="sec-label">底部滑轨</span>
+              <div class="sec-value">
+                <span class="switch" id="tlBarSwitch" onclick="toggleTimelineBarSwitch(this)"></span>
+                <span style="font-size:11px;color:var(--gray-400)">编辑时显示底部时间滑轨</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tlf-foot">💡 播放时画布高亮当前「发布时点 / 图层顺序」对应条目；场景A 播放会真实切换地图数据，场景B 为图层顺序展示（服务本身始终指向最新数据，分期=发布时人为切分）。</div>
+        </div>
+      </div>
+
+      <!-- Timeline canvas hint（当前时段提示，随播放切换） -->
+      <div class="tl-canvas-hint hidden" id="tlCanvasHint"></div>
+
+      <!-- Timeline bar（底部时间滑轨，默认隐藏：时序面板开关或序列非空时显示） -->
+      <div class="timeline-bar hidden" id="timelineBar">
+        <button class="tl-btn primary" id="tlPlayBtn" onclick="toggleTimelinePlay()" data-tip="播放 / 暂停">▶</button>
+        <button class="tl-btn" onclick="timelineStep(-1)" data-tip="上一个">⏮</button>
+        <div class="tl-track" id="timelineTrack" onclick="setTimelineByTrack(event)">
+          <div class="tl-track-fill" id="timelineTrackFill"></div>
+          <div class="tl-dots" id="timelineDots"></div>
+          <div class="tl-thumb" id="timelineThumb"></div>
+        </div>
+        <button class="tl-btn" onclick="timelineStep(1)" data-tip="下一个">⏭</button>
+        <span class="tl-label" id="timelineLabel">— 未启用 —</span>
+        <span class="tl-range" id="timelineRange"></span>
+        <span class="tl-status" id="timelineStatus"></span>
       </div>
     </div>
 
@@ -1601,26 +1766,18 @@ input { font-family: inherit; }
               </div>
             </div>
             <div class="sec">
-              <div class="sec-title">⬡ 符号</div>
+              <div class="sec-title">🧩 符号 <span style="font-weight:400;font-size:11px;color:var(--gray-400)">来自项目下所选雪碧图组 · 直接点用</span></div>
               <div style="padding:var(--sp-sm) var(--sp-lg)">
-                <!-- Active symbol -->
+                <!-- 先选项目，再选该项目下的某一组雪碧图（符号直接取自该组，不做编辑器内管理） -->
                 <div style="display:flex;align-items:center;gap:var(--sp-sm);margin-bottom:var(--sp-sm)">
-                  <span style="font-size:12px;color:var(--gray-500);flex-shrink:0">当前符号</span>
-                  <span class="swatch round lg" style="background:#e8e8e8" title="默认圆形"></span>
-                  <span style="font-size:var(--text-base);font-weight:500">默认圆形</span>
-                  <span class="text-hint" style="font-size:10px">◀ 点击下方切换</span>
+                  <span style="font-size:12px;color:var(--gray-500);flex-shrink:0">项目 / 雪碧图组</span>
+                  <span class="sprite-pill" id="styleSpriteTitle" title="当前项目下预选的雪碧图组">八五六农场 / default-sprite</span>
+                  <button class="btn btn-xs" onclick="openSpriteModal()">切换 ▾</button>
+                  <span class="text-hint" style="font-size:10px;margin-left:auto">选项目 → 选其内雪碧图组</span>
                 </div>
-                <!-- Quick picker -->
-                <div style="display:flex;gap:var(--sp-sm);flex-wrap:wrap;margin-bottom:10px">
-                  <span class="swatch round" style="background:#ff6b6b;cursor:pointer" onclick="showToast('⬡ 已切换符号：红色圆点')" title="红色圆点"></span>
-                  <span class="swatch round" style="background:#4ecdc4;cursor:pointer" onclick="showToast('⬡ 已切换符号：青色圆点')" title="青色圆点"></span>
-                  <span class="swatch round" style="background:#ffe66d;cursor:pointer" onclick="showToast('⬡ 已切换符号：黄色圆点')" title="黄色圆点"></span>
-                  <span class="swatch round" style="background:#7c5cfc;cursor:pointer" onclick="showToast('⬡ 已切换符号：紫色圆点')" title="紫色圆点"></span>
-                  <span style="width:22px;height:22px;border-radius:50%;border:1.5px dashed var(--gray-300);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gray-300);cursor:pointer;flex-shrink:0" title="更多">+</span>
-                </div>
-                <div class="hr" style="margin:var(--sp-sm) 0"></div>
-                <button class="btn btn-sm btn-block" onclick="switchRightFunc('symbol')">📂 浏览全部符号…</button>
-                <div style="font-size:10px;color:var(--gray-400);margin-top:4px;text-align:center">上传、管理图标库和雪碧图</div>
+                <!-- 当前项目下所选雪碧图组内的符号：直接点选使用 -->
+                <div id="spriteSymbolGrid" class="sprite-symbol-grid"></div>
+                <div class="sprite-hint">点选后直用该组内符号；上传 / 图标库 / 雪碧图管理请到顶级菜单</div>
               </div>
             </div>
           </div>
@@ -1796,9 +1953,6 @@ input { font-family: inherit; }
         <button class="func-btn dim" data-func="filter" onclick="switchRightFunc('filter')" data-tip-left="过滤器">
           <span class="fb-icon">🔍</span><span class="fb-label">过滤器</span>
         </button>
-        <button class="func-btn dim" data-func="symbol" onclick="switchRightFunc('symbol')" data-tip-left="符号">
-          <span class="fb-icon">⬡</span><span class="fb-label">符号</span>
-        </button>
       </div>
     </div>
 
@@ -1815,6 +1969,8 @@ input { font-family: inherit; }
     <span class="st-item">🔍 缩放 85%</span>
     <span class="st-sep"></span>
     <span class="st-item">🎯 当前：<span id="stSelected" class="st-current">基础矢量</span></span>
+    <span class="st-sep"></span>
+    <span class="st-item" id="stTimeline" style="display:none">⏱ 时点：<span id="stTimelineTime" class="st-current">—</span></span>
   </div>
 
 </div>
@@ -1898,17 +2054,31 @@ input { font-family: inherit; }
 <div class="modal-mask hidden" id="shareModal">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-hd">
-      <span>🔗 分享地图</span>
+      <span>🔗 分享 · 评审预览</span>
       <button class="modal-close" onclick="closeShareModal()">✕</button>
     </div>
     <div class="modal-bd">
+      <div class="review-note" style="margin:0 var(--sp-lg) var(--sp-md);padding:var(--sp-md) var(--sp-lg);background:var(--brand-bg);border:1px solid var(--brand-border);border-radius:var(--r-md);font-size:12px;color:var(--gray-600);line-height:1.7">
+        临时评审预览：把当前编辑效果发给他人查看“做得对不对”。链接可随时取消、可设有效期，仅作内部评审用；<b>正式交付请使用卡片级「共享」（推送服务超市，不设时限、不可取消）</b>。
+      </div>
       <div class="sec">
-        <div class="sec-title">分享链接</div>
+        <div class="sec-title">预览链接</div>
         <div class="sec-row">
           <span class="sec-label">链接</span>
           <div class="sec-value">
-            <input class="input text-mono" readonly value="https://hetu.example.com/map/s-25/share/a1b2c3d4" style="font-size:12px">
+            <input id="reviewLinkInput" class="input text-mono" readonly value="https://hetu.example.com/map/s-25/preview/a1b2c3d4" style="font-size:12px">
             <button class="btn btn-sm" onclick="copyShare('link')">复制</button>
+          </div>
+        </div>
+        <div class="sec-row" style="margin-top:8px">
+          <span class="sec-label">有效期</span>
+          <div class="sec-value" style="display:flex;gap:8px">
+            <select id="reviewExpire" class="input" style="width:120px" onchange="setReviewExpire(this.value)">
+              <option value="7">7 天</option>
+              <option value="30">30 天</option>
+              <option value="forever">长期</option>
+            </select>
+            <button class="btn btn-sm ghost" onclick="cancelShareReview()">取消分享</button>
           </div>
         </div>
       </div>
@@ -2261,25 +2431,12 @@ input { font-family: inherit; }
      ==================================================================== -->
 <div class="modal-mask hidden" id="spriteModal">
   <div class="modal modal-lg" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span>默认雪碧图</span><button class="modal-close" onclick="closeModal('spriteModal')">✕</button></div>
+    <div class="modal-hd"><span>选择雪碧图组</span><button class="modal-close" onclick="closeModal('spriteModal')">✕</button></div>
     <div class="modal-bd" style="display:flex;gap:var(--sp-lg)">
-      <div style="width:150px;flex-shrink:0">
-        <div class="cat-item selected" onclick="selectCat(this)"><span class="cat-arrow open">▶</span>通用</div>
-        <div class="cat-item sub" onclick="selectCat(this)">农业农村一张图</div>
-        <div class="cat-item" onclick="selectCat(this)">自定义<span class="cat-count">12</span></div>
-      </div>
+      <div style="width:180px;flex-shrink:0;border-right:1px solid var(--gray-100);padding-right:var(--sp-md)" id="spriteProjectList"></div>
       <div style="flex:1">
-        <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px">选择一张雪碧图作为默认（切换将影响整张图的图标渲染）</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="radio-card selected" onclick="selectSprite(this)">
-            <span class="rc-radio"></span>
-            <div class="rc-desc"><div class="rc-name">default-sprite</div><div class="rc-meta">32 个图标 · 通用农业</div></div>
-          </div>
-          <div class="radio-card" onclick="selectSprite(this)">
-            <span class="rc-radio"></span>
-            <div class="rc-desc"><div class="rc-name">iot-sprite</div><div class="rc-meta">24 个图标 · 物联网设备</div></div>
-          </div>
-        </div>
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px">先选项目空间，再选该项目下的<b>某一组雪碧图</b>（符号直接用该组内，不做上传 / 图标库管理）</div>
+        <div id="spriteGroupList" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
       </div>
     </div>
     <div class="modal-ft">
@@ -2477,6 +2634,27 @@ input { font-family: inherit; }
 </div>
 
 <!-- ====================================================================
+     TIMELINE SOURCE PICKER（时序：从数据资源选择加入）
+     ==================================================================== -->
+<div class="modal-mask hidden" id="tlPickerModal">
+  <div class="modal modal-sm" onclick="event.stopPropagation()">
+    <div class="modal-hd"><span>从图层 / 服务选择加入时序</span><button class="modal-close" onclick="closeModal('tlPickerModal')">✕</button></div>
+    <div class="modal-bd" style="padding:var(--sp-md) var(--sp-lg)">
+      <div class="input-wrap" style="margin-bottom:var(--sp-sm)">
+        <span class="input-icon">🔍</span>
+        <input class="input input-search" id="tlPickerSearch" placeholder="搜索图层 / 服务…" oninput="renderTimelinePicker(this.value)" />
+      </div>
+      <div class="tl-inline-label" style="margin-bottom:var(--sp-sm)">点击条目加入时序序列；已加入的条目置灰（可在时序面板移出）。</div>
+      <div id="tlPickerList"></div>
+    </div>
+    <div class="modal-ft">
+      <span class="ft-count" id="tlPickerCount"></span>
+      <button class="btn btn-xs" onclick="closeModal('tlPickerModal')">完成</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================================
      TOAST STACK
      ==================================================================== -->
 <div class="toast-stack" id="toastStack"></div>
@@ -2499,6 +2677,8 @@ const S = {
   currentBasemap: '遥感影像',
   modalTab: 'feature',
   currentStyle: 'single-fill', // 当前选中的「选取样式」类型
+  spriteProject: '北大荒 · 八五六农场', // 样式选取：当前所属项目空间；'' = 无项目空间（个人）
+  spriteName: 'default-sprite', // 样式选取：当前项目下预选的雪碧图组，符号直接取自该组
   symbolProject: '北大荒 · 八五六农场' // 当前符号管理所在项目空间；null = 无项目空间（个人）
 };
 
@@ -2529,9 +2709,18 @@ const FEATURES = [
     vals:['天然牧草地','','0','-','','','1980.7752000000','','','0','集体','-','-','10',''] }
 ];
 
-// ── 顺序面板：同类内拖拽排序 ──
+// ── 图层树（pnl-layer）：拖拽排序 ──
+// 图层节点（.lt-row）可跨图层间排序（在 #layerTree 内整体移动）；
+// 表达层子行（.lt-sub）仅能在其所属图层节点内（.lt-subs 内）排序。
+function layerDragUnit(el) {
+  if (el.classList.contains('lt-sub')) {
+    return { unit: el, scope: el.parentNode }; // 所属图层的 .lt-subs 容器
+  }
+  const node = el.closest('.layer-node');
+  return { unit: node, scope: node ? node.parentNode : null }; // #layerTree
+}
 function initSortDrag() {
-  document.querySelectorAll('#pnl-order .sort-row').forEach(function (row) {
+  document.querySelectorAll('#pnl-data .lt-row, #pnl-data .lt-sub').forEach(function (row) {
     row.setAttribute('draggable', 'true');
     row.addEventListener('dragstart', onSortDragStart);
     row.addEventListener('dragover', onSortDragOver);
@@ -2545,16 +2734,17 @@ function onSortDragStart(e) {
   _dragRow = this;
   this.classList.add('dragging');
   e.dataTransfer.effectAllowed = 'move';
-  try { e.dataTransfer.setData('text/plain', this.querySelector('.sr-name').textContent); } catch (_) {}
+  try { e.dataTransfer.setData('text/plain', this.querySelector('.lt-name').textContent); } catch (_) {}
 }
 function onSortDragOver(e) {
   if (!_dragRow || _dragRow === this) return;
-  const thisSec = this.closest('.sec');
-  const dragSec = _dragRow.closest('.sec');
-  if (thisSec !== dragSec) return; // 仅允许同类（同一渲染类型）内排序
+  const thisScope = layerDragUnit(this).scope;
+  const dragScope = layerDragUnit(_dragRow).scope;
+  // 跨范围（图层节点 vs 表达层 / 不同图层的表达层）不允许
+  if (!thisScope || thisScope !== dragScope) return;
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
-  thisSec.querySelectorAll('.sort-row').forEach(r => r.classList.remove('drop-before', 'drop-after'));
+  thisScope.querySelectorAll('.lt-row, .lt-sub').forEach(r => r.classList.remove('drop-before', 'drop-after'));
   const rect = this.getBoundingClientRect();
   const after = (e.clientY - rect.top) > rect.height / 2;
   this.classList.add(after ? 'drop-after' : 'drop-before');
@@ -2564,52 +2754,23 @@ function onSortDragLeave() {
 }
 function onSortDrop(e) {
   if (!_dragRow || _dragRow === this) return;
-  const thisSec = this.closest('.sec');
-  const dragSec = _dragRow.closest('.sec');
-  if (thisSec !== dragSec) return;
+  const thisUnit = layerDragUnit(this);
+  const dragUnit = layerDragUnit(_dragRow);
+  if (!thisUnit.scope || thisUnit.scope !== dragUnit.scope) return;
   e.preventDefault();
   e.stopPropagation();
   const rect = this.getBoundingClientRect();
   const after = (e.clientY - rect.top) > rect.height / 2;
-  if (after) this.parentNode.insertBefore(_dragRow, this.nextSibling);
-  else this.parentNode.insertBefore(_dragRow, this);
-  thisSec.querySelectorAll('.sort-row').forEach(r => r.classList.remove('drop-before', 'drop-after'));
-  refreshPin(thisSec);
-  showToast('🔀 已调整同类图层渲染顺序');
+  const container = thisUnit.scope;
+  if (after) container.insertBefore(dragUnit.unit, thisUnit.unit.nextSibling);
+  else container.insertBefore(dragUnit.unit, thisUnit.unit);
+  container.querySelectorAll('.lt-row, .lt-sub').forEach(r => r.classList.remove('drop-before', 'drop-after'));
+  showToast('🔀 已调整图层叠放顺序（上 = 顶）');
 }
 function onSortDragEnd() {
   if (_dragRow) _dragRow.classList.remove('dragging');
-  document.querySelectorAll('#pnl-order .sort-row').forEach(r => r.classList.remove('drop-before', 'drop-after'));
+  document.querySelectorAll('#pnl-data .lt-row, #pnl-data .lt-sub').forEach(r => r.classList.remove('drop-before', 'drop-after'));
   _dragRow = null;
-}
-// 刷新某分类的「当前置顶」与计数
-function refreshPin(sec) {
-  const rows = sec.querySelectorAll('.sort-row');
-  const cnt = sec.querySelector('.sec-count');
-  if (cnt) cnt.textContent = rows.length + ' 项';
-  const name = rows.length ? rows[0].querySelector('.sr-name').textContent : '无';
-  const pin = sec.querySelector('.pin-name');
-  if (pin) {
-    pin.textContent = name;
-    pin.classList.toggle('empty', !rows.length);
-  }
-  const mini = sec.querySelector('.order-pin-mini');
-  if (mini) {
-    mini.textContent = '置顶：' + name;
-    mini.classList.toggle('empty', !rows.length);
-  }
-}
-function refreshAllPins() {
-  document.querySelectorAll('#pnl-order .sec').forEach(refreshPin);
-}
-
-// 顺序面板：分类折叠 / 展开（折叠后仍显示「当前置顶」名称）
-function toggleOrderSec(sec) {
-  const body = sec.querySelector('.sec-collapse');
-  const arr = sec.querySelector('.tgh-arrow');
-  const collapsed = body.classList.toggle('collapsed');
-  sec.classList.toggle('collapsed', collapsed);
-  if (arr) arr.style.transform = collapsed ? 'rotate(0deg)' : 'rotate(90deg)';
 }
 
 // ── Left Tab ──
@@ -2630,8 +2791,8 @@ function switchLeftTab(tab) {
   document.querySelectorAll('.left-tab').forEach(t => t.classList.remove('active'));
   const tabEl = document.querySelector(`.left-tab[data-ltab="${tab}"]`);
   if (tabEl) tabEl.classList.add('active');
-  // Show panel content
-  ['data','order','basemap','legend','settings'].forEach(id => {
+  // Show panel content（时序已迁往画布浮层，不再占用左侧面板）
+  ['data','basemap','legend','settings'].forEach(id => {
     document.getElementById('pnl-'+id).classList.toggle('hidden', id !== tab);
   });
 }
@@ -2659,9 +2820,13 @@ function expandPanel() {
 }
 
 // ── Layer Selection ──
+// 统一清除数据/图层树中的全部选中态（保证单选互斥，兼容各选中层级）
+function clearTreeSelection() {
+  document.querySelectorAll('#pnl-data .layer-node.selected, #pnl-data .lt-row.selected, #pnl-data .lt-sub.selected').forEach(r => r.classList.remove('selected'));
+  document.querySelectorAll('#pnl-data .tree-row.selected, #pnl-data .layer-group.selected, #pnl-data .tree-row.svc-sel').forEach(r => r.classList.remove('selected'));
+}
 function selectLayer(el, name, icon, type) {
-  // Deselect previous (兼容普通图层行与可折叠图层组)
-  document.querySelectorAll('#pnl-data .tree-row.selected, #pnl-data .layer-group.selected').forEach(r => r.classList.remove('selected'));
+  clearTreeSelection();
   // Select this
   el.classList.add('selected');
   S.selectedLayer = { name, icon, type };
@@ -2682,9 +2847,54 @@ function selectLayerFromHeader(el, name, icon, type, groupId) {
   selectLayer(el, name, icon, type);
 }
 
+// ── 图层树（pnl-layer）：图层节点选中 ──
+// 与「数据」面板共用 S.selectedLayer / S.selectionLevel，选中态在树内互斥同步
+function selectLayerNode(el, name, icon, type) {
+  clearTreeSelection();
+  const node = el.closest('.layer-node');
+  if (node) node.classList.add('selected');
+  S.selectedLayer = { name: name, icon: icon, type: type };
+  S.selectedLayerEl = el;
+  // 图层层级：右侧仅「符号」可用，其余置灰不可点
+  S.selectionLevel = 'layer';
+  applyFuncBtnState();
+  updateSelectionUI();
+  updateLayerDetail(name);
+  populateLegendSelect(name);
+  closeDrawer();
+  showToast('✅ 已选中图层：' + name + ' — 仅「符号」功能可用');
+}
+
+// ── 图层树（pnl-layer）：表达层子节点选中（标注/符号/描边/填充/栅格）──
+// 视为服务级：右侧功能全部解锁，并自动打开对应抽屉（style/anno/symbol）
+function selectLayerSub(el, name, kind, func) {
+  clearTreeSelection();
+  el.classList.add('selected');
+  S.selectedLayer = { name: name, icon: '✏', type: '表达层 · ' + kind };
+  S.selectedLayerEl = el;
+  S.selectionLevel = 'service';
+  applyFuncBtnState();
+  updateSelectionUI();
+  populateLegendSelect(name);
+  if (func) switchRightFunc(func);
+  showToast('✏ 已选中表达层：' + name + '（' + kind + '）');
+}
+
+// ── 图层树：折叠 / 展开表达层子节点（默认展开）──
+function toggleLayerSubs(el) {
+  const node = el.closest('.layer-node');
+  if (!node) return;
+  const subs = node.querySelector('.lt-subs');
+  if (!subs) return;
+  const collapsed = subs.style.display === 'none';
+  subs.style.display = collapsed ? '' : 'none';
+  el.classList.toggle('open', collapsed);
+  el.style.transform = collapsed ? 'rotate(90deg)' : 'rotate(0deg)';
+}
+
 function deselectLayer() {
   if (!S.selectedLayer) return;
-  document.querySelectorAll('#pnl-data .tree-row.selected, #pnl-data .layer-group.selected').forEach(r => r.classList.remove('selected'));
+  clearTreeSelection();
   S.selectedLayer = null;
   S.selectedLayerEl = null;
   S.selectionLevel = null;
@@ -2894,6 +3104,10 @@ function switchRightFunc(func) {
   ['props','style','symbol','filter','anno'].forEach(id => {
     document.getElementById('drawer-'+id).classList.toggle('hidden', id !== func);
   });
+  // 打开「样式」面板时，按当前选中图层/表达层的几何类型重新渲染渲染方式候选（成熟产品：随类型/表达层联动）
+  if (func === 'style') {
+    renderStyleCards(currentGeom(), !!selectedFieldName);
+  }
 }
 
 function closeDrawer() {
@@ -2921,7 +3135,7 @@ function toggleTreeGroup(id) {
 
 // ── 服务叶子节点选中：解锁右侧全部功能按钮 ──
 function selectService(el, name) {
-  document.querySelectorAll('#pnl-data .tree-row.svc-sel').forEach(r => r.classList.remove('svc-sel'));
+  clearTreeSelection();
   el.classList.add('svc-sel');
   // 服务层级：右侧功能按钮全部可用；并同步「当前选中」画布标识 / 状态栏 / 抽屉标题
   S.selectedLayer = { name: name, icon: '🔌', type: '服务' };
@@ -2959,49 +3173,36 @@ function collapseAllGroups() {
 function newCategory(where) {
   showToast('📁 在「' + (where || '') + '」下新建分类');
 }
-// ── 数据树搜索过滤 ──
-function applyFilter(container, q) {
-  let anyVisible = false;
-  Array.from(container.children).forEach(function (child) {
-    if (child.classList.contains('tree-group')) {
-      const header = child.querySelector(':scope > .tree-grp-header');
-      const sub = child.querySelector(':scope > div[id^="grp-"]');
-      const selfMatch = !!header && header.textContent.toLowerCase().indexOf(q) !== -1;
-      const subMatch = sub ? applyFilter(sub, q) : false;
-      const visible = selfMatch || subMatch;
-      child.style.display = visible ? '' : 'none';
-      if (visible) anyVisible = true;
-    } else if (child.classList.contains('tree-row')) {
-      const match = child.textContent.toLowerCase().indexOf(q) !== -1;
-      child.style.display = match ? '' : 'none';
-      if (match) anyVisible = true;
-    }
-  });
-  return anyVisible;
-}
+// ── 数据 / 图层树 搜索过滤（作用于统一图层树 #layerTree）──
 function filterTree(val) {
   const q = (val || '').trim().toLowerCase();
-  const root = document.getElementById('grp-theme');
-  if (!root) return;
-  if (!q) {
-    root.querySelectorAll('.tree-group').forEach(function (g) { g.style.display = ''; });
-    root.querySelectorAll('.tree-row').forEach(function (r) { r.style.display = ''; });
-    return;
-  }
-  // 过滤时自动展开各级，保证命中项可见
-  ALL_GROUPS.forEach(function (id) {
-    const g = document.getElementById('grp-' + id);
-    const a = document.getElementById('arr-' + id);
-    if (g) g.style.display = 'block';
-    if (a) { a.classList.add('open'); a.style.transform = 'rotate(90deg)'; }
+  const tree = document.getElementById('layerTree');
+  if (!tree) return;
+  tree.querySelectorAll('.layer-node').forEach(function (node) {
+    if (!q) {
+      node.style.display = '';
+      node.querySelectorAll('.lt-sub').forEach(s => { s.style.display = ''; });
+      return;
+    }
+    const row = node.querySelector('.lt-row');
+    const selfMatch = !!row && row.textContent.toLowerCase().indexOf(q) !== -1;
+    let anySub = false;
+    node.querySelectorAll('.lt-sub').forEach(function (s) {
+      const m = s.textContent.toLowerCase().indexOf(q) !== -1;
+      s.style.display = m ? '' : 'none';
+      if (m) anySub = true;
+    });
+    node.style.display = (selfMatch || anySub) ? '' : 'none';
+    // 命中子项时自动展开该图层，保证可见
+    if (anySub) node.querySelector('.lt-subs').style.display = '';
   });
-  applyFilter(root, q);
 }
 
 // ── Eye Toggle（真实控制地图上示例图层的显隐）──
 function toggleEye(el) {
-  const row = el.closest('.tree-row, .layer-group');
-  const name = row ? row.querySelector('.tr-name').textContent.trim() : null;
+  const row = el.closest('.tree-row, .layer-group, .lt-row');
+  const nameEl = row ? row.querySelector('.tr-name, .lt-name') : null;
+  const name = nameEl ? nameEl.textContent.trim() : null;
   el.classList.toggle('off');
   const off = el.classList.contains('off');
   // 若该图层已构建为真实地图矢量图层，则真实增减到地图
@@ -3227,7 +3428,7 @@ function doAddLayers() {
   showToast('✅ 已成功添加 ' + count + ' 个图层');
 }
 
-// ── Share Modal ──
+// ── Share Modal（分享=临时评审预览，与共享到服务超市分开）──
 function openShareModal() {
   document.getElementById('shareModal').classList.remove('hidden');
 }
@@ -3235,13 +3436,22 @@ function closeShareModal() {
   document.getElementById('shareModal').classList.add('hidden');
 }
 function copyShare(type) {
-  showToast('✅ 已复制' + (type === 'link' ? '分享链接' : '嵌入代码') + '到剪贴板');
+  showToast('✅ 已复制' + (type === 'link' ? '预览链接' : '嵌入代码') + '到剪贴板');
 }
 function pickPermission(el, name) {
   el.parentElement.querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('sharePwdInput').classList.toggle('hidden', name !== '密码访问');
-  showToast('🔒 访问权限已设为：' + name);
+  showToast('🔒 评审预览权限已设为：' + name);
+}
+function setReviewExpire(v) {
+  const t = v === '7' ? '7 天' : v === '30' ? '30 天' : '长期';
+  showToast('⏱ 评审预览有效期已设为：' + t);
+}
+function cancelShareReview() {
+  const link = document.getElementById('reviewLinkInput');
+  if (link) { link.value = 'https://hetu.example.com/map/s-25/preview/（已取消）'; link.classList.add('text-gray-300'); }
+  showToast('✕ 已取消分享，预览链接即时失效');
 }
 
 // ── Render mode card (样式渲染方式) ──
@@ -3269,7 +3479,7 @@ function updateLayerDetail(name) {
 // ====================================================================
 
 // ── Generic modal open/close ──
-const MODAL_IDS = ['addModal','shareModal','legendEditorModal','nodeTypeModal','nodeNameModal','bindFilterModal','layerLegendSelectModal','iconLibModal','iconEditModal','addProjectModal','spriteModal','organizationModal','styleTemplateModal','fieldSelectModal','styleOptionsModal','dynamicFilterModal','viewParamModal','permissionModal','coordModal'];
+const MODAL_IDS = ['addModal','shareModal','legendEditorModal','nodeTypeModal','nodeNameModal','bindFilterModal','layerLegendSelectModal','iconLibModal','iconEditModal','addProjectModal','spriteModal','organizationModal','styleTemplateModal','fieldSelectModal','styleOptionsModal','dynamicFilterModal','viewParamModal','permissionModal','coordModal','tlPickerModal'];
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -3597,7 +3807,48 @@ function uploadIcon() {
 }
 
 function openIconLibModal() { openModal('iconLibModal'); }
-function openSpriteModal() { openModal('spriteModal'); }
+function openSpriteModal() {
+  // 两级选取：左列=项目空间，右列=该项目下的雪碧图组
+  renderSpriteProjectList();
+  renderSpriteGroupList();
+  openModal('spriteModal');
+}
+// 弹窗左列：项目空间列表（预选当前项目）
+function renderSpriteProjectList() {
+  const box = document.getElementById('spriteProjectList');
+  if (!box) return;
+  const cur = S.spriteProject;
+  box.innerHTML = PROJECT_SPRITES.map(function (p, i) {
+    const sel = (p.id === cur) || (i === 0 && cur === undefined) ? ' selected' : '';
+    return '<div class="cat-item' + sel + '" data-p="' + p.name + '" onclick="selectSpriteProject(this)">' +
+      '<span class="cat-arrow"></span>' + p.name + '<span class="cat-count">' + p.sprites.length + '</span>' +
+      '</div>';
+  }).join('');
+}
+// 弹窗右列：当前（点击选中的）项目下的雪碧图组
+function renderSpriteGroupList() {
+  const box = document.getElementById('spriteGroupList');
+  if (!box) return;
+  const proj = currentSpriteProject();
+  const cur = S.spriteName;
+  box.innerHTML = proj.sprites.map(function (g) {
+    const sel = g.name === cur ? ' selected' : '';
+    return '<div class="radio-card' + sel + '" data-sprite="' + g.name + '" onclick="selectSprite(this)">' +
+      '<span class="rc-radio"></span>' +
+      '<div class="rc-desc"><div class="rc-name">' + g.name + '</div><div class="rc-meta">' + g.meta + '</div></div>' +
+      '</div>';
+  }).join('');
+}
+// 点击左列项目：切换当前项目并刷新右列雪碧图组
+function selectSpriteProject(el) {
+  const pName = el.getAttribute('data-p');
+  const proj = PROJECT_SPRITES.find(function (p) { return p.name === pName; });
+  if (!proj) return;
+  S.spriteProject = proj.id;
+  S.spriteName = proj.sprites[0].name; // 默认该项目第一组
+  renderSpriteProjectList();
+  renderSpriteGroupList();
+}
 
 function switchIconTab(el, tab) {
   el.parentElement.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
@@ -3653,12 +3904,99 @@ function confirmAddProject() {
 function selectSprite(el) {
   el.parentElement.querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
+  const gName = el.getAttribute('data-sprite');
+  if (gName) S.spriteName = gName; // 记录当前项目下选中的雪碧图组
 }
 function confirmSprite() {
-  const name = document.querySelector('#spriteModal .radio-card.selected .rc-name').textContent;
-  document.getElementById('symSpriteName').textContent = name;
+  // S.spriteProject / S.spriteName 已在弹窗交互（selectSpriteProject / selectSprite）中同步
+  refreshSpriteUI(); // 同步样式抽屉标题 + 采用当前雪碧图组符号
   closeModal('spriteModal');
-  showToast('🧩 雪碧图已切换为「' + name + '」，将影响整张图的图标渲染');
+  showToast('🧩 已选用「' + S.spriteProject + '」下的雪碧图组「' + S.spriteName + '」，将直接使用该组符号');
+}
+
+// ── 雪碧图组预设选取（先选项目，再选该项目下某一组雪碧图；不做编辑器内管理） ──
+// 项目空间 → 该项目下的雪碧图组（每组含：名称 / 描述 / 组内符号）
+const PROJECT_SPRITES = [
+  { id:'北大荒 · 八五六农场', name:'八五六农场', org:'北大荒集团',
+    sprites:[
+      { name:'default-sprite', meta:'32 个图标 · 通用农业', symbols:[
+        { g:'⬤', n:'圆点', c:'#2bbaa0' }, { g:'🔴', n:'红点', c:'#ff6b6b' }, { g:'🔵', n:'蓝点', c:'#4ecdc4' },
+        { g:'⭐', n:'星形' }, { g:'📍', n:'标记' }, { g:'⛺', n:'大棚' }, { g:'🌾', n:'麦穗' }, { g:'🌽', n:'玉米' },
+        { g:'🚜', n:'农机' }, { g:'💧', n:'滴灌' }, { g:'🏞', n:'灌区' }, { g:'🩹', n:'泵站' }
+      ]},
+      { name:'farm-sprite', meta:'20 个图标 · 农场地块', symbols:[
+        { g:'🟩', n:'地块', c:'#7cb342' }, { g:'🧭', n:'方位' }, { g:'📏', n:'面积' }, { g:'🗺', n:'图斑' },
+        { g:'🌱', n:'出苗' }, { g:'🌿', n:'长势' }, { g:'🍂', n:'枯斑' }, { g:'🌰', n:'产量' }
+      ]}
+    ]},
+  { id:'北大荒 · 建三江分公司', name:'建三江分公司', org:'北大荒集团',
+    sprites:[
+      { name:'sj-sprite', meta:'18 个图标 · 分公司通用', symbols:[
+        { g:'🏭', n:'场部' }, { g:'🏘', n:'连队' }, { g:'🌾', n:'稻作' }, { g:'🚜', n:'农机' },
+        { g:'🛰', n:'遥感' }, { g:'💧', n:'水利' }, { g:'🧱', n:'晒场' }, { g:'🚚', n:'物流' }
+      ]}
+    ]},
+  { id:'北大荒 · 红兴隆分公司', name:'红兴隆分公司', org:'北大荒集团',
+    sprites:[
+      { name:'hxl-agri', meta:'26 个图标 · 农业专题', symbols:[
+        { g:'🌽', n:'玉米' }, { g:'🌾', n:'水稻' }, { g:'🌻', n:'葵花' }, { g:'🫘', n:'大豆' },
+        { g:'🌰', n:'大豆田' }, { g:'💊', n:'植保' }, { g:'🧪', n:'测土' }, { g:'🚁', n:'飞防' }
+      ]},
+      { name:'hxl-iot', meta:'22 个图标 · 物联网', symbols:[
+        { g:'📡', n:'遥测' }, { g:'🤖', n:'终端' }, { g:'📟', n:'网关' }, { g:'🔋', n:'电源' },
+        { g:'🌡', n:'温感' }, { g:'💦', n:'水感' }, { g:'🎛', n:'控制' }, { g:'📶', n:'信号' }
+      ]},
+      { name:'hxl-misc', meta:'12 个图标 · 应急设施', symbols:[
+        { g:'🚨', n:'警报' }, { g:'🧯', n:'消防' }, { g:'🛟', n:'救援' }, { g:'⛑', n:'安全' }
+      ]}
+    ]},
+  { id:'', name:'无项目空间（个人）', org:'个人',
+    sprites:[
+      { name:'personal-sprite', meta:'16 个图标 · 个人自定义', symbols:[
+        { g:'⬤', n:'圆点', c:'#607d8b' }, { g:'📍', n:'标记' }, { g:'📌', n:'图钉' }, { g:'🔖', n:'书签' }
+      ]}
+    ]}
+];
+// 当前所属项目空间
+function currentSpriteProject() {
+  return PROJECT_SPRITES.find(function (p) { return p.id === S.spriteProject; }) || PROJECT_SPRITES[0];
+}
+// 当前项目下选中的雪碧图组
+function currentSpriteGroup() {
+  const proj = currentSpriteProject();
+  return proj.sprites.find(function (g) { return g.name === S.spriteName; }) || proj.sprites[0];
+}
+// 刷新样式抽屉的雪碧图区（标题 + 符号网格）
+function refreshSpriteUI() {
+  const proj = currentSpriteProject();
+  const grp = currentSpriteGroup();
+  const sTitle = document.getElementById('styleSpriteTitle');
+  if (sTitle) sTitle.textContent = proj.name + ' / ' + grp.name;
+  const elSym = document.getElementById('symSpriteName');
+  if (elSym) elSym.textContent = grp.name;
+  renderSpriteSymbols();
+}
+// 渲染「当前项目下选定雪碧图组」内的符号：直接点选使用
+function renderSpriteSymbols() {
+  const grid = document.getElementById('spriteSymbolGrid');
+  if (!grid) return;
+  const symbols = (currentSpriteGroup().symbols) || [];
+  grid.innerHTML = symbols.map(function (sy, i) {
+    const color = sy.c ? ' style="color:' + sy.c + '"' : '';
+    return '<div class="sprite-sym' + (i === 0 ? ' active' : '') + '" data-name="' + sy.n + '" onclick="pickSpriteSymbol(this)" title="' + sy.n + '">' +
+      '<span class="sym-glyph"' + color + '>' + sy.g + '</span>' +
+      '<span class="sym-name">' + sy.n + '</span>' +
+      '</div>';
+  }).join('');
+  const sel = grid.querySelector('.sprite-sym.active');
+  if (sel) S.currentSpriteSymbol = sel.getAttribute('data-name');
+}
+// 点选当前雪碧图组内的某个符号直接使用
+function pickSpriteSymbol(el) {
+  el.parentElement.querySelectorAll('.sprite-sym').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  S.currentSpriteSymbol = el.getAttribute('data-name');
+  showToast('⬡ 已选用当前雪碧图组符号：' + S.currentSpriteSymbol);
 }
 function confirmIconSelect() {
   closeModal('iconLibModal');
@@ -3694,7 +4032,7 @@ function confirmField() {
   document.getElementById('styleFieldTag').hidden = false;
   document.getElementById('styleFieldClear').hidden = false;
   closeModal('fieldSelectModal');
-  renderStyleCards(true);
+  renderStyleCards(currentGeom(), true);
   showToast('✅ 已选择字段：' + selectedFieldName);
 }
 
@@ -3704,7 +4042,7 @@ function clearStyleField() {
   document.getElementById('styleFieldName').textContent = '未选择';
   document.getElementById('styleFieldTag').hidden = true;
   document.getElementById('styleFieldClear').hidden = true;
-  renderStyleCards(false);
+  renderStyleCards(currentGeom(), false);
   showToast('🧹 已清除渲染字段，回到基础渲染');
 }
 
@@ -3730,7 +4068,11 @@ function styleThumb(type) {
     'unique': '<svg viewBox="0 0 64 40" class="st-svg">' + blk('#4caf50', 3) + blk('#ffb300', 23) + blk('#2196f3', 43) + '</svg>',
     'graduated': '<svg viewBox="0 0 64 40" class="st-svg">' + blk('#c7e9c0', 3) + blk('#74c476', 23) + blk('#238b45', 43) + '</svg>',
     'graduated-line': '<svg viewBox="0 0 64 40" class="st-svg"><line x1="5" y1="13" x2="22" y2="13" stroke="#c7e9c0" stroke-width="4"/><line x1="24" y1="20" x2="41" y2="20" stroke="#74c476" stroke-width="4"/><line x1="43" y1="27" x2="60" y2="27" stroke="#238b45" stroke-width="4"/></svg>',
-    'interp': '<svg viewBox="0 0 64 40" class="st-svg"><defs><linearGradient id="' + u + 'ig" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fee08b"/><stop offset="50%" stop-color="#a6d96a"/><stop offset="100%" stop-color="#1a9850"/></linearGradient></defs><rect x="4" y="7" width="56" height="26" rx="3" fill="url(#' + u + 'ig)"/></svg>'
+    'interp': '<svg viewBox="0 0 64 40" class="st-svg"><defs><linearGradient id="' + u + 'ig" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fee08b"/><stop offset="50%" stop-color="#a6d96a"/><stop offset="100%" stop-color="#1a9850"/></linearGradient></defs><rect x="4" y="7" width="56" height="26" rx="3" fill="url(#' + u + 'ig)"/></svg>',
+    'single-point': '<svg viewBox="0 0 64 40" class="st-svg"><circle cx="20" cy="20" r="8" fill="#2bbaa0" stroke="#0f947c" stroke-width="2"/><circle cx="43" cy="17" r="6" fill="#2bbaa0" fill-opacity="0.6" stroke="#0f947c" stroke-width="1.6"/><circle cx="32" cy="28" r="5" fill="#2bbaa0" fill-opacity="0.4" stroke="#0f947c" stroke-width="1.4"/></svg>',
+    'dot-size': '<svg viewBox="0 0 64 40" class="st-svg"><circle cx="16" cy="20" r="4" fill="#ffb300"/><circle cx="32" cy="20" r="7" fill="#fb8c00"/><circle cx="50" cy="20" r="10" fill="#e65100" fill-opacity="0.85"/></svg>',
+    'unique-line': '<svg viewBox="0 0 64 40" class="st-svg"><line x1="5" y1="12" x2="59" y2="12" stroke="#4caf50" stroke-width="4"/><line x1="5" y1="21" x2="59" y2="21" stroke="#ffb300" stroke-width="4"/><line x1="5" y1="30" x2="59" y2="30" stroke="#2196f3" stroke-width="4"/></svg>',
+    'raster': '<svg viewBox="0 0 64 40" class="st-svg"><defs><linearGradient id="' + u + 'ra" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0b2a33"/><stop offset="50%" stop-color="#2bbaa0"/><stop offset="100%" stop-color="#f2f0e9"/></linearGradient></defs><rect x="4" y="5" width="56" height="30" rx="2" fill="url(#' + u + 'ra)"/></svg>'
   };
   return svg[type] || svg['single-fill'];
 }
@@ -3740,14 +4082,43 @@ function styleNameOf(type) {
   return map[type] || type;
 }
 
-// 选取样式：未选字段 / 已选字段 两套候选，且都带缩略图
-function renderStyleCards(hasField) {
+// 由当前选中图层/服务推导几何类型：面 / 线 / 点 / 栅格（成熟产品：样式选项随几何类型变化）
+function currentGeom() {
+  const t = S.selectedLayer ? (S.selectedLayer.type || '') : '';
+  if (t.indexOf('符号') >= 0 || t === '点') return '点';
+  if (t.indexOf('描边') >= 0 || t === '线') return '线';
+  if (t.indexOf('栅格') >= 0) return '栅格';
+  return '面'; // 填充 / 面 / 参考 / 默认
+}
+
+// 按「几何类型 + 是否已选字段」返回可用的渲染方式候选（成熟产品做法：面/线/点/栅格各自不同）
+function styleCandidatesFor(geom, hasField) {
+  if (geom === '点') {
+    return hasField
+      ? [ {type:'single-point', name:'单一符号'}, {type:'dot-size', name:'分级(大小)'}, {type:'unique', name:'唯一值'}, {type:'heatmap', name:'热力图'} ]
+      : [ {type:'single-point', name:'单一符号'}, {type:'heatmap', name:'热力图'} ];
+  }
+  if (geom === '线') {
+    return hasField
+      ? [ {type:'single-line', name:'单一线'}, {type:'unique-line', name:'唯一值线'}, {type:'graduated-line', name:'分段线'} ]
+      : [ {type:'single-line', name:'单一线'} ];
+  }
+  if (geom === '栅格') {
+    return [ {type:'raster', name:'拉伸/透明度'} ];
+  }
+  // 面 / 参考
+  return hasField
+    ? [ {type:'single-fill', name:'单一填充'}, {type:'unique', name:'唯一值填充'}, {type:'graduated', name:'分段填充'}, {type:'interp', name:'插值'} ]
+    : [ {type:'single-fill', name:'单一填充'}, {type:'heatmap', name:'热力图'} ];
+}
+
+// 选取样式：候选随「几何类型 × 是否已选字段」变化，且都带缩略图
+function renderStyleCards(geom, hasField) {
   const grid = document.getElementById('styleRenderGrid');
   const hint = document.getElementById('styleRenderHint');
-  const defs = hasField
-    ? [ {type:'unique', name:'唯一值填充'}, {type:'graduated', name:'分段填充'}, {type:'graduated-line', name:'分段轮廓'}, {type:'heatmap', name:'热力图'}, {type:'interp', name:'插值'} ]
-    : [ {type:'single-fill', name:'单一填充'}, {type:'single-line', name:'单一轮廓'}, {type:'heatmap', name:'热力图'} ];
-  hint.textContent = hasField ? '已选字段：支持唯一值 / 分段 / 插值' : '未选字段时仅基础渲染';
+  const g = geom || currentGeom();
+  const defs = styleCandidatesFor(g, !!hasField);
+  hint.textContent = '当前为「' + g + ' 图层」 · ' + (hasField ? '已选字段：可做分级/唯一值/插值' : '基础渲染');
   grid.innerHTML = defs.map(function (d, i) {
     return '<div class="style-thumb-card' + (i === 0 ? ' active' : '') + '" data-type="' + d.type + '" onclick="pickStyleRender(this)">' +
       styleThumb(d.type) +
@@ -3770,6 +4141,8 @@ function pickStyleRender(el) {
   S.currentStyle = el.getAttribute('data-type');
   document.getElementById('styleOptionsName').textContent = el.querySelector('.st-name').textContent;
   document.getElementById('styleOptionsEntry').classList.remove('hidden');
+  // 选中即自动打开该样式的配置弹窗（每个样式都有对应参数）
+  openStyleOptions();
   showToast('✅ 选取样式：' + el.querySelector('.st-name').textContent);
 }
 
@@ -3793,10 +4166,11 @@ function buildStyleOptions(type) {
     body += optSlider('热力半径', 60);
     body += optSlider('强度', 70);
     body += '<div class="form-item"><span class="fi-label">权重字段</span><div class="fi-control"><select class="select" style="height:28px"><option>无（均匀）</option><option>zzmj 种植面积</option><option>ndvi 长势指数</option></select></div></div>';
-  } else if (type === 'unique') {
+  } else if (type === 'unique' || type === 'unique-line') {
     body += '<div class="form-item"><span class="fi-label">分类字段</span><div class="fi-control"><select class="select" style="height:28px"><option>sddlmc 地块名称</option><option>trslx 土壤类型</option></select></div></div>';
     body += '<div class="form-item"><span class="fi-label">配色方案</span><div class="fi-control"><select class="select" style="height:28px"><option>分类色板（高区分度）</option><option>柔和自然色</option><option>随机配色</option></select></div></div>';
     body += optToggle('自动配色');
+    if (type === 'unique-line') body += optSlider('线宽', 20);
   } else if (type === 'graduated' || type === 'graduated-line') {
     body += '<div class="form-item"><span class="fi-label">分级方法</span><div class="fi-control"><select class="select" style="height:28px"><option>等间隔</option><option>分位数</option><option>自然断点</option></select></div></div>';
     body += optSlider('分级数量', 50);
@@ -3806,6 +4180,25 @@ function buildStyleOptions(type) {
     body += '<div class="form-item"><span class="fi-label">色带</span><div class="fi-control"><select class="select" style="height:28px"><option>绿（浅→深）</option><option>红黄绿</option></select></div></div>';
     body += optSlider('网格大小', 40);
     body += optToggle('平滑插值');
+  } else if (type === 'single-point') {
+    body += optColor('填充色', '#2bbaa0');
+    body += '<div class="form-item"><span class="fi-label">符号样式</span><div class="fi-control"><select class="select" style="height:28px"><option>圆点（默认）</option><option>方形</option><option>三角</option><option>菱形</option></select></div></div>';
+    body += optSlider('符号大小', 45);
+    body += optSlider('旋转角度', 0);
+    body += optSlider('透明底', 0);
+  } else if (type === 'dot-size') {
+    body += '<div class="form-item"><span class="fi-label">分级字段</span><div class="fi-control"><select class="select" style="height:28px"><option>zzmj 种植面积</option><option>ndvi 长势指数</option></select></div></div>';
+    body += '<div class="form-item"><span class="fi-label">分级方法</span><div class="fi-control"><select class="select" style="height:28px"><option>等间隔</option><option>分位数</option><option>自然断点</option></select></div></div>';
+    body += optSlider('分级数量', 40);
+    body += optSlider('最小尺寸', 20);
+    body += optSlider('最大尺寸', 80);
+    body += '<div class="form-item"><span class="fi-label">配色</span><div class="fi-control"><select class="select" style="height:28px"><option>橙（浅→深）</option><option>绿（浅→深）</option><option>蓝（浅→深）</option></select></div></div>';
+  } else if (type === 'raster') {
+    body += '<div class="form-item"><span class="fi-label">拉伸方式</span><div class="fi-control"><select class="select" style="height:28px"><option>线性拉伸</option><option>标准差拉伸</option><option>直方图均衡</option></select></div></div>';
+    body += '<div class="form-item"><span class="fi-label">色带</span><div class="fi-control"><select class="select" style="height:28px"><option>灰度</option><option>绿→淡</option><option>热力</option><option>假彩色</option></select></div></div>';
+    body += optSlider('透明度', 100);
+    body += optSlider('亮度', 50);
+    body += optSlider('对比度', 50);
   }
   return head + body;
 }
@@ -3850,7 +4243,7 @@ function applyPreset(i) {
     document.getElementById('styleFieldClear').hidden = true;
     selectedFieldName = null;
   }
-  renderStyleCards(hasField);
+  renderStyleCards(currentGeom(), hasField);
   const card = document.querySelector('#styleRenderGrid .style-thumb-card[data-type="' + p.style + '"]');
   if (card) {
     card.parentElement.querySelectorAll('.style-thumb-card').forEach(c => c.classList.remove('active'));
@@ -4073,13 +4466,602 @@ document.getElementById('mapArea').addEventListener('click', function(e) {
   }
 });
 
+// ════════════════════════════════════════════════════════════════════════
+// 时序组件（时间滑轨）
+//   场景A：单数据集按「数据发布时点」播放（服务恒最新，期=发布时人为切分）；
+//   场景B：多个独立图层/服务人为约定先后顺序，编排成可播放的时间序列。
+//   同一时间只启用一个场景（activeScene），各有独立序列；播放内核共用。
+// ════════════════════════════════════════════════════════════════════════
+const timelineState = {
+  activeScene: 'B', // 当前时序模式：'A'=单数据发布时点 / 'B'=多图层顺序
+  enabled: false,   // 时序是否启用（当前场景序列非空即视为启用）
+  // 场景B：多图层顺序（沿用原 items / idx）
+  items: [],        // [{ name, icon, kind, label, time, on, refEl }]
+  idx: -1,          // 场景B 当前下标
+  // 场景A：单数据发布时点
+  A: { layer: '', periods: [], idx: -1, sliceGroups: [] },
+  playing: false,   // 是否正在播放
+  intervalId: null, // setInterval id（停用时必须 clear）
+  speed: 1500,      // 播放间隔 ms / 步
+  autoRange: true,  // 起止时间自动 = 按当前序列时间标签排序
+  rangeStart: '',
+  rangeEnd: '',
+  barOn: false,     // 「编辑时显示底部时间滑轨」开关
+};
+
+// 时序场景辅助（统一入口：两条独立序列，同一时间只播当前 activeScene 的序列）
+function tlItems()   { return timelineState.activeScene === 'A' ? timelineState.A.periods : timelineState.items; }
+function tlIdx()     { return timelineState.activeScene === 'A' ? timelineState.A.idx : timelineState.idx; }
+function tlSetIdx(v) { if (timelineState.activeScene === 'A') timelineState.A.idx = v; else timelineState.idx = v; }
+function tlEnabled() { return tlItems().length > 0; }
+
+// HTML 转义（用于 title / value / innerHTML）
+function tlEsc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// 收集数据/图层树中的可选条目（图层节点 + 表达层/服务子节点），去重
+function timelineSourceCandidates() {
+  const out = [];
+  const seen = {};
+  document.querySelectorAll('#pnl-data .lt-row, #pnl-data .lt-sub').forEach(function (el) {
+    const nameEl = el.querySelector('.lt-name');
+    if (!nameEl) return;
+    const name = nameEl.textContent.trim();
+    if (!name || seen[name]) return;
+    const iconEl = el.querySelector('.lt-icon');
+    seen[name] = true;
+    out.push({
+      name: name,
+      icon: iconEl ? iconEl.textContent.trim() : '🗺',
+      kind: el.classList.contains('lt-sub') ? '服务/表达层' : '图层',
+      el: el
+    });
+  });
+  return out;
+}
+
+// 加入时序序列（场景A/场景B 通用入口；nameOrRef 传名称字符串或 DOM 元素）
+function addToTimeline(nameOrRef) {
+  let cand = null;
+  if (typeof nameOrRef === 'string') {
+    cand = timelineSourceCandidates().filter(function (c) { return c.name === nameOrRef; })[0] || null;
+  } else if (nameOrRef && nameOrRef.querySelector) {
+    const nameEl = nameOrRef.querySelector('.lt-name');
+    if (nameEl) {
+      const iconEl = nameOrRef.querySelector('.lt-icon');
+      cand = {
+        name: nameEl.textContent.trim(),
+        icon: iconEl ? iconEl.textContent.trim() : '🗺',
+        kind: nameOrRef.classList.contains('lt-sub') ? '服务/表达层' : '图层',
+        el: nameOrRef
+      };
+    }
+  }
+  if (!cand) { showToast('⚠️ 未在图层 / 服务中找到该图层'); return; }
+  if (timelineState.items.some(function (it) { return it.name === cand.name; })) {
+    showToast('⏱ ' + cand.name + ' 已在时序序列中'); return;
+  }
+  const label = '顺序 ' + (timelineState.items.length + 1);
+  timelineState.items.push({ name: cand.name, icon: cand.icon, kind: cand.kind, label: label, time: label, on: true, refEl: cand.el });
+  timelineState.enabled = true;
+  if (timelineState.items.length === 1 && timelineState.idx < 0) timelineState.idx = 0;
+  timelineStop(); // 序列变化 → 停止播放，避免旧序列残留
+  syncTimelineRange();
+  renderTimelinePanel();
+  renderTimelineBar();
+  timelineApplyCurrent();
+  showToast('⏱ 已加入时序：' + cand.name + '（' + label + '）');
+}
+
+// 移出时序序列
+function removeFromTimeline(i) {
+  if (!timelineState.items[i]) return;
+  const it = timelineState.items[i];
+  timelineState.items.splice(i, 1);
+  timelineState.enabled = timelineState.items.length > 0;
+  if (timelineState.idx >= timelineState.items.length) timelineState.idx = timelineState.items.length - 1;
+  if (!timelineState.enabled) timelineState.idx = -1;
+  timelineStop();
+  syncTimelineRange();
+  renderTimelinePanel();
+  renderTimelineBar();
+  timelineApplyCurrent();
+  showToast('🗑 已移出时序：' + it.name);
+}
+
+// 上移 / 下移：人为约定先后顺序（场景B）
+function moveTimelineItem(i, dir) {
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= timelineState.items.length) return;
+  const tmp = timelineState.items[i];
+  timelineState.items[i] = timelineState.items[j];
+  timelineState.items[j] = tmp;
+  if (timelineState.idx === i) timelineState.idx = j;
+  else if (timelineState.idx === j) timelineState.idx = i;
+  syncTimelineRange();
+  renderTimelinePanel();
+  renderTimelineBar();
+  timelineApplyCurrent();
+}
+
+// 编辑某条的时间标签（如 2026-08）
+function setTimelineLabel(i, val) {
+  if (!timelineState.items[i]) return;
+  const v = String(val || '').trim();
+  if (!v) return;
+  timelineState.items[i].label = v;
+  timelineState.items[i].time = v;
+  syncTimelineRange();
+  renderTimelinePanel();
+  renderTimelineBar();
+}
+
+// 眼睛：切换该条目是否参与播放
+function toggleTimelineItem(i) {
+  if (!timelineState.items[i]) return;
+  timelineState.items[i].on = !timelineState.items[i].on;
+  renderTimelinePanel();
+  renderTimelineBar();
+  showToast('👁 ' + timelineState.items[i].name + (timelineState.items[i].on ? ' 参与播放' : ' 暂停参与播放'));
+}
+
+// 时序面板列表渲染
+function renderTimelinePanel() {
+  const list = document.getElementById('tlList');
+  if (!list) return;
+  const countEl = document.getElementById('tlCount');
+  if (timelineState.activeScene === 'A') {
+    // 场景A：单数据的「数据发布时点」只读列表（点击跳转）
+    const A = timelineState.A;
+    const items = A.periods;
+    if (countEl) countEl.textContent = (A.layer ? A.layer : '—') + ' · ' + items.length + ' 个发布时点';
+    if (!items.length) {
+      list.innerHTML = '<div class="tl-empty"><div class="empty-icon">🕐</div>场景A · 单数据时序<br>先选一个动态图层，<br>下方列出其「数据发布时点」<br>（服务恒最新，期=发布时切分）</div>';
+      return;
+    }
+    list.innerHTML = items.map(function (it, i) {
+      const cur = i === A.idx ? ' current' : '';
+      return '<div class="tl-item' + cur + '" onclick="setSceneAIdx(' + i + ')" style="cursor:pointer" title="跳到该发布时点">' +
+        '<span class="tl-rank">' + (i + 1) + '</span>' +
+        '<span class="tl-ic">🕐</span>' +
+        '<span class="tl-name" style="flex:1">发布 · ' + tlEsc(it.time) + '</span>' +
+        '<span class="tl-time">' + tlEsc(it.time) + '</span>' +
+      '</div>';
+    }).join('');
+    return;
+  }
+  // 场景B：多图层顺序（原编排列表）
+  const items = timelineState.items;
+  const countElB = countEl;
+  if (countElB) countElB.textContent = items.length + ' 项';
+  if (!items.length) {
+    list.innerHTML = '<div class="tl-empty"><div class="empty-icon">⏱</div>场景B · 多图层顺序<br>点击下方「从图层 / 服务选择加入」<br>将图层 / 服务加入序列</div>';
+    return;
+  }
+  list.innerHTML = items.map(function (it, i) {
+    const cur = i === timelineState.idx ? ' current' : '';
+    const eyeCls = it.on ? '' : ' off';
+    const eyeIcon = it.on ? '👁' : '🙈';
+    const up = '<button onclick="moveTimelineItem(' + i + ',-1)"' + (i === 0 ? ' disabled' : '') + ' title="上移（更早）">▲</button>';
+    const down = '<button onclick="moveTimelineItem(' + i + ',1)"' + (i === items.length - 1 ? ' disabled' : '') + ' title="下移（更晚）">▼</button>';
+    return '<div class="tl-item' + cur + '">' +
+      '<span class="tl-rank">' + (i + 1) + '</span>' +
+      '<span class="tl-ic">' + it.icon + '</span>' +
+      '<span class="tl-name" title="' + tlEsc(it.name) + '">' + tlEsc(it.name) + '</span>' +
+      '<input class="tl-time-input" value="' + tlEsc(it.time) + '" onchange="setTimelineLabel(' + i + ',this.value)" title="编辑时间标签" />' +
+      '<span class="tl-move">' + up + down + '</span>' +
+      '<button class="tl-eye' + eyeCls + '" onclick="toggleTimelineItem(' + i + ')" title="参与播放">' + eyeIcon + '</button>' +
+      '<button class="tl-del" onclick="removeFromTimeline(' + i + ')" title="移出时序">✕</button>' +
+    '</div>';
+  }).join('');
+}
+
+// 起止时间：自动（按条目时间标签排序）或手动
+function syncTimelineRange() {
+  const sEl = document.getElementById('tlStart');
+  const eEl = document.getElementById('tlEnd');
+  const autoEl = document.getElementById('tlAutoRange');
+  if (!sEl || !eEl || !autoEl) return;
+  const auto = !!timelineState.autoRange;
+  autoEl.classList.toggle('on', auto);
+  sEl.disabled = auto;
+  eEl.disabled = auto;
+  if (auto) {
+    const labels = tlItems().map(function (it) { return it.time; }).filter(Boolean);
+    if (labels.length) {
+      sEl.value = labels[0];
+      eEl.value = labels[labels.length - 1];
+    } else {
+      sEl.value = '';
+      eEl.value = '';
+    }
+  }
+  timelineState.rangeStart = sEl.value;
+  timelineState.rangeEnd = eEl.value;
+}
+
+function toggleTimelineAuto() {
+  timelineState.autoRange = !timelineState.autoRange;
+  syncTimelineRange();
+  renderTimelineBar();
+}
+
+function setTimelineSpeed(v) {
+  const ms = parseInt(v, 10);
+  timelineState.speed = ms > 0 ? ms : 1500;
+  if (timelineState.playing) { // 正在播放时重启定时器以应用新间隔
+    if (timelineState.intervalId) clearInterval(timelineState.intervalId);
+    timelineState.intervalId = setInterval(function () { timelineStep(1); }, timelineState.speed);
+  }
+}
+
+// 底部时间滑轨条渲染（同时维护面板开关状态）
+function renderTimelineBar() {
+  syncTimelineRange();
+  const bar = document.getElementById('timelineBar');
+  if (!bar) return;
+  const items = tlItems();
+  const n = items.length;
+  const visible = timelineState.barOn || (tlEnabled() && n > 0);
+  bar.classList.toggle('hidden', !visible);
+  const sw = document.getElementById('tlBarSwitch');
+  if (sw) sw.classList.toggle('on', !!timelineState.barOn);
+  const playBtn = document.getElementById('tlPlayBtn');
+  const fill = document.getElementById('timelineTrackFill');
+  const dots = document.getElementById('timelineDots');
+  const thumb = document.getElementById('timelineThumb');
+  const label = document.getElementById('timelineLabel');
+  const range = document.getElementById('timelineRange');
+  const status = document.getElementById('timelineStatus');
+  if (!n) {
+    if (playBtn) playBtn.textContent = '▶';
+    if (fill) fill.style.width = '0%';
+    if (dots) dots.innerHTML = '';
+    if (thumb) thumb.style.left = '0%';
+    if (label) label.textContent = '— 未启用 —';
+    if (range) range.textContent = '';
+    if (status) status.textContent = '';
+    return;
+  }
+  const idx = tlIdx();
+  let dotsHtml = '';
+  for (let i = 0; i < n; i++) {
+    const left = n === 1 ? 50 : (i / (n - 1)) * 100;
+    const cls = i === idx ? 'tl-dot cur on' : (i < idx ? 'tl-dot on' : 'tl-dot');
+    dotsHtml += '<span class="' + cls + '" style="left:' + left + '%"></span>';
+  }
+  if (dots) dots.innerHTML = dotsHtml;
+  const pct = n === 1 ? 100 : (idx / (n - 1)) * 100;
+  const pctShown = idx >= 0 ? pct : 0;
+  if (fill) fill.style.width = pctShown + '%';
+  if (thumb) thumb.style.left = pctShown + '%';
+  if (label) label.textContent = idx >= 0 ? (items[idx].time || items[idx].name) : '— 未播放 —';
+  if (range) range.textContent = (timelineState.rangeStart || '?') + ' ~ ' + (timelineState.rangeEnd || '?');
+  if (status) status.textContent = timelineState.playing ? '● 播放中' : (idx >= 0 ? '⏸ 已暂停' : '');
+  if (playBtn) playBtn.textContent = timelineState.playing ? '⏸' : '▶';
+}
+
+// 底部时间滑轨 显示/隐藏（on 传布尔则强制，否则取反）
+function toggleTimelineBar(on) {
+  timelineState.barOn = typeof on === 'boolean' ? on : !timelineState.barOn;
+  renderTimelineBar();
+}
+
+function toggleTimelineBarSwitch(el) {
+  el.classList.toggle('on');
+  toggleTimelineBar(el.classList.contains('on'));
+  if (timelineState.barOn && !tlItems().length) {
+    showToast('💡 已显示底部时间滑轨——当前时序无条目，添加后即可播放');
+  }
+}
+
+// 时序画布浮层：展开 / 收起（force 传布尔则强制，否则切换）。展开时刷新面板内容。
+function toggleTimelineFloating(force) {
+  const panel = document.getElementById('tlFloatingPanel');
+  const btn = document.getElementById('tlFloatingBtn');
+  if (!panel) return;
+  const show = typeof force === 'boolean' ? force : panel.classList.contains('hidden');
+  panel.classList.toggle('hidden', !show);
+  if (btn) btn.classList.toggle('active', show);
+  if (show) {
+    renderTimelinePanel();
+    renderTimelineBar();
+  }
+}
+
+// 点击浮层 / 按钮之外的区域时收起时序浮层（与全局菜单关闭逻辑一致，避免遮挡画布）
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('tlFloatingPanel');
+  if (!panel || panel.classList.contains('hidden')) return;
+  if (!e.target.closest('#tlFloatingPanel') && !e.target.closest('#tlFloatingBtn')) {
+    toggleTimelineFloating(false);
+  }
+});
+
+// 播放 / 暂停（当前 activeScene 的序列）
+function toggleTimelinePlay() {
+  if (!tlItems().length) {
+    showToast(timelineState.activeScene === 'A' ? '⏱ 场景A：请先选一个动态图层生成发布时点' : '⏱ 场景B：请先添加图层 / 服务');
+    return;
+  }
+  if (timelineState.playing) {
+    timelineStop();
+    renderTimelineBar();
+    showToast('⏸ 已暂停播放');
+    return;
+  }
+  timelineState.playing = true;
+  if (tlIdx() < 0) tlSetIdx(0);
+  timelineApplyCurrent();
+  timelineStartInterval();
+  renderTimelinePanel();
+  renderTimelineBar();
+  showToast('▶ 开始播放时序：' + tlItems()[tlIdx()].name);
+}
+
+function timelineStartInterval() {
+  if (timelineState.intervalId) return;
+  timelineState.intervalId = setInterval(function () { timelineStep(1); }, timelineState.speed);
+}
+
+// 停止播放并清理定时器（组件停用/序列变化时必须调用，避免泄漏）
+function timelineStop() {
+  if (timelineState.intervalId) {
+    clearInterval(timelineState.intervalId);
+    timelineState.intervalId = null;
+  }
+  timelineState.playing = false;
+}
+
+// 步进：dir=+1 下一发布时点 / -1 上一发布时点（循环）
+function timelineStep(dir) {
+  const n = tlItems().length;
+  if (!n) return;
+  let idx = tlIdx();
+  if (idx < 0) {
+    idx = dir > 0 ? 0 : n - 1;
+  } else {
+    idx += dir;
+    if (idx >= n) idx = 0;
+    if (idx < 0) idx = n - 1;
+  }
+  tlSetIdx(idx);
+  timelineApplyCurrent();
+  renderTimelinePanel();
+  renderTimelineBar();
+}
+
+// 点击 / 拖动时间轴轨道 → 定位到对应发布时点
+function setTimelineByTrack(e) {
+  const track = document.getElementById('timelineTrack');
+  const n = tlItems().length;
+  if (!n) return;
+  const rect = track.getBoundingClientRect();
+  let ratio = (e.clientX - rect.left) / rect.width;
+  ratio = Math.max(0, Math.min(1, ratio));
+  const idx = Math.round(ratio * (n - 1));
+  tlSetIdx(idx);
+  timelineApplyCurrent();
+  renderTimelinePanel();
+  renderTimelineBar();
+  showToast('⏱ 定位到：' + tlItems()[idx].time + ' · ' + tlItems()[idx].name);
+}
+
+// 应用当前时间点：按 activeScene 处理
+//  - 场景B：高亮图层树对应条目（tl-current）+ 画布提示
+//  - 场景A：真实切换该图层当前「发布时点」的地图切片（服务恒最新，期=发布时切分）
+function timelineApplyCurrent() {
+  const n = tlItems().length;
+  const idx = tlIdx();
+  document.querySelectorAll('#pnl-data .lt-row, #pnl-data .lt-sub').forEach(function (el) {
+    el.classList.remove('tl-current');
+  });
+  const hint = document.getElementById('tlCanvasHint');
+  const st = document.getElementById('stTimeline');
+  const stTime = document.getElementById('stTimelineTime');
+
+  if (timelineState.activeScene === 'A') {
+    // 场景A：真实切换地图切片
+    const A = timelineState.A;
+    timedApplySlice(A, idx);
+    if (idx >= 0 && idx < n) {
+      const it = A.periods[idx];
+      if (hint) { hint.classList.remove('hidden'); hint.innerHTML = '📅 当前发布时点：<b>' + tlEsc(it.time) + '</b> · ' + tlEsc(it.label || A.layer); }
+      if (st) st.style.display = '';
+      if (stTime) stTime.textContent = it.time + ' · ' + (it.label || A.layer);
+    } else {
+      if (hint) hint.classList.add('hidden');
+      if (st) st.style.display = 'none';
+    }
+    return;
+  }
+
+  // 场景B（原逻辑）
+  if (idx >= 0 && idx < n) {
+    const it = tlItems()[idx];
+    if (it.refEl) it.refEl.classList.add('tl-current');
+    if (hint) {
+      hint.classList.remove('hidden');
+      hint.innerHTML = '⏱ 当前：<b>' + tlEsc(it.time) + '</b> · ' + tlEsc(it.name);
+    }
+    if (st) st.style.display = '';
+    if (stTime) stTime.textContent = it.time + ' · ' + it.name;
+  } else {
+    if (hint) hint.classList.add('hidden');
+    if (st) st.style.display = 'none';
+  }
+}
+
+// 场景A：把当前发布时点的切片显示到地图，其它隐藏（真实切换）
+function timedApplySlice(A, idx) {
+  if (!map || !A || !A.sliceGroups || !A.sliceGroups.length) return;
+  A.sliceGroups.forEach(function (g) { if (g) map.removeLayer(g); });
+  if (idx >= 0 && idx < A.sliceGroups.length) {
+    const g = A.sliceGroups[idx];
+    if (g) map.addLayer(g);
+  }
+}
+
+// 从数据资源选择加入（浮层）
+function pickTimelineSource() {
+  renderTimelinePicker('');
+  openModal('tlPickerModal');
+}
+
+function renderTimelinePicker(q) {
+  const listEl = document.getElementById('tlPickerList');
+  const countEl = document.getElementById('tlPickerCount');
+  if (!listEl) return;
+  const qs = String(q || '').trim().toLowerCase();
+  const cands = timelineSourceCandidates();
+  const matched = qs ? cands.filter(function (c) { return c.name.toLowerCase().indexOf(qs) >= 0; }) : cands;
+  const addedNames = tlItems().map(function (it) { return it.name; });
+  if (!matched.length) {
+    listEl.innerHTML = '<div class="tl-empty">没有可加入的图层 / 服务</div>';
+    if (countEl) countEl.textContent = '0 项';
+    return;
+  }
+  listEl.innerHTML = matched.map(function (c) {
+    const added = addedNames.indexOf(c.name) >= 0;
+    const onClick = added ? '' : "addToTimelineFromPicker('" + String(c.name).replace(/'/g, "\\'") + "')";
+    return '<div class="modal-item' + (added ? ' disabled' : '') + '" onclick="' + onClick + '">' +
+      '<span class="mi-cb' + (added ? ' checked' : '') + '"></span>' +
+      '<span class="mi-icon">' + c.icon + '</span>' +
+      '<span class="mi-info"><span class="mi-name">' + tlEsc(c.name) + '</span>' +
+      '<div class="mi-meta">' + c.kind + ' · 点击加入时序</div></span>' +
+    '</div>';
+  }).join('');
+  if (countEl) countEl.textContent = matched.length + ' 个可选';
+}
+
+function addToTimelineFromPicker(name) {
+  addToTimeline(name);
+  const search = document.getElementById('tlPickerSearch');
+  renderTimelinePicker(search ? search.value : '');
+}
+
+// 原型演示：预置「多图层人为约定顺序」（场景B）示例序列；不需要可删除本函数及其 init 调用
+function seedTimelineDemo() {
+  const demo = [
+    { name: '耕地地块', label: '2026-08 · 播期' },
+    { name: '作物长势', label: '2026-09 · 长势' },
+    { name: '土壤类型', label: '2026-10 · 成熟' }
+  ];
+  const cands = timelineSourceCandidates();
+  demo.forEach(function (d) {
+    const c = cands.filter(function (x) { return x.name === d.name; })[0];
+    if (c && !timelineState.items.some(function (it) { return it.name === c.name; })) {
+      timelineState.items.push({ name: c.name, icon: c.icon, kind: c.kind, label: d.label, time: d.label, on: true, refEl: c.el });
+    }
+  });
+  timelineState.enabled = timelineState.items.length > 0;
+  if (timelineState.items.length && timelineState.idx < 0) timelineState.idx = 0;
+}
+
+// ── 时序场景切换（A/B 二选一，两条独立序列，同一时间只播一个） ──
+function switchTLScene(scene) {
+  if (scene !== 'A' && scene !== 'B') return;
+  timelineState.activeScene = scene;
+  timelineStop();
+  tlSetIdx(-1);
+  document.querySelectorAll('.tl-scene-tab').forEach(function (t) {
+    t.classList.toggle('active', t.getAttribute('data-scene') === scene);
+  });
+  const secA = document.getElementById('tlSceneA');
+  const secB = document.getElementById('tlSceneB');
+  if (secA) secA.style.display = scene === 'A' ? '' : 'none';
+  if (secB) secB.style.display = scene === 'B' ? '' : 'none';
+  if (scene === 'A') populateSceneALayers();
+  syncTimelineRange();
+  renderTimelinePanel();
+  renderTimelineBar();
+  timelineApplyCurrent();
+  showToast('🔄 已切换到：场景' + scene + (scene === 'A' ? ' · 单数据发布时点' : ' · 多图层顺序'));
+}
+
+// 场景A：填充动态图层下拉
+function populateSceneALayers() {
+  const sel = document.getElementById('tlSceneALayer');
+  if (!sel) return;
+  const opts = timelineSourceCandidates().filter(function (c) { return c.kind === '图层'; });
+  sel.innerHTML = '<option value="">— 请选择动态图层 —</option>' + opts.map(function (c) {
+    return '<option value="' + tlEsc(c.name) + '"' + (c.name === timelineState.A.layer ? ' selected' : '') + '>' + tlEsc(c.name) + '</option>';
+  }).join('');
+}
+
+// 场景A：选择图层 → 生成其「数据发布时点」（服务恒最新，期=发布时切分）并构建地图切片
+function setSceneALayer(name) {
+  timelineStop();
+  timelineState.A.layer = name || '';
+  timelineState.A.periods = [];
+  timelineState.A.idx = -1;
+  // 清理旧切片
+  if (timelineState.A.sliceGroups && timelineState.A.sliceGroups.length) {
+    timelineState.A.sliceGroups.forEach(function (g) { if (map && g) map.removeLayer(g); });
+    timelineState.A.sliceGroups = [];
+  }
+  if (name) buildSceneASlices(name);
+  syncTimelineRange();
+  renderTimelinePanel();
+  renderTimelineBar();
+  timelineApplyCurrent();
+}
+
+// 场景A：跳转到指定发布时点
+function setSceneAIdx(i) {
+  const n = tlItems().length;
+  if (i < 0 || i >= n) return;
+  tlSetIdx(i);
+  timelineApplyCurrent();
+  renderTimelinePanel();
+  renderTimelineBar();
+  showToast('📅 发布时点：' + tlItems()[i].time);
+}
+
+// 场景A：为该图层构建「发布时点」切片（示例按 2026-08/09/10 三版，体现"每次发布=最新数据 + 发布时人为主观切分"）
+function buildSceneASlices(layer) {
+  const A = timelineState.A;
+  A.sliceGroups = [];
+  const periods = [
+    { time: '2026-08-01 · 播期', label: '2026-08 · 播期数据' },
+    { time: '2026-09-01 · 长势', label: '2026-09 · 长势数据' },
+    { time: '2026-10-01 · 成熟', label: '2026-10 · 成熟数据' }
+  ];
+  const colors = ['#d73027', '#fc8d59', '#66bd63'];
+  if (!map) { A.periods = periods; A.idx = 0; return; }
+  periods.forEach(function (p, i) {
+    const g = L.featureGroup();
+    // 该图层真实要素范围上叠加当期着色（体现"同一图层各发布时点数据在变"）
+    const grp = MAP_LAYERS[layer];
+    if (grp && grp.getLayers && grp.getLayers().length && grp.getBounds) {
+      try {
+        const b = grp.getBounds();
+        g.addLayer(L.rectangle(b, { color: colors[i], weight: 1.5, fillColor: colors[i], fillOpacity: 0.3, dashArray: '4 4' }));
+      } catch (e) { /* 忽略 bounds 异常 */ }
+    }
+    const base = geoRect([47.235, 132.50], 0.06, 0.08);
+    g.addLayer(L.polygon(base, { color: '#333', weight: 1, fillColor: colors[i], fillOpacity: 0.4 }));
+    g.addLayer(L.marker([47.235, 132.50], { icon: L.divIcon({ className: '', html: '<div style="background:rgba(255,255,255,0.95);border:1px solid #d97706;border-radius:6px;padding:2px 8px;font-size:11px;color:#b45309;white-space:nowrap">📅 ' + p.time + '</div>' }) }));
+    A.sliceGroups.push(g);
+  });
+  A.periods = periods;
+  A.idx = 0;
+  showToast('🕐 已为「' + layer + '」生成 3 个数据发布时点（服务恒最新，期=发布时切分）');
+}
+
 // ── Init ──
 // 注意：必须放在本文件所有 const（如 STYLE_PRESETS / MODAL_IDS）初始化之后，
 // 否则 init 内调用的 renderPresetCards() 会因访问尚未初始化的 const 触发 TDZ 报错，
 // 进而导致后续 window.addEventListener('load', initMap) 不执行、底图不加载。
 (function init() {
   // Set initial selected layer element reference
-  S.selectedLayerEl = document.querySelector('#pnl-data .tree-row.selected, #pnl-data .layer-group.selected');
+  S.selectedLayerEl = document.querySelector('#pnl-data .layer-node.selected');
   // 图层层级默认选中：右侧仅「符号」可用，其余置灰
   S.selectionLevel = 'layer';
   applyFuncBtnState();
@@ -4090,17 +5072,23 @@ document.getElementById('mapArea').addEventListener('click', function(e) {
   // 图斑等示例数据图层在地图初始化后由 buildMapLayers() 构建（按真实经纬度定位，随底图平移缩放）
   // Set initial tree arrows
   document.querySelectorAll('.tgh-arrow.open').forEach(a => a.style.transform = 'rotate(90deg)');
-  // 顺序面板：启用同类内拖拽排序 + 刷新置顶/计数
+  // 图层树：启用拖拽排序（图层节点跨图层；表达层子行限本图层内）
   initSortDrag();
-  refreshAllPins();
   // 图例面板：初始渲染「全局图例」与「图层图例」（静态展示全部图层图例，不随选中项联动）
   renderLegendPanels();
   // 样式面板：渲染「选取样式」缩略图卡片 + 样式模板预设
-  renderStyleCards(false);
+  renderStyleCards(currentGeom(), false);
   renderPresetCards();
+  // 样式面板：初始渲染「项目下所选雪碧图组」标题 + 组内符号（选项目 → 选其内雪碧图组 → 直接用其内符号）
+  refreshSpriteUI();
   // 符号管理：初始渲染项目空间（含无项目空间空态）+ 锁定/解锁无关区块
   renderProjectSpace();
   syncSymbolLock();
+  // 时序组件：预置演示序列 + 初始渲染（时间滑轨条 / 面板 / 当前时段高亮）
+  seedTimelineDemo();
+  renderTimelinePanel();
+  renderTimelineBar();
+  timelineApplyCurrent();
 })();
 
 </script>

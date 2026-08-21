@@ -18,7 +18,7 @@
   --text-secondary: #595959;
   --text-muted: #999999;
   --text-placeholder: #bfbfbf;
-  --bg-page: #f9fafb;
+  --bg-page: #F6F6F4;
   --bg-panel: #ffffff;
   --bg-hover: #fafafa;
   --border: #f0f0f0;
@@ -42,6 +42,15 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* ── 图标与文字同行（关键修复）─────────────────────────
+   Tailwind preflight 把 svg 设为 display:block，导致任何「图标 + 文字」且自身不是
+   flex 容器的元素（详情弹窗 tab 页签、各类提示/脚注 span、未来新增的内联图标等）
+   被强制分行：图标独占一行、文字落到下一行（即"图标文字上下排布"）。
+   这里统一把内联图标拉回 inline-block 并与文字垂直居中，从根上消除竖排。
+   需要占满宽度的特殊 SVG 用 .svg-block 显式覆盖即可。 */
+svg { display: inline-block; vertical-align: middle; }
+.svg-block { display: block; }
 
 /* ── Scrollbar ──────────────────────────────────────── */
 .scroll-thin::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -97,25 +106,79 @@ body {
   border-radius: var(--radius-sm);
 }
 .nav-btn:hover { background: transparent; color: var(--brand-hover); }
-.nav-btn.active { color: var(--brand-hover) !important; font-weight: 600; }
+/* 选中态对齐真实系统：浅品牌绿圆角底块 + 绿色下划线，文字保持深色 */
+.nav-btn.active {
+  background: rgba(43,186,160,.10);
+  color: var(--brand-active) !important;
+  font-weight: 600;
+}
 .nav-btn .active-bar {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
+  bottom: 1px;
+  left: 8px;
+  right: 8px;
+  height: 3px;
   background: var(--brand-hover);
-  border-radius: 2px 2px 0 0;
+  border-radius: 3px 3px 0 0;
   animation: navBarIn .25s var(--transition);
 }
 @keyframes navBarIn { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-/* ── Buttons (global refinements) ───────────────────── */
+/* ── Buttons (unified design system) ────────────────── */
 button {
   transition: all var(--transition);
   cursor: pointer;
 }
 button:active { transform: scale(.98); }
+
+/* 统一按钮系统：所有交互按钮统一使用 .btn + 尺寸/变体类，禁止再用零散 Tailwind 尺寸类
+   解决：高度不一致(29-41px)、过小难点、文字换行、主操作误用绿色等问题 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  line-height: 1;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background var(--transition), border-color var(--transition),
+              color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+.btn svg { width: 1em; height: 1em; flex-shrink: 0; }
+.btn:disabled, .btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+.btn:active:not(:disabled) { transform: scale(.98); }
+
+/* 尺寸：sm 32 / md 36 / lg 40 —— 统一可点击高度，最小 32px 消除难点 */
+.btn-sm { height: 32px; padding: 0 12px; font-size: 13px; }
+.btn-md { height: 36px; padding: 0 16px; font-size: 14px; }
+.btn-lg { height: 40px; padding: 0 20px; font-size: 14px; }
+
+/* 变体 */
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover { background: var(--brand-hover); }
+.btn-primary:active { background: var(--brand-active); }
+.btn-default { background: #fff; color: var(--text); border-color: #d9d9d9; }
+.btn-default:hover { border-color: var(--brand); color: var(--brand-active); }
+.btn-outline { background: #fff; color: var(--brand-active); border-color: var(--brand); }
+.btn-outline:hover { background: var(--brand-light); }
+.btn-text { background: transparent; color: var(--text-secondary); }
+.btn-text:hover { background: var(--bg-hover); color: var(--text); }
+/* 危险/删除操作：红色描边变体（保持与其它按钮同尺寸，避免"看起来像 bug"） */
+.btn-danger { background: #fff; color: var(--danger); border-color: var(--danger); }
+.btn-danger:hover { background: var(--danger-light); }
+.btn-danger:active { background: #ffe0de; }
+
+/* 图标按钮：固定方块，保证可点（配合尺寸类使用，如 btn-icon btn-sm） */
+.btn-icon { padding: 0 !important; }
+.btn-icon.btn-sm { width: 32px; }
+.btn-icon.btn-md { width: 36px; }
+.btn-icon.btn-lg { width: 40px; }
 
 /* ── Form Elements ──────────────────────────────────── */
 input[type="text"],
@@ -168,6 +231,40 @@ input[type="checkbox"]:focus {
   letter-spacing: .01em;
 }
 
+/* 统计卡片图标块底色（饱和色 500 不在预编译 tailwind.css 里，按项目约定落到 common.css） */
+.stat-icon-blue   { background:#3b82f6; }
+.stat-icon-green  { background:#22c55e; }
+.stat-icon-purple { background:#a855f7; }
+.stat-icon-orange { background:#f97316; }
+.stat-icon-cyan   { background:#06b6d4; }
+.stat-icon-red    { background:#ef4444; }
+.stat-icon-brand  { background:var(--brand); }
+
+/* 标签集气泡：挂在 body 上用 fixed 定位，规避卡片 overflow-hidden 裁剪；
+   不依赖构建缺失的 sticky/任意值类，全部用普通属性。 */
+.tag-set-pop {
+  position: fixed;
+  z-index: 9999;
+  max-width: 300px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  padding: 10px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  animation: scaleIn .2s var(--transition);
+}
+.tag-set-pop .tag-set-title {
+  width: 100%;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
 /* ── Card Thumbnail ─────────────────────────────────── */
 .card-thumb {
   position: relative;
@@ -190,16 +287,19 @@ input[type="checkbox"]:focus {
 
 /* ── 筛选切换（对齐原始平台 data-view-filterswtich）── */
 .filter-swtich {
-  width: 50px;
+  min-width: 56px;
+  min-height: 32px;
+  padding: 0 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 2px;
   color: rgba(0,0,0,.88);
   font-size: 14px;
   background: none;
-  border: none;
-  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
   flex-shrink: 0;
 }
 .filter-swtich .filter-chev { transition: transform .2s ease; }

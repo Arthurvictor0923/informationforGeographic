@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>要素图层编辑器 — 河图·地理信息平台</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
+<style>
+/* ============ 令牌 ============ */
+:root{
+  --brand:#2bbaa0; --brand-hover:#1cd6b4; --brand-active:#0f947c;
+  --brand-bg:#e7f7f2; --brand-light:#d7efe4; --brand-soft:#b4edcf;
+  --gray-25:#fafafa; --gray-50:#f5f5f5; --gray-100:#f0f0f0; --gray-200:#e6e8e6;
+  --gray-300:#d9d9d9; --gray-400:#bfbfbf; --gray-500:#999; --gray-600:#595959; --gray-700:#333; --gray-900:#1c1e21;
+  --white:#fff;
+  --bg-page:#F6F6F4;            /* 整页暖灰背景（面板外露缝） */
+  --text:#333; --text-2:#595959; --text-3:#999;
+  --r-xs:2px; --r-sm:4px; --r-md:6px; --r-lg:8px; --r-full:50%;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.03);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.04);
+  --t-fast:.15s; --t-normal:.2s; --t-slow:.3s;
+  --ease-out:cubic-bezier(0,0,.2,1); --ease-in-out:cubic-bezier(.4,0,.2,1);
+  --topbar-h:52px;
+  --tab-w:56px;
+  --panel-w:300px;
+  --drawer-w:330px;
+  --statusbar-h:30px;
+  --font-stack:"PingFang SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden}
+body{font-family:var(--font-stack);font-size:14px;line-height:1.5714;color:var(--text);background:var(--bg-page);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--brand);text-decoration:none}
+.scroll-thin::-webkit-scrollbar{width:5px;height:5px}
+.scroll-thin::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:10px}
+.hidden{display:none !important}
+
+/* ============ App Shell（对齐原地图编辑器：顶栏 + 主区 = 绝对底图 + 悬浮可折叠面板） ============ */
+.app{display:flex;flex-direction:column;height:100vh}
+
+.topbar{height:var(--topbar-h);background:var(--white);border-bottom:1px solid var(--gray-100);display:flex;align-items:center;padding:0 16px;gap:12px;z-index:30;box-shadow:var(--shadow-xs);flex-shrink:0}
+.topbar .title{font-weight:600;font-size:15px;color:var(--gray-900);flex:1;display:flex;align-items:center;gap:10px;overflow:hidden}
+.topbar .title .type-tag{font-size:11px;padding:1px 8px;border-radius:20px;background:var(--brand-bg);color:var(--brand-active);font-weight:600;flex-shrink:0}
+.topbar .title .sub{font-size:12px;color:var(--gray-500);font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn{height:32px;padding:0 14px;border-radius:var(--r-md);font-size:13px;border:1px solid var(--gray-300);background:var(--white);color:var(--text-2);display:inline-flex;align-items:center;gap:6px;transition:all var(--t-normal) var(--ease-in-out);flex-shrink:0}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn.primary:hover{background:var(--brand-hover);border-color:var(--brand-hover);color:#fff}
+.btn.ghost{border-color:transparent;color:var(--gray-500)}
+.btn.ghost:hover{border-color:transparent;background:var(--brand-bg);color:var(--brand)}
+.btn-sm{height:26px;padding:0 10px;font-size:12px}
+
+/* ── 主区：绝对底图 + 悬浮左/右面板 ── */
+.main{display:flex;flex:1;overflow:hidden;position:relative}
+/* 对齐地图编辑器原型：中间 .map-area 弹性占位(flex:1) 把右容器顶到最右；地图 absolute 铺满 map-area */
+.map-area{flex:1;position:relative;min-width:0;overflow:hidden}
+#mapCanvas.leaflet-container{position:absolute;inset:0;background:#e9edf0;z-index:0}
+.leaflet-container{font:14px/1.5714 var(--font-stack);background:#e9edf0}
+.leaflet-control-attribution{font-size:10px;background:rgba(255,255,255,.72);padding:1px 5px;z-index:20}
+
+/* ── 左：页签栏 + 可折叠面板（悬浮在地图上） ── */
+.left-container{display:flex;z-index:1000;flex-shrink:0;height:100%}
+.left-tabs{width:var(--tab-w);background:rgba(250,250,250,.96);border-right:1px solid var(--gray-100);display:flex;flex-direction:column;align-items:center;padding:4px 0;user-select:none;backdrop-filter:blur(2px)}
+.left-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:44px;height:46px;margin:1px 0;cursor:pointer;font-size:10px;color:var(--gray-500);border-radius:var(--r-md);border:none;background:transparent;transition:all var(--t-fast) var(--ease-in-out);position:relative}
+.left-tab .lt-icon{font-size:18px;line-height:1}
+.left-tab .lt-label{font-size:10px;line-height:1;white-space:nowrap}
+.left-tab:hover{background:var(--gray-50);color:var(--gray-700)}
+.left-tab.active{color:var(--brand-active);background:var(--white);box-shadow:var(--shadow-xs)}
+.left-tab.active::before{content:'';position:absolute;left:0;top:10px;bottom:10px;width:3px;background:var(--brand);border-radius:0 3px 3px 0}
+.left-tabs .spacer{flex:1}
+.left-tabs .collapser{width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray-400);border-radius:var(--r-md);border:none;background:transparent;font-size:15px;margin:2px 0;transition:all var(--t-fast) var(--ease-in-out)}
+.left-tabs .collapser:hover{color:var(--gray-600);background:var(--gray-50)}
+.left-tabs .collapser.flip{transform:rotate(180deg)}
+.left-panel{width:var(--panel-w);min-width:0;background:var(--white);display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--gray-100);box-shadow:var(--shadow-sm);transition:width var(--t-slow) var(--ease-out)}
+.left-panel.shut{width:0;border-right:none;box-shadow:none}
+.left-panel.shut>*{display:none}
+
+.pnl-body{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
+.pnl-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--gray-100);font-weight:600;font-size:13px;color:var(--gray-900);flex-shrink:0}
+.pnl-header .pnl-hint{font-size:11px;color:var(--text-3);font-weight:400}
+.pnl-section{padding:10px 12px}
+
+/* 主体数据卡 */
+.subject-card{border:1px solid var(--brand-light);background:#f4fbf9;border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.subject-card .sc-label{font-size:10px;color:var(--text-3);display:flex;align-items:center;gap:4px;margin-bottom:6px}
+.subject-card .sc-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--gray-900)}
+.subject-card .sc-tags{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.tag-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:1px 7px;border-radius:5px;background:var(--brand-light);color:var(--brand-active)}
+.tag-pill.gray{background:var(--gray-50);color:var(--text-2);border:1px solid var(--gray-100)}
+.tag-pill.purple{background:#f5f0ff;color:#7a5af8;border:1px solid #e6dfff}
+.subject-card .lockline{font-size:10px;color:var(--text-3);margin-top:7px;display:flex;align-items:center;gap:4px}
+
+/* 主体图层（重点）vs 表达层（辅助）——主次视觉分级 */
+.primary-layer-box{border:1.5px solid var(--brand);border-radius:8px;background:#f0fbf8;margin-bottom:8px;overflow:hidden}
+.plb-head{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--brand);color:#fff;font-weight:600;font-size:13px}
+.plb-badge{font-size:10px;background:rgba(255,255,255,.28);border-radius:10px;padding:1px 8px;font-weight:500;margin-left:auto}
+.plb-body{padding:6px 10px}
+.aux-layer-box{border:1px solid var(--gray-200);border-radius:8px;background:var(--gray-25);margin-bottom:8px;overflow:hidden}
+.alb-head{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--gray-100);color:var(--text-2);font-weight:600;font-size:12px}
+.alb-badge{font-size:10px;background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:0 7px;color:var(--text-3);font-weight:500;margin-left:auto}
+.alb-body{padding:6px 10px}
+
+.sec-title{font-size:12px;font-weight:600;color:var(--text-2);margin:10px 0 6px;display:flex;align-items:center;justify-content:space-between}
+/* 图层树 */
+.lt-row{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;cursor:pointer;color:var(--text-2);font-size:13px}
+.lt-row:hover{background:var(--brand-bg)}
+.lt-row.selected{background:var(--brand-bg);color:var(--brand-active);font-weight:600}
+.lt-row .lt-arrow{width:14px;color:var(--text-3);transition:transform var(--t-fast);flex-shrink:0}
+.lt-row.open .lt-arrow{transform:rotate(90deg)}
+.lt-row .lt-ic{width:18px;text-align:center;flex-shrink:0}
+.lt-row .lt-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lt-row .lt-state{font-size:10px;color:var(--text-3);background:var(--gray-50);border-radius:4px;padding:0 5px}
+.lt-children{display:none;padding-left:20px}
+.lt-children.open{display:block}
+.lt-sub{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;cursor:pointer;color:var(--text-2);font-size:13px}
+.lt-sub:hover{background:var(--brand-bg)}
+.lt-sub.selected{background:var(--brand-bg);color:var(--brand-active);font-weight:600}
+.lt-sub .lts-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.lt-node-chip{font-size:10px;color:var(--text-3);border:1px solid var(--gray-100);border-radius:4px;padding:0 4px}
+.lt-eye{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--gray-400);border-radius:4px;font-size:13px;flex-shrink:0;cursor:pointer;line-height:1}
+.lt-eye:hover{color:var(--brand);background:var(--gray-50)}
+.lt-eye.off{color:var(--gray-300);opacity:.5}
+.lt-row .lt-eye{margin-left:auto;margin-right:-2px}
+.lt-sub .lt-eye{margin-left:auto;margin-right:-2px}
+/* 顺序两维度 */
+.order-block{border:1px solid var(--gray-100);border-radius:8px;overflow:hidden}
+.order-block .ob-head{background:var(--gray-25);padding:5px 10px;font-size:12px;font-weight:600;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:6px}
+.order-block .ob-head .dim{font-size:10px;color:var(--text-3);font-weight:400}
+.order-row{display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid var(--gray-100);font-size:13px;color:var(--text-2)}
+.order-row:last-child{border-bottom:none}
+.order-row .ord-grip{color:var(--text-3);cursor:grab}
+.order-row .ord-move{color:var(--text-3);cursor:pointer;font-size:12px}
+.order-row .ord-move:hover{color:var(--brand)}
+/* 图例（左 panel 内）两层编辑器 */
+.legend-editor{border:1px solid var(--gray-100);border-radius:8px;overflow:hidden}
+.le-layer{padding:8px 10px;border-bottom:1px solid var(--gray-100);font-size:12px;color:var(--text-2);background:var(--gray-25)}
+.le-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--gray-100)}
+.le-row:last-child{border-bottom:none}
+.le-row .sw{width:16px;height:16px;border-radius:4px;flex-shrink:0;border:1px solid rgba(0,0,0,.1)}
+.le-row .sw.circ{width:13px;height:13px;border-radius:50%}
+.le-row input[type=color]{width:26px;height:26px;padding:1px;border:1px solid var(--gray-100);border-radius:5px;background:#fff;cursor:pointer}
+.le-row .le-name{flex:1;font-size:12px;border:1px solid transparent;background:transparent;color:var(--text);padding:2px 6px;border-radius:4px;height:auto;min-width:0}
+.le-row .le-name:hover{border-color:var(--gray-300)}
+.le-row .lg-desc{font-size:10px;color:var(--text-3)}
+.info-banner{display:flex;gap:6px;align-items:flex-start;background:#f0fbf8;border:1px solid #cdeee6;border-radius:8px;padding:8px 10px;font-size:11px;color:#0b7d68;line-height:1.5}
+.info-banner.warn{background:#fff8ec;border-color:#ffe3b3;color:#8a5b00}
+.info-banner.purple{background:#f7f5ff;border-color:#e3dcff;color:#5a3fd6}
+.meta-line{display:flex;justify-content:space-between;font-size:12px;color:var(--text-2);padding:2px 0}
+.meta-line .k{color:var(--text-3)}
+
+/* ── 右：可折叠属性抽屉（悬浮在地图上） ── */
+/* ── 右：right-container（功能栏 + 多功能抽屉）——对齐地图编辑器原型 ── */
+.right-container{display:flex;flex-direction:row;z-index:10;flex-shrink:0}
+.right-funcbar{width:46px;background:rgba(250,250,250,.96);border-left:1px solid var(--gray-100);display:flex;flex-direction:column;align-items:center;padding:4px 0;user-select:none;backdrop-filter:blur(2px)}
+.func-btn{width:40px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin:1px 0;cursor:pointer;font-size:16px;color:var(--gray-500);border-radius:var(--r-md);border:none;background:transparent;transition:all var(--t-fast) var(--ease-in-out);position:relative}
+.func-btn span{font-size:9px;line-height:1}
+.func-btn:hover{background:var(--gray-50);color:var(--gray-700)}
+.func-btn.active{color:var(--brand-active);background:var(--white);box-shadow:var(--shadow-xs)}
+.func-btn.active::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:3px;background:var(--brand);border-radius:0 3px 3px 0}
+.right-drawer{width:var(--drawer-w);min-width:0;background:var(--white);border-left:1px solid var(--gray-100);display:flex;flex-direction:column;overflow:hidden;transition:width var(--t-slow) var(--ease-out);box-shadow:var(--shadow-sm)}
+.right-drawer.shut{width:0;border-left:none;box-shadow:none}
+.right-drawer.shut>*{display:none}
+.drawer-panel{display:flex;flex-direction:column;height:100%;overflow:hidden}
+.drawer-hd{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--gray-100);font-weight:600;font-size:13px;color:var(--gray-900);flex-shrink:0;gap:6px}
+.drawer-hd .drawer-subtitle{font-size:11px;font-weight:400;color:var(--text-3);flex:1}
+.drawer-close{width:26px;height:26px;border:none;background:transparent;color:var(--text-3);font-size:16px;border-radius:6px;flex-shrink:0}
+.drawer-close:hover{background:var(--gray-50);color:var(--text)}
+.drawer-bd{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:14px}
+.d-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-3);font-size:13px;text-align:center;padding:20px}
+
+.prop-label{font-size:12px;color:var(--text-2);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
+.field{margin-bottom:13px}
+.input{width:100%;height:34px;border:1px solid var(--gray-300);border-radius:var(--r-md);padding:0 10px;background:var(--white);outline:none;transition:border-color var(--t-normal),box-shadow var(--t-normal)}
+.input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(43,186,160,.08)}
+select.input{cursor:pointer}
+.color-row{display:flex;align-items:center;gap:8px}
+input[type=color]{width:34px;height:34px;border:1px solid var(--gray-300);border-radius:6px;padding:2px;background:var(--white);cursor:pointer}
+input[type=range]{flex:1;accent-color:var(--brand)}
+.num{width:64px}
+.toggle{display:inline-flex;align-items:center;width:36px;height:20px;border-radius:20px;background:var(--gray-300);position:relative;cursor:pointer;transition:background var(--t-normal);flex-shrink:0;border:none}
+.toggle.on{background:var(--brand)}
+.toggle::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left var(--t-normal)}
+.toggle.on::after{left:18px}
+.field-row{display:flex;align-items:center;gap:8px}
+.svc-pick{border:1px solid var(--gray-100);border-radius:8px;overflow:hidden}
+.svc-pick .sp-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--gray-100);cursor:pointer;font-size:13px;color:var(--text-2)}
+.svc-pick .sp-item:last-child{border-bottom:none}
+.svc-pick .sp-item:hover{background:var(--brand-bg)}
+.svc-pick .sp-item.sel{background:var(--brand-bg);color:var(--brand-active);font-weight:600}
+.svc-pick .sp-item .sp-desc{font-size:11px;color:var(--text-3);font-weight:400;display:block}
+.svc-pick .sp-item .sp-check{margin-left:auto;color:var(--brand)}
+
+/* 样式面板分区（三个服务各自样式；选中节点高亮对应区） */
+.style-sec{border:1px solid var(--gray-100);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.style-sec .ss-head{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px}
+.style-sec.active{border-color:var(--brand);background:var(--brand-bg)}
+.style-sec.active .ss-head{color:var(--brand-active)}
+/* 数据选择弹窗分页 */
+.pg-bar{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:12px;color:var(--text-3)}
+.pg-btn{height:26px;padding:0 10px;border:1px solid var(--gray-300);border-radius:var(--r-md);background:var(--white);color:var(--text-2);font-size:12px;cursor:pointer}
+.pg-btn:hover{border-color:var(--brand);color:var(--brand)}
+.pg-btn:disabled{opacity:.4;cursor:not-allowed}
+.data-item{display:flex;align-items:center;padding:10px 12px;gap:10px;border-radius:var(--r-md);cursor:pointer;margin:1px 0;transition:all var(--t-fast) var(--ease-in-out);border:1px solid transparent}
+.data-item:hover{background:var(--gray-25);border-color:var(--gray-200)}
+.data-item .di-cb{width:18px;height:18px;border:2px solid var(--gray-300);border-radius:var(--r-sm);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all var(--t-fast)}
+.data-item:hover .di-cb{border-color:var(--brand)}
+.data-item.sel .di-cb{background:var(--brand);border-color:var(--brand)}
+.data-item.sel .di-cb::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
+.data-item .di-icon{font-size:18px;flex-shrink:0}
+.data-item .di-info{flex:1;min-width:0}
+.data-item .di-name{font-size:13px;font-weight:500;color:var(--gray-900)}
+.data-item .di-meta{font-size:11px;color:var(--text-3);margin-top:1px}
+/* 字段选择弹窗 radio-card（对齐地图编辑器原型） */
+.radio-card{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--r-md);cursor:pointer;transition:all var(--t-fast) var(--ease-in-out);font-size:13px;color:var(--text-2);user-select:none;margin:1px 0}
+.radio-card:hover{border-color:var(--brand)}
+.radio-card.selected{border-color:var(--brand);background:var(--brand-bg);color:var(--brand-active);font-weight:600}
+.radio-card .rc-radio{width:16px;height:16px;border-radius:50%;border:2px solid var(--gray-300);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all var(--t-fast)}
+.radio-card.selected .rc-radio{border-color:var(--brand)}
+.radio-card.selected .rc-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--brand)}
+.radio-card .rc-desc{flex:1;min-width:0}
+.radio-card .rc-name{font-size:13px;font-weight:500;color:var(--gray-900)}
+.radio-card.selected .rc-name{color:var(--brand-active)}
+.radio-card .rc-meta{font-size:11px;color:var(--text-3);margin-top:1px;font-weight:400}
+/* 样式卡片示例预览（SVG：示例地块填充/边界/标注） */
+.preset-svg{width:110px;height:56px;flex-shrink:0;border:1px solid var(--gray-100);border-radius:6px;background:#fff}
+/* 符号雪碧图选择单元格 */
+.sym-cell{height:44px;display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid var(--gray-200);border-radius:var(--r-md);cursor:pointer;transition:all var(--t-fast)}
+.sym-cell:hover{border-color:var(--brand);background:var(--brand-bg)}
+.sym-cell.sel{border-color:var(--brand);background:var(--brand-bg);box-shadow:0 0 0 2px var(--brand-light)}
+/* 雪碧图集切换标签 */
+.sprite-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.sprite-tab{height:26px;padding:0 12px;border:1px solid var(--gray-300);border-radius:var(--r-md);background:var(--white);color:var(--text-2);font-size:12px;cursor:pointer;transition:all var(--t-fast)}
+.sprite-tab:hover{border-color:var(--brand);color:var(--brand)}
+.sprite-tab.sel{background:var(--brand);border-color:var(--brand);color:#fff}
+.converge-note{display:flex;gap:6px;align-items:flex-start;background:#f0fbf8;border:1px solid #cdeee6;border-radius:8px;padding:8px 10px;font-size:11px;color:#0b7d68;margin-top:10px}
+
+.map-label{background:rgba(255,255,255,.92);border:1px solid var(--gray-100);color:var(--text);font-size:12px;font-weight:600;padding:1px 7px;border-radius:5px;box-shadow:var(--shadow-sm);white-space:nowrap}
+
+/* 画布时间指示（动态数据：当前渲染时间段，随筛选实时更新） */
+.time-indicator{position:absolute;top:12px;left:12px;z-index:900;background:rgba(255,255,255,.95);border:1px solid var(--gray-100);border-radius:8px;box-shadow:var(--shadow-sm);padding:6px 12px;font-size:12px;color:var(--text-2)}
+/* 画布右下角图例框（对齐地图编辑器原型：实时渲染已配置图例） */
+.map-legend-box{position:absolute;right:60px;bottom:18px;z-index:940;width:220px;background:rgba(255,255,255,.97);border:1px solid var(--gray-100);border-radius:10px;box-shadow:var(--shadow-md);overflow:hidden}
+.map-legend-box .mlb-hd{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--gray-100);font-weight:600;font-size:12px;color:var(--gray-900)}
+.map-legend-box .mlb-sub{font-size:10px;font-weight:400;color:var(--text-3);flex:1}
+.map-legend-box .mlb-body{padding:6px 12px 10px}
+.map-legend-box .mlb-sec{font-size:10px;font-weight:600;color:var(--text-3);margin:8px 0 3px}
+.map-legend-box .mlb-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);padding:3px 0}
+.map-legend-box .mlb-row .sw{width:14px;height:14px;border-radius:3px;flex-shrink:0;border:1px solid rgba(0,0,0,.1)}
+.map-legend-box .mlb-row .sw.circ{width:12px;height:12px;border-radius:50%}
+.map-legend-box .mlb-note{font-size:10px;color:var(--text-3);margin-top:2px;line-height:1.5}
+/* 抽屉展开时，图例框贴右容器左缘（390=抽屉330+功能栏46+边距14），避免被样式抽屉遮盖 */
+.drawer-open .map-legend-box{right:390px}
+
+/* 图层详情条（底部信息框，对齐地图编辑器原型） */
+.layer-detail-bar{height:36px;background:var(--gray-25);border-top:1px solid var(--gray-100);display:flex;align-items:center;gap:14px;padding:0 14px;font-size:11px;color:var(--text-2);z-index:20;flex-shrink:0;overflow-x:auto;white-space:nowrap}
+.layer-detail-bar b{color:var(--gray-900);font-size:12px;flex-shrink:0}
+.layer-detail-bar .k{color:var(--text-3);flex-shrink:0}
+.layer-detail-bar span:not(.k){flex-shrink:0}
+
+/* 状态栏 */
+.statusbar{height:var(--statusbar-h);background:var(--white);border-top:1px solid var(--gray-100);display:flex;align-items:center;padding:0 12px;gap:10px;font-size:11px;color:var(--text-3);z-index:20;flex-shrink:0}
+.statusbar .st-current{color:var(--brand-active);font-weight:600;margin-left:auto}
+.statusbar .st-sep{width:1px;height:12px;background:var(--gray-100)}
+
+/* Toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);background:#1c1e21;color:#fff;padding:9px 16px;border-radius:8px;font-size:13px;z-index:2000;opacity:0;pointer-events:none;transition:.3s;display:flex;align-items:center;gap:8px;box-shadow:0 6px 16px rgba(0,0,0,.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1500}
+.mask.on{display:flex}
+.modal{background:#fff;border-radius:12px;width:560px;box-shadow:0 6px 16px rgba(0,0,0,.08),0 3px 6px -4px rgba(0,0,0,.12);overflow:hidden;animation:fadeUp .25s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--gray-100);font-size:15px;font-weight:600}
+.modal-close{width:26px;height:26px;border:none;background:transparent;color:var(--text-3);font-size:17px;border-radius:6px}
+.modal-close:hover{background:var(--gray-50)}
+.modal-body{padding:18px 20px}
+.modal-foot{padding:12px 20px;border-top:1px solid var(--gray-100);display:flex;justify-content:flex-end;gap:8px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ════ 顶栏 ════ -->
+  <div class="topbar">
+    <span class="title">
+      <span id="topbarTitle">中晚稻·地块图层</span>
+      <span class="type-tag">要素图层</span>
+      <span class="sub">一份数据的制图表达 · 渲染 + 标注</span>
+    </span>
+    <button class="btn ghost" onclick="openShare()">🔗 分享·评审预览</button>
+    <button class="btn primary" style="background:var(--brand-active)" onclick="openMarketShare()">🚀 共享·推送服务超市</button>
+    <button class="btn primary" onclick="saveLayer()">保存</button>
+  </div>
+
+  <!-- ════ 主区（绝对底图 + 悬浮左/右面板） ════ -->
+  <div class="main">
+
+    <!-- ===== 左侧（页签栏 + 可折叠面板） ===== -->
+    <div class="left-container">
+      <div class="left-tabs">
+        <button class="left-tab active" data-ltab="layer" onclick="switchLeftTab('layer')" title="图层（本图层 = 一份数据的渲染 + 标注）"><span class="lt-icon">🗺</span><span class="lt-label">图层</span></button>
+        <button class="left-tab" data-ltab="legend" onclick="switchLeftTab('legend')" title="图例"><span class="lt-icon">📋</span><span class="lt-label">图例</span></button>
+        <button class="left-tab" data-ltab="settings" onclick="switchLeftTab('settings')" title="设置"><span class="lt-icon">⚙</span><span class="lt-label">设置</span></button>
+        <div class="spacer"></div>
+        <button class="collapser" id="collapseBtn" onclick="togglePanel()" title="收起面板">◀</button>
+      </div>
+
+      <div class="left-panel" id="leftPanel">
+        <!-- 图层 -->
+        <div class="pnl-body" id="pnl-layer">
+          <div class="pnl-header"><span>🗺 图层结构</span><span class="pnl-hint">作为图层设计组织</span></div>
+          <div class="pnl-section">
+            <!-- 一套数据（唯一定位；可更换 → 服务随数据派生） -->
+            <div class="subject-card">
+              <div class="sc-label">📦 一套数据 <span style="color:var(--text-3);font-weight:400">· 唯一定位</span><button class="btn btn-sm" style="margin-left:auto;height:24px;padding:0 10px" onclick="openDataSelect()">更换数据</button></div>
+              <div class="sc-name" id="scDataName">🌾 中晚稻·2025·地块</div>
+              <div class="sc-tags">
+                <span class="tag-pill" id="scDataType">面 · Polygon</span>
+                <span class="tag-pill">CGCS2000</span>
+                <span class="tag-pill purple" id="scDataCount">3,218 个要素</span>
+              </div>
+              <div class="lockline">主体图层 + 表达层 <b>均源自这一套数据</b>（不混入其它数据）。</div>
+              <button class="btn btn-sm" style="width:100%;margin-top:6px" onclick="openUpdateCheck()">🔄 检测数据更新</button>
+            </div>
+
+            <!-- 主体图层：本数据的主渲染（重点，高亮卡片） -->
+            <div class="primary-layer-box">
+              <div class="plb-head">🗺 主体图层 <span class="plb-badge">主渲染 · 重点</span></div>
+              <div class="plb-body">
+                <div class="lt" id="treeSubject">
+                  <div class="lt-sub selected" data-target="fill" onclick="selectNode(this,'fill')"><span class="lts-dot" style="background:#2bbaa0"></span><span class="lt-name" id="subjectServiceName">耕地面</span> <span class="lt-node-chip" id="subjectChip">面 · 主体</span><button class="lt-eye on" onclick="event.stopPropagation();toggleLayerVis('subject',this)" title="显示/隐藏主体图层">👁</button></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 表达层：辅助表达（次级，灰卡片） -->
+            <div class="aux-layer-box">
+              <div class="alb-head">🏷 表达层 <span class="alb-badge">辅助 · 派生服务</span></div>
+              <div class="alb-body">
+                <div class="lt" id="treeAux">
+                  <div class="lt-children open" id="ch-aux">
+                    <div class="lt-sub" data-target="label" onclick="selectNode(this,'label')"><span class="lts-dot" style="background:#7a5af8"></span>标注 · 地块名称 <span class="lt-node-chip">面→中心点</span><button class="lt-eye on" onclick="event.stopPropagation();toggleLayerVis('label',this)" title="显示/隐藏标注">👁</button></div>
+                    <div class="lt-sub" id="auxBoundaryNode" data-target="symbol" onclick="selectNode(this,'symbol')"><span class="lts-dot" style="background:#f56a00"></span>边界 · 地块边界 <span class="lt-node-chip">面→描边</span><button class="lt-eye on" onclick="event.stopPropagation();toggleLayerVis('symbol',this)" title="显示/隐藏边界">👁</button></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="sec-title">📋 图层信息 <button class="btn btn-sm" style="height:24px;padding:0 10px" onclick="openLayerEdit()">编辑</button></div>
+            <div class="legend-editor">
+              <div class="le-layer">图层</div>
+              <div class="meta-line"><span class="k">图层名称</span><span id="infoLayerName">中晚稻·地块图层</span></div>
+              <div class="meta-line"><span class="k">图层编码</span><span id="infoLayerCode">LY-AGRI-001</span></div>
+              <div class="meta-line"><span class="k">图层分类</span><span id="infoLayerCat">农业资源 / 耕地</span></div>
+              <div class="meta-line"><span class="k">共享状态</span><span id="infoShareState" style="color:var(--brand-active);font-weight:600">未共享</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 图例（两层） -->
+        <div class="pnl-body hidden" id="pnl-legend">
+          <div class="pnl-header"><span>📋 图例</span><span class="pnl-hint">两层 · 数据与图层</span></div>
+          <div class="pnl-section">
+            <div class="field-row" style="margin-bottom:10px"><label class="toggle on" id="legendVisibleToggle" onclick="toggleLegendVisible()"></label><span style="font-size:12px;color:var(--text-2)">画布图例框显示</span><span style="font-size:11px;color:var(--text-3);margin-left:auto">一直浮动 · 开关控制</span></div>
+            <div class="info-banner">图例分两层：①数据内容描述 ②全局图层描述（随图层分享携带）。</div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:6px">🗺 本图例定义将随图层带入专题图，自动参与专题图图例聚合。</div>
+            <div style="height:12px"></div>
+            <div class="legend-editor">
+              <div class="le-layer">① 数据内容描述 <span style="font-size:10px;color:var(--text-3);font-weight:400">（颜色随样式；名称可编辑）</span></div>
+              <div class="le-row" id="lgFillRow"><span class="sw" id="lgSwFill" style="background:#2bbaa0"></span><input class="le-name" id="lgNameFill" value="中晚稻种植区" oninput="updateLegendBox()" style="flex:1"><span class="lg-desc">填充 · 主体</span></div>
+              <div class="le-row" id="lgStrokeRow"><span class="sw" id="lgSwStroke" style="background:#0f947c"></span><input class="le-name" id="lgNameStroke" value="地块边界" oninput="updateLegendBox()" style="flex:1"><span class="lg-desc">描边 · 表达层</span></div>
+              <div class="le-row" id="lgSymRow" style="display:none"><span class="sw circ" id="lgSwSym" style="background:#f56a00"></span><input class="le-name" id="lgNameSym" value="监测点" oninput="updateLegendBox()" style="flex:1"><span class="lg-desc">点 · 主体</span></div>
+              <div class="le-layer">② 全局图层描述（随分享携带，可编辑）</div>
+              <div class="le-row"><input class="le-name" id="lgNameGlobal" value="来源：遥感监测科 · 2026年晚稻期" style="flex:1" oninput="updateLegendBox()"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 设置 -->
+        <div class="pnl-body hidden" id="pnl-settings">
+          <div class="pnl-header"><span>⚙ 设置</span><span class="pnl-hint">可操作项</span></div>
+          <div class="pnl-section">
+            <div class="sec-title" style="margin-top:0">画布底图源</div>
+            <div class="svc-pick">
+              <div class="sp-item sel" id="bmDefaultItem" onclick="setBasemapDemo('default')"><div><b>默认统一底图</b><span class="sp-desc">遥感影像 + 注记 · 选择即自动恢复</span></div><span class="sp-check">✓</span></div>
+              <div class="sp-item" id="bmExternalItem" onclick="setBasemapDemo('external')"><div><b>外部底图服务（覆盖默认）</b><span class="sp-desc">示例：矢量底图服务（外部注册 · role=底图）· 选择即自动覆盖默认底图</span></div><span class="sp-check"></span></div>
+            </div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:6px">当前：<b id="basemapSourceLabel">统一默认底图（遥感影像 + 注记）</b></div>
+            <div style="height:12px"></div>
+            <div class="meta-line"><span class="k">创建人</span><span>张工</span></div>
+            <div class="meta-line"><span class="k">创建时间</span><span>2026-08-19</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 画布（真实地图，铺满中间 .map-area 弹性占位） ===== -->
+    <div class="map-area" id="mapArea">
+      <div id="mapCanvas"></div>
+      <div class="time-indicator hidden" id="timeIndicator">⏱ 当前时段：—</div>
+    </div>
+
+    <!-- ===== 右侧：功能栏 + 多功能抽屉（对齐地图编辑器原型） ===== -->
+    <div class="right-container">
+      <div class="right-drawer shut" id="rightDrawer">
+        <!-- 属性 -->
+        <div id="drawer-props" class="hidden drawer-panel">
+          <div class="drawer-hd"><span>📋 属性</span><span class="drawer-subtitle">选中：<span id="propTarget">填充 · 主体图层</span></span>
+            <button class="drawer-close" onclick="closeDrawer()" title="收起">✕</button>
+          </div>
+          <div class="drawer-bd scroll-thin" id="propsBody">
+            <div class="sec-title" style="margin-top:0">📌 当前选中节点</div>
+            <div class="meta-line"><span class="k">节点</span><span id="propNodeName">填充 · 主体图层</span></div>
+            <div class="meta-line"><span class="k">所属</span><span id="propNodeBelong">主体图层 · 耕地面 (MVT)</span></div>
+            <div class="meta-line"><span class="k">数据源</span><span>中晚稻·2025·地块（一套数据，唯一）</span></div>
+            <div class="meta-line"><span class="k">坐标系</span><span>CGCS2000 (EPSG:4490)</span></div>
+            <div class="meta-line"><span class="k">可见性</span><span>随左树节点 👁 显隐联动</span></div>
+            <div class="sec-title">🖱 交互设置</div>
+            <div class="field-row" style="margin-bottom:10px"><label class="toggle on" id="hiliteToggle" onclick="toggleHilite()"></label><span style="font-size:12px;color:var(--text-2)">悬停高亮</span></div>
+            <div class="field-row" style="margin-bottom:10px"><label class="toggle on" onclick="this.classList.toggle('on')"></label><span style="font-size:12px;color:var(--text-2)">点击弹窗</span></div>
+            <div class="prop-label">高亮颜色</div>
+            <div class="field color-row">
+              <input type="color" id="hiliteColor" value="#f8d210" oninput="applyHilite()">
+              <input class="input" id="hiliteColorText" value="#f8d210" onchange="applyHiliteText()">
+            </div>
+            <div class="prop-label">高亮透明度</div>
+            <div class="field"><input type="range" id="hiliteOp" min="10" max="90" value="45" oninput="applyHilite()"></div>
+            <div class="sec-title">🔍 可见范围（缩放级别）</div>
+            <div class="field-row"><span style="font-size:12px;color:var(--text-2)">最小 <b id="visMinVal">0</b></span><input type="range" id="visRangeMin" min="0" max="20" value="0" oninput="applyVisRange()" style="flex:1"></div>
+            <div class="field-row"><span style="font-size:12px;color:var(--text-2)">最大 <b id="visMaxVal">20</b></span><input type="range" id="visRangeMax" min="0" max="20" value="20" oninput="applyVisRange()" style="flex:1"></div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:4px">缩放级别超出范围时隐藏图层（对齐 ArcGIS 可见范围）</div>
+            <div style="height:10px"></div>
+            <div class="info-banner">💡 本要素图层基于<b>一套数据</b>制图：主体图层 + 表达层均源自同一数据；样式请在「🎨 样式」功能页调整。</div>
+          </div>
+        </div>
+        <!-- 样式（统一面板：预选样式 + 三个服务各自样式） -->
+        <div id="drawer-style" class="hidden drawer-panel">
+          <div class="drawer-hd"><span>🎨 样式</span><span class="drawer-subtitle">预选 + 三个服务</span>
+            <button class="drawer-close" onclick="closeDrawer()" title="收起">✕</button>
+          </div>
+          <div class="drawer-bd scroll-thin" id="styleBody">
+            <div class="field-row" style="gap:6px;margin-bottom:10px">
+              <button class="btn btn-sm" onclick="undoStyle()" style="flex:1">↩ 撤销</button>
+              <button class="btn btn-sm" onclick="redoStyle()" style="flex:1">↪ 重做</button>
+            </div>
+            <!-- 预选样式（顶部） -->
+            <div class="sec-title" style="margin-top:0">✨ 预选样式</div>
+            <div class="field-row">
+              <span class="input" id="presetName" style="flex:1;display:flex;align-items:center;padding:0 10px;height:34px;background:var(--gray-25)">标准制图规范</span>
+              <button class="btn btn-sm" onclick="openPresetSelect()">选择样式</button>
+            </div>
+            <div style="height:10px"></div>
+            <!-- 雪碧图（标记符号集预选，与预选样式并列，均为可选预选） -->
+            <div class="sec-title">✨ 雪碧图 <span style="font-size:10px;color:var(--text-3);font-weight:400">标记符号集</span></div>
+            <div class="field-row">
+              <span class="input" id="spriteGroupName" style="flex:1;display:flex;align-items:center;padding:0 10px;height:34px;background:var(--gray-25)">标准符号集</span>
+              <button class="btn btn-sm" onclick="openSpriteGroupSelect()">选择雪碧图</button>
+            </div>
+            <div style="height:10px"></div>
+            <!-- 图层级效果 -->
+            <div class="sec-title">✨ 图层效果 <span style="font-size:10px;color:var(--text-3);font-weight:400">整层</span></div>
+            <div class="prop-label">图层透明度 <span id="layerOpVal">0%</span></div>
+            <div class="field"><input type="range" id="layerOp" min="0" max="90" value="0" oninput="applyLayerOpacity()"></div>
+            <div style="height:10px"></div>
+            <!-- 主体图层 · 填充 -->
+            <div class="style-sec" id="sec-fill">
+              <div class="ss-head">🗺 主体图层 · 填充</div>
+              <div class="prop-label">渲染方式</div>
+              <div class="field"><select class="input" id="fillRenderMode" onchange="onFillModeChange()"><option value="single">单一填充</option><option value="unique">按字段分类</option><option value="graduated">按字段分段</option><option value="heatmap">热力图</option><option value="interp">插值</option></select></div>
+              <div class="field" id="fillFieldRow" style="display:none">
+                <div class="prop-label">分类字段</div>
+                <div class="field-row">
+                  <span class="input" id="fillFieldName" style="flex:1;display:flex;align-items:center;padding:0 10px;height:34px;background:var(--gray-25)">trslx · 土壤类型</span>
+                  <button class="btn btn-sm" onclick="openFieldSelect()">选择字段</button>
+                </div>
+              </div>
+              <div class="field" id="periodRow" style="display:none">
+                <div class="prop-label">时间段（按时间渲染预览）</div>
+                <div class="field-row">
+                  <input type="date" class="input" id="timeStart" value="2026-05-01" onchange="onTimeChange()" style="flex:1">
+                  <span style="color:var(--text-3);flex-shrink:0">至</span>
+                  <input type="date" class="input" id="timeEnd" value="2026-05-31" onchange="onTimeChange()" style="flex:1">
+                </div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:4px" id="timeSegmentLabel">选择时间段筛选要素（最新一期服务 · 要素带时间属性）</div>
+              </div>
+              <div id="fillClassList" style="display:none"></div>
+              <div class="field" id="renderCfgRow" style="display:none">
+                <div class="prop-label">渲染字段</div>
+                <div class="field"><select class="input" id="renderField" onchange="applyFill()"><option>ndvi 作物长势</option><option>zzmj 面积</option></select></div>
+                <div class="prop-label">色带</div>
+                <div class="field"><select class="input" id="renderRamp" onchange="applyFill()"><option value="gr">绿-黄-红</option><option value="br">蓝-白-红</option><option value="mono">单色渐变</option></select></div>
+                <div class="prop-label" id="heatRadiusRow" style="display:none">热力半径 <span id="heatRadiusVal">20</span></div>
+                <div class="field" id="heatRadiusRow2" style="display:none"><input type="range" id="heatRadius" min="10" max="50" value="20" oninput="applyFill()"></div>
+                <div class="prop-label" id="interpClassRow" style="display:none">插值分级 <span id="interpClassVal">5</span></div>
+                <div class="field" id="interpClassRow2" style="display:none"><input type="range" id="interpClass" min="3" max="10" value="5" oninput="applyFill()"></div>
+              </div>
+              <div class="field" id="fillColorRow">
+                <div class="prop-label">填充颜色</div>
+                <div class="field color-row">
+                  <input type="color" id="fillColor" value="#2bbaa0" oninput="applyFill()">
+                  <input class="input" id="fillColorText" value="#2bbaa0" onchange="applyFillText()">
+                </div>
+              </div>
+              <div class="prop-label">填充图案</div>
+              <div class="field"><select class="input" id="fillPattern" onchange="applyFill()"><option value="none">纯色</option><option value="hash">斜线</option><option value="dot">网点</option><option value="cross">交叉线</option></select></div>
+              <div class="prop-label">不透明度 <span id="fillOpVal">80%</span></div>
+              <div class="field"><input type="range" id="fillOp" min="10" max="100" value="80" oninput="applyFill()"></div>
+              <div class="field-row"><label class="toggle on" id="fillToggle" onclick="toggleFillLayer()"></label><span style="font-size:12px;color:var(--text-2)">填充可见</span></div>
+            </div>
+            <!-- 表达层 · 标注 -->
+            <div class="style-sec" id="sec-label">
+              <div class="ss-head">🏷 表达层 · 标注</div>
+              <div class="field-row" style="margin-bottom:12px"><label class="toggle on" id="labelLayerToggle" onclick="toggleLabelLayer()"></label><span style="font-size:12px;color:var(--text-2)">标注层可见</span></div>
+              <div class="prop-label">标注字段 <span style="color:var(--text-3)">（按所选字段值显示标注）</span></div>
+              <div class="field"><select class="input" id="labelField" onchange="applyLabel()"><option>sddlmc 地块名称</option><option>fid 地块编码</option><option>zzmj 面积(亩)</option></select></div>
+              <div class="prop-label">字号</div>
+              <div class="field field-row"><input class="input num" type="number" id="labelSize" value="12" min="8" max="24" oninput="applyLabel()"> <span style="font-size:12px;color:var(--text-3)">px</span></div>
+              <div class="prop-label">文字颜色</div>
+              <div class="field color-row">
+                <input type="color" id="labelColor" value="#2c3a44" oninput="applyLabel()">
+                <input class="input" id="labelColorText" value="#2c3a44" onchange="applyLabelText()">
+              </div>
+              <div class="prop-label">标注位置</div>
+              <div class="field"><select class="input" id="labelPos" onchange="applyLabel()"><option value="center">居中</option><option value="top">上方</option><option value="bottom">下方</option></select></div>
+              <div class="field-row"><label class="toggle" id="labelAvoid" onclick="this.classList.toggle('on');showToast('标注避让（避免重叠）：' + (this.classList.contains('on') ? '开启' : '关闭') + '（原型演示）')"></label><span style="font-size:12px;color:var(--text-2)">避免重叠</span></div>
+            </div>
+            <!-- 表达层 · 边界 -->
+            <div class="style-sec" id="sec-symbol">
+              <div class="ss-head">🖊 表达层 · 边界</div>
+              <div class="prop-label">渲染方式</div>
+              <div class="field"><select class="input" id="boundaryRenderMode" onchange="onBoundaryModeChange()"><option value="single">单一</option><option value="graduated">按字段分段</option></select></div>
+              <div class="field" id="boundaryFieldRow" style="display:none">
+                <div class="prop-label">分段字段</div>
+                <select class="input" id="boundaryField" onchange="applyBoundary()"><option>zzmj 面积(亩)</option><option>dwmc 单位</option><option>trslx 土壤类型</option></select>
+              </div>
+              <div class="field" id="boundaryColorRow">
+                <div class="prop-label">边界线颜色</div>
+                <div class="field color-row">
+                  <input type="color" id="boundaryColor" value="#0f947c" oninput="applyBoundary()">
+                  <input class="input" id="boundaryColorText" value="#0f947c" onchange="applyBoundaryText()">
+                </div>
+                <div class="prop-label">边界线宽度 <span id="boundaryWd">2px</span></div>
+                <div class="field"><input type="range" id="boundaryW" min="1" max="6" value="2" oninput="applyBoundary()"></div>
+                <div class="prop-label">线型（线符号）</div>
+                <div class="field"><select class="input" id="boundaryDash" onchange="applyBoundary()">
+                  <option value="">实线</option>
+                  <option value="6 3">虚线</option>
+                  <option value="1 3">点线</option>
+                  <option value="6 3 1 3">点划线</option>
+                  <option value="arrow">箭头线</option>
+                </select></div>
+              </div>
+            </div>
+            <!-- 点标记（符号：使用顶部所选雪碧图组，再选组内符号） -->
+            <div class="style-sec" id="sec-marker">
+              <div class="ss-head">📍 点标记 · 符号</div>
+              <div class="prop-label">标记符号</div>
+              <div class="field-row">
+                <span class="input" id="markerSymbolBox" style="flex:1;display:flex;align-items:center;gap:8px;padding:0 10px;height:34px;background:var(--gray-25)"><span id="markerSymbolPreview" style="font-size:16px;line-height:1">📍</span><span style="font-size:12px;color:var(--text-3)">当前符号</span></span>
+                <button class="btn btn-sm" onclick="openSymbolPicker()">选择符号</button>
+              </div>
+              <div class="field-row" style="margin-top:10px"><label class="toggle on" id="markerToggle" onclick="toggleMarker()"></label><span style="font-size:12px;color:var(--text-2)">点标记可见</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧功能栏（属性 / 样式） -->
+      <div class="right-funcbar">
+        <button class="func-btn" data-func="props" onclick="switchRightFunc('props')" title="属性"><span style="font-size:16px">📋</span><span>属性</span></button>
+        <button class="func-btn" data-func="style" onclick="switchRightFunc('style')" title="样式"><span style="font-size:16px">🎨</span><span>样式</span></button>
+      </div>
+    </div>
+
+    <!-- 画布浮层：右下角图例框（实时渲染） -->
+
+    <!-- 画布右下角图例框（对齐原型：实时渲染已配置图例） -->
+    <div class="map-legend-box" id="mapLegendBox">
+      <div class="mlb-hd">📋 图例 <span class="mlb-sub">本图层 · 随分享携带</span></div>
+      <div class="mlb-body">
+        <div class="mlb-sec">① 数据内容描述</div>
+        <div class="mlb-row" id="mlbFillRow"><span class="sw" id="mlbSwFill"></span><span id="mlbNameFill">中晚稻种植区</span></div>
+        <div id="mlbFillClasses" style="display:none"></div>
+        <div class="mlb-row" id="mlbStrokeRow"><span class="sw" id="mlbSwStroke"></span><span id="mlbNameStroke">地块边界</span></div>
+        <div class="mlb-row" id="mlbSymRow" style="display:none"><span class="sw circ" id="mlbSwSym"></span><span id="mlbNameSym">监测点</span></div>
+        <div class="mlb-sec">② 全局图层描述</div>
+        <div class="mlb-note" id="mlbNote">来源：遥感监测科 · 2026年晚稻期</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 图层详情（底部信息框，对齐地图编辑器原型） ════ -->
+  <div class="layer-detail-bar">
+    <b>📋 图层详情</b>
+    <span class="k">类型</span><span>面图层 · Polygon</span>
+    <span class="k">要素数量</span><span>3,218 个地块</span>
+    <span class="k">坐标系</span><span>CGCS2000 (EPSG:4490)</span>
+    <span class="k">来源</span><span>平台发布 · 遥感监测科</span>
+    <span class="k">更新时间</span><span>2026-08-19 16:20</span>
+    <span class="k">发布者</span><span>张工</span>
+  </div>
+
+  <!-- ════ 状态栏 ════ -->
+  <div class="statusbar">
+    <span id="stCoord">中心：47.2000°N, 132.5000°E · 北大荒·建三江</span>
+    <span class="st-sep"></span>
+    <span title="画布底图为全局统一参考背景，供平移/缩放定位；不在要素图层内按层配置">🗺 统一参考底图 · 可平移缩放</span>
+    <span class="st-sep"></span>
+    <span>图层数据：中晚稻·地块（一份，固定）</span>
+    <span class="st-sep"></span>
+    <span>一套数据 → 主体图层 + 表达层</span>
+    <span class="st-current" id="stCurrent">当前选中：填充层</span>
+  </div>
+</div>
+
+<!-- 符号雪碧图选择（与预选样式区分：独立符号选择弹窗） -->
+<div class="mask" id="symbolPickerMask">
+  <div class="modal" style="width:440px">
+    <div class="modal-head">选择符号（雪碧图） <button class="modal-close" onclick="closeSymbolPicker()">✕</button></div>
+    <div class="modal-body">
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:6px">当前项目：<b id="symbolProjectLab" style="color:var(--text-2)">八五六农场</b> · 下列为该项目的雪碧图组</div>
+      <div class="prop-label">雪碧图组</div>
+      <div class="sprite-tabs" id="spriteTabs"></div>
+      <div class="prop-label" style="margin-top:12px">符号（当前组）</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px" id="symbolGrid"></div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeSymbolPicker()">取消</button><button class="btn btn-primary" onclick="confirmSymbolPick()">应用符号</button></div>
+  </div>
+</div>
+
+<!-- 雪碧图组选择（与预选样式一致的弹窗交互：radio-card 列表单选） -->
+<div class="mask" id="spriteGroupMask">
+  <div class="modal" style="width:460px">
+    <div class="modal-head">选择雪碧图组 <button class="modal-close" onclick="closeSpriteGroupSelect()">✕</button></div>
+    <div class="modal-body">
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">💡 雪碧图组在【制图规范 → 符号规范】统一管理（每组由图标库组合），此处为图层引用。</div>
+      <div class="prop-label">项目</div>
+      <select class="input" id="spriteProjectSelect" onchange="onSpriteProjectChange(this.value)"></select>
+      <div style="height:8px"></div>
+      <div class="prop-label">该项目下的雪碧图组</div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:8px">先选项目 → 再选该项目下的一组，然后在「选择符号」中选组内符号</div>
+      <div id="spriteGroupList"></div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeSpriteGroupSelect()">取消</button><button class="btn btn-primary" onclick="confirmSpriteGroup()">确定</button></div>
+  </div>
+</div>
+
+<!-- 数据更新同步提示（对齐真值 BR23：源数据更新 → 提示同步引用新版） -->
+<div class="mask" id="updateMask">
+  <div class="modal" style="width:440px">
+    <div class="modal-head">数据更新提示 <button class="modal-close" onclick="closeUpdateCheck()">✕</button></div>
+    <div class="modal-body">
+      <div class="info-banner" style="margin-bottom:12px">🔄 检测到<b>源数据存在更新</b>（2026-08-21 遥感监测科 更新）</div>
+      <div class="meta-line"><span class="k">当前引用</span><span id="updateOldVer">数据版本 3</span></div>
+      <div class="meta-line"><span class="k">最新版本</span><span id="updateNewVer">数据版本 4（新增 12 个要素）</span></div>
+      <div class="info-banner" style="margin-top:12px">💡 同步后：图层将引用新版数据（样式可能需微调）。</div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeUpdateCheck()">暂不处理</button><button class="btn btn-primary" onclick="confirmUpdateSync()">同步更新</button></div>
+  </div>
+</div>
+
+<!-- 保存要素图层（真实保存对话框：图层命名确认） -->
+<div class="mask" id="saveMask">
+  <div class="modal" style="width:440px">
+    <div class="modal-head">保存要素图层 <button class="modal-close" onclick="closeSave()">✕</button></div>
+    <div class="modal-body">
+      <div class="prop-label">图层名称</div>
+      <div class="field"><input class="input" id="saveLayerName" value="中晚稻·地块图层"></div>
+      <div class="prop-label">保存内容</div>
+      <div class="meta-line"><span class="k">服务</span><span>主体 + 标注 + 边界（带样式）</span></div>
+      <div class="meta-line"><span class="k">图层编码</span><span id="saveLayerCode">LY-AGRI-001</span></div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:8px">保存后样式配置随图层持久化。</div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeSave()">取消</button><button class="btn btn-primary" onclick="confirmSave()">保存</button></div>
+  </div>
+</div>
+
+<!-- 共享 · 推送服务超市（持久不可取消，带样式成品） -->
+<div class="mask" id="shareMarketMask">
+  <div class="modal" style="width:480px">
+    <div class="modal-head">共享 · 推送服务超市 <button class="modal-close" onclick="closeMarketShare()">✕</button></div>
+    <div class="modal-body">
+      <div class="info-banner purple" style="margin-bottom:14px">🔗 <b>共享 = 推送到服务超市</b>：将本要素图层（带样式成品）推送至服务超市供消费方使用。<b>持久生效、不可取消</b>。</div>
+      <div class="prop-label">推送内容</div>
+      <div class="meta-line"><span class="k">图层</span><span id="shareLayerName">中晚稻·地块图层</span></div>
+      <div class="meta-line"><span class="k">服务</span><span>主体 + 标注 + 边界（带样式）</span></div>
+      <div class="meta-line"><span class="k">坐标系</span><span>CGCS2000 (EPSG:4490)</span></div>
+      <div class="meta-line"><span class="k">数据量</span><span>3,218 个要素</span></div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeMarketShare()">取消</button><button class="btn btn-primary" onclick="confirmMarketShare()">确认推送</button></div>
+  </div>
+</div>
+
+<!-- 图层信息编辑 -->
+<div class="mask" id="layerEditMask">
+  <div class="modal" style="width:460px">
+    <div class="modal-head">编辑图层信息 <button class="modal-close" onclick="closeLayerEdit()">✕</button></div>
+    <div class="modal-body">
+      <div class="prop-label">图层名称</div>
+      <div class="field"><input class="input" id="editLayerName" value="中晚稻·地块图层"></div>
+      <div class="prop-label">图层编码</div>
+      <div class="field"><input class="input" id="editLayerCode" value="LY-AGRI-001"></div>
+      <div class="prop-label">图层分类</div>
+      <div class="field"><select class="input" id="editLayerCat"><option>农业资源 / 耕地</option><option>农业资源 / 种植</option><option>水利资源</option><option>自然资源</option></select></div>
+      <div class="prop-label">描述</div>
+      <div class="field"><textarea class="input" id="editLayerDesc" style="height:60px;padding:8px 10px">中晚稻地块及其边界的标准表达</textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeLayerEdit()">取消</button><button class="btn btn-primary" onclick="confirmLayerEdit()">保存</button></div>
+  </div>
+</div>
+
+<!-- 预选样式选择（样式卡片网格，对齐原型 styleTemplateModal） -->
+<div class="mask" id="presetMask">
+  <div class="modal" style="width:520px">
+    <div class="modal-head">选择预选样式 <button class="modal-close" onclick="closePresetSelect()">✕</button></div>
+    <div class="modal-body">
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">💡 制图规范/样式模板在【系统设置】统一管理，此处为图层引用。</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="presetCardList"></div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closePresetSelect()">取消</button><button class="btn btn-primary" onclick="confirmPreset()">应用样式</button></div>
+  </div>
+</div>
+
+<!-- 分类字段选择（当前服务属性字段 + 自定义每值颜色） -->
+<div class="mask" id="fieldSelectMask">
+  <div class="modal" style="width:480px">
+    <div class="modal-head">选择分类字段 <button class="modal-close" onclick="closeFieldSelect()">✕</button></div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:8px">选择用于样式渲染的字段（单选）</div>
+      <div id="serviceFieldList"></div>
+      <div id="fieldValueSection" style="margin-top:12px;display:none">
+        <div class="prop-label">字段值（自定义每值颜色）</div>
+        <div id="fieldValueList"></div>
+        <button class="btn btn-sm" style="width:100%;margin-top:6px" onclick="addFieldValue()">＋ 添加值</button>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeFieldSelect()">取消</button><button class="btn btn-primary" onclick="confirmFieldSelect()">确定</button></div>
+  </div>
+</div>
+
+<!-- 选择主体数据（对齐地图编辑器原型弹窗样式；单选） -->
+<div class="mask" id="dataMask">
+  <div class="modal" style="width:460px">
+    <div class="modal-head">选择主体数据 <button class="modal-close" onclick="closeDataSelect()">✕</button></div>
+    <div class="modal-body">
+      <div class="field" style="margin-bottom:12px;position:relative">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text-3)">🔍</span>
+        <input class="input" id="dataSearchInput" style="padding-left:32px" placeholder="搜索数据名称…" oninput="filterSubjectData(this)">
+      </div>
+      <div id="subjectDataList"></div>
+      <div class="pg-bar">
+        <span class="pg-count" id="dataPgCount">共 8 条</span>
+        <span style="display:flex;align-items:center;gap:6px">
+          <button class="pg-btn" id="dataPgPrev" onclick="dataPg(-1)">← 上一页</button>
+          <span id="dataPgInfo" style="min-width:44px;text-align:center">1 / 2</span>
+          <button class="pg-btn" id="dataPgNext" onclick="dataPg(1)">下一页 →</button>
+        </span>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeDataSelect()">取消</button><button class="btn btn-primary" onclick="confirmSubjectData()">确定</button></div>
+  </div>
+</div>
+
+<!-- 分享 = 临时评审预览 -->
+<div class="mask" id="shareMask">
+  <div class="modal">
+    <div class="modal-head">分享 · 评审预览 <button class="modal-close" onclick="closeShare()">✕</button></div>
+    <div class="modal-body">
+      <div class="info-banner" style="margin-bottom:14px">💡 分享 = <b>编辑器内临时评审预览</b>（可取消、可设有效期）；与「共享（推送到服务超市）」不同。</div>
+      <div class="prop-label">评审预览链接</div>
+      <div class="field field-row">
+        <input class="input" id="shareUrl" value="http://10.11.14.211:30879/layer/preview/zl-8821" readonly>
+        <button class="btn btn-sm" onclick="copyUrl()">复制</button>
+      </div>
+      <div class="prop-label">有效期</div>
+      <div class="field"><select class="input"><option>7 天</option><option>1 天</option><option>24 小时</option><option>永久（仅评审内部）</option></select></div>
+      <div class="prop-label">访问对象</div>
+      <div class="field"><select class="input"><option>仅指定同事（评审组成员）</option><option>组织机构内任何人</option></select></div>
+    </div>
+    <div class="modal-foot"><button class="btn" onclick="closeShare()">取消</button><button class="btn btn-primary" onclick="confirmShare()">生成分享</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= 状态 ================= */
+const S = {
+  activeLeftTab: 'layer',
+  panelOpen: true,
+  drawerOpen: false,
+  activeRightFunc: 'style', // 右侧功能栏当前面板（props/style）
+  current: 'fill',
+  selectedNode: null,
+  fillVisible: true,
+  basemapSource: 'default', // 'default'=统一默认底图 | 'external'=外部底图服务源覆盖
+};
+const $ = id => document.getElementById(id);
+
+/* ================= 真实地图（Leaflet + 天地图） ================= */
+/* 天地图 Key —— 仅用于本地原型。生产环境请到天地图控制台配置 Referer 白名单或由后端代理鉴权，切勿将明文 Key 提交公开仓库。
+   默认用与原地图编辑器（地图编辑器优化原型.html）一致的、已验证可渲染的 Key；
+   若你提供的 Key 已在天地图控制台被本机 Referer 授权，可改回 '7af397bfec2d5bc8f66950c7b4c2e37d'。 */
+const TIANDITU_KEY = '3c09577ba4730ed9d8b3fe778dfa0271';
+const MAP_INIT = { center: [47.20, 132.50], zoom: 10 }; // 北大荒·建三江
+let map = null;
+let parcelLayers = [], labelGroup = null, boundaryLayers = [], labelList = [], pointLayers = [], isPointMode = false;
+const STYLE = { fillColor: '#2bbaa0', fillOpacity: .8, boundaryColor: '#0f947c', boundaryWeight: 2 };
+
+function makeTDT(type) {
+  return L.tileLayer(
+    'https://t{s}.tianditu.gov.cn/DataServer?T=' + type + '&x={x}&y={y}&l={z}&tk=' + TIANDITU_KEY,
+    { subdomains: '01234567', maxZoom: 18 }
+  );
+}
+
+/* 画布底图源：默认=统一默认底图；当图层/画布源为「外部底图服务（role=basemap 外部注册）」时，用该外部服务覆盖当前默认底图 */
+function clearBasemap() {
+  if (!map) return;
+  map.eachLayer(function (l) { if (l instanceof L.TileLayer) map.removeLayer(l); });
+}
+function applyDefaultBasemap() {
+  if (!map) return;
+  clearBasemap();
+  makeTDT('img_w').addTo(map);   // 遥感影像
+  makeTDT('cia_w').addTo(map);   // 影像注记
+  S.basemapSource = 'default';
+  const el = document.getElementById('basemapSourceLabel');
+  if (el) el.textContent = '统一默认底图（遥感影像 + 注记）';
+}
+function applyExternalBasemap(types) {
+  if (!map) return;
+  clearBasemap();
+  (types || ['img_w', 'cia_w']).forEach(function (t) { makeTDT(t).addTo(map); });
+  S.basemapSource = 'external';
+  const el = document.getElementById('basemapSourceLabel');
+  if (el) el.textContent = '外部底图服务 · 已覆盖默认底图';
+}
+function setBasemapDemo(kind) {
+  document.getElementById('bmDefaultItem').classList.toggle('sel', kind === 'default');
+  document.getElementById('bmExternalItem').classList.toggle('sel', kind === 'external');
+  document.querySelector('#bmDefaultItem .sp-check').textContent = kind === 'default' ? '✓' : '';
+  document.querySelector('#bmExternalItem .sp-check').textContent = kind === 'external' ? '✓' : '';
+  if (!map) return;
+  if (kind === 'external') {
+    // 演示：源为「外部底图服务」→ 用外部矢量底图服务覆盖默认底图
+    applyExternalBasemap(['vec_w', 'cva_w']);   // 天地图矢量（充当外部底图服务示例）
+  } else {
+    applyDefaultBasemap();
+  }
+}
+
+function initMap() {
+  if (map) return;
+  if (typeof L === 'undefined') { showToast('⚠ Leaflet 未加载（CDN 网络受限），无法显示底图'); return; }
+  map = L.map('mapCanvas', {
+    center: MAP_INIT.center, zoom: MAP_INIT.zoom,
+    minZoom: 3, maxZoom: 18, attributionControl: false, preferCanvas: true,
+    zoomControl: false,   // 对齐地图编辑器原型：不显示缩放控件，地图保持干净
+  });
+  L.control.attribution({ position: 'bottomleft', prefix: '© 天地图' }).addTo(map);
+  // 默认统一参考底图（遥感影像 + 注记）；当图层/画布源为「外部底图服务」时会覆盖为外部服务
+  applyDefaultBasemap();
+
+  // 主体数据：中晚稻地块（真实经纬度，建三江一带）
+  const PARCELS = [
+    [[47.190,132.440],[47.185,132.470],[47.205,132.475],[47.210,132.445]],
+    [[47.205,132.480],[47.200,132.520],[47.225,132.525],[47.228,132.485]],
+    [[47.166,132.440],[47.160,132.475],[47.180,132.480],[47.186,132.446]],
+    [[47.220,132.490],[47.215,132.530],[47.240,132.535],[47.245,132.496]],
+    [[47.176,132.500],[47.170,132.545],[47.195,132.550],[47.200,132.506]],
+    [[47.130,132.510],[47.125,132.555],[47.150,132.560],[47.156,132.516]],
+  ];
+  // 主体图层：面（仅填充，无描边——描边归表达层「边界」）
+  parcelLayers = PARCELS.map(function (ring) {
+    return L.polygon(ring, { fillColor: STYLE.fillColor, fillOpacity: STYLE.fillOpacity, color: 'transparent', weight: 0 });
+  });
+  parcelLayers.forEach(function (p) { p.on('click', function () { selectOnMap(p); }); p.addTo(map); });
+
+  // 辅助表达层：标注
+  labelList = [
+    { pos: [47.198,132.452], name: '东区-01' },
+    { pos: [47.213,132.500], name: '东区-02' },
+    { pos: [47.174,132.462], name: '南区-11' },
+    { pos: [47.230,132.512], name: '西区-05' },
+    { pos: [47.185,132.528], name: '南区-12' },
+    { pos: [47.140,132.538], name: '西区-06' },
+  ];
+  labelGroup = L.featureGroup().addTo(map);
+  // 表达层：边界（面→描边，地块边界线）
+  boundaryLayers = PARCELS.map(function (ring) {
+    return L.polygon(ring, { fill: false, color: STYLE.boundaryColor, weight: STYLE.boundaryWeight }).addTo(map);
+  });
+
+  if (window.ResizeObserver) {
+    new ResizeObserver(function () { map.invalidateSize(); }).observe(document.getElementById('mapCanvas'));
+  }
+  window.addEventListener('resize', function () { map.invalidateSize(); });
+  map.on('zoomend', checkVisRange);
+  // 布局就绪后强制重算一次，确保瓦片渲染
+  setTimeout(function () { map.invalidateSize(); }, 120);
+
+  applyFill(); applyBoundary(); applyLabel();
+  buildHilite();
+  buildMarkers();
+  updateLegendBox();
+}
+
+function selectOnMap(layer) {
+  parcelLayers.forEach(function (l) { l.setStyle({ fillColor: STYLE.fillColor, fillOpacity: STYLE.fillOpacity, color: 'transparent', weight: 0 }); });
+  layer.setStyle({ fillColor: STYLE.fillColor, fillOpacity: STYLE.fillOpacity, color: STYLE.boundaryColor, weight: STYLE.boundaryWeight + 1 });
+  layer.bringToFront && layer.bringToFront();
+  showToast('选中地块：已高亮显示');
+}
+
+/* ================= 左页签 + 折叠 ================= */
+function switchLeftTab(tab) {
+  if (S.activeLeftTab === tab && S.panelOpen) { collapsePanel(); return; }
+  document.querySelectorAll('.left-tab').forEach(function (t) { t.classList.remove('active'); });
+  document.querySelector('.left-tab[data-ltab="' + tab + '"]').classList.add('active');
+  S.activeLeftTab = tab; S.panelOpen = true;
+  document.getElementById('collapseBtn').classList.remove('flip');
+  document.getElementById('collapseBtn').setAttribute('title', '收起面板');
+  ['layer','legend','settings'].forEach(function (id) {
+    document.getElementById('pnl-' + id).classList.toggle('hidden', id !== tab);
+  });
+  document.getElementById('leftPanel').classList.remove('shut');
+}
+function togglePanel() { S.panelOpen ? collapsePanel() : expandPanel(); }
+function collapsePanel() {
+  S.panelOpen = false;
+  document.getElementById('leftPanel').classList.add('shut');
+  document.getElementById('collapseBtn').classList.add('flip');
+  document.getElementById('collapseBtn').setAttribute('title', '展开面板');
+  document.querySelectorAll('.left-tab').forEach(function (t) { t.classList.remove('active'); });
+}
+function expandPanel() {
+  S.panelOpen = true;
+  document.getElementById('leftPanel').classList.remove('shut');
+  document.getElementById('collapseBtn').classList.remove('flip');
+  document.getElementById('collapseBtn').setAttribute('title', '收起面板');
+  const tabEl = document.querySelector('.left-tab[data-ltab="' + S.activeLeftTab + '"]');
+  if (tabEl) tabEl.classList.add('active');
+}
+/* ================= 右抽屉：功能栏 + 多功能面板（对齐地图编辑器原型） ================= */
+const NODE_PANEL = { fill:'style', label:'style', symbol:'style' };
+function selectNode(el, target) {
+  document.querySelectorAll('.lt-sub, .lt-row').forEach(function (n) { n.classList.remove('selected'); });
+  el.classList.add('selected');
+  S.current = target;
+  const nameMap = { fill:'填充 · 主体图层', label:'标注 · 面中心点', symbol:'边界 · 描边服务' };
+  const nm = nameMap[target] || target;
+  const pt = $('propTarget'); if (pt) pt.textContent = nm;
+  const pn = $('propNodeName'); if (pn) pn.textContent = nm;
+  $('stCurrent').textContent = '当前选中：' + nm;
+  openRightPanel(NODE_PANEL[target] || 'style', target);
+}
+/* 打开抽屉并切换到指定功能面板（func: props/style/anno/filter/symbol） */
+function openRightPanel(func, target) {
+  S.drawerOpen = true;
+  document.getElementById('rightDrawer').classList.remove('shut');
+  const m = document.querySelector('.main'); if (m) m.classList.add('drawer-open');
+  document.querySelectorAll('.right-drawer > .drawer-panel').forEach(function (p) { p.classList.add('hidden'); });
+  const panel = document.getElementById('drawer-' + func);
+  if (panel) panel.classList.remove('hidden');
+  document.querySelectorAll('.func-btn').forEach(function (b) { b.classList.toggle('active', b.dataset.func === func); });
+  S.activeRightFunc = func;
+  if (target) {
+    const secMap = { fill:'sec-fill', label:'sec-label', symbol:'sec-symbol' };
+    document.querySelectorAll('.style-sec').forEach(function (s) { s.classList.remove('active'); });
+    const sec = $(secMap[target]); if (sec) sec.classList.add('active');
+  }
+}
+/* 右侧功能栏按钮：同功能再点=收起，否则切换面板 */
+function switchRightFunc(func) {
+  if (S.activeRightFunc === func && S.drawerOpen) { closeDrawer(); return; }
+  openRightPanel(func);
+}
+function openDrawer() { openRightPanel(S.activeRightFunc || 'style'); }
+function closeDrawer() {
+  S.drawerOpen = false;
+  document.getElementById('rightDrawer').classList.add('shut');
+  const m = document.querySelector('.main'); if (m) m.classList.remove('drawer-open');
+  document.querySelectorAll('.func-btn').forEach(function (b) { b.classList.remove('active'); });
+}
+
+/* ================= 样式实时联动（作用到 Leaflet 图层） ================= */
+/* 样式操作历史（撤销/重做） */
+let styleHistory = [], historyIdx = -1, historyLock = false;
+function currentStyleSnapshot() {
+  return {
+    fillColor: $('fillColor') ? $('fillColor').value : '#2bbaa0',
+    fillOp: $('fillOp') ? $('fillOp').value : '80',
+    fillMode: fillRenderMode,
+    pattern: $('fillPattern') ? $('fillPattern').value : 'none',
+    boundaryColor: $('boundaryColor') ? $('boundaryColor').value : '#0f947c',
+    boundaryW: $('boundaryW') ? $('boundaryW').value : '2',
+    boundaryDash: $('boundaryDash') ? $('boundaryDash').value : '',
+    labelColor: $('labelColor') ? $('labelColor').value : '#2c3a44',
+    labelSize: $('labelSize') ? $('labelSize').value : '12',
+    labelPos: $('labelPos') ? $('labelPos').value : 'center',
+    sym: currentSymbol,
+    sprite: currentSpriteGroup,
+    isPoint: isPointMode,
+    renderField: $('renderField') ? $('renderField').value : '',
+    renderRamp: $('renderRamp') ? $('renderRamp').value : 'gr',
+    heatRadius: $('heatRadius') ? $('heatRadius').value : '20',
+    interpClass: $('interpClass') ? $('interpClass').value : '5',
+  };
+}
+function pushHistory() {
+  if (historyLock) return;
+  styleHistory = styleHistory.slice(0, historyIdx + 1);
+  styleHistory.push(currentStyleSnapshot());
+  if (styleHistory.length > 60) styleHistory.shift();
+  historyIdx = styleHistory.length - 1;
+}
+function applyStyleSnapshot(snap) {
+  historyLock = true;
+  const f = $('fillColor'); if (f) f.value = snap.fillColor;
+  const fo = $('fillOp'); if (fo) fo.value = snap.fillOp;
+  const fp = $('fillPattern'); if (fp) fp.value = snap.pattern;
+  const bc = $('boundaryColor'); if (bc) bc.value = snap.boundaryColor;
+  const bw = $('boundaryW'); if (bw) bw.value = snap.boundaryW;
+  const bd = $('boundaryDash'); if (bd) bd.value = snap.boundaryDash;
+  const lc = $('labelColor'); if (lc) lc.value = snap.labelColor;
+  const ls = $('labelSize'); if (ls) ls.value = snap.labelSize;
+  const lp = $('labelPos'); if (lp) lp.value = snap.labelPos;
+  fillRenderMode = snap.fillMode;
+  const rm = $('fillRenderMode'); if (rm) rm.value = snap.fillMode;
+  currentSymbol = snap.sym; currentSpriteGroup = snap.sprite;
+  const pv = $('markerSymbolPreview'); if (pv) pv.textContent = snap.sym;
+  const sg = $('spriteGroupName'); if (sg) sg.textContent = snap.sprite;
+  const rf = $('renderField'); if (rf) rf.value = snap.renderField;
+  const rr = $('renderRamp'); if (rr) rr.value = snap.renderRamp;
+  const hr = $('heatRadius'); if (hr) hr.value = snap.heatRadius;
+  const ic = $('interpClass'); if (ic) ic.value = snap.interpClass;
+  const needSwitch = snap.isPoint !== isPointMode;
+  isPointMode = snap.isPoint;
+  historyLock = false;
+  if (needSwitch) { if (isPointMode) showPoints(); else showParcels(); }
+  renderFillClasses(); applyFill(); applyBoundary(); applyLabel(); buildMarkers(); updateLegendBox();
+}
+function undoStyle() { if (historyIdx <= 0) { showToast('⚠️ 没有可撤销的样式操作'); return; } historyIdx--; applyStyleSnapshot(styleHistory[historyIdx]); }
+function redoStyle() { if (historyIdx >= styleHistory.length - 1) { showToast('⚠️ 没有可重做的操作'); return; } historyIdx++; applyStyleSnapshot(styleHistory[historyIdx]); }
+
+function applyFill() {
+  pushHistory();
+  const c = $('fillColor').value; $('fillColorText').value = c;
+  const op = +$('fillOp').value / 100; $('fillOpVal').textContent = Math.round(op * 100) + '%';
+  STYLE.fillColor = c; STYLE.fillOpacity = S.fillVisible ? op : 0;
+  if (isPointMode) { applyPointFill(c); updateLegendBox(); return; }
+  if (!parcelLayers.length) { updateLegendBox(); return; }
+  const pattern = $('fillPattern') ? $('fillPattern').value : 'none';
+  if (pattern !== 'none') ensurePatternDefs();
+  if (fillRenderMode === 'single') {
+    const fillVal = pattern === 'none' ? c : 'url(#' + pattern + 'Pattern)';
+    parcelLayers.forEach(function (l) { l.setStyle({ fillColor: fillVal, fillOpacity: STYLE.fillOpacity, color: 'transparent', weight: 0 }); });
+  } else if (fillRenderMode === 'heatmap' || fillRenderMode === 'interp') {
+    // 热力图/插值：按渲染字段值映射色带（对齐成熟产品：字段 + 色带 + 热力半径/插值分级）
+    const ramp = $('renderRamp') ? $('renderRamp').value : 'gr';
+    const hr = +($('heatRadius') ? $('heatRadius').value : 20);
+    const hv = $('heatRadiusVal'); if (hv) hv.textContent = hr;
+    const ic = +($('interpClass') ? $('interpClass').value : 5);
+    const iv = $('interpClassVal'); if (iv) iv.textContent = ic;
+    parcelLayers.forEach(function (l, i) {
+      const v = fieldValue(i);
+      l.setStyle({ fillColor: rampColor(v, ramp), fillOpacity: STYLE.fillOpacity, color: 'transparent', weight: 0 });
+    });
+  } else {
+    // 分级设色：各地块按类目着色（演示：按地块索引取类）
+    parcelLayers.forEach(function (l, i) {
+      const cls = FILL_CLASSES[i % FILL_CLASSES.length];
+      l.setStyle({ fillColor: cls.c, fillOpacity: STYLE.fillOpacity, color: 'transparent', weight: 0 });
+    });
+  }
+  updateLegendBox();
+}
+/* 填充图案：注入 SVG pattern 定义（斜线/网点/交叉线） */
+function ensurePatternDefs() {
+  const svg = document.querySelector('#mapCanvas svg');
+  if (!svg) return;
+  if (document.getElementById('hashPattern')) return;
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML =
+    '<pattern id="hashPattern" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="transparent"/><line x1="0" y1="0" x2="0" y2="6" stroke="#000" stroke-width="1" opacity="0.35"/></pattern>' +
+    '<pattern id="dotPattern" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="transparent"/><circle cx="3" cy="3" r="1" fill="#000" opacity="0.4"/></pattern>' +
+    '<pattern id="crossPattern" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="transparent"/><path d="M0 0L8 8M8 0L0 8" stroke="#000" stroke-width="1" opacity="0.3"/></pattern>';
+  svg.insertBefore(defs, svg.firstChild);
+}
+/* 热力图/插值：字段值归一化 + 色带插值（对齐成熟产品色带映射） */
+function fieldValue(i) {
+  if (PARCEL_TIME[i] && PARCEL_TIME[i].ndvi) {
+    const v = parseFloat(PARCEL_TIME[i].ndvi);
+    return Math.max(0, Math.min(1, (v - 0.4) / 0.45)); // ndvi 0.4~0.85 → 0~1
+  }
+  return i / Math.max(1, parcelLayers.length - 1);
+}
+function rampColor(v, ramp) {
+  var stops;
+  if (ramp === 'br') stops = [[0,[59,76,192]],[0.5,[255,255,255]],[1,[180,4,38]]];
+  else if (ramp === 'mono') stops = [[0,[247,251,255]],[1,[8,48,107]]];
+  else stops = [[0,[26,152,80]],[0.5,[254,240,139]],[1,[215,48,39]]];
+  for (var i = 0; i < stops.length - 1; i++) {
+    if (v >= stops[i][0] && v <= stops[i + 1][0]) {
+      var t = (v - stops[i][0]) / (stops[i + 1][0] - stops[i][0]);
+      var a = stops[i][1], b = stops[i + 1][1];
+      var r = Math.round(a[0] + (b[0] - a[0]) * t), g = Math.round(a[1] + (b[1] - a[1]) * t), bl = Math.round(a[2] + (b[2] - a[2]) * t);
+      return 'rgb(' + r + ',' + g + ',' + bl + ')';
+    }
+  }
+  return 'rgb(215,48,39)';
+}
+function applyFillText() { const c = $('fillColorText').value; $('fillColor').value = c; applyFill(); }
+
+/* 点数据渲染（水利监测点等：选择点数据时切换为点服务，支持热力图/插值） */
+const POINT_DATA = [
+  { pos: [47.200,132.466], v: 0.72, name: '监测站1' },
+  { pos: [47.212,132.512], v: 0.58, name: '监测站2' },
+  { pos: [47.172,132.520], v: 0.81, name: '监测站3' },
+  { pos: [47.230,132.500], v: 0.45, name: '监测站4' },
+  { pos: [47.185,132.540], v: 0.66, name: '监测站5' },
+  { pos: [47.140,132.530], v: 0.52, name: '监测站6' },
+];
+function buildPoints() {
+  pointLayers = POINT_DATA.map(function (p) {
+    return L.circleMarker(p.pos, { radius: 6, color: '#f56a00', fillColor: '#f56a00', fillOpacity: 1 });
+  });
+}
+function showPoints() {
+  if (!pointLayers.length) buildPoints();
+  parcelLayers.forEach(function (l) { map.removeLayer(l); });
+  boundaryLayers.forEach(function (l) { map.removeLayer(l); });
+  if (labelGroup) map.removeLayer(labelGroup);
+  markerLayers.forEach(function (m) { map.removeLayer(m); });
+  pointLayers.forEach(function (l) { if (!map.hasLayer(l)) l.addTo(map); });
+  // 点模式 UI 联动：隐藏边界节点/边界样式/填充图例行，显示点符号图例，更新属性所属
+  const abn = $('auxBoundaryNode'); if (abn) abn.style.display = 'none';
+  const ss = $('sec-symbol'); if (ss) ss.style.display = 'none';
+  const lfr = $('lgFillRow'), lsr = $('lgStrokeRow'), lyr = $('lgSymRow');
+  if (lfr) lfr.style.display = 'none'; if (lsr) lsr.style.display = 'none'; if (lyr) lyr.style.display = '';
+  const pb = $('propNodeBelong'); if (pb) pb.textContent = '点服务 · 监测点';
+  updateLegendBox();
+}
+function showParcels() {
+  clearSpecialLayers();
+  pointLayers.forEach(function (l) { map.removeLayer(l); });
+  parcelLayers.forEach(function (l) { if (!map.hasLayer(l)) l.addTo(map); });
+  boundaryLayers.forEach(function (l) { if (!map.hasLayer(l)) l.addTo(map); });
+  if (labelGroup && !map.hasLayer(labelGroup)) labelGroup.addTo(map);
+  markerLayers.forEach(function (m) { if (!map.hasLayer(m)) m.addTo(map); });
+  // 面模式恢复 UI：显示边界节点/边界样式/填充图例行，隐藏点符号图例
+  const abn = $('auxBoundaryNode'); if (abn) abn.style.display = '';
+  const ss = $('sec-symbol'); if (ss) ss.style.display = '';
+  const lfr = $('lgFillRow'), lsr = $('lgStrokeRow'), lyr = $('lgSymRow');
+  if (lfr) lfr.style.display = ''; if (lsr) lsr.style.display = ''; if (lyr) lyr.style.display = 'none';
+  const pb = $('propNodeBelong'); if (pb) pb.textContent = '主体图层 · 耕地面 (MVT)';
+  updateLegendBox();
+}
+function pointFieldValue(i) {
+  if (POINT_DATA[i]) return Math.max(0, Math.min(1, (POINT_DATA[i].v - 0.4) / 0.45));
+  return i / Math.max(1, pointLayers.length - 1);
+}
+/* 点数据填充：单一/分类/分段/热力图/插值 */
+function applyPointFill(c) {
+  if (!pointLayers.length) return;
+  clearSpecialLayers();
+  if (fillRenderMode === 'heatmap') { buildHeatLayer(); return; }
+  if (fillRenderMode === 'interp') { buildInterpLayer(); return; }
+  const r = 6;
+  if (fillRenderMode === 'single') {
+    pointLayers.forEach(function (l) { l.setStyle({ color: c, fillColor: c, fillOpacity: STYLE.fillOpacity, radius: r }); });
+  } else {
+    pointLayers.forEach(function (l, i) {
+      const cls = FILL_CLASSES[i % FILL_CLASSES.length];
+      l.setStyle({ color: cls.c, fillColor: cls.c, fillOpacity: STYLE.fillOpacity, radius: r });
+    });
+  }
+}
+/* 热力图展示层（Leaflet.heat 密度光晕）：点密度可视化 */
+let heatLayer = null, interpLayer = null;
+function clearSpecialLayers() {
+  if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+  if (interpLayer) { map.removeLayer(interpLayer); interpLayer = null; }
+}
+function rampToGradient(ramp) {
+  if (ramp === 'br') return { 0: '#3b4cc0', 0.5: '#ffffff', 1: '#b40426' };
+  if (ramp === 'mono') return { 0: '#f7fbff', 1: '#08306b' };
+  return { 0: '#1a9850', 0.5: '#fef08b', 1: '#d73027' };
+}
+function buildHeatLayer() {
+  if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+  if (!POINT_DATA.length) return;
+  const ramp = $('renderRamp') ? $('renderRamp').value : 'gr';
+  const radius = +($('heatRadius') ? $('heatRadius').value : 20);
+  const pts = POINT_DATA.map(function (p) { return [p.pos[0], p.pos[1], p.v]; });
+  heatLayer = L.heatLayer(pts, { radius: radius, blur: radius * 0.8, maxZoom: 14, gradient: rampToGradient(ramp) }).addTo(map);
+}
+/* 插值展示层（IDW 反距离加权网格）：从采样点推算连续面 */
+function getPointsBBox() {
+  var minx = 999, miny = 999, maxx = -999, maxy = -999;
+  POINT_DATA.forEach(function (p) {
+    minx = Math.min(minx, p.pos[1]); maxx = Math.max(maxx, p.pos[1]);
+    miny = Math.min(miny, p.pos[0]); maxy = Math.max(maxy, p.pos[0]);
+  });
+  return { minx: minx, maxx: maxx, miny: miny, maxy: maxy };
+}
+function idwValue(lat, lng) {
+  var sumW = 0, sumV = 0;
+  POINT_DATA.forEach(function (p) {
+    var d = Math.sqrt(Math.pow(p.pos[0] - lat, 2) + Math.pow(p.pos[1] - lng, 2));
+    var w = d < 0.0001 ? 1e6 : 1 / (d * d);
+    sumW += w; sumV += w * p.v;
+  });
+  var val = sumW ? sumV / sumW : 0.5;
+  return Math.max(0, Math.min(1, (val - 0.4) / 0.45));
+}
+function buildInterpLayer() {
+  if (interpLayer) { map.removeLayer(interpLayer); interpLayer = null; }
+  if (!POINT_DATA.length) return;
+  interpLayer = L.featureGroup();
+  const bbox = getPointsBBox();
+  const grid = 14;
+  const cellW = (bbox.maxx - bbox.minx) / grid, cellH = (bbox.maxy - bbox.miny) / grid;
+  const ramp = $('renderRamp') ? $('renderRamp').value : 'gr';
+  const clsN = +($('interpClass') ? $('interpClass').value : 5);
+  for (var gx = 0; gx < grid; gx++) {
+    for (var gy = 0; gy < grid; gy++) {
+      const cx = bbox.minx + cellW * (gx + 0.5), cy = bbox.miny + cellH * (gy + 0.5);
+      const v = idwValue(cy, cx);
+      const lvl = Math.min(clsN - 1, Math.floor(v * clsN));
+      const col = rampColor((lvl + 0.5) / clsN, ramp);
+      const nw = [cy - cellH / 2, cx - cellW / 2], se = [cy + cellH / 2, cx + cellW / 2];
+      L.rectangle([nw, se], { color: col, fillColor: col, fillOpacity: 0.55, weight: 0 }).addTo(interpLayer);
+    }
+  }
+  interpLayer.addTo(map);
+}
+function applyBoundary() {
+  pushHistory();
+  if (!boundaryLayers.length) { updateLegendBox(); return; }
+  const m = $('boundaryRenderMode') ? $('boundaryRenderMode').value : 'single';
+  if (m === 'single') {
+    const c = $('boundaryColor').value; $('boundaryColorText').value = c;
+    const w = +$('boundaryW').value; $('boundaryWd').textContent = w + 'px';
+    STYLE.boundaryColor = c; STYLE.boundaryWeight = w;
+    const dash = $('boundaryDash') ? $('boundaryDash').value : '';
+    const dashVal = (dash === 'arrow') ? '' : (dash || null); // 箭头线=方向线符号（演示以实线呈现）
+    boundaryLayers.forEach(function (l) { l.setStyle({ color: c, weight: w, dashArray: dashVal }); });
+  } else {
+    // 按字段分段：演示按地块索引分段线宽
+    boundaryLayers.forEach(function (l, i) { l.setStyle({ color: '#7a3d0e', weight: (i % 3) + 1, dashArray: null }); });
+  }
+  updateLegendBox();
+}
+function applyBoundaryText() { const c = $('boundaryColorText').value; $('boundaryColor').value = c; applyBoundary(); }
+
+/* ================= 渲染方式 / 分级设色（对齐地图编辑器原型） ================= */
+let FILL_CLASSES = [
+  { name: '黑土', c: '#3e2723' },
+  { name: '草甸土', c: '#5d4037' },
+  { name: '白浆土', c: '#8d6e63' },
+  { name: '沼泽土', c: '#455a64' },
+];
+let fillRenderMode = 'single';
+function onFillModeChange() {
+  fillRenderMode = $('fillRenderMode').value;
+  const classified = fillRenderMode === 'unique' || fillRenderMode === 'graduated';
+  $('fillFieldRow').style.display = classified ? '' : 'none';
+  $('fillColorRow').style.display = fillRenderMode === 'single' ? '' : 'none';
+  const isHeat = fillRenderMode === 'heatmap', isInterp = fillRenderMode === 'interp';
+  const cfg = $('renderCfgRow'); if (cfg) cfg.style.display = (isHeat || isInterp) ? '' : 'none';
+  const hr = $('heatRadiusRow'), hr2 = $('heatRadiusRow2'); if (hr) hr.style.display = isHeat ? '' : 'none'; if (hr2) hr2.style.display = isHeat ? '' : 'none';
+  const ic = $('interpClassRow'), ic2 = $('interpClassRow2'); if (ic) ic.style.display = isInterp ? '' : 'none'; if (ic2) ic2.style.display = isInterp ? '' : 'none';
+  renderFillClasses();
+  applyFill();
+}
+
+/* 动态数据：时间筛选（最新一期服务，要素带时间属性；时间段=起止筛选，渲染窗口内要素） */
+const PARCEL_TIME = [
+  { t: '2026-05-08', ndvi: '0.72', soil: '黑土' },
+  { t: '2026-05-25', ndvi: '0.66', soil: '草甸土' },
+  { t: '2026-06-12', ndvi: '0.58', soil: '白浆土' },
+  { t: '2026-06-28', ndvi: '0.81', soil: '黑土' },
+  { t: '2026-07-15', ndvi: '0.42', soil: '沼泽土' },
+  { t: '2026-07-22', ndvi: '0.69', soil: '草甸土' },
+];
+function applyTimeFilter() {
+  if (!parcelLayers.length) return;
+  applyVisibility();
+  applyFill();
+}
+/* 统一显隐：综合 时间筛选(面+边界按索引同步) × 可见范围(缩放级别) × 点模式守卫 */
+function applyVisibility() {
+  if (!map || !parcelLayers.length) return;
+  if (isPointMode) return; // 点模式由 showPoints 统一管理
+  const z = map.getZoom();
+  const visRangeOk = z >= visMin && z <= visMax;
+  const s = $('timeStart') ? $('timeStart').value : '', e = $('timeEnd') ? $('timeEnd').value : '';
+  const timeActive = !!$('periodRow') && $('periodRow').style.display !== 'none';
+  let visibleCount = 0;
+  parcelLayers.forEach(function (l, i) {
+    const inTime = !timeActive || ((!s || PARCEL_TIME[i].t >= s) && (!e || PARCEL_TIME[i].t <= e));
+    const visible = visRangeOk && inTime;
+    if (visible) { visibleCount++; if (!map.hasLayer(l)) l.addTo(map); }
+    else { if (map.hasLayer(l)) map.removeLayer(l); }
+    // 边界与主体按索引同步显隐（被筛掉面的边界不残留）
+    const b = boundaryLayers[i];
+    if (b) { if (visible) { if (!map.hasLayer(b)) b.addTo(map); } else { if (map.hasLayer(b)) map.removeLayer(b); } }
+  });
+  // 标注/点标记：仅受可见范围（不随时间筛选）
+  if (labelGroup) { visRangeOk ? (map.hasLayer(labelGroup) || labelGroup.addTo(map)) : (map.hasLayer(labelGroup) && map.removeLayer(labelGroup)); }
+  markerLayers.forEach(function (m) { visRangeOk ? (map.hasLayer(m) || m.addTo(map)) : (map.hasLayer(m) && map.removeLayer(m)); });
+  // 时间标签
+  if (timeActive) {
+    const lb = $('timeSegmentLabel'); if (lb) lb.textContent = (s || '—') + ' ~ ' + (e || '—') + ' · 显示 ' + visibleCount + ' / ' + parcelLayers.length + ' 个要素';
+    const ind = $('timeIndicator'); if (ind) ind.textContent = '⏱ 当前时段：' + (s || '—') + ' ~ ' + (e || '—');
+  }
+}
+function onTimeChange() {
+  applyTimeFilter();
+  showToast('⏱ 已按时间段筛选：' + ($('timeSegmentLabel') ? $('timeSegmentLabel').textContent : ''));
+}
+function renderFillClasses() {
+  const box = $('fillClassList');
+  if (!box) return;
+  if (fillRenderMode !== 'unique' && fillRenderMode !== 'graduated') { box.style.display = 'none'; box.innerHTML = ''; return; }
+  box.style.display = '';
+  const fieldName = $('fillFieldName').textContent;
+  box.innerHTML = '<div class="prop-label">类目与颜色（分级设色 · ' + fieldName + '）</div>' + FILL_CLASSES.map(function (cls, i) {
+    return '<div class="le-row"><span class="sw" style="background:' + cls.c + '"></span>' +
+      '<input type="color" value="' + cls.c + '" oninput="onFillClassColor(' + i + ',this)">' +
+      '<input class="le-name" value="' + cls.name + '" onchange="FILL_CLASSES[' + i + '].name=this.value;updateLegendBox()" style="flex:1"></div>';
+  }).join('');
+}
+function onFillClassColor(i, el) {
+  FILL_CLASSES[i].c = el.value;
+  document.querySelectorAll('#fillClassList .le-row .sw')[i].style.background = el.value;
+  applyFill();
+}
+function onBoundaryModeChange() {
+  const m = $('boundaryRenderMode').value;
+  $('boundaryFieldRow').style.display = m === 'single' ? 'none' : '';
+  $('boundaryColorRow').style.display = m === 'single' ? '' : 'none';
+  applyBoundary();
+}
+
+/* ================= 分类字段选择弹窗（当前服务属性字段 + 自定义每值颜色） ================= */
+const SERVICE_FIELDS = [
+  { name: 'trslx', desc: '土壤类型', type: '离散', values: [['黑土','#3e2723'],['草甸土','#5d4037'],['白浆土','#8d6e63'],['沼泽土','#455a64']] },
+  { name: 'ndvi', desc: '作物长势指数', type: '连续', values: [['优 >0.7','#1a9850'],['良 0.5-0.7','#a6d96a'],['中 0.3-0.5','#fee08b'],['差 <0.3','#d73027']] },
+  { name: 'zzmj', desc: '种植面积(亩)', type: '连续', values: [['<10 亩','#fdd49e'],['10-50 亩','#fc8d59'],['>50 亩','#d7301f']] },
+  { name: 'dwmc', desc: '单位名称', type: '离散', values: [['建三江农场','#2bbaa0'],['红卫农场','#7a5af8']] },
+];
+let selFieldIdx = 0, currentFillField = 'trslx';
+function openFieldSelect() {
+  selFieldIdx = SERVICE_FIELDS.findIndex(function (f) { return f.name === currentFillField; });
+  if (selFieldIdx < 0) selFieldIdx = 0;
+  renderFieldList(); renderFieldValues();
+  $('fieldSelectMask').classList.add('on');
+}
+function closeFieldSelect() { $('fieldSelectMask').classList.remove('on'); }
+function renderFieldList() {
+  $('serviceFieldList').innerHTML = SERVICE_FIELDS.map(function (f, i) {
+    return '<div class="radio-card' + (i === selFieldIdx ? ' selected' : '') + '" onclick="selectServiceField(' + i + ')">' +
+      '<span class="rc-radio"></span><div class="rc-desc"><div class="rc-name">' + f.name + '</div><div class="rc-meta">' + f.desc + ' · ' + f.type + '</div></div></div>';
+  }).join('');
+}
+function selectServiceField(i) { selFieldIdx = i; renderFieldList(); renderFieldValues(); }
+function renderFieldValues() {
+  const section = $('fieldValueSection'), list = $('fieldValueList');
+  if (!section || !list || selFieldIdx < 0) return;
+  section.style.display = '';
+  const vals = SERVICE_FIELDS[selFieldIdx].values;
+  list.innerHTML = vals.map(function (v, i) {
+    return '<div class="le-row"><span class="sw" style="background:' + v[1] + '"></span>' +
+      '<input type="color" value="' + v[1] + '" oninput="onFieldValueColor(' + i + ',this)">' +
+      '<input class="le-name" value="' + v[0] + '" onchange="SERVICE_FIELDS[' + selFieldIdx + '].values[' + i + '][0]=this.value" style="flex:1">' +
+      '<button class="drawer-close" onclick="removeFieldValue(' + i + ')" title="删除该值">✕</button></div>';
+  }).join('');
+}
+function onFieldValueColor(i, el) {
+  SERVICE_FIELDS[selFieldIdx].values[i][1] = el.value;
+  document.querySelectorAll('#fieldValueList .le-row .sw')[i].style.background = el.value;
+}
+function addFieldValue() {
+  SERVICE_FIELDS[selFieldIdx].values.push(['新值', '#999999']);
+  renderFieldValues();
+}
+function removeFieldValue(i) {
+  SERVICE_FIELDS[selFieldIdx].values.splice(i, 1);
+  renderFieldValues();
+}
+function confirmFieldSelect() {
+  const f = SERVICE_FIELDS[selFieldIdx];
+  currentFillField = f.name;
+  const fn = $('fillFieldName'); if (fn) fn.textContent = f.name + ' · ' + f.desc;
+  FILL_CLASSES = f.values.map(function (v) { return { name: v[0], c: v[1] }; });
+  closeFieldSelect();
+  renderFillClasses(); applyFill();
+  showToast('✅ 分类字段已设为「' + f.name + ' · ' + f.desc + '」，共 ' + FILL_CLASSES.length + ' 个类目');
+}
+
+/* 预选样式（制图规范预设，弹窗卡片选择）：套用三个服务样式 */
+const STYLE_PRESETS = [
+  { name: '标准制图规范', desc: '农业资源 · 默认配色', fill: '#2bbaa0', boundary: '#0f947c', label: '#2c3a44' },
+  { name: '高对比制图规范', desc: '突出边界与标注', fill: '#3d9a5f', boundary: '#7a3d0e', label: '#000000' },
+  { name: '土壤分类样式', desc: '配合 trslx 分类', fill: '#8d6e63', boundary: '#5d4037', label: '#3e2723' },
+  { name: '长势分级样式', desc: '配合 ndvi 分级', fill: '#a6d96a', boundary: '#1a9850', label: '#276419' },
+  { name: '农田标准样式', desc: '浅色农田底图', fill: '#d9f0a3', boundary: '#78c679', label: '#2c3a44' },
+  { name: '监测点样式', desc: '点数据 · 醒目符号', fill: '#2f6fed', boundary: '#0b3d91', label: '#ffffff' },
+];
+let selPresetIdx = 0, currentPreset = '标准制图规范';
+function openPresetSelect() {
+  selPresetIdx = STYLE_PRESETS.findIndex(function (p) { return p.name === currentPreset; });
+  if (selPresetIdx < 0) selPresetIdx = 0;
+  renderPresetCards();
+  $('presetMask').classList.add('on');
+}
+function closePresetSelect() { $('presetMask').classList.remove('on'); }
+function renderPresetCards() {
+  $('presetCardList').innerHTML = STYLE_PRESETS.map(function (p, i) {
+    return '<div class="radio-card' + (i === selPresetIdx ? ' selected' : '') + '" onclick="selectPreset(' + i + ')">' +
+      '<span class="rc-radio"></span>' +
+      '<div class="rc-desc"><div class="rc-name">' + p.name + '</div><div class="rc-meta">' + p.desc + '</div></div>' +
+      presetSvg(p) + '</div>';
+  }).join('');
+}
+/* 示例数据预览：两个示例地块（填充+边界）+ 标注文字 + 符号点 */
+function presetSvg(p) {
+  return '<svg class="preset-svg" viewBox="0 0 120 62" xmlns="http://www.w3.org/2000/svg">' +
+    '<rect x="5" y="5" width="50" height="30" rx="2" fill="' + p.fill + '" stroke="' + p.boundary + '" stroke-width="2"/>' +
+    '<rect x="62" y="10" width="50" height="28" rx="2" fill="' + p.fill + '" stroke="' + p.boundary + '" stroke-width="2"/>' +
+    '<circle cx="80" cy="24" r="3" fill="' + p.boundary + '"/>' +
+    '<text x="10" y="14" font-size="7" fill="' + p.label + '">东区-01</text>' +
+    '<text x="66" y="22" font-size="7" fill="' + p.label + '">东区-02</text>' +
+    '</svg>';
+}
+function selectPreset(i) {
+  selPresetIdx = i;
+  document.querySelectorAll('#presetCardList .radio-card').forEach(function (c, j) { c.classList.toggle('selected', j === i); });
+}
+function confirmPreset() {
+  const p = STYLE_PRESETS[selPresetIdx];
+  currentPreset = p.name;
+  const pn = $('presetName'); if (pn) pn.textContent = p.name;
+  const fc = $('fillColor'); if (fc) fc.value = p.fill;
+  const bc = $('boundaryColor'); if (bc) bc.value = p.boundary;
+  const lc = $('labelColor'); if (lc) lc.value = p.label;
+  applyFill(); applyBoundary(); applyLabel();
+  closePresetSelect();
+  showToast('✨ 已应用预选样式「' + p.name + '」');
+}
+function buildLabels() {
+  if (!labelGroup) return;
+  labelGroup.clearLayers();
+  const size = +$('labelSize').value, col = $('labelColor').value;
+  const pos = $('labelPos') ? $('labelPos').value : 'center';
+  const ay = pos === 'top' ? 34 : pos === 'bottom' ? -6 : 12;
+  labelList.forEach(function (t) {
+    L.marker(t.pos, { icon: L.divIcon({ className: '', html: '<div class="map-label" style="font-size:' + size + 'px;color:' + col + '">' + t.name + '</div>', iconSize: [0, 0], iconAnchor: [0, ay] }) }).addTo(labelGroup);
+  });
+}
+function applyLabel() { pushHistory(); $('labelColorText').value = $('labelColor').value; buildLabels(); }
+function applyLabelText() { const c = $('labelColorText').value; $('labelColor').value = c; applyLabel(); }
+function toggleLabelLayer() {
+  const on = $('labelLayerToggle').classList.toggle('on');
+  if (labelGroup) { on ? labelGroup.addTo(map) : map.removeLayer(labelGroup); }
+}
+function toggleFillLayer() {
+  S.fillVisible = !S.fillVisible;
+  $('fillToggle').classList.toggle('on');
+  STYLE.fillOpacity = S.fillVisible ? +$('fillOp').value / 100 : 0;
+  if (parcelLayers.length) parcelLayers.forEach(function (l) { l.setStyle({ fillOpacity: STYLE.fillOpacity }); });
+}
+/* 交互高亮（属性面板「交互设置」）：叠加半透明高亮，可整体点亮/关闭 */
+let hiliteLayer = null, hiliteOn = true;
+function buildHilite() {
+  if (!map || !parcelLayers.length) return;
+  if (hiliteLayer) { map.removeLayer(hiliteLayer); hiliteLayer = null; }
+  const c = $('hiliteColor').value, op = +$('hiliteOp').value / 100;
+  hiliteLayer = L.featureGroup();
+  parcelLayers.forEach(function (p) {
+    const ring = p.getLatLngs()[0];
+    L.polygon(ring, { color: c, weight: 1, dashArray: '4 3', fillColor: c, fillOpacity: op, className: 'hilite', interactive: false }).addTo(hiliteLayer);
+  });
+  if (hiliteOn) map.addLayer(hiliteLayer);
+}
+function applyHilite() { $('hiliteColorText').value = $('hiliteColor').value; buildHilite(); }
+function applyHiliteText() { const c = $('hiliteColorText').value; $('hiliteColor').value = c; buildHilite(); }
+
+/* 图层级效果：整层透明度 */
+function applyLayerOpacity() {
+  const op = +$('layerOp').value / 100;
+  const v = $('layerOpVal'); if (v) v.textContent = Math.round(op * 100) + '%';
+  const fillOp = STYLE.fillOpacity * (1 - op);
+  parcelLayers.forEach(function (l) { l.setStyle({ fillOpacity: fillOp }); });
+  boundaryLayers.forEach(function (l) { l.setStyle({ opacity: 1 - op }); });
+  if (markerLayers.length) markerLayers.forEach(function (m) { if (m.setOpacity) m.setOpacity(1 - op); });
+  if (labelGroup) labelGroup.eachLayer(function (m) { if (m.setOpacity) m.setOpacity(1 - op); });
+}
+/* 可见范围（按缩放级别控制显示，对齐 ArcGIS 可见范围） */
+let visMin = 0, visMax = 20;
+function applyVisRange() {
+  visMin = +$('visRangeMin').value; visMax = +$('visRangeMax').value;
+  const a = $('visMinVal'); if (a) a.textContent = visMin;
+  const b = $('visMaxVal'); if (b) b.textContent = visMax;
+  checkVisRange();
+}
+function checkVisRange() {
+  if (!map) return;
+  applyVisibility();
+}
+
+/* ================= 符号雪碧图选择（两级：先选【项目】→ 再选该项目下的【雪碧图组】→ 选组内符号） ================= */
+const SYMBOL_PROJECTS = ['八五六农场','建三江分公司','红兴隆分公司'];
+const SYMBOL_SPRITES = [
+  { name: '标准符号集',    project: '八五六农场',   icons: ['📍','⭐','🔺','◆','⬟','⬢','🔷','🔸','🔵','🔴'] },
+  { name: '农业符号集',    project: '八五六农场',   icons: ['🌾','🌱','🌽','🌿','🚜','💧','☀️','🌧','🦠','🌡'] },
+  { name: '作物专用符号集', project: '八五六农场',   icons: ['🌾','🌽','🌿','🌱','🚜','☀️','💧','🌧','🌡','🦠'] },
+  { name: '水利符号集',    project: '建三江分公司', icons: ['💧','🌊','🚰','⚙️','🏭','🔧','📡','🧯','🚧','⛽'] },
+  { name: '监测符号集',    project: '建三江分公司', icons: ['📡','🛰','📍','🗼','⚡','🔋','📊','🧪','⚠️','✅'] },
+  { name: '红兴隆作物集',  project: '红兴隆分公司', icons: ['🌾','🌽','🌿','🚜','☀️','💧','🌡','🦠','🔶','🔵'] },
+];
+let selSpriteIdx = 0, selSymbolIdx = 0, selProjectIdx = 0, currentSymbol = '📍', currentSpriteGroup = '标准符号集', currentSpriteProject = '八五六农场', markerOn = true, markerLayers = [];
+function buildMarkers() {
+  if (!map || !parcelLayers.length) return;
+  markerLayers.forEach(function (m) { map.removeLayer(m); });
+  markerLayers = [];
+  parcelLayers.forEach(function (p) {
+    const c = p.getBounds().getCenter();
+    const icon = L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1">' + currentSymbol + '</div>', iconSize: [22,22], iconAnchor: [11,11] });
+    const mk = L.marker(c, { icon: icon });
+    if (markerOn) mk.addTo(map);
+    markerLayers.push(mk);
+  });
+}
+function toggleMarker() {
+  markerOn = !markerOn;
+  const t = $('markerToggle'); if (t) t.classList.toggle('on', markerOn);
+  if (markerLayers.length) markerLayers.forEach(function (m) { markerOn ? m.addTo(map) : map.removeLayer(m); });
+  if (markerOn && !markerLayers.length) buildMarkers();
+}
+function openSymbolPicker() {
+  const gi = SYMBOL_SPRITES.findIndex(function (sp) { return sp.name === currentSpriteGroup && sp.project === currentSpriteProject; });
+  selSpriteIdx = gi > -1 ? gi : 0;
+  currentSpriteProject = SYMBOL_SPRITES[selSpriteIdx].project;
+  selSymbolIdx = Math.max(0, SYMBOL_SPRITES[selSpriteIdx].icons.indexOf(currentSymbol));
+  renderSpriteTabs(); renderSymbolGrid();
+  $('symbolPickerMask').classList.add('on');
+}
+function closeSymbolPicker() { $('symbolPickerMask').classList.remove('on'); }
+/* 符号选择：只显示「当前项目」下的雪碧图组（两级中的第二级） */
+function renderSpriteTabs() {
+  const lab = $('symbolProjectLab'); if (lab) lab.textContent = currentSpriteProject;
+  const list = projectSpriteIdx(currentSpriteProject);
+  $('spriteTabs').innerHTML = list.map(function (i) {
+    return '<button class="sprite-tab' + (i === selSpriteIdx ? ' sel' : '') + '" onclick="selectSprite(' + i + ')">' + SYMBOL_SPRITES[i].name + '</button>';
+  }).join('');
+}
+function selectSprite(i) {
+  selSpriteIdx = i; selSymbolIdx = 0;
+  renderSpriteTabs(); renderSymbolGrid();
+}
+function renderSymbolGrid() {
+  const icons = SYMBOL_SPRITES[selSpriteIdx].icons;
+  $('symbolGrid').innerHTML = icons.map(function (s, i) {
+    return '<div class="sym-cell' + (i === selSymbolIdx ? ' sel' : '') + '" onclick="selectSymbol(' + i + ')">' + s + '</div>';
+  }).join('');
+}
+function selectSymbol(i) {
+  selSymbolIdx = i;
+  document.querySelectorAll('#symbolGrid .sym-cell').forEach(function (c, j) { c.classList.toggle('sel', j === i); });
+}
+function confirmSymbolPick() {
+  currentSymbol = SYMBOL_SPRITES[selSpriteIdx].icons[selSymbolIdx];
+  currentSpriteGroup = SYMBOL_SPRITES[selSpriteIdx].name;
+  currentSpriteProject = SYMBOL_SPRITES[selSpriteIdx].project;
+  const pv = $('markerSymbolPreview'); if (pv) pv.textContent = currentSymbol;
+  const g = $('spriteGroupName'); if (g) g.textContent = currentSpriteGroup;
+  closeSymbolPicker();
+  buildMarkers();
+  showToast('✅ 已应用标记符号「' + currentSymbol + '」（' + currentSpriteProject + ' · ' + currentSpriteGroup + '）');
+}
+
+/* 雪碧图组选择（两级：先选【项目】→ 再选该项目下的【雪碧图组】） */
+function projectSpriteIdx(project) {
+  return SYMBOL_SPRITES.map(function (sp, i) { return sp.project === project ? i : -1; }).filter(function (i) { return i > -1; });
+}
+function renderSpriteProjectSelect() {
+  const sel = $('spriteProjectSelect'); if (!sel) return;
+  sel.innerHTML = SYMBOL_PROJECTS.map(function (p) {
+    return '<option value="' + p + '"' + (p === currentSpriteProject ? ' selected' : '') + '>' + p + '</option>';
+  }).join('');
+}
+function openSpriteGroupSelect() {
+  const gi = SYMBOL_SPRITES.findIndex(function (sp) { return sp.name === currentSpriteGroup && sp.project === currentSpriteProject; });
+  selSpriteIdx = gi > -1 ? gi : 0;
+  currentSpriteProject = SYMBOL_SPRITES[selSpriteIdx].project;
+  renderSpriteProjectSelect();
+  renderSpriteGroupList();
+  $('spriteGroupMask').classList.add('on');
+}
+function closeSpriteGroupSelect() { $('spriteGroupMask').classList.remove('on'); }
+function onSpriteProjectChange(v) {
+  currentSpriteProject = v;
+  const gi = SYMBOL_SPRITES.findIndex(function (sp) { return sp.project === v; });
+  selSpriteIdx = gi > -1 ? gi : 0;
+  renderSpriteGroupList();
+}
+function renderSpriteGroupList() {
+  const list = projectSpriteIdx(currentSpriteProject);
+  $('spriteGroupList').innerHTML = list.map(function (i) {
+    const sp = SYMBOL_SPRITES[i];
+    return '<div class="radio-card' + (i === selSpriteIdx ? ' selected' : '') + '" data-idx="' + i + '" onclick="selectSpriteGroup(' + i + ')">' +
+      '<span class="rc-radio"></span><div class="rc-desc"><div class="rc-name">' + sp.name + '</div><div class="rc-meta">' + sp.icons.length + ' 个符号 · ' + sp.project + '</div></div>' +
+      '<span style="font-size:16px;flex-shrink:0">' + sp.icons[0] + sp.icons[1] + sp.icons[2] + '</span></div>';
+  }).join('');
+}
+function selectSpriteGroup(i) {
+  selSpriteIdx = i;
+  currentSpriteProject = SYMBOL_SPRITES[i].project;
+  document.querySelectorAll('#spriteGroupList .radio-card').forEach(function (c) {
+    c.classList.toggle('selected', parseInt(c.getAttribute('data-idx'), 10) === i);
+  });
+}
+function confirmSpriteGroup() {
+  currentSpriteGroup = SYMBOL_SPRITES[selSpriteIdx].name;
+  currentSpriteProject = SYMBOL_SPRITES[selSpriteIdx].project;
+  if (SYMBOL_SPRITES[selSpriteIdx].icons.indexOf(currentSymbol) < 0) {
+    currentSymbol = SYMBOL_SPRITES[selSpriteIdx].icons[0];
+    const pv = $('markerSymbolPreview'); if (pv) pv.textContent = currentSymbol;
+  }
+  const g = $('spriteGroupName'); if (g) g.textContent = currentSpriteGroup;
+  closeSpriteGroupSelect();
+  buildMarkers();
+  showToast('✅ 已切换雪碧图组「' + currentSpriteProject + ' · ' + currentSpriteGroup + '」');
+}
+function toggleHilite() {
+  hiliteOn = !hiliteOn;
+  $('hiliteToggle').classList.toggle('on');
+  if (!hiliteLayer) { buildHilite(); return; }
+  if (hiliteOn) map.addLayer(hiliteLayer); else map.removeLayer(hiliteLayer);
+}
+/* 左图层树 显示/隐藏眼睛（成熟产品图层列表）：按 表达节点 切换对应图层显隐 */
+function toggleLayerVis(target, iconEl) {
+  const off = iconEl.classList.toggle('off');
+  iconEl.classList.toggle('on', !off);
+  switch (target) {
+    case 'subject': // 主体面（填充）
+      parcelLayers.forEach(function (l) { off ? map.removeLayer(l) : map.addLayer(l); });
+      break;
+    case 'fill':
+      if (!$('fillToggle').classList.contains('on')) $('fillToggle').classList.toggle('on');
+      else if (off) { $('fillToggle').classList.remove('on'); }
+      S.fillVisible = !off;
+      if (parcelLayers.length) parcelLayers.forEach(function (l) { l.setStyle({ fillOpacity: off ? 0 : STYLE.fillOpacity }); });
+      break;
+    case 'label':
+      if (labelGroup) { off ? map.removeLayer(labelGroup) : labelGroup.addTo(map); }
+      break;
+    case 'symbol':
+      if (boundaryLayers.length) boundaryLayers.forEach(function (l) { off ? map.removeLayer(l) : l.addTo(map); });
+      break;
+  }
+}
+/* ================= 图例 ================= */
+
+/* 画布右下角图例框（常浮，由左图例页签开关控制显隐） */
+function toggleLegendVisible() {
+  const box = $('mapLegendBox');
+  if (!box) return;
+  const hidden = box.classList.contains('hidden');
+  box.classList.toggle('hidden', !hidden);
+  const t = $('legendVisibleToggle'); if (t) t.classList.toggle('on', hidden);
+  if (hidden) updateLegendBox();
+  showToast(hidden ? '📋 图例框已显示' : '📋 图例框已隐藏');
+}
+function updateLegendBox() {
+  if (!$('mlbSwFill')) return;
+  // 图例 = 样式的只读说明：颜色从 STYLE 自动同步（样式是唯一编辑源），不独立编辑
+  $('mlbSwFill').style.background = STYLE.fillColor;
+  $('mlbSwStroke').style.background = STYLE.boundaryColor;
+  const f = $('lgNameFill'); if (f) $('mlbNameFill').textContent = f.value;
+  const s = $('lgNameStroke'); if (s) $('mlbNameStroke').textContent = s.value;
+  $('mlbNote').textContent = $('lgNameGlobal').value;
+  const swF = $('lgSwFill'); if (swF) swF.style.background = STYLE.fillColor;
+  const swS = $('lgSwStroke'); if (swS) swS.style.background = STYLE.boundaryColor;
+  // 点模式：图例框显示点符号
+  const symR = $('mlbSymRow'), strokeR = $('mlbStrokeRow');
+  if (symR && strokeR) {
+    symR.style.display = isPointMode ? '' : 'none';
+    strokeR.style.display = isPointMode ? 'none' : '';
+    if (isPointMode) {
+      const sws = $('mlbSwSym'); if (sws) sws.style.background = ($('lgSwSym') ? $('lgSwSym').style.background : '#f56a00');
+      const ns = $('mlbNameSym'); if (ns) ns.textContent = ($('lgNameSym') ? $('lgNameSym').value : '监测点');
+    }
+  }
+  // 分级设色：图例填充项扩展为多类目
+  const clsBox = $('mlbFillClasses'), fillRow = $('mlbFillRow');
+  if (!clsBox || !fillRow) return;
+  if (fillRenderMode === 'single') {
+    clsBox.style.display = 'none'; fillRow.style.display = '';
+  } else {
+    fillRow.style.display = 'none';
+    clsBox.style.display = '';
+    clsBox.innerHTML = FILL_CLASSES.map(function (cls) {
+      return '<div class="mlb-row"><span class="sw" style="background:' + cls.c + '"></span><span>' + cls.name + '</span></div>';
+    }).join('');
+  }
+}
+
+/* ================= 顶栏操作 ================= */
+function openShare() { $('shareMask').classList.add('on'); }
+function closeShare() { $('shareMask').classList.remove('on'); }
+
+/* ================= 共享 · 推送服务超市（持久不可取消） ================= */
+function openMarketShare() {
+  const n = $('infoLayerName'); if (n) { const sn = $('shareLayerName'); if (sn) sn.textContent = n.textContent; }
+  $('shareMarketMask').classList.add('on');
+}
+function closeMarketShare() { $('shareMarketMask').classList.remove('on'); }
+function confirmMarketShare() {
+  closeMarketShare();
+  const st = $('infoShareState'); if (st) st.textContent = '已共享（推送到服务超市）';
+  showToast('🚀 已推送服务超市：' + ($('infoLayerName') ? $('infoLayerName').textContent : ''));
+}
+
+/* ================= 图层信息编辑 ================= */
+function openLayerEdit() {
+  const n = $('infoLayerName').textContent, c = $('infoLayerCode').textContent, ct = $('infoLayerCat').textContent;
+  const en = $('editLayerName'); if (en) en.value = n;
+  const ec = $('editLayerCode'); if (ec) ec.value = c;
+  const ecat = $('editLayerCat'); if (ecat) ecat.value = ct;
+  $('layerEditMask').classList.add('on');
+}
+function closeLayerEdit() { $('layerEditMask').classList.remove('on'); }
+function confirmLayerEdit() {
+  const n = $('editLayerName').value, c = $('editLayerCode').value, ct = $('editLayerCat').value;
+  const inName = $('infoLayerName'); if (inName) inName.textContent = n;
+  const inCode = $('infoLayerCode'); if (inCode) inCode.textContent = c;
+  const inCat = $('infoLayerCat'); if (inCat) inCat.textContent = ct;
+  closeLayerEdit();
+  showToast('✅ 图层信息已保存');
+}
+
+/* ================= 选择主体数据（列表 + 搜索 + 分页；单选） ================= */
+const SUBJECT_DATA = [
+  { name: '中晚稻·2025·地块', type: '面', count: '3,218 个要素', crs: 'CGCS2000', owner: '遥感监测科', icon: '🗺', tag: '面', subject: '耕地面' },
+  { name: '大豆·2025·种植区', type: '面', count: '1,240 个要素', crs: 'CGCS2000', owner: '夏莹', icon: '🗺', tag: '面', subject: '大豆区' },
+  { name: '玉米·2025·种植区', type: '面', count: '2,105 个要素', crs: 'CGCS2000', owner: '夏莹', icon: '🗺', tag: '面', subject: '玉米区' },
+  { name: '水稻·2025·地块', type: '面', count: '5,012 个要素', crs: 'CGCS2000', owner: '遥感监测科', icon: '🗺', tag: '面', subject: '水稻区' },
+  { name: '水利·2025·监测点', type: '点', count: '86 个监测点', crs: 'CGCS2000', owner: '王磊', icon: '📍', tag: '点', subject: '监测点' },
+  { name: '土壤·2025·采样点', type: '点', count: '154 个采样点', crs: 'CGCS2000', owner: '王磊', icon: '📍', tag: '点', subject: '采样点' },
+  { name: '灌排渠系·2025', type: '线', count: '214 条渠系', crs: 'CGCS2000', owner: '聂聪', icon: '〰', tag: '线', subject: '渠系' },
+  { name: '道路·2025·路网', type: '线', count: '86 条道路', crs: 'CGCS2000', owner: '聂聪', icon: '〰', tag: '线', subject: '路网' },
+  { name: '作物长势·动态监测', type: '面', count: '3,218 个要素', crs: 'CGCS2000', owner: '遥感监测科', icon: '🌿', tag: '动态', subject: '长势区', dynamic: true, defaultRange: ['2026-07-01','2026-07-31'] },
+];
+let selectedDataIdx = 0, dataPage = 1, dataPageSize = 5;
+function renderDataList() {
+  const q = ($('dataSearchInput').value || '').trim().toLowerCase();
+  const filtered = SUBJECT_DATA.filter(function (d) { return !q || d.name.toLowerCase().indexOf(q) >= 0; });
+  const totalPages = Math.max(1, Math.ceil(filtered.length / dataPageSize));
+  if (dataPage > totalPages) dataPage = totalPages;
+  const start = (dataPage - 1) * dataPageSize;
+  const pageItems = filtered.slice(start, start + dataPageSize);
+  $('subjectDataList').innerHTML = pageItems.map(function (d) {
+    const realIdx = SUBJECT_DATA.indexOf(d);
+    return '<div class="data-item' + (realIdx === selectedDataIdx ? ' sel' : '') + '" data-idx="' + realIdx + '" onclick="toggleSubjectData(this)">' +
+      '<span class="di-cb"></span><span class="di-icon">' + d.icon + '</span>' +
+      '<div class="di-info"><div class="di-name">' + d.name + '</div><div class="di-meta">' + d.type + '图层 · ' + d.count + ' · ' + d.crs + ' · ' + d.owner + ' 发布' + (d.dynamic ? ' · 最新一期 · 要素带时间属性' : '') + '</div></div>' +
+      '<span class="tag-pill" style="background:var(--brand-light);color:var(--brand-active)">' + d.tag + '</span></div>';
+  }).join('');
+  $('dataPgCount').textContent = '共 ' + filtered.length + ' 条';
+  $('dataPgInfo').textContent = dataPage + ' / ' + totalPages;
+  $('dataPgPrev').disabled = dataPage <= 1;
+  $('dataPgNext').disabled = dataPage >= totalPages;
+}
+function dataPg(delta) { dataPage += delta; renderDataList(); }
+function openDataSelect() {
+  selectedDataIdx = 0; dataPage = 1;
+  const si = $('dataSearchInput'); if (si) si.value = '';
+  renderDataList();
+  $('dataMask').classList.add('on');
+}
+function closeDataSelect() { $('dataMask').classList.remove('on'); }
+function toggleSubjectData(el) {
+  document.querySelectorAll('#subjectDataList .data-item').forEach(function (it) { it.classList.remove('sel'); });
+  el.classList.add('sel');
+  selectedDataIdx = +el.dataset.idx;
+}
+function filterSubjectData(inp) { dataPage = 1; renderDataList(); }
+function confirmSubjectData() {
+  const d = SUBJECT_DATA[selectedDataIdx];
+  isPointMode = d.type === '点';
+  const dn = $('scDataName'); if (dn) dn.textContent = d.icon + ' ' + d.name;
+  const dt = $('scDataType'); if (dt) dt.textContent = d.type + ' · ' + d.crs;
+  const dc = $('scDataCount'); if (dc) dc.textContent = d.count;
+  // 主体服务名联动（演示：服务随数据派生；平铺展示主体服务）
+  const ssn = $('subjectServiceName'); if (ssn) ssn.textContent = d.subject;
+  const sch = $('subjectChip'); if (sch) sch.textContent = (d.type === '点' ? '点' : '面') + ' · 主体';
+  // 动态数据：显示「时间段」选择并按时间字段分级渲染；静态数据恢复单一
+  const pr = $('periodRow'), rm = $('fillRenderMode'), fr = $('fillFieldRow');
+  if (d.dynamic) {
+    showParcels();
+    if (pr) pr.style.display = '';
+    if (rm) rm.value = 'graduated';
+    fillRenderMode = 'graduated';
+    if (fr) fr.style.display = '';
+    const fn = $('fillFieldName'); if (fn) fn.textContent = 'ndvi · 作物长势';
+    // 分级类目 = ndvi 标准分级（优/良/中/差），不随月份变化（数据为最新一期，要素带时间属性）
+    FILL_CLASSES = SERVICE_FIELDS[1].values.map(function (v) { return { name: v[0], c: v[1] }; });
+    // 默认时间段 = 数据建模界定的「默认渲染时间窗口」（发布时序服务时配置；避免默认全部时相叠加）
+    const ts = $('timeStart'), te = $('timeEnd');
+    if (ts) ts.value = (d.defaultRange && d.defaultRange[0]) || '2026-07-01';
+    if (te) te.value = (d.defaultRange && d.defaultRange[1]) || '2026-07-31';
+    const ind = $('timeIndicator'); if (ind) ind.classList.remove('hidden');
+    renderFillClasses();
+    onTimeChange();
+  } else {
+    if (pr) pr.style.display = 'none';
+    const ind2 = $('timeIndicator'); if (ind2) ind2.classList.add('hidden');
+    if (isPointMode) {
+      // 点数据：切换为点服务渲染，默认热力图（点专属，成熟产品对齐）
+      if (rm) rm.value = 'heatmap';
+      fillRenderMode = 'heatmap';
+      if (fr) fr.style.display = 'none';
+      const cfg = $('renderCfgRow'); if (cfg) cfg.style.display = '';
+      showPoints();
+      renderFillClasses(); applyFill();
+      showToast('📍 已切换为点服务渲染（热力图）');
+    } else {
+      if (rm) rm.value = 'single';
+      fillRenderMode = 'single';
+      if (fr) fr.style.display = 'none';
+      const cfg2 = $('renderCfgRow'); if (cfg2) cfg2.style.display = 'none';
+      // 恢复全部地块显示（无时间筛选）
+      showParcels();
+      renderFillClasses(); applyFill();
+    }
+  }
+  closeDataSelect();
+  showToast('✅ 已选择主体数据「' + d.name + '」，服务随数据更新（原型演示）');
+}
+function confirmShare() { closeShare(); showToast('✅ 已生成评审预览分享（7 天有效期）'); }
+
+/* ================= 数据更新同步提示（真值 BR23） ================= */
+function openUpdateCheck() { $('updateMask').classList.add('on'); }
+function closeUpdateCheck() { $('updateMask').classList.remove('on'); }
+function confirmUpdateSync() {
+  closeUpdateCheck();
+  showToast('✅ 已同步引用新版数据（数据版本 4）');
+}
+function copyUrl() { navigator.clipboard && navigator.clipboard.writeText($('shareUrl').value); showToast('链接已复制'); }
+function saveLayer() {
+  const n = $('infoLayerName') ? $('infoLayerName').textContent : '';
+  const en = $('saveLayerName'); if (en) en.value = n;
+  const ec = $('infoLayerCode'); if (ec) { const sc = $('saveLayerCode'); if (sc) sc.textContent = ec.textContent; }
+  $('saveMask').classList.add('on');
+}
+function closeSave() { $('saveMask').classList.remove('on'); }
+function confirmSave() {
+  const n = $('saveLayerName').value;
+  const inName = $('infoLayerName'); if (inName) inName.textContent = n;
+  const tb = $('topbarTitle'); if (tb) tb.textContent = n;
+  closeSave();
+  showToast('✅ 要素图层已保存：' + n);
+}
+function showToast(msg) {
+  const t = $('toast'); t.innerHTML = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('show'); }, 2200);
+}
+
+/* ================= init（与原地图编辑器一致：等 load 后 Leaflet/CSS 就绪再建图） ================= */
+function boot() {
+  initMap();
+  applyFill(); applyBoundary(); applyLabel();
+}
+window.addEventListener('load', boot);
+window.addEventListener('load', function () { if (map) setTimeout(function () { map.invalidateSize(); }, 60); });
+</script>
+</body>
+</html>

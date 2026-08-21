@@ -8,7 +8,7 @@ module.exports = {
         'brand-hover': '#1cd6b4',
         'brand-light': '#d7efe4',
         'brand-lightest': '#b4edcf',
-        'page-bg': '#f9fafb',
+        'page-bg': '#F6F6F4', // 真实系统框架背景（暖灰，对齐设计示例截图数据资源页）
         panel: '#ffffff',
         line: '#f0f0f0',
         muted: '#999999',

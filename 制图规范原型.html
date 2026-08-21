@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>制图规范 · 河图地理信息平台</title>
+<link rel="stylesheet" href="tailwind.css">
+<link rel="stylesheet" href="common.css">
+<style>
+  /* ============ 令牌（对齐《设计规范-像素级还原指引》真值） ============ */
+  :root{
+    --c-primary:#2bbaa0; --c-primary-hover:#1cd6b4; --c-primary-active:#0f947c;
+    --c-primary-bg:rgba(43,186,160,.10); --c-primary-deep:#0f947c;
+    --c-primary-lightest:#d7efe4; --c-primary-lighter:#b4edcf;
+    --c-success:#52c41a; --c-warn:#faad14; --c-danger:#ff4d4f;
+    --c-info:#1677ff;
+    --page-bg:#F6F6F4;
+    --panel-bg:#ffffff;
+    --border:#d9d9d9; --border-sec:#f0f0f0; --split:#f0f0f0;
+    --text:#333333; --text-2:#595959; --text-3:#999999; --text-4:#cccccc; --text-ph:#bfbfbf;
+    --radius:6px; --radius-lg:8px; --radius-xs:2px; --radius-sm:4px;
+    --shadow-card:2px 2px 5px rgba(0,0,0,.05);
+    --shadow-modal:0 6px 16px 0 rgba(0,0,0,.08),0 3px 6px -4px rgba(0,0,0,.12),0 9px 28px 8px rgba(0,0,0,.05);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:var(--font);font-size:14px;line-height:1.5714;color:var(--text);
+    background:var(--page-bg);-webkit-font-smoothing:antialiased;
+  }
+  .app-shell{height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+  /* ============ 工作区 ============ */
+  .workspace{flex:1;display:flex;gap:16px;padding:16px 24px 24px;min-height:0;}
+
+  /* 悬浮面板通用 */
+  .panel{background:var(--panel-bg);border:1px solid var(--border-sec);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+
+  /* ============ 左侧 Sider ============ */
+  .sider{width:290px;flex:0 0 290px;display:flex;flex-direction:column;min-height:0;}
+  .sider-top{padding:16px 16px 10px;border-bottom:1px solid var(--split);}
+  .module-tab{display:flex;gap:0;padding:4px 0 0;}
+  .mtab{flex:1;text-align:center;padding:10px 0;font-size:14px;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;user-select:none;transition:color .15s;}
+  .mtab:hover{color:var(--c-primary-hover);}
+  .mtab.active{color:var(--c-primary-hover);border-bottom:2px solid var(--c-primary);font-weight:600;}
+  .sider-search{padding:12px 16px 8px;}
+  .sider-search input{width:100%;height:32px;border:1px solid var(--border);border-radius:var(--radius);padding:0 10px 0 30px;font-size:13px;color:var(--text);background:#fff;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M10.5 3.5a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0-1a5 5 0 0 0-3.9 8.2L5 12.3l-.7-.7 1.6-1.6a5 5 0 1 0 5.1-.5z' fill='%23999'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center;background-size:14px;}
+  .sider-search input:focus{border-color:var(--c-primary-hover);box-shadow:0 0 0 2px rgba(43,186,160,.1);}
+  .tree-body{flex:1;overflow-y:auto;padding:4px 8px 12px;}
+
+  /* 树 */
+  .tree-group{font-size:12px;color:var(--text-3);padding:12px 12px 4px;font-weight:500;}
+  .tree-group:first-child{padding-top:6px;}
+  .tn{display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text);position:relative;user-select:none;}
+  .tn:hover{background:var(--c-primary-bg);}
+  .tn.active{background:rgba(43,186,160,.06);color:var(--c-primary-deep);font-weight:600;}
+  .tn.active::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:3px;background:var(--c-primary);border-radius:2px;}
+  .tn .chv{width:16px;color:var(--text-3);font-size:10px;transition:transform .15s;flex-shrink:0;}
+  .tn .chv.collapsed{transform:rotate(-90deg);}
+  .tn .ic{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+  .tn .tname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .tn .count{font-size:11px;color:var(--text-3);background:rgba(0,0,0,.04);padding:0 7px;border-radius:9px;line-height:18px;flex-shrink:0;}
+  .tn.active .count{background:var(--c-primary-lightest);color:var(--c-primary-deep);}
+  .tn .lock{font-size:10px;color:var(--text-3);}
+  .tn[data-lvl="2"]{padding-left:34px;}
+  .tn[data-lvl="3"]{padding-left:50px;}
+  .sider-foot{flex:0 0 auto;padding:12px 16px;border-top:1px solid var(--split);display:flex;gap:8px;}
+
+  /* ============ 右侧主区 ============ */
+  .main{flex:1;display:flex;flex-direction:column;min-height:0;}
+  .main.page-margin{margin:0;}
+
+  /* 页头 */
+  .page-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--split);}
+  .page-title{font-size:16px;font-weight:600;color:var(--text);}
+  .page-sub{font-size:12px;color:var(--text-3);margin-top:2px;}
+  .page-head-actions{display:flex;align-items:center;gap:10px;}
+  .head-tabs{display:flex;gap:0;padding:0 20px;border-bottom:1px solid var(--split);background:#fff;}
+  .htab{padding:12px 18px;font-size:14px;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;user-select:none;}
+  .htab:hover{color:var(--c-primary-hover);}
+  .htab.active{color:var(--c-primary-hover);border-bottom-color:var(--c-primary);font-weight:600;}
+
+  /* 筛选栏 */
+  .filter-bar{display:flex;align-items:center;gap:10px;padding:14px 20px 6px;flex-wrap:wrap;flex-shrink:0;}
+  .filter-bar input[type=text]{height:32px;min-width:220px;flex:1 1 220px;border:1px solid var(--border);border-radius:var(--radius);padding:0 12px;font-size:13px;outline:none;}
+  .filter-bar input[type=text]:focus{border-color:var(--c-primary-hover);box-shadow:0 0 0 2px rgba(43,186,160,.1);}
+  .filter-bar select{height:32px;min-width:120px;border:1px solid var(--border);border-radius:var(--radius);padding:0 8px;font-size:13px;color:var(--text-2);background:#fff;cursor:pointer;}
+  .filter-toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px 20px;flex-shrink:0;}
+  .stat-row{display:flex;align-items:center;gap:12px;}
+  .stat{font-size:13px;color:var(--text-2);}
+  .stat b{color:var(--text);font-weight:600;}
+  .seg{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+  .seg span{padding:0 13px;height:30px;display:flex;align-items:center;font-size:13px;color:var(--text-2);cursor:pointer;border-right:1px solid var(--border);}
+  .seg span:last-child{border-right:none;}
+  .seg span.active{background:var(--c-primary);color:#fff;}
+
+  /* 内容区：卡片栅格 */
+  .data-area{flex:1;overflow-y:auto;padding:8px 20px 20px;}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
+
+  /* 规范卡片 */
+  .spec-card{position:relative;border:1px solid var(--border-sec);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card);transition:box-shadow .15s,transform .15s,border-color .15s;cursor:pointer;background:#fff;}
+  .spec-card:hover{border-color:var(--c-primary-lighter);box-shadow:0 6px 16px rgba(0,0,0,.08);transform:translateY(-2px);}
+  .spec-vis{height:150px;background:linear-gradient(180deg,#f7f9f8,#f0f4f2);display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border-sec);position:relative;}
+  .spec-vis .card-menu{position:absolute;top:8px;right:8px;display:none;}
+  .spec-card:hover .card-menu{display:flex;}
+  .card-menu button{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--text-2);cursor:pointer;font-size:13px;margin-left:4px;}
+  .spec-body{padding:12px 14px;}
+  .spec-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .spec-desc{font-size:12px;color:var(--text-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .spec-meta{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap;}
+
+  /* Pill / Tag */
+  .pill{display:inline-flex;align-items:center;gap:5px;background:var(--c-primary-lightest);color:var(--c-primary-deep);padding:1px 9px;border-radius:4px;font-size:12px;line-height:20px;}
+  .pill .dot{width:6px;height:6px;border-radius:50%;background:var(--c-primary);}
+  .pill.gray{background:#f5f5f5;color:var(--text-2);}
+  .pill.gray .dot{background:#bfbfbf;}
+  .pill.warn{background:#fff7e6;color:#d46b08;}
+  .pill.warn .dot{background:#faad14;}
+
+  /* 表格视图 */
+  .ln-table{display:none;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{text-align:left;background:#fafafa;font-weight:500;color:var(--text);padding:10px 14px;border-bottom:1px solid var(--split);white-space:nowrap;}
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--split);color:var(--text);vertical-align:middle;}
+  tbody tr:hover{background:#fafafa;}
+  tbody tr.selected{background:var(--c-primary-lightest);}
+  .lnk{color:var(--c-primary-hover);cursor:pointer;margin-right:10px;}
+  .lnk.danger{color:var(--c-danger);}
+  .lnk.disabled{color:var(--text-4);cursor:not-allowed;}
+
+  /* 分页 */
+  .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 0 4px;flex-shrink:0;}
+  .pg-info{font-size:13px;color:var(--text-2);}
+  .pg-btns{display:flex;align-items:center;gap:4px;}
+  .pg{min-width:30px;height:30px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;cursor:pointer;font-size:13px;color:var(--text);display:flex;align-items:center;justify-content:center;padding:0 8px;}
+  .pg:hover{color:var(--c-primary-hover);border-color:var(--c-primary-hover);}
+  .pg.active{background:var(--c-primary-hover);border-color:var(--c-primary-hover);color:#fff;}
+
+  /* ============ 按钮 ============ */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 15px;border-radius:var(--radius);border:1px solid transparent;font-size:14px;cursor:pointer;background:#fff;color:var(--text);transition:all .15s;user-select:none;white-space:nowrap;}
+  .btn.primary{background:var(--c-primary);color:#fff;}
+  .btn.primary:hover{background:var(--c-primary-hover);}
+  .btn.primary:active{background:var(--c-primary-active);}
+  .btn.default{border-color:var(--border);}
+  .btn.default:hover{border-color:var(--c-primary-hover);color:var(--c-primary-hover);}
+  .btn.danger{background:#fff;color:var(--c-danger);border:1px solid var(--c-danger);}
+  .btn.danger:hover{background:var(--c-danger);color:#fff;}
+  .btn.sm{height:28px;padding:0 11px;font-size:13px;}
+  .btn.lg{height:40px;padding:0 20px;font-size:15px;}
+
+  /* ============ 弹窗 ============ */
+  .mask{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1040;display:none;align-items:center;justify-content:center;}
+  .mask.show{display:flex;}
+  .modal{background:#fff;border-radius:10px;box-shadow:var(--shadow-modal);width:560px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;animation:pop .18s ease-out;}
+  @keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal.w640{width:640px;}
+  .modal.w720{width:720px;}
+  .modal-hd{height:56px;flex:0 0 56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--split);font-size:16px;font-weight:600;}
+  .modal-hd .x{width:28px;height:28px;border:none;background:transparent;border-radius:6px;cursor:pointer;color:var(--text-3);font-size:16px;}
+  .modal-hd .x:hover{background:#f5f5f5;color:var(--text);}
+  .modal-bd{padding:20px;overflow-y:auto;}
+  .modal-ft{flex:0 0 64px;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 20px;border-top:1px solid var(--split);}
+
+  /* 表单 */
+  .form-row{display:flex;align-items:flex-start;margin-bottom:18px;}
+  .form-label{width:100px;flex:0 0 100px;padding-top:7px;color:var(--text);font-size:14px;text-align:right;padding-right:12px;}
+  .form-label .req{color:var(--c-danger);margin-right:2px;}
+  .form-ctrl{flex:1;}
+  .form-ctrl input[type=text],.form-ctrl select,.form-ctrl textarea{width:100%;height:32px;border:1px solid var(--border);border-radius:var(--radius);padding:0 11px;font-size:14px;outline:none;background:#fff;}
+  .form-ctrl input:focus,.form-ctrl select:focus,.form-ctrl textarea:focus{border-color:var(--c-primary-hover);box-shadow:0 0 0 2px rgba(43,186,160,.1);}
+  .form-ctrl textarea{height:64px;padding:8px 11px;resize:none;}
+  .form-help{font-size:12px;color:var(--text-3);margin-top:4px;}
+
+  /* 样式编辑器（两栏） */
+  .editor-split{display:flex;gap:16px;}
+  .editor-left{flex:1;min-width:0;}
+  .editor-right{flex:0 0 280px;border:1px solid var(--border-sec);border-radius:8px;background:#fafaf8;display:flex;align-items:center;justify-content:center;min-height:300px;}
+  .field-label{font-size:13px;color:var(--text-2);margin-bottom:5px;}
+  .field-label .val{float:right;color:var(--text-3);font-size:12px;}
+  .color-row{display:flex;align-items:center;gap:8px;}
+  .color-row input[type=color]{width:34px;height:32px;border:1px solid var(--border);border-radius:6px;padding:2px;background:#fff;cursor:pointer;}
+  .color-row input[type=text]{height:32px;border:1px solid var(--border);border-radius:6px;padding:0 10px;font-size:13px;flex:1;outline:none;}
+
+  /* 示例预览（复刻编辑器示例地块） */
+  .preview-box{padding:20px;}
+  .swatch-wrap{display:flex;align-items:center;}
+
+  /* 图标库栅格 */
+  .icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:8px;}
+  .icon-cell{height:56px;border:1px solid var(--border-sec);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;background:#fff;transition:all .15s;}
+  .icon-cell:hover{border-color:var(--c-primary);box-shadow:0 0 0 2px rgba(43,186,160,.12);}
+  .icon-cell.selected{border-color:var(--c-primary);background:var(--c-primary-lightest);}
+  .icon-cat{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .cat-chip{padding:2px 12px;font-size:13px;border:1px solid var(--border);border-radius:14px;cursor:pointer;color:var(--text-2);background:#fff;}
+  .cat-chip.active{background:var(--c-primary);border-color:var(--c-primary);color:#fff;}
+
+  /* 雪碧图组列表 */
+  .sprite-list{display:flex;flex-direction:column;gap:10px;}
+  .sprite-item{display:flex;align-items:center;gap:14px;padding:12px 14px;border:1px solid var(--border-sec);border-radius:8px;cursor:pointer;transition:all .15s;background:#fff;}
+  .sprite-item:hover{border-color:var(--c-primary-lighter);}
+  .sprite-item.selected{border-color:var(--c-primary);background:var(--c-primary-bg);}
+  .sprite-ic{font-size:22px;width:56px;height:40px;background:#f5f7f6;border-radius:6px;display:flex;align-items:center;justify-content:center;}
+  .sprite-info{flex:1;}
+  .sprite-name{font-size:14px;font-weight:600;}
+  .sprite-meta{font-size:12px;color:var(--text-3);}
+
+  /* 上传 */
+  .upload-zone{border:1px dashed var(--border);border-radius:8px;height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-3);cursor:pointer;transition:all .15s;}
+  .upload-zone:hover{border-color:var(--c-primary);color:var(--c-primary-deep);background:var(--c-primary-bg);}
+  .upload-zone .uz-ic{font-size:26px;margin-bottom:6px;}
+
+  /* toast */
+  .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);background:#333;color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;z-index:2000;opacity:0;transition:all .25s;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.18);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* 空态 */
+  .empty{text-align:center;padding:64px 0;color:var(--text-3);}
+  .empty .e-ic{font-size:40px;margin-bottom:12px;opacity:.5;}
+
+  /* 通用隐藏 */
+  .hidden{display:none !important;}
+
+  /* 几何类型页签（编辑弹窗） */
+  .geo-tab{padding:5px 12px;font-size:13px;color:var(--text-2);border:1px solid var(--border);border-radius:14px;cursor:pointer;background:#fff;user-select:none;transition:all .15s;white-space:nowrap;}
+  .geo-tab:hover{color:var(--c-primary-hover);border-color:var(--c-primary-lighter);}
+  .geo-tab.active{background:var(--c-primary);border-color:var(--c-primary);color:#fff;font-weight:600;}
+  .geo-panel{overflow-y:auto;padding-right:4px;}
+  .gram-title{font-size:12px;font-weight:600;color:var(--text);background:#f5f7f6;border-radius:6px;padding:6px 8px;margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ============ TopNav（与项目壳一致：图标+文案、制图规范高亮） ============ -->
+  <header class="h-16 flex items-center justify-between flex-shrink-0 z-30 px-5">
+    <div class="flex items-center">
+      <div class="flex items-center gap-2 mr-6">
+        <div class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-base">河</div>
+        <span class="text-base font-semibold text-brand">河图·地理信息平台</span>
+      </div>
+      <nav id="topNav" class="flex items-center h-16 gap-0.5">
+        <a href="数据资产.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
+        </a>
+        <a href="地图服务.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg> 地图服务
+        </a>
+        <a href="要素图层.html" data-module="layer" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg> 要素图层
+        </a>
+        <a href="专题地图.html" data-module="map" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 专题地图
+        </a>
+        <a href="制图规范原型.html" data-module="spec" class="nav-btn active px-3.5 h-16 text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M12 22a10 10 0 1 1 10-10c0 1.7-1.3 3-3 3h-2.5a2.5 2.5 0 0 0-1.9 4.1c.6.7.4 1.9-.6 1.9Z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="11" cy="7.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/></svg> 制图规范
+          <span class="active-bar"></span>
+        </a>
+        <a href="任务中心.html" data-module="task" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> 任务中心
+        </a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-[#f56a00] text-white flex items-center justify-center font-semibold text-sm">石</div>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- ============ 左侧 Sider 悬浮面板 ============ -->
+    <aside class="panel sider">
+      <div class="sider-top">
+        <div class="page-title">制图规范</div>
+        <div class="page-sub">组织级制图标准资产库</div>
+        <div class="module-tab">
+          <div class="mtab active" data-mtab="style" onclick="switchMTab('style')">样式规范</div>
+          <div class="mtab" data-mtab="icon" onclick="switchMTab('icon')">符号规范</div>
+        </div>
+      </div>
+      <div class="sider-search"><input type="text" id="siderSearch" placeholder="搜索…" oninput="filterTree(this.value)"></div>
+      <div class="tree-body" id="siderTree"></div>
+      <div class="sider-foot">
+        <button class="btn default" style="flex:1" onclick="manageAction()">＋ 新建</button>
+      </div>
+    </aside>
+
+    <!-- ============ 右侧主区 悬浮面板 ============ -->
+    <main class="panel main">
+
+      <!-- 页头 -->
+      <div class="page-head">
+        <div>
+          <div class="page-title" id="headTitle">样式规范</div>
+          <div class="page-sub" id="headSub">成熟的图层渲染样式包 · 按业务分类，套用时一键整体生效（供图层与地图编辑器引用）</div>
+        </div>
+        <div class="page-head-actions">
+          <button class="btn primary" id="btnPrimary" onclick="primaryAction()">＋ 新建样式包</button>
+        </div>
+      </div>
+
+      <!-- 页签：符号规范时显示（图标库 / 雪碧图组）；样式规范隐藏（用右侧卡片/列表切换） -->
+      <div class="head-tabs" id="headTabs" style="display:none;">
+        <div class="htab active" data-htab="list" onclick="switchHtab('list')">样式包卡片</div>
+        <div class="htab" data-htab="tree" onclick="switchHtab('tree')">样式包清单</div>
+      </div>
+
+      <!-- 筛选栏（随样式/符号切换） -->
+      <div class="filter-bar" id="filterBar">
+        <input type="text" placeholder="搜索规范名称…" oninput="applySearch(this.value)">
+        <select id="filterSource" onchange="applyFilters()"><option value="">来源</option><option value="preset">系统预置</option><option value="custom">组织自定义</option></select>
+        <select id="filterDs" onchange="applyFilters()"><option value="">数据源类型</option><option value="point">点</option><option value="line">线</option><option value="polygon">面</option><option value="raster">栅格</option></select>
+      </div>
+
+      <!-- 视图 & 统计 -->
+      <div class="filter-toolbar">
+        <div class="stat-row">
+          <span class="stat">共 <b id="statCount">0</b> 条</span>
+          <span class="pill gray"><span class="dot"></span><span id="statPreset">预置</span></span>
+          <span class="pill"><span class="dot"></span><span id="statCustom">自定义</span></span>
+        </div>
+        <div class="seg" id="viewSeg">
+          <span class="active" data-view="card" onclick="switchView('card')">▦ 卡片</span>
+          <span data-view="table" onclick="switchView('table')">☰ 列表</span>
+        </div>
+      </div>
+
+      <!-- 数据区 -->
+      <div class="data-area">
+        <!-- 卡片视图 -->
+        <div id="cardView"></div>
+        <!-- 列表视图 -->
+        <div id="tableView" style="display:none"></div>
+        <!-- 空态 -->
+        <div class="empty" id="emptyBox" style="display:none"><div class="e-ic">🎨</div>暂无匹配样式包，点击右上角「新建」创建</div>
+        <!-- 分页 -->
+        <div class="pagination" id="pagination" style="display:none">
+          <span class="pg-info">共 12 条</span>
+          <div class="pg-btns">
+            <div class="pg" onclick="pg(-1)">‹ 上一页</div>
+            <div class="pg active">1</div><div class="pg">2</div>
+            <div class="pg" onclick="pg(1)">下一页 ›</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============ 编辑样式包弹窗 ============ -->
+<div class="mask" id="editMask">
+  <div class="modal w760">
+    <div class="modal-hd">编辑样式包 · <span id="editPkgName">中晚稻标准化制图</span> <button class="x" onclick="closeModal('editMask')">✕</button></div>
+    <div class="modal-bd" style="display:flex;gap:16px;height:520px;">
+      <!-- 左侧：包信息 + 按几何类型的配置页签 -->
+      <div style="flex:0 0 380px;min-width:0;display:flex;flex-direction:column;">
+        <div style="display:flex;gap:10px;margin-bottom:12px;">
+          <div style="flex:1;">
+            <div class="field-label">样式包名称</div>
+            <input type="text" id="editName" value="中晚稻标准化制图" style="width:100%;height:30px;border:1px solid var(--border);border-radius:6px;padding:0 10px;outline:none;font-size:13px;">
+          </div>
+          <div style="flex:0 0 104px;">
+            <div class="field-label">业务分类</div>
+            <select id="editBiz" style="width:100%;height:30px;border:1px solid var(--border);border-radius:6px;padding:0 5px;font-size:12px;">
+              <option>🌾 作物种植</option><option>🟫 土壤与长势</option><option>💧 水利设施</option><option>📡 监测管理</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-label">说明</div>
+        <textarea id="editDesc" style="width:100%;height:40px;border:1px solid var(--border);border-radius:6px;padding:6px 10px;outline:none;font-size:12px;resize:none;">中晚稻地块标准表达</textarea>
+
+        <!-- 几何类型页签 -->
+        <div style="display:flex;gap:6px;margin:12px 0 10px;border-bottom:1px solid var(--split);padding-bottom:8px;">
+          <div class="geo-tab active" data-geo="polygon" onclick="switchGeo('polygon')">⬛ 面</div>
+          <div class="geo-tab" data-geo="line" onclick="switchGeo('line')">━ 线</div>
+          <div class="geo-tab" data-geo="point" onclick="switchGeo('point')">● 点</div>
+          <div class="geo-tab" data-geo="raster" onclick="switchGeo('raster')">▦ 栅格</div>
+          <div class="geo-tab" data-geo="label" onclick="switchGeo('label')">注记</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;">▼ 当前几何类型配置（样式包内可切换配置每一类）</div>
+
+        <!-- 面 polygon 配置 -->
+        <div class="geo-panel" id="geo-polygon">
+          <div class="gram-title">面要素 · 填充 + 边界 + 面标注</div>
+          <div style="display:flex;gap:8px;">
+            <div style="flex:1;">
+              <div class="field-label">填充颜色</div>
+              <div class="color-row"><input type="color" value="#2bbaa0" oninput="this.nextElementSibling.value=this.value;renderEditLive()" onchange="renderEditLive()"><input type="text" style="font-size:11px;height:26px;padding:0 6px;" oninput="this.previousElementSibling.value=this.value;renderEditLive()" onchange="renderEditLive()"></div>
+              <div class="field-label" style="margin-top:6px">不透明度 <span class="val">80%</span></div>
+              <input type="range" value="80" style="width:100%">
+            </div>
+            <div style="flex:1;">
+              <div class="field-label">填充图案</div>
+              <select style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;"><option>纯色</option><option>斜线</option><option>网点</option><option>交叉线</option></select>
+              <div class="field-label" style="margin-top:6px">边界线颜色</div>
+              <div class="color-row"><input type="color" value="#0f947c" oninput="this.nextElementSibling.value=this.value;renderEditLive()" onchange="renderEditLive()"><input type="text" style="font-size:11px;height:26px;padding:0 6px;" oninput="this.previousElementSibling.value=this.value;renderEditLive()" onchange="renderEditLive()"></div>
+            </div>
+          </div>
+          <div class="field-label" style="margin-top:8px">面标注字段</div>
+          <select style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;"><option>sddlmc 地块名称</option><option>zwlx 作物类型</option><option>zzmj 面积(亩)</option></select>
+        </div>
+
+        <!-- 线 line 配置 -->
+        <div class="geo-panel hidden" id="geo-line">
+          <div class="gram-title">线要素 · 线样式 + 沿线标注</div>
+          <div class="field-label">线颜色</div>
+          <div class="color-row"><input type="color" value="#1f3a93" oninput="this.nextElementSibling.value=this.value;renderEditLive()" onchange="renderEditLive()"><input type="text" style="font-size:11px;height:26px;padding:0 6px;" oninput="this.previousElementSibling.value=this.value;renderEditLive()" onchange="renderEditLive()"></div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <div style="flex:1;"><div class="field-label">线宽 <span class="val">2px</span></div><input type="range" value="2" min="1" max="8" style="width:100%"></div>
+            <div style="flex:1;"><div class="field-label">线型</div><select style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;"><option>实线</option><option>虚线</option><option>点线</option><option>点划线</option><option>箭头</option></select></div>
+          </div>
+          <div class="field-label" style="margin-top:8px">沿线标注字段</div>
+          <select style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;"><option>渠道名称</option><option>道路名称</option><option>灌渠编码</option></select>
+        </div>
+
+        <!-- 点 point 配置 -->
+        <div class="geo-panel hidden" id="geo-point">
+          <div class="gram-title">点要素 · 符号 + 点标注</div>
+          <div class="field-label">点符号 <span class="val">来自符号规范</span></div>
+          <select style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;"><option>🌾 农业符号集</option><option>📡 监测符号集</option><option>💧 水利符号集</option></select>
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+            <div style="font-size:22px" id="pointSymPrev">🌾</div>
+            <button class="btn sm default" onclick="toast('选择组内符号（原型）')">选择符号</button>
+          </div>
+          <div class="field-label" style="margin-top:8px">点标注字段</div>
+          <select style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;"><option>站点名称</option><option>采样点编号</option><option>x 坐标</option></select>
+        </div>
+
+        <!-- 栅格 raster 配置 -->
+        <div class="geo-panel hidden" id="geo-raster">
+          <div class="gram-title">栅格要素 · 色带 + 分级</div>
+          <div class="field-label">色带</div>
+          <select style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;"><option>绿-黄-红</option><option>红-黄-绿</option><option>蓝-白-红</option><option>浅绿-白</option></select>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <div style="flex:1;"><div class="field-label">分级数</div><input type="number" value="5" min="2" max="10" style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;"></div>
+            <div style="flex:1;"><div class="field-label">分级方式</div><select style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;"><option>等距分段</option><option>分位数</option><option>自然断点</option></select></div>
+          </div>
+          <div class="field-label" style="margin-top:8px">不透明度 <span class="val">80%</span></div>
+          <input type="range" value="80" style="width:100%">
+        </div>
+
+        <!-- 注记 label 配置 -->
+        <div class="geo-panel hidden" id="geo-label">
+          <div class="gram-title">注记 · 通用标注样式</div>
+          <div class="field-label">字体</div>
+          <select style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;"><option>PingFang SC</option><option>Microsoft YaHei</option><option>SimSun</option></select>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <div style="flex:1;"><div class="field-label">字号</div><input type="number" value="12" style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;"></div>
+            <div style="flex:1;"><div class="field-label">位置</div><select style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;"><option>居中</option><option>上方</option><option>下方</option></select></div>
+          </div>
+          <div class="field-label" style="margin-top:8px">文字颜色</div>
+          <div class="color-row"><input type="color" value="#2c3a44" oninput="this.nextElementSibling.value=this.value;renderEditLive()" onchange="renderEditLive()"><input type="text" style="font-size:11px;height:26px;padding:0 6px;" oninput="this.previousElementSibling.value=this.value;renderEditLive()" onchange="renderEditLive()"></div>
+          <div class="field-label" style="margin-top:8px">注记背景 / 光晕</div>
+          <select style="width:100%;height:28px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;"><option>无</option><option>白底光晕</option><option>半透明底</option></select>
+        </div>
+      </div>
+
+      <!-- 右侧：整套多几何预览 -->
+      <div style="flex:1;min-width:0;">
+        <div style="border:1px solid var(--border-sec);border-radius:8px;background:#fafaf8;padding:14px;height:100%;overflow:auto;">
+          <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;">示例预览 · 一套样式包按几何类型整体渲染（面 / 线 / 点 / 栅格）</div>
+          <div id="editPreview" style="display:flex;justify-content:center;min-height:300px;align-items:center;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn default" onclick="closeModal('editMask')">取消</button>
+      <button class="btn default" onclick="saveAsCopy()">另存为新包</button>
+      <button class="btn primary" onclick="saveEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 新建样式包弹窗 ============ -->
+<div class="mask" id="createMask">
+  <div class="modal" style="width:480px">
+    <div class="modal-hd">新建样式包 <button class="x" onclick="closeModal('createMask')">✕</button></div>
+    <div class="modal-bd">
+      <div style="background:var(--c-primary-bg);border:1px solid var(--c-primary-lighter);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--c-primary-deep);margin-bottom:16px;">💡 样式包 = 一套囊括所有几何类型（面/线/点/栅格/注记）的成熟配图方案；套用到图层时按该图层几何类型自动取对应配置。可从零创建，也可复制现有包改造。</div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>业务分类</div>
+        <div class="form-ctrl">
+          <select>
+            <option value="crop">🌾 作物种植</option><option value="soil">🟫 土壤与长势</option>
+            <option value="water">💧 水利设施</option><option value="monitor">📡 监测管理</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>样式包名称</div>
+        <div class="form-ctrl"><input type="text" value="我的新制图样式"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">起始方式</div>
+        <div class="form-ctrl">
+          <select onchange="onCreateStart(this.value)">
+            <option value="blank">从零配置（元素逐个设置）</option>
+            <option value="copy">从现有样式包复制改造</option>
+          </select>
+          <div class="form-help" id="createStartHelp">将进入样式包编辑，逐个配置填充/标注/边界/点标记/图层效果。</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">归属</div>
+        <div class="form-ctrl">
+          <select><option>组织自定义（可删）</option><option>系统预置（不可删）</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn default" onclick="closeModal('createMask')">取消</button>
+      <button class="btn primary" onclick="doCreate()">确认并编辑</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 删除确认 ============ -->
+<div class="mask" id="delMask">
+  <div class="modal" style="width:420px">
+    <div class="modal-hd">删除样式包 <button class="x" onclick="closeModal('delMask')">✕</button></div>
+    <div class="modal-bd">
+      <div style="padding:8px 0;">确定删除「<b id="delName">监测点样式</b>」？删除后不可恢复。</div>
+      <div style="margin-top:10px;background:#fff7e6;border:1px solid #ffe58f;border-radius:6px;padding:8px 12px;font-size:13px;color:#d46b08;">⚠️ 该规范当前被 <b>3</b> 个图层/地图引用，删除后将无法在编辑器中继续选择，已引用图层保留副本不受影响。</div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn default" onclick="closeModal('delMask')">取消</button>
+      <button class="btn danger" onclick="toast('已删除规范（原型演示）');closeModal('delMask')">删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 符号规范相关弹窗：上传、雪碧图详情 ============ -->
+<div class="mask" id="uploadMask">
+  <div class="modal" style="width:520px">
+    <div class="modal-hd">上传图标 <button class="x" onclick="closeModal('uploadMask')">✕</button></div>
+    <div class="modal-bd">
+      <div class="upload-zone" style="height:150px;" onclick="uploadIcon()">
+        <div class="uz-ic">⤒</div>
+        点击或拖拽图标文件到此处上传
+        <div style="font-size:12px;margin-top:4px;">支持 PNG / SVG / JPG，上传后进图标库「自定义」分类</div>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="field-label">目标分类</div>
+        <select style="width:100%;height:32px;border:1px solid var(--border);border-radius:6px;padding:0 8px;"><option>自定义</option><option>农业标记</option><option>设施标识</option><option>基础形状</option></select>
+      </div>
+    </div>
+    <div class="modal-ft"><button class="btn default" onclick="closeModal('uploadMask')">取消</button><button class="btn primary" onclick="uploadIcon()">上传</button></div>
+  </div>
+</div>
+
+<!-- 雪碧图组详情（两列符号选择） -->
+<div class="mask" id="spriteDetailMask">
+  <div class="modal w640">
+    <div class="modal-hd">雪碧图组 · <span id="sdName">农业符号集</span> <button class="x" onclick="closeModal('spriteDetailMask')">✕</button></div>
+    <div class="modal-bd" style="display:flex;gap:16px;">
+      <div style="width:170px;flex-shrink:0;">
+        <div class="field-label">组内符号（点击选取）</div>
+        <div style="display:flex;flex-direction:column;gap:4px;max-height:300px;overflow-y:auto;">
+          <div class="cat-chip active">全部</div>
+          <div class="cat-chip">作物</div><div class="cat-chip">设施</div><div class="cat-chip">水利</div>
+        </div>
+      </div>
+      <div style="flex:1;">
+        <div class="field-label">预览</div>
+        <div style="border:1px solid var(--border-sec);border-radius:8px;background:#fafaf8;height:220px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;padding:10px;" id="sdGrid"></div>
+      </div>
+    </div>
+    <div class="modal-ft"><button class="btn default" onclick="closeModal('spriteDetailMask')">取消</button><button class="btn primary" onclick="closeModal('spriteDetailMask');toast('已应用该雪碧图组（原型演示）')">应用</button></div>
+  </div>
+</div>
+
+<!-- 雪碧图组编辑/组合（从图标库勾选图标组成一组雪碧图） -->
+<div class="mask" id="composeMask">
+  <div class="modal w720">
+    <div class="modal-hd" id="composeTitle">编辑雪碧图组 <button class="x" onclick="closeModal('composeMask')">✕</button></div>
+    <div class="modal-bd" style="display:flex;gap:16px;height:430px;">
+      <!-- 左：属性 + 图标库勾选 -->
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <div style="flex:1;"><div class="field-label"><span class="req" style="color:var(--c-danger)">*</span>雪碧图名称</div>
+            <input type="text" id="cmpName" value="" style="width:100%;height:30px;border:1px solid var(--border);border-radius:6px;padding:0 10px;outline:none;font-size:13px;"></div>
+          <div style="flex:0 0 110px;"><div class="field-label">所属项目</div>
+            <select id="cmpProject" style="width:100%;height:30px;border:1px solid var(--border);border-radius:6px;padding:0 5px;font-size:12px;"></select></div>
+        </div>
+        <div class="field-label">从图标库勾选图标（全局素材池，按分类筛选）</div>
+        <div class="icon-cat" id="cmpCats"></div>
+        <div style="flex:1;overflow-y:auto;border:1px solid var(--border-sec);border-radius:8px;padding:10px;background:#fafaf8;" id="cmpGrid"></div>
+      </div>
+      <!-- 右：已选图标（当前组成） -->
+      <div style="flex:0 0 230px;border:1px solid var(--border-sec);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;">
+        <div style="padding:10px 12px;border-bottom:1px solid var(--split);font-size:13px;font-weight:600;">已选图标 <span class="val" id="cmpCount">0</span></div>
+        <div style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;" id="cmpSelected">
+          <div class="empty" style="padding:20px 0;font-size:12px;">从左侧勾选图标加入组内，构成这组雪碧图。可点击图标移除。</div>
+        </div>
+        <div style="padding:10px;border-top:1px solid var(--split);font-size:11px;color:var(--text-3);">💡 雪碧图 = 一组点标记符号；勾选进来的图标即成为组内符号（点标记时先选组、再选组内符号）。</div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn default" onclick="closeModal('composeMask')">取消</button>
+      <button class="btn primary" onclick="saveCompose()">保存雪碧图组</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ============ 数据 ============ */
+  /*
+    样式规范 = 一套成熟的「图层渲染样式包」，按业务分类。
+    每个样式包 = 一套「囊括所有几何类型」的完整样式集：
+      polygon(面:填充/边界/面标注)、line(线:线宽/线色/线型/沿线标注)、
+      point(点:符号/点标注)、raster(栅格:色带/分级)、label(注记:通用标注)。
+    套用到图层时，按该图层的几何类型自动取相应的配置区块。
+    ❗ 样式包没有「默认」概念。
+  */
+  const GEOM_KEYS = ['polygon','line','point','raster','label'];
+  const STYLE_SPECS = [
+    {id:'s1', name:'中晚稻标准化制图', biz:'crop', src:'preset', desc:'中晚稻地块标准表达 · 覆盖面/边界/标注', usage:8,
+      geoms:{
+        polygon:{fillC:'#2bbaa0',op:.8,pattern:'纯色',strokeC:'#0f947c',strokeW:2,labelField:'sddlmc 地块名称',labelSize:12,labelC:'#2c3a44'},
+        line:{strokeC:'#3a7d5c',strokeW:2,dash:'实线',dir:'实线',labelField:'渠道名称',labelSize:11,labelC:'#2c3a44'},
+        point:{sprite:'农业符号集',symbol:'🌾',labelField:'监测点名称',labelSize:11,labelC:'#1c1e21'},
+        raster:{ramp:'绿-黄-红',classes:5,method:'分段',op:.8},
+        label:{font:'PingFang SC',size:12,c:'#2c3a44',pos:'居中'}}},
+    {id:'s2', name:'大豆玉米分类制图', biz:'crop', src:'custom', desc:'按作物类型分类配色（大豆/玉米）', usage:3,
+      geoms:{
+        polygon:{fillC:'#3d9a5f',op:.85,pattern:'纯色',strokeC:'#5d4037',strokeW:1.5,labelField:'zwlx 作物类型',labelSize:11,labelC:'#1c1e21'},
+        line:{strokeC:'#7d9a3f',strokeW:1.5,dash:'点划线',dir:'点划线',labelField:'作物行',labelSize:10,labelC:'#1c1e21'},
+        point:{sprite:'农业符号集',symbol:'🌽',labelField:'种植点',labelSize:11,labelC:'#1c1e21'},
+        raster:{ramp:'黄-绿',classes:4,method:'分类',op:.75},
+        label:{font:'PingFang SC',size:11,c:'#1c1e21',pos:'上方'}}},
+    {id:'s3', name:'土壤分类制图', biz:'soil', src:'preset', desc:'配合 trslx 土壤类型分类表达', usage:5,
+      geoms:{
+        polygon:{fillC:'#8d6e63',op:.8,pattern:'斜线',strokeC:'#5d4037',strokeW:2,labelField:'trname 土壤名称',labelSize:12,labelC:'#3e2723'},
+        line:{strokeC:'#6d5a4d',strokeW:2,dash:'实线',dir:'实线',labelField:'土壤边界',labelSize:11,labelC:'#3e2723'},
+        point:{sprite:'农业符号集',symbol:'🌿',labelField:'采样点',labelSize:11,labelC:'#3e2723'},
+        raster:{ramp:'棕-黄',classes:6,method:'分段',op:.8},
+        label:{font:'PingFang SC',size:12,c:'#3e2723',pos:'居中'}}},
+    {id:'s4', name:'NDVI 长势分级制图', biz:'soil', src:'preset', desc:'配合 ndvi 五段分级色带', usage:4,
+      geoms:{
+        polygon:{fillC:'#a6d96a',op:.85,pattern:'纯色',strokeC:'#1a9850',strokeW:1.5,labelField:'ndvi 长势等级',labelSize:11,labelC:'#276419'},
+        line:{strokeC:'#1fa860',strokeW:1.5,dash:'实线',dir:'实线',labelField:'长势分带',labelSize:10,labelC:'#276419'},
+        point:{sprite:'标准符号集',symbol:'📍',labelField:'监测站',labelSize:11,labelC:'#276419'},
+        raster:{ramp:'红-黄-绿',classes:5,method:'分段',op:.85},
+        label:{font:'PingFang SC',size:11,c:'#276419',pos:'下方'}}},
+    {id:'s5', name:'灌渠线制图', biz:'water', src:'preset', desc:'灌区干支渠线型表达 + 水闸点标记', usage:2,
+      geoms:{
+        polygon:{fillC:'#b8deff',op:.5,pattern:'纯色',strokeC:'#1f3a93',strokeW:2,labelField:'渠段名称',labelSize:11,labelC:'#0b3d91'},
+        line:{strokeC:'#1f3a93',strokeW:2.5,dash:'实线',dir:'箭头',labelField:'渠道名称',labelSize:11,labelC:'#0b3d91'},
+        point:{sprite:'水利符号集',symbol:'🚰',labelField:'水闸名称',labelSize:11,labelC:'#0b3d91'},
+        raster:{ramp:'蓝-青',classes:4,method:'分段',op:.6},
+        label:{font:'PingFang SC',size:11,c:'#0b3d91',pos:'上方'}}},
+    {id:'s6', name:'监测点标准制图', biz:'monitor', src:'custom', desc:'监测站点醒目符号 + 统计标注', usage:3,
+      geoms:{
+        polygon:{fillC:'#2f6fed',op:.7,pattern:'纯色',strokeC:'#0b3d91',strokeW:2,labelField:'站点名称',labelSize:11,labelC:'#ffffff'},
+        line:{strokeC:'#2f6fed',strokeW:2,dash:'虚线',dir:'虚线',labelField:'监测线路',labelSize:11,labelC:'#0b3d91'},
+        point:{sprite:'监测符号集',symbol:'📡',labelField:'站点名称',labelSize:11,labelC:'#1c1e21'},
+        raster:{ramp:'蓝-紫',classes:5,method:'分段',op:.8},
+        label:{font:'PingFang SC',size:11,c:'#1c1e21',pos:'上方'}}},
+    {id:'s7', name:'农田标准制图（浅色）', biz:'crop', src:'custom', desc:'浅色农田底图，适合叠加分析', usage:1,
+      geoms:{
+        polygon:{fillC:'#d9f0a3',op:.8,pattern:'纯色',strokeC:'#78c679',strokeW:1.5,labelField:'sddlmc 地块名称',labelSize:12,labelC:'#2c3a44'},
+        line:{strokeC:'#8fb96e',strokeW:1.5,dash:'实线',dir:'实线',labelField:'田埂线',labelSize:10,labelC:'#2c3a44'},
+        point:{sprite:'农业符号集',symbol:'🌱',labelField:'作物点',labelSize:11,labelC:'#2c3a44'},
+        raster:{ramp:'浅绿-白',classes:3,method:'分段',op:.7},
+        label:{font:'PingFang SC',size:12,c:'#2c3a44',pos:'居中'}}},
+  ];
+  /* 雪碧图（组）：由图标库内图标组合而成，一个项目可有多组雪碧图可选 */
+  const SPRITES = [
+    {id:'g1',name:'标准符号集',   project:'八五六农场',   fromCat:'基础形状', icons:['📍','⭐','🔺','◆','⬟','⬢','🔷','🔸','🔵','🔴']},
+    {id:'g2',name:'农业符号集',   project:'八五六农场',   fromCat:'农业标记', icons:['🌾','🌱','🌽','🌿','🚜','💧','☀️','🌧','🦠','🌡']},
+    {id:'g3',name:'水利符号集',   project:'建三江分公司', fromCat:'设施标识', icons:['💧','🌊','🚰','⚙️','🏭','🔧','📡','🧯','🚧','⛽']},
+    {id:'g4',name:'监测符号集',   project:'建三江分公司', fromCat:'设施标识', icons:['📡','🛰','📍','🗼','⚡','🔋','📊','🧪','⚠️','✅']},
+    {id:'g5',name:'作物专用符号集',project:'八五六农场',   fromCat:'农业标记', icons:['🌾','🌽','🌿','🌱','🚜','☀️','💧','🌧','🌡','🦠']},
+  ];
+  const ICONS = ['📍','⭐','🔺','◆','⬟','⬢','🔷','🔸','🔵','🔴','🌾','🌱','🌽','🌿','🚜','💧','☀️','🌧','📡','🛰','🗼','⚡','🔋','📊','🏭','🚰','⚙️','🧯','📶','🅿️','⛽','⚠️','🧪','✅','🌡','🔻','🔶','🔹','🟡','🟠'];
+  const ICON_CATS = ['全部','基础形状','农业标记','设施标识','自定义'];
+  const PROJECTS = ['八五六农场','建三江分公司','红兴隆分公司'];
+
+  let mtab = 'style';      // style | icon
+  let htab = 'list';       // 列表/清单 Tab（主内容）
+  let view = 'card';
+  let curTree = 'all';     // 左侧树选中（样式=业务；符号=图标分类/雪碧图项目/组）
+  let curIconCat = '全部'; // 图标库当前分类
+  let selIcon = 0;
+  let searchTerm = '';
+
+  const $ = id => document.getElementById(id);
+
+  /* ============ 模块页签切换（样式/符号）+ 左树 ============ */
+  function switchMTab(t){
+    mtab = t;
+    document.querySelectorAll('.mtab').forEach(el=>el.classList.toggle('active', el.dataset.mtab===t));
+    const headTitle = t==='style' ? '样式规范' : '符号规范';
+    $('headTitle').textContent = headTitle;
+    $('headSub').textContent = t==='style'
+      ? '成熟的图层渲染样式包 · 按业务分类，套用时一键整体生效（供图层与地图编辑器引用）'
+      : '图标 / 雪碧图 · 组织级符号标准，供图层点标记引用';
+    updatePrimaryBtn();
+    // 视图切换去重：样式规范用右侧「卡片/列表」；符号规范用「图标库/雪碧图组」
+    $('headTabs').style.display = t==='icon' ? 'flex' : 'none';
+    $('viewSeg').style.display = t==='style' ? 'flex' : 'none';
+    const tabs = document.querySelectorAll('.htab');
+    tabs[0].textContent = '图标库';
+    tabs[1].textContent = '雪碧图组';
+    renderTree();
+    renderFilterOptions();
+    renderData();
+  }
+
+  function renderTree(){
+    let html='';
+    if(mtab==='style'){
+      // 左侧树按「业务」分类，每个业务下是备齐全部元素样式的样式包
+      html = '<div class="tree-group">业务分类</div>'
+        + tn('all','🗂','全部样式包', STYLE_SPECS.length);
+      BIZ_CATS.forEach(b=>{
+        html += tn('biz-'+b.key, b.icon, b.name, STYLE_SPECS.filter(x=>x.biz===b.key).length);
+      });
+      html += '<div class="tree-group">我的</div>'
+        + tn('my','🖊','我的自定义', STYLE_SPECS.filter(x=>x.src==='custom').length);
+      html += '<div class="tree-group">来源</div>'
+        + tn('preset','🔒','系统预置', countSrc('preset'))
+        + tn('custom','🖊','组织自定义', countSrc('custom'));
+    } else {
+      // 符号规范：左树 = 图标库(全局图标池，按分类) + 雪碧图(按项目，每组由图标库组合)
+      html = '<div class="tree-group">图标库 · 图标素材池</div>'
+        + tn('cat-全部','🗂','全部图标', ICONS.length);
+      ICON_CATS.slice(1).forEach(c=>{
+        html += tn('cat-'+c,'📁',c, iconCatCount(c));
+      });
+      html += '<div class="tree-group">雪碧图 · 按项目（由图标库组合）</div>';
+      PROJECTS.forEach((p)=>{
+        const grps = SPRITES.filter(g=>g.project===p);
+        html += '<div class="tn" data-key="proj-'+p+'" onclick="selectTree(\'proj-'+p+'\')"><span class="chv">▾</span><span class="ic">🏢</span><span class="tname">'+p+'</span><span class="count">'+grps.length+'</span></div>';
+        grps.forEach(g=>{
+          html += '<div class="tn" data-lvl="2" data-skey="sprite-'+g.name+'" data-sprite="'+g.id+'" onclick="selectTree(\'sprite-'+g.name+'\')"><span class="ic">🧩</span><span class="tname">'+g.name+'</span><span class="count">'+g.icons.length+'</span></div>';
+        });
+      });
+    }
+    $('siderTree').innerHTML = html;
+    // 高亮当前选中
+    document.querySelectorAll('#siderTree .tn').forEach(el=>{
+      if(el.dataset.key===curTree) el.classList.add('active');
+    });
+  }
+  const BIZ_CATS = [
+    {key:'crop',    name:'作物种植', icon:'🌾'},
+    {key:'soil',    name:'土壤与长势', icon:'🟫'},
+    {key:'water',   name:'水利设施', icon:'💧'},
+    {key:'monitor', name:'监测管理', icon:'📡'},
+  ];
+  function tn(key,ic,name,count){
+    return '<div class="tn" data-key="'+key+'" onclick="selectTree(\''+key+'\')"><span class="ic">'+ic+'</span><span class="tname">'+name+'</span><span class="count">'+count+'</span></div>';
+  }
+  function bizName(biz){ const b=BIZ_CATS.find(x=>x.key===biz); return b? b.name : '我的自定义'; }
+  function bizIcon(biz){ const b=BIZ_CATS.find(x=>x.key===biz); return b? b.icon : '🖊'; }
+  function countSrc(s){ return STYLE_SPECS.filter(x=>x.src===s).length; }
+  function iconCatCount(c){ return c==='全部' ? ICONS.length : 6 + (c==='自定义'?2:0); }
+  function selectTree(key){
+    curTree = key;
+    document.querySelectorAll('#siderTree .tn').forEach(el=>{
+      el.classList.toggle('active', el.dataset.key===key || el.dataset.skey===key);
+    });
+    // 符号规范左树联动：点图标分类→切到图标库视图；点雪碧图组/项目→切到雪碧图组视图
+    if(mtab==='icon'){
+      if(key.indexOf('cat-')===0){ curIconCat=key.slice(4); setHtab('list'); }
+      else if(key.indexOf('proj-')===0 || key.indexOf('sprite-')===0){ setHtab('tree'); }
+    }
+    renderData();
+  }
+  function setHtab(t){
+    htab = t;
+    document.querySelectorAll('.htab').forEach(el=>el.classList.toggle('active', el.dataset.htab===t));
+    updatePrimaryBtn();
+  }
+  function filterTree(v){ searchTerm = v.trim(); renderData(); }
+  function applySearch(v){ searchTerm = v.toLowerCase().trim(); renderData(); }
+
+  function renderFilterOptions(){
+    const fb = $('filterBar');
+    if(mtab==='style'){
+      fb.innerHTML =
+        '<input type="text" placeholder="搜索样式包名称…" oninput="applySearch(this.value)">'
+        + '<select id="filterBiz" onchange="applyFilters()"><option value="">业务分类</option>'
+        + BIZ_CATS.map(b=>'<option value="'+b.key+'">'+b.name+'</option>').join('')
+        + '</select>'
+        + '<select id="filterSource" onchange="applyFilters()"><option value="">来源</option><option value="preset">系统预置</option><option value="custom">组织自定义</option></select>';
+    } else {
+      fb.innerHTML =
+        '<input type="text" placeholder="搜索图标 / 雪碧图名称…" oninput="applySearch(this.value)">'
+        + '<select id="filterSource" onchange="applyFilters()"><option value="">来源</option><option value="preset">系统预置</option><option value="custom">组织自定义</option></select>';
+    }
+  }
+
+  /* ============ 明细 Tab（卡片/清单） ============ */
+  function switchHtab(t){
+    htab = t;
+    document.querySelectorAll('.htab').forEach(el=>el.classList.toggle('active', el.dataset.htab===t));
+    updatePrimaryBtn();
+    renderData();
+  }
+
+  /* ============ 主数据渲染 ============ */
+  function applySearch(v){ renderData(); }
+  function applyFilters(){ renderData(); }
+
+  function renderData(){
+    if(mtab==='style'){
+      renderStyleData();
+    } else {
+      renderIconData();
+    }
+  }
+
+  function filteredStyleList(){
+    let list = STYLE_SPECS.filter(x=>{
+      if(curTree!=='all' && curTree!=='my'){
+        if(curTree==='preset') return x.src==='preset';
+        if(curTree==='custom') return x.src==='custom';
+        if(curTree.indexOf('biz-')===0) return x.biz===curTree.slice(4);
+      }
+      if(curTree==='my') return x.src==='custom';
+      return true;
+    });
+    const src = $('filterSource') ? $('filterSource').value : '';
+    const biz = $('filterBiz') ? $('filterBiz').value : '';
+    if(src) list = list.filter(x=>x.src===src);
+    if(biz) list = list.filter(x=>x.biz===biz);
+    if(searchTerm) list = list.filter(x=> (x.name+x.desc+bizName(x.biz)).toLowerCase().includes(searchTerm));
+    return list;
+  }
+
+  function renderStyleData(){
+    const list = filteredStyleList();
+    $('statCount').textContent = STYLE_SPECS.length;
+    $('statPreset').textContent = '系统预置 '+countSrc('preset');
+    $('statCustom').textContent = '组织自定义 '+countSrc('custom');
+    $('pagination').style.display = 'flex';
+
+    // 卡片
+    let cards='';
+    if(view==='card'){
+      if(!list.length){ $('emptyBox').style.display='block'; $('cardView').innerHTML=''; $('tableView').innerHTML=''; return; }
+      $('emptyBox').style.display='none';
+      list.forEach(s=>{
+        const lock = s.src==='preset' ? '<span class="lock" title="系统预置不可删除">🔒</span>' : '';
+        cards += '<div class="spec-card" onclick="openEdit(\''+s.id+'\')">'
+          + '<div class="card-menu"><button title="编辑" onclick="event.stopPropagation();openEdit(\''+s.id+'\')">✎</button><button title="另存为新包" onclick="event.stopPropagation();saveAsCopy()">⎘</button><button title="删除" onclick="event.stopPropagation();openDel(\''+s.id+'\')">🗑</button></div>'
+          + '<div class="spec-vis">'+pvs(s)+'</div>'
+          + '<div class="spec-body">'
+          + '<div class="spec-name">'+s.name+lock+'</div>'
+          + '<div class="spec-desc">'+s.desc+'</div>'
+          + '<div class="spec-meta">'
+          + '<span class="pill"><span class="dot"></span>'+bizIcon(s.biz)+' '+bizName(s.biz)+'</span>'
+          + '<span class="pill '+(s.src==='preset'?'warn':'gray')+'"><span class="dot"></span>'+(s.src==='preset'?'系统预置':'自定义')+'</span>'
+          + '</div>'
+          + '<div style="margin-top:10px;font-size:12px;color:var(--text-2);display:flex;flex-wrap:wrap;gap:4px;" class="geom-coverage">'+geomChips(s)+'</div>'
+          + '</div></div>';
+      });
+      $('cardView').innerHTML = '<div class="card-grid">'+cards+'</div>';
+      $('cardView').style.display='block'; $('tableView').style.display='none';
+    } else {
+      // 清单/表格
+      let rows='';
+      list.forEach(s=>{
+        rows += '<tr onclick="this.classList.toggle(\'selected\')">'
+          + '<td><span class="lnk" onclick="openEdit(\''+s.id+'\')">'+s.name+'</span></td>'
+          + '<td><span class="pill"><span class="dot"></span>'+bizName(s.biz)+'</span></td>'
+          + '<td><span class="pill gray"><span class="dot"></span>'+(s.src==='preset'?'🔒 系统预置':'自定义')+'</span></td>'
+          + '<td>'+s.usage+'</td>'
+          + '<td style="color:var(--text-3)">'+geomCovered(s)+'</td>'
+          + '<td><span class="lnk" onclick="openEdit(\''+s.id+'\')">编辑</span><span class="lnk" onclick="saveAsCopy()">另存为新包</span>'+(s.src==='preset'?'<span class="lnk disabled">删除</span>':'<span class="lnk danger" onclick="openDel(\''+s.id+'\')">删除</span>')+'</td>'
+          + '</tr>';
+      });
+      $('tableView').innerHTML = '<table><thead><tr><th>样式包名称</th><th>业务</th><th>来源</th><th>套用次数</th><th>已覆盖几何类型</th><th>操作</th></tr></thead><tbody>'+rows+'</tbody></table>';
+      $('tableView').style.display='block'; $('cardView').style.display='none';
+    }
+  }
+
+  /* 几何类型覆盖 chips：每个样式包囊括全部几何类型 */
+  const GEOM_META = [
+    {k:'polygon', icon:'⬛', name:'面'},
+    {k:'line',    icon:'━',  name:'线'},
+    {k:'point',   icon:'●',  name:'点'},
+    {k:'raster',  icon:'▦',  name:'栅格'},
+    {k:'label',   icon:'🅣',  name:'注记'},
+  ];
+  function geomCovered(s){
+    // 返回已覆盖的几何类型名称串
+    return GEOM_META.map(g=>g.name).join(' / ');
+  }
+  function geomChips(s){
+    return GEOM_META.map(g=>'<span class="pill"><span class="dot"></span>'+g.icon+' '+g.name+'</span>').join('');
+  }
+
+  /* 预览 SVG：展示一个样式包对「面 + 线 + 点 + 栅格」各几何类型的整体渲染效果 */
+  function pvs(s){
+    const pg = s.geoms.polygon, ln = s.geoms.line, pt = s.geoms.point, rs = s.geoms.raster;
+    const fc = pg.fillC, bc = pg.strokeC, lc = pg.labelC;
+    // 栅格色带条
+    const ramp = '<rect x="70" y="8" width="60" height="8" rx="2" fill="url(#ramp'+s.id+')"/>';
+    return '<svg width="150" height="84" viewBox="0 0 150 84" xmlns="http://www.w3.org/2000/svg">'
+      + '<defs><linearGradient id="ramp'+s.id+'" x1="0" y1="0" x2="1" y2="0">'
+      + '<stop offset="0" stop-color="'+rs.ramp.split('-')[0]+'"/>'
+      + '<stop offset="1" stop-color="'+rs.ramp.split('-')[1]+'"/>'
+      + '</linearGradient></defs>'
+      // 面
+      + '<rect x="8" y="10" width="46" height="30" rx="2" fill="'+fc+'" stroke="'+bc+'" stroke-width="2"/>'
+      + '<text x="14" y="26" font-size="8" fill="'+lc+'">地块</text>'
+      // 线
+      + '<path d="M62 12 L106 30 L128 48" fill="none" stroke="'+ln.strokeC+'" stroke-width="2.5"/>'
+      // 点
+      + '<text x="118" y="14" font-size="12">'+pt.symbol+'</text>'
+      // 栅格色带
+      + '<rect x="8" y="52" width="46" height="8" rx="2" fill="url(#ramp'+s.id+')"/>'
+      + '<text x="58" y="60" font-size="7" fill="#999">栅格色带</text>'
+      + '<text x="118" y="66" font-size="7" fill="#999">注记 ●━</text>'
+      + '</svg>';
+  }
+  function renderNames(){ /* 编辑预览联动 */ }
+
+  /* 几何类型页签切换（编辑弹窗） */
+  function switchGeo(key){
+    document.querySelectorAll('.geo-tab').forEach(el=>el.classList.toggle('active', el.dataset.geo===key));
+    document.querySelectorAll('.geo-panel').forEach(el=>el.classList.toggle('hidden', el.id!=='geo-'+key));
+  }
+
+  /* 取某 geo 面板内第一个颜色输入 */
+  function pickCol(panelSel){
+    const el = document.querySelector(panelSel+' input[type=color]');
+    return el ? el.value : '';
+  }
+  /* 取某 geo 面板内 点/标注 相关 select 的符号 */
+  function pickSymbol(){
+    const sel = document.querySelector('#geo-point select');
+    return sel ? (sel.value.indexOf('监测')>-1?'📡':(sel.value.indexOf('水利')>-1?'🚰':'🌾')) : '🌾';
+  }
+
+  /* 多几何类型整体预览：面 + 线 + 点 + 栅格色带 */
+  function renderFullPreview(fc, lc, tc, sym){
+    const id = 'editRamp';
+    $('editPreview').innerHTML =
+      '<div style="font-size:12px;color:var(--text-3);margin-bottom:10px;text-align:center">示例预览 · 一套样式包按几何类型整体渲染（面 / 线 / 点 / 栅格）</div>'
+      + '<svg width="250" height="132" viewBox="0 0 250 132" xmlns="http://www.w3.org/2000/svg">'
+      + '<defs><linearGradient id="'+id+'" x1="0" y1="0" x2="1" y2="0">'
+      + '<stop offset="0" stop-color="#a6d96a"/><stop offset=".5" stop-color="#fee08b"/><stop offset="1" stop-color="#d73027"/>'
+      + '</linearGradient></defs>'
+      // 面
+      + '<rect x="16" y="14" width="70" height="46" rx="4" fill="'+fc+'" stroke="'+lc+'" stroke-width="2"/>'
+      + '<text x="26" y="40" font-size="11" fill="'+tc+'">中晚稻地块</text>'
+      + '<text x="12" y="74" font-size="9" fill="#999">面</text>'
+      // 线
+      + '<path d="M104 20 L150 42 L176 68" fill="none" stroke="'+lc+'" stroke-width="3" stroke-linecap="round"/>'
+      + '<text x="118" y="34" font-size="10" fill="'+tc+'">灌渠</text>'
+      + '<text x="104" y="74" font-size="9" fill="#999">线</text>'
+      // 点
+      + '<text x="196" y="34" font-size="22">'+sym+'</text><text x="196" y="54" font-size="9" fill="'+tc+'">监测站</text>'
+      + '<text x="196" y="74" font-size="9" fill="#999">点</text>'
+      // 栅格色带
+      + '<rect x="16" y="96" width="120" height="12" rx="3" fill="url(#'+id+')"/>'
+      + '<text x="150" y="106" font-size="9" fill="#999">栅格·分级色带(5段)</text>'
+      + '</svg>';
+  }
+
+  function renderEditLive(){
+    // 从编辑弹窗各几何面板读取颜色，实时刷新整体预览
+    const fc = pickCol('#geo-polygon');
+    const lc = pickCol('#geo-line');
+    const tc = pickCol('#geo-label');
+    renderFullPreview(fc||'#2bbaa0', lc||'#1f3a93', tc||'#2c3a44', pickSymbol());
+  }
+
+  function switchView(v){
+    view = v;
+    document.querySelectorAll('.seg span').forEach(el=>el.classList.toggle('active', el.dataset.view===v));
+    renderData();
+  }
+  function pg(d){ toast(d>0?'下一页（原型演示）':'上一页（原型演示）'); }
+
+  /* ============ 弹窗操作 ============ */
+  function showModal(id){ $(id).classList.add('show'); }
+  function closeModal(id){ $(id).classList.remove('show'); }
+  function openCreateModal(){ showModal('createMask'); }
+  function onCreateStart(v){ const h=$('createStartHelp'); h.textContent = v==='copy' ? '将弹出选择框，选择一个现有样式包复制后改造。' : '将进入样式包编辑，按几何类型（面/线/点/栅格/注记）逐个配置。'; }
+  function doCreate(){ closeModal('createMask'); showModal('editMask'); toast('已创建样式包「我的新制图样式」，可开始配置各几何类型'); }
+  function openEdit(id){
+    showModal('editMask');
+    const s = STYLE_SPECS.find(x=>x.id===id);
+    if(s){
+      $('editPkgName').textContent = s.name;
+      if($('editName')) $('editName').value = s.name;
+      if($('editDesc')) $('editDesc').value = s.desc;
+      // 业务分类选择（按 BIZ_CATS 匹配）
+      const es = $('editBiz');
+      if(es){ const bi=BIZ_CATS.findIndex(b=>b.key===s.biz); if(bi>-1) es.selectedIndex=bi; }
+      renderEditPreview(s);
+    } else {
+      renderEditLive();
+    }
+    switchGeo('polygon');
+  }
+  function renderEditPreview(s){
+    const g = s && s.geoms ? s.geoms : { polygon:{fillC:'#2bbaa0',strokeC:'#0f947c',labelC:'#2c3a44'}, line:{strokeC:'#1f3a93'}, point:{symbol:'🌾'}, label:{c:'#2c3a44'} };
+    const fc = (g.polygon&&g.polygon.fillC)||'#2bbaa0';
+    const lc = (g.line&&g.line.strokeC)||'#1f3a93';
+    const tc = (g.polygon&&g.polygon.labelC)||'#2c3a44';
+    const sym = (g.point&&g.point.symbol)||'🌾';
+    renderFullPreview(fc, lc, tc, sym);
+  }
+
+  function openDel(id){ const s=STYLE_SPECS.find(x=>x.id===id); $('delName').textContent=s? s.name:'样式包'; showModal('delMask'); }
+  function saveEdit(){ closeModal('editMask'); toast('✅ 样式包已保存'); }
+  function saveAsCopy(){ closeModal('editMask'); toast('⎘ 已另存为新的样式包（组织自定义）'); }
+
+  /* ============ 符号规范 ============ */
+  function renderIconData(){
+    $('statCount').textContent = ICONS.length;
+    $('statPreset').textContent = '系统预置 '+ICONS.length;
+    $('statCustom').textContent = '组织自定义 34';
+    $('pagination').style.display='flex';
+    $('emptyBox').style.display='none';
+
+    if(htab==='list'){
+      // ===== 图标库：全局图标素材池（非项目空间内容）=====
+      const activeCat = curIconCat;
+      const cats = ICON_CATS.map(function(c){
+        return '<span class="cat-chip'+(c===activeCat?' active':'')+'" onclick="setIconCat(\''+c+'\')">'+c+'</span>';
+      }).join('');
+      const shown = ICONS.filter(function(ic){
+        if(curIconCat!=='全部' && !(ic in CAT_ICON_MAP[curIconCat])) return false;
+        if(searchTerm && iconName(ic).indexOf(searchTerm)<0) return false;
+        return true;
+      });
+      let grid = shown.map(function(ic){ return '<div class="icon-cell" onclick="pickIcon(\''+ic+'\')" title="'+iconName(ic)+'">'+ic+'</div>'; }).join('');
+      if(!grid) grid = '<div class="empty"><div class="e-ic">🖼</div>该分类暂无匹配图标</div>';
+      $('cardView').innerHTML =
+        '<div style="font-size:12px;color:var(--text-3);margin-bottom:12px;">🖼 图标库 = 图标素材池（全局共享，<b>不属于项目空间</b>）。雪碧图由这里的图标组合而成；上传图标请用右上角「＋ 上传图标」。</div>'
+        + '<div class="icon-cat">'+cats+'</div>'
+        + '<div class="icon-grid">'+grid+'</div>'
+        + '<div style="margin-top:16px;font-size:12px;color:var(--text-3);">💡 在图标库点选图标仅预览；真正用于点标记需先在「雪碧图组」里把图标组合成组，再在图层点标记中选组。</div>';
+      $('cardView').style.display='block'; $('tableView').style.display='none';
+    } else {
+      // ===== 雪碧图组：按项目分组，每组由图标库图标组合而成 =====
+      let grps = SPRITES;
+      if(curTree && curTree.indexOf('proj-')===0) grps = grps.filter(function(g){ return g.project===curTree.slice(5); });
+      if(curTree && curTree.indexOf('sprite-')===0) grps = grps.filter(function(g){ return ('sprite-'+g.name)===curTree; });
+      let body='';
+      PROJECTS.forEach(function(p){
+        const pg = grps.filter(function(g){ return g.project===p; });
+        if(!pg.length) return;
+        body += '<div style="font-size:13px;font-weight:600;color:var(--text);margin:14px 0 8px;">🏢 '+p+'</div>';
+        pg.forEach(function(g){
+          const gi = SPRITES.indexOf(g);
+          body += '<div class="sprite-item'+(gi===curSprite?' selected':'')+'" onclick="selectSpriteGroup('+gi+')">'
+            + '<div class="sprite-ic">'+g.icons[0]+'</div>'
+            + '<div class="sprite-info"><div class="sprite-name">'+g.name+'</div>'
+            + '<div class="sprite-meta">由 '+g.icons.length+' 个图标组合（取自图标库「'+g.fromCat+'」）</div></div>'
+            + '<div style="display:flex;gap:6px;flex-shrink:0;">'
+            + '<button class="btn sm default" onclick="event.stopPropagation();showSpriteDetail('+gi+')">查看符号</button>'
+            + '<button class="btn sm default" onclick="event.stopPropagation();openSpriteCompose('+gi+')">编辑组成</button>'
+            + '</div></div>';
+        });
+      });
+      if(!body) body = '<div class="empty"><div class="e-ic">🧩</div>该项目暂无雪碧图</div>';
+      const topNote = '<div style="font-size:13px;color:var(--text-2);margin-bottom:12px;">雪碧图按项目分组 · 每组由图标库图标组合（新建/上传请用右上角主按钮）</div>';
+      $('tableView').innerHTML = topNote + '<div class="sprite-list">'+body+'</div>'
+        + '<div style="margin-top:16px;font-size:12px;color:var(--text-3);">💡 雪碧图（组）= 从「图标库」挑选图标组合成的一组标记符号集；一个项目可有多组雪碧图可选，点标记时先选组、再选组内符号。「编辑组成」可从图标库勾选增删本组图标。</div>';
+      $('tableView').style.display='block'; $('cardView').style.display='none';
+    }
+  }
+  const ICON_NAMES = { '📍':'定位标记','⭐':'星形','🔺':'三角','◆':'菱形','⬟':'五边','⬢':'六边','🔷':'蓝圆','🔸':'橙菱','🌾':'麦穗','🌱':'幼苗','🌽':'玉米','🌿':'作物','🚜':'农机','💧':'水滴','☀️':'晴天','🌧':'降雨','📡':'监测站','🛰':'卫星','🗼':'铁塔','⚡':'电力','🔋':'电量','📊':'统计','🏭':'工厂','🚰':'水闸','⚙️':'设备','🧯':'消防','📶':'信号','🅿️':'停车','⛽':'加油站','⚠️':'警示','🧪':'检测','✅':'完成','🌡':'温度','🔻':'下三角','🔶':'橙菱形','🔹':'蓝菱形','🟡':'黄圆','🟠':'橙圆' };
+  /* 图标库分类 → 图标集合（原型近似归属，用于分类筛选） */
+  const CAT_ICON_MAP = {
+    '基础形状':['📍','⭐','🔺','◆','⬟','⬢','🔷','🔸','🔵','🔴','🔻','🔶','🔹','🟡','🟠'],
+    '农业标记':['🌾','🌱','🌽','🌿','🚜','☀️','🌧','🌡','🦠','💧'],
+    '设施标识':['📡','🛰','🗼','⚡','🔋','📊','🏭','🚰','⚙️','🧯','📶','🅿️','⛽','⚠️','🧪','✅'],
+    '自定义':[''],
+  };
+  function iconName(ic){ return ICON_NAMES[ic]||ic; }
+  function pickIcon(ic){ toast('已选取图标：'+iconName(ic)+'（图标库为素材池，可组合进雪碧图）'); }
+  function setIconCat(c){ curIconCat=c; curTree='cat-'+c; renderTree(); renderData(); }
+  function showSpriteDetail(gi){ $('sdName').textContent=SPRITES[gi].name; let g=''; SPRITES[gi].icons.forEach(sy=>{ g+='<div class="icon-cell" style="font-size:22px">'+sy+'</div>'; }); $('sdGrid').innerHTML=g; showModal('spriteDetailMask'); }
+  let curSprite=0;
+  function selectSpriteGroup(gi){ curSprite=gi; toast('已切换雪碧图组：'+SPRITES[gi].name); renderIconData(); }
+
+  /* ===== 雪碧图组编辑/组合（从图标库勾选图标组成）===== */
+  let cmIdx=-1, cmSel=[], cmCat='全部';
+  function openSpriteCompose(gi){
+    cmIdx=gi; cmSel=[].concat(SPRITES[gi].icons); cmCat='全部';
+    $('composeTitle').textContent='编辑雪碧图组 · '+SPRITES[gi].name;
+    $('cmpName').value=SPRITES[gi].name;
+    renderCompose(); showModal('composeMask');
+  }
+  function openSpriteComposeNew(){
+    cmIdx=-1; cmSel=[]; cmCat='全部';
+    $('composeTitle').textContent='新建雪碧图组';
+    $('cmpName').value='';
+    renderCompose(); showModal('composeMask');
+  }
+  function renderCompose(){
+    // 所属项目
+    $('cmpProject').innerHTML = PROJECTS.map(function(p){ return '<option>'+p+'</option>'; }).join('');
+    if(cmIdx>-1 && SPRITES[cmIdx]){ const pi=PROJECTS.indexOf(SPRITES[cmIdx].project); if(pi>-1) $('cmpProject').selectedIndex=pi; }
+    // 分类 chips
+    $('cmpCats').innerHTML = ICON_CATS.map(function(c){
+      return '<span class="cat-chip'+(c===cmCat?' active':'')+'" onclick="composeCat(\''+c+'\')">'+c+'</span>';
+    }).join('');
+    // 图标格（按分类过滤 + 已勾选态）
+    let icons = ICONS;
+    if(cmCat!=='全部'){ const arr = CAT_ICON_MAP[cmCat]; if(arr && arr.length){ icons = ICONS.filter(function(ic){ return arr.indexOf(ic)>-1; }); } }
+    $('cmpGrid').innerHTML = icons.map(function(ic){
+      return '<div class="icon-cell'+(cmSel.indexOf(ic)>-1?' selected':'')+'" onclick="toggleComposeIcon(\''+ic+'\')" title="'+iconName(ic)+'">'+ic+'</div>';
+    }).join('') || '<div class="empty">该分类暂无图标</div>';
+    renderComposeSelected();
+  }
+  function composeCat(c){ cmCat=c; renderCompose(); }
+  function toggleComposeIcon(ic){
+    const i=cmSel.indexOf(ic);
+    if(i>-1) cmSel.splice(i,1); else cmSel.push(ic);
+    renderCompose();
+  }
+  function renderComposeSelected(){
+    $('cmpCount').textContent = cmSel.length;
+    $('cmpSelected').innerHTML = cmSel.length
+      ? cmSel.map(function(ic){
+          return '<div class="icon-cell" style="font-size:20px;width:44px;height:44px;cursor:pointer" onclick="toggleComposeIcon(\''+ic+'\')" title="'+iconName(ic)+' (点击移除)">'+ic+'</div>';
+        }).join('')
+      : '<div class="empty" style="padding:20px 0;font-size:12px;color:var(--text-3)">从左侧勾选图标加入组内，构成这组雪碧图。可点击已选图标移除。</div>';
+  }
+  function saveCompose(){
+    const name = ($('cmpName').value||'').trim() || (cmIdx>-1? SPRITES[cmIdx].name : '未命名雪碧图组');
+    const proj = $('cmpProject').value;
+    if(cmIdx>-1){
+      SPRITES[cmIdx].name=name; SPRITES[cmIdx].project=proj; SPRITES[cmIdx].icons=cmSel.slice();
+      toast('✅ 已保存雪碧图组「'+name+'」组成');
+    } else {
+      SPRITES.push({ id:'g'+Date.now(), name:name, project:proj, fromCat:'自定义', icons:cmSel.slice() });
+      toast('✅ 已新建雪碧图组「'+name+'」（'+cmSel.length+' 个图标）');
+    }
+    closeModal('composeMask'); renderTree(); renderData();
+  }
+  function uploadIcon(){ closeModal('uploadMask'); toast('✅ 图标已上传进图标库「自定义」分类'); }
+
+  /* 主按钮：样式→新建样式包；符号→图标库页签上传图标 / 雪碧图页签新建组 */
+  function updatePrimaryBtn(){
+    if(mtab==='style'){ $('btnPrimary').textContent='＋ 新建样式包'; }
+    else{ $('btnPrimary').textContent = (htab==='tree') ? '＋ 新建雪碧图组' : '＋ 上传图标'; }
+  }
+  function manageAction(){
+    if(mtab==='style') openCreateModal();
+    else if(htab==='tree') openSpriteComposeNew();
+    else showModal('uploadMask');
+  }
+  function primaryAction(){
+    if(mtab==='style') openCreateModal();
+    else if(htab==='tree') openSpriteComposeNew();
+    else showModal('uploadMask');
+  }
+
+  /* ============ toast ============ */
+  let toastTimer;
+  function toast(msg){
+    const t=$('toast'); t.textContent=msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+  }
+
+  /* ============ 初始化 ============ */
+  renderTree();
+  renderData();
+</script>
+</body>
+</html>
