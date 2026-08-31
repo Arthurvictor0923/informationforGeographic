@@ -4,9 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>要素图层编辑器 — 河图·地理信息平台</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
+<link rel="stylesheet" href="lib/leaflet/leaflet.css" />
+<script src="lib/leaflet/leaflet.js"></script>
+<script src="lib/leaflet/leaflet-heat.js"></script>
 <style>
 /* ============ 令牌 ============ */
 :root{
@@ -444,6 +444,11 @@ input[type=range]{flex:1;accent-color:var(--brand)}
               <div class="sc-label">📦 服务 <span class="sc-note">图层数据主体</span></div>
               <div class="sc-name" id="scDataName">🗺 中晚稻·地块服务</div>
               <div class="sc-from" id="scFromLine">📎 发布自数据资产 · 中晚稻监测</div>
+              <!-- 数据部分：描述「连接的数据资产」（数据名称见 scFromLine；此处补数据形态/数据组织） -->
+              <div id="scDataMeta" class="sc-meta-grid">
+                <div class="meta-line"><span class="k">数据形态</span><span id="dmShape">矢量面</span></div>
+                <div class="meta-line"><span class="k">数据组织</span><span id="dmOrg">单份数据</span></div>
+              </div>
               <div class="sc-tags" id="scTags">
                 <span class="tag-pill" id="scDataType">要素 · 面 · Polygon</span>
                 <span class="tag-pill">CGCS2000</span>
@@ -453,9 +458,6 @@ input[type=range]{flex:1;accent-color:var(--brand)}
               <div id="scRasterMeta" class="hidden sc-meta-grid">
                 <div class="meta-line"><span class="k">类型</span><span id="roType">—</span></div>
                 <div class="meta-line"><span class="k">坐标系</span><span id="roCrs">—</span></div>
-                <div class="meta-line"><span class="k">分辨率</span><span id="roRes">—</span></div>
-                <div class="meta-line"><span class="k">波段</span><span id="roBands">—</span></div>
-                <div class="meta-line"><span class="k">获取</span><span id="roDate">—</span></div>
                 <div class="meta-line"><span class="k">来源</span><span id="roSource">—</span></div>
               </div>
             </div>
@@ -2090,9 +2092,9 @@ const SERVICE_CATALOG = [
   { name: '道路·路网服务', type: 'WFS 要素服务', dataModel: '矢量', geometry: '线', count: '86 条道路', crs: 'CGCS2000', owner: '聂聪', icon: '〰', subject: '路网', role: '业务', timeSeries: false },
   { name: '作物长势·动态监测服务', type: 'WFS 要素服务', dataModel: '矢量', geometry: '面', count: '3,218 个要素', crs: 'CGCS2000', owner: '遥感监测科', icon: '🌿', subject: '长势区', role: '业务', timeSeries: true, defaultRange: ['2026-07-01', '2026-07-31'] },
   // ── 栅格服务（已发布·可预览）：栅格单张发布；时序栅格绑服务序列（sequenceId）；协议 = WMS / WMTS / WCS ──
-  { name: '遥感影像·建三江', type: 'WMS 影像服务', dataModel: '栅格', flavor: '影像', sensor: '多光谱', bands: 6, scenes: 8, crs: 'CGCS2000', owner: '遥感监测科', icon: '🛰', subject: '遥感影像', role: '业务', timeSeries: true, sequenceId: 'seq-jjs', resolution: '0.5 m', bandList: 'R/G/B/NIR/RedEdge/SWIR', dataType: 'UInt16', noData: 0, acquire: '2026-05-01 ~ 2026-08-20', source: '遥感监测科 · 建三江' },
-  { name: '土壤湿度·雷达', type: 'WMS 雷达服务', dataModel: '栅格', flavor: '雷达', bands: 4, scenes: 12, crs: 'CGCS2000', owner: '王磊', icon: '🛰', subject: '雷达影像', role: '业务', timeSeries: true, sequenceId: 'seq-radar', resolution: '10 m', bandList: 'HH/HV/VH/VV', dataType: 'Float32', noData: -9999, acquire: '2026 多期', source: '王磊 · 雷达' },
-  { name: 'DEM·地形晕渲', type: 'WMS 地形服务', dataModel: '栅格', flavor: '地形', bands: 1, scenes: 1, crs: 'CGCS2000', owner: '聂聪', icon: '🏔', subject: '地形晕渲', role: '业务', timeSeries: false, resolution: '12.5 m', bandList: '高程', dataType: 'Int16', noData: -32768, acquire: '2024', source: '聂聪 · DEM' },
+  { name: '遥感影像·建三江', type: 'WMS 影像服务', dataModel: '栅格', flavor: '影像', sensor: '多光谱', bands: 6, scenes: 8, crs: 'CGCS2000', owner: '遥感监测科', icon: '🛰', subject: '遥感影像', role: '业务', timeSeries: true, sequenceId: 'seq-jjs', resolution: '0.5 m', bandList: 'R/G/B/NIR/RedEdge/SWIR', dataType: 'UInt16', noData: 0, acquire: '2026-05-01 ~ 2026-08-20', source: '遥感监测科 · 建三江', assetOrg: '数据包 · 8 份' },
+  { name: '土壤湿度·雷达', type: 'WMS 雷达服务', dataModel: '栅格', flavor: '雷达', bands: 4, scenes: 12, crs: 'CGCS2000', owner: '王磊', icon: '🛰', subject: '雷达影像', role: '业务', timeSeries: true, sequenceId: 'seq-radar', resolution: '10 m', bandList: 'HH/HV/VH/VV', dataType: 'Float32', noData: -9999, acquire: '2026 多期', source: '王磊 · 雷达', assetOrg: '数据包 · 12 份' },
+  { name: 'DEM·地形晕渲', type: 'WMS 地形服务', dataModel: '栅格', flavor: '地形', bands: 1, scenes: 1, crs: 'CGCS2000', owner: '聂聪', icon: '🏔', subject: '地形晕渲', role: '业务', timeSeries: false, resolution: '12.5 m', bandList: '高程', dataType: 'Int16', noData: -32768, acquire: '2024', source: '聂聪 · DEM', assetOrg: '单份数据' },
 ];
 // 服务序列（独立模块，时序栅格在发布层绑定其一；要素图层按 sequenceId 引用）
 const SERVICE_SEQUENCES = {
@@ -2303,8 +2305,7 @@ function confirmServiceSelection() {
     if (isRaster) {
       scTags.innerHTML =
         '<span class="tag-pill">' + (d.flavor || '影像') + ' · ' + (d.timeSeries ? '时序序列' : '单张') + '</span>' +
-        '<span class="tag-pill">' + d.crs + '</span>' +
-        '<span class="tag-pill purple">' + (d.bands || '—') + ' 波段 · ' + d.resolution + '</span>';
+        '<span class="tag-pill">' + d.crs + '</span>';
     } else {
       const geom = d.geometry === '点' ? 'Point' : d.geometry === '线' ? 'Line' : 'Polygon';
       scTags.innerHTML =
@@ -2313,15 +2314,19 @@ function confirmServiceSelection() {
         '<span class="tag-pill purple" id="scDataCount">' + d.count + '</span>';
     }
   }
-  // 主体来源说明（修正“以服务为主体”误导：主体＝来自数据集的某一服务/某一期）
+  // 主体来源说明（栅格/矢量统一「发布自数据资产」；「数据集时序 · N 期」为已废除的"期"模型残留，2026-08-31 移除——栅格单张发布，时序由服务序列表达）
   const fromEl = $('scFromLine');
   if (fromEl) {
-    fromEl.innerHTML = isRaster
-      ? (d.timeSeries
-          ? '📎 数据集时序 · 共 ' + (d.scenes || '?') + ' 期（图层主体取其中一期服务）'
-          : '📎 发布自数据资产 · ' + (d.source || '本平台数据资产'))
-      : '📎 发布自数据资产 · ' + (d.source || '本平台数据资产');
+    fromEl.innerHTML = '📎 发布自数据资产 · ' + (d.source || '本平台数据资产');
   }
+  // 数据部分补充描述（连接的数据资产：数据形态 / 数据组织；数据名称见 scFromLine）
+  const dmShape = $('dmShape'), dmOrg = $('dmOrg');
+  if (dmShape) {
+    dmShape.textContent = isRaster
+      ? ((d.sensor ? d.sensor + '影像' : (d.flavor || '栅格')) + ' · ' + ((d.scenes && d.scenes > 1) ? d.scenes + ' 景' : '单景'))
+      : ('矢量' + (d.geometry || '面'));
+  }
+  if (dmOrg) dmOrg.textContent = d.assetOrg || '单份数据';
   const pds = $('propDataSource'); if (pds) pds.textContent = d.name;
 
   // ── 栅格：单张发布（2026-08-28 模型）；时序按 timeSeries 分派 ──
@@ -2342,7 +2347,7 @@ function confirmServiceSelection() {
       const frames = seq.frames || d.scenes || RASTER_SCENES.length;
       // 左列「样式模板」由服务序列带出：标注序列名
       const rspSeq = $('rspSeqLabel');
-      if (rspSeq) rspSeq.textContent = '样式管理预置 · ' + (seq.name || (d.scenes + ' 期')) + ' 带出';
+      if (rspSeq) rspSeq.textContent = '样式管理预置 · ' + (seq.name || (d.scenes + ' 帧')) + ' 带出';
       const rs = $('rasterScene'); if (rs) rs.max = Math.max(0, frames - 1);
       buildRasterTimeline(d, frames);
       showRasterTimeline();
@@ -2749,12 +2754,9 @@ function setRasterActive(i, openPanel) {
 /* ================= 栅格·属性信息卡 / 单张静态预览 / 时序播放 ================= */
 function fillRasterProps(d) {
   const set = function (id, v) { const e = $(id); if (e) e.textContent = v; };
-  // 关键字段合入顶部服务卡（#scRasterMeta）；仅展示类型/坐标系/分辨率/波段/获取/来源
+  // 关键字段合入顶部服务卡（#scRasterMeta）；分辨率/波段/获取时间目前取不到，2026-08-31 起不再展示，仅保留类型/坐标系/来源
   set('roType', (d.type || '栅格') + (d.timeSeries ? ' · 时序' : ' · 单张'));
   set('roCrs', d.crs || '—');
-  set('roRes', d.resolution || '—');
-  set('roBands', d.bandList || ((d.bands || '—') + ' 波段'));
-  set('roDate', d.acquire || '—');
   set('roSource', d.source || '—');
   const meta = $('scRasterMeta'); if (meta) meta.classList.remove('hidden');
 }
@@ -2876,8 +2878,10 @@ function applyUrlPreset() {
 function boot() {
   renderRasterStylePick();    // 左列「样式模板」卡 —— 由 RASTER_STYLE_TEMPLATES（样式管理预置）渲染
   renderBatchTpls();          // 批量绑定面板的模板卡
+  // 列表页带 ?svc= 进入时先加载服务（栅格单张/时序序列）——置于 initMap 之前，
+  // 保证即便 Leaflet 加载异常（CDN 不可达/本地化文件缺失），「卡片信息→编辑器内容」联动仍生效，只是底图区域留空。
+  applyUrlPreset();
   initMap();
-  applyUrlPreset();           // 列表页带 ?svc= 进入时，按服务直接加载（栅格单张/时序序列）
   applyFill(); applyBoundary(); applyLabel();
 }
 window.addEventListener('load', boot);
