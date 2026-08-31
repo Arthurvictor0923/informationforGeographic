@@ -130,8 +130,8 @@
   .lnk.danger{color:var(--c-danger);}
   .lnk.disabled{color:var(--text-4);cursor:not-allowed;}
 
-  /* 分页 */
-  .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 0 4px;flex-shrink:0;}
+  /* 分页（2026-08-31 统一：右下角右对齐） */
+  .pagination{display:flex;align-items:center;justify-content:flex-end;padding:12px 0 4px;flex-shrink:0;}
   .pg-info{font-size:13px;color:var(--text-2);}
   .pg-btns{display:flex;align-items:center;gap:4px;}
   .pg{min-width:30px;height:30px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;cursor:pointer;font-size:13px;color:var(--text);display:flex;align-items:center;justify-content:center;padding:0 8px;}
@@ -244,7 +244,7 @@
         <a href="数据资产.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
         </a>
-        <a href="地图服务.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+        <a href="地图服务-重设计.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg> 地图服务
         </a>
         <a href="要素图层.html" data-module="layer" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
@@ -252,10 +252,6 @@
         </a>
         <a href="专题地图.html" data-module="map" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 专题地图
-        </a>
-        <a href="制图规范原型.html" data-module="spec" class="nav-btn active px-3.5 h-16 text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M12 22a10 10 0 1 1 10-10c0 1.7-1.3 3-3 3h-2.5a2.5 2.5 0 0 0-1.9 4.1c.6.7.4 1.9-.6 1.9Z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="11" cy="7.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/></svg> 制图规范
-          <span class="active-bar"></span>
         </a>
         <a href="任务中心.html" data-module="task" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> 任务中心
@@ -334,13 +330,13 @@
         <div id="tableView" style="display:none"></div>
         <!-- 空态 -->
         <div class="empty" id="emptyBox" style="display:none"><div class="e-ic">🎨</div>暂无匹配样式包，点击右上角「新建」创建</div>
-        <!-- 分页 -->
+        <!-- 分页（2026-08-31 统一：始终显示 + 右下角；12 条样式包仅 1 页） -->
         <div class="pagination" id="pagination" style="display:none">
           <span class="pg-info">共 12 条</span>
           <div class="pg-btns">
-            <div class="pg" onclick="pg(-1)">‹ 上一页</div>
-            <div class="pg active">1</div><div class="pg">2</div>
-            <div class="pg" onclick="pg(1)">下一页 ›</div>
+            <div class="pg" style="opacity:.4;cursor:not-allowed">‹ 上一页</div>
+            <div class="pg active">1</div>
+            <div class="pg" style="opacity:.4;cursor:not-allowed">下一页 ›</div>
           </div>
         </div>
       </div>

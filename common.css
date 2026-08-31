@@ -41,6 +41,11 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* 全局缩放：80%，模拟浏览器从 100% 缩到 80% 的视觉比例 */
+  transform: scale(0.8);
+  transform-origin: top left;
+  width: 125%;              /* 1 / 0.8，补偿缩放导致的右侧留白 */
+  min-height: 125vh;        /* 补偿纵向，避免底部截断 */
 }
 
 /* ── 图标与文字同行（关键修复）─────────────────────────
@@ -78,6 +83,10 @@ svg { display: inline-block; vertical-align: middle; }
   border-color: #b4edcf;
 }
 .card-hover:active { transform: translateY(-1px); }
+
+/* 待发布视觉优先级：左侧琥珀强调边，让"待处理"一眼跳出（hover 亦保留） */
+.card-todo { border-color: #f5c142; box-shadow: 2px 2px 5px rgba(0,0,0,.05), inset 3px 0 0 #faad14; }
+.card-todo:hover { border-color: #f5c142; box-shadow: 2px 2px 5px rgba(0,0,0,.08), inset 3px 0 0 #faad14; }
 
 /* ── Step Indicator ─────────────────────────────────── */
 .step-dot { transition: all var(--transition); }
@@ -135,6 +144,7 @@ button:active { transform: scale(.98); }
    解决：高度不一致(29-41px)、过小难点、文字换行、主操作误用绿色等问题 */
 .btn {
   display: inline-flex;
+  box-sizing: border-box;
   align-items: center;
   justify-content: center;
   gap: 6px;
@@ -160,7 +170,7 @@ button:active { transform: scale(.98); }
 .btn-lg { height: 40px; padding: 0 20px; font-size: 14px; }
 
 /* 变体 */
-.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary { background: var(--brand); color: #fff; border-color: var(--brand); }
 .btn-primary:hover { background: var(--brand-hover); }
 .btn-primary:active { background: var(--brand-active); }
 .btn-default { background: #fff; color: var(--text); border-color: #d9d9d9; }
@@ -320,3 +330,150 @@ input[type="checkbox"]:focus {
 }
 .filter-select:hover { border-color: #2bbaa0; }
 .filter-select:focus { outline: none; border-color: #2bbaa0; }
+
+/* ── 统计胶囊（数据资产页：已发布服务 / 可发布）────────────── */
+.stat-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 11px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+  box-shadow: var(--shadow-xs);
+}
+.stat-pill-label { color: var(--text-muted); }
+.stat-pill-num { color: var(--text); font-weight: 600; font-size: 13px; }
+.stat-pill-accent { background: var(--brand-light); border-color: transparent; }
+.stat-pill-accent .stat-pill-num { color: var(--brand-active); }
+
+/* ── 视图切换分段控件（卡片 / 列表）──────────────────────── */
+.view-seg {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  gap: 2px;
+}
+.view-seg button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+}
+.view-seg button:hover { color: var(--brand-active); }
+.view-seg button.active {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.view-seg button.active:hover { background: var(--brand-hover); color: #fff; }
+
+/* ── 卡片选中态（批量选择）──────────────────────────────── */
+.card-selected {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px rgba(43,186,160,.45), 2px 2px 5px rgba(0,0,0,.06);
+}
+
+/* ── 列表视图数据表 ─────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.data-table thead th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #fafafa;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.data-table thead th.text-right { text-align: right; }
+.data-table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+.data-table tbody tr {
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.data-table tbody tr:hover { background: var(--bg-hover); }
+.row-selected, .row-selected:hover { background: var(--brand-light); }
+
+/* 状态胶囊：待发布=琥珀 / 测试=灰 / 已发布=品牌青 */
+.st-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.st-amber { background: var(--warning-light); color: #d48806; }
+.st-gray  { background: #fafafa; color: var(--text-muted); border: 1px solid var(--border); }
+.st-brand { background: var(--brand-light); color: var(--brand-active); }
+
+/* ── 按钮：幽灵/次按钮（列表内"查看"）────────────────────── */
+.btn-ghost { background: transparent; color: var(--text-secondary); border-color: transparent; }
+.btn-ghost:hover { background: var(--bg-hover); color: var(--text); }
+
+/* ── 批量操作条（浮动于底部居中）────────────────────────── */
+.batch-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 18px;
+  background: #1f2a28;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp .25s var(--transition);
+}
+.b-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font-size: 13px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+.b-btn:hover { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.4); }
+.b-danger { border-color: rgba(255,77,79,.5); color: #ff7875; }
+.b-danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+/* ── 分页当前页高亮（替代 precompiled tailwind 缺失的任意值类）── */
+.page-current { background: var(--brand-hover); color: #fff; font-weight: 500; }
+.page-current:hover { background: var(--brand-hover); color: #fff; }
+
+/* ── 要素图层创建向导：选中态（2026-08-26）── */
+.lw-svc-checked { background: #d7efe4; box-shadow: inset 0 0 0 1px #2bbaa0; }
+.lw-svc-checked:hover { background: #d7efe4; }

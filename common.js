@@ -4,7 +4,7 @@
    ============================================================ */
 
 // ── 跨页联动：模块 → 文件名映射 ────────────────────────
-const MODULE_FILES = { data: '数据资产', service: '地图服务', layer: '要素图层', map: '专题地图', task: '任务中心', spec: '制图规范原型' };
+const MODULE_FILES = { data: '数据资产', service: '地图服务-重设计', layer: '要素图层', map: '专题地图', symbol: '符号库', spec: '制图规范原型', task: '任务中心' };
 function goModule(m) {
   if (MODULE_FILES[m]) location.href = MODULE_FILES[m] + '.html';
 }
@@ -19,9 +19,12 @@ function openEditorPrototype() {
 
 // 要素图层编辑器：与专题地图编辑器分离的独立场景（08-14 解耦）。
 // 设计要素图层 → 打开「要素图层编辑器」（单一数据制图表达），不再复用专题图编辑器。
-function openLayerEditor(title) {
+function openLayerEditor(title, svc) {
   var url = '要素图层编辑器.html';
-  if (title) { try { url += '?layer=' + encodeURIComponent(title); } catch (e) {} }
+  var q = [];
+  if (svc) { try { q.push('svc=' + encodeURIComponent(svc)); } catch (e) {} }
+  if (title) { try { q.push('layer=' + encodeURIComponent(title)); } catch (e) {} }
+  if (q.length) url += '?' + q.join('&');
   window.open(url, '_blank');
 }
 
@@ -252,7 +255,7 @@ function removeModuleTip() {
 
 // ── Module Switching ────────────────────────────────────
 // ── 列表筛选状态（左侧数据组织 ↔ 右侧筛选 联动）────────
-let uiFilter = { tree: '*', treePath: '', kw: '', type: '全部', status: '全部', mine: false, formal: true, page: 1, serviceRole: '全部', source: '全部', crs: '全部' };
+let uiFilter = { tree: '*', treePath: '', kw: '', type: '全部', status: '全部', mine: false, formal: true, page: 1, view: 'card', serviceRole: '全部', source: '全部', crs: '全部' };
 
 // ── Pagination（规范 §4.10：居右「共 N 条」+ 页码 + 上/下页，当前页 #1cd6b4 底白字圆角 6px）──
 const PAGE_SIZE = 12;
@@ -261,7 +264,7 @@ function getPageCount(total) {
 }
 function renderPagination(total, page) {
   const totalPages = getPageCount(total);
-  if (totalPages <= 1) return '';
+  // 2026-08-31 统一分页：始终渲染（即使仅 1 页也显示「共 N 条」+ 页码，保持各页面分页器一致）
   const cur = Math.min(Math.max(1, page), totalPages);
   const nums = [];
   const push = p => { if (!nums.includes(p)) nums.push(p); };
@@ -273,7 +276,7 @@ function renderPagination(total, page) {
   let prev = 0;
   nums.forEach(p => {
     if (p - prev > 1) pages += '<span class="w-8 h-8 flex items-center justify-center text-gray-400 text-sm">…</span>';
-    pages += '<button onclick="gotoPage(' + p + ')" class="w-8 h-8 rounded-md text-sm flex items-center justify-center transition-colors ' + (p === cur ? 'bg-[#1cd6b4] text-white font-medium' : 'bg-white text-gray-700 hover:text-brand-hover hover:bg-brand-light border border-line') + '">' + p + '</button>';
+    pages += '<button onclick="gotoPage(' + p + ')" class="w-8 h-8 rounded-md text-sm flex items-center justify-center transition-colors ' + (p === cur ? 'page-current' : 'bg-white text-gray-700 hover:text-brand-hover hover:bg-brand-light border border-line') + '">' + p + '</button>';
     prev = p;
   });
   return '<span class="text-sm text-gray-500">共 ' + total + ' 条</span>'
@@ -357,9 +360,72 @@ const moduleTrees = {
         {name:'竞山水利', filter:'水利'},
         {name:'竞山自然资源', filter:'自然资源'},
       ]},
-    ]}
-  ]
+    ]},
+  ],
+  symbol: [
+    {name:'全部符号集', open:true, filter:'*', children:[
+      {name:'公共集池', filter:'公共集池'},
+      {name:'项目私有集', filter:'项目私有集'},
+      {name:'字体资源', filter:'字体资源'},
+    ]},
+    {name:'按分类', open:true, children:[
+      {name:'基础', filter:'基础'},
+      {name:'农业', filter:'农业'},
+      {name:'水利', filter:'水利'},
+      {name:'IoT', filter:'IoT'},
+    ]},
+  ],
 };
+
+// ── 服务序列（独立模块，08-28 决议 §三.5）──
+// ⚠️ 2026-08-31 用户拍板收敛：服务序列 = 一组制图样式模板的命名容器（≤3 个模板，其一为默认），
+// **不承载**期数/时间帧、播放排序、关联服务——时序语义由发布层（关联时间点）与制图端各自表达。
+// 下方内置常量中的 frames/dates/service/editorService/order 均为**遗留字段**，
+// 仅供 要素图层.html 向导「时序分支」旧渲染消费（N 期徽标 / 时间跨度 / 服务卡联动）；
+// 「服务序列管理.html」新建的序列不包含这些字段（见下方合并逻辑）。
+// 注：service = 平台服务卡标题（向导内用）；editorService = 要素图层编辑器 SERVICE_CATALOG 对应项。
+const SERVICE_SEQUENCES = {
+  'seq-jjs': {
+    name: '建三江遥感影像序列', frames: 8,
+    dates: ['2026-05-01','2026-05-15','2026-06-01','2026-06-15','2026-07-01','2026-07-15','2026-08-01','2026-08-15'],
+    service: '建三江遥感影像（时序）', editorService: '遥感影像·建三江',
+    defaultTpl: 'graded', desc: '作物长势分级专题 · 逐期 NDVI 分级色带'
+  },
+  'seq-radar': {
+    name: '土壤湿度雷达序列', frames: 12,
+    dates: ['2026-01-05','2026-02-05','2026-03-05','2026-04-05','2026-05-05','2026-06-05','2026-07-05','2026-08-05','2026-09-05','2026-10-05','2026-11-05','2026-12-05'],
+    service: '土壤湿度雷达（时序）', editorService: '土壤湿度·雷达',
+    defaultTpl: 'standard', desc: '土壤湿度标准影像 · 真彩 / 假彩合成'
+  },
+};
+
+// ── 服务序列管理（独立模块 · 2026-08-31 落地）──────────────────────
+// 「服务序列管理.html」由管理员在该页创建/维护序列（localStorage 持久化），
+// 此处启动时把自建序列**防御性合并**进 SERVICE_SEQUENCES 注册表：
+// 消费点 = 数据资产发布弹窗（时序栅格「绑定服务序列」下拉，只读 name）、
+//          要素图层创建向导（时序分支 lwGetSequences）等。
+// 新口径自建序列仅携带 name/desc/tpls/defaultTpl/owner/createdAt/builtin，
+// **不写入** frames/dates/service/editorService/order 等遗留字段。
+// ⚠️ 双源维护注意：要素图层编辑器.html 内另有一份 SERVICE_SEQUENCES（自包含），
+// 自建序列不会出现在编辑器内的时间轴（其数据来自编辑器本地常量），属已知边界。
+try {
+  const __hetuCustomSeqs = JSON.parse(localStorage.getItem('hetu_seq_custom') || '[]');
+  if (Array.isArray(__hetuCustomSeqs)) {
+    __hetuCustomSeqs.forEach(function (s) {
+      if (s && s.id && s.name && (s.tpls && s.tpls.length) && !SERVICE_SEQUENCES[s.id]) {
+        SERVICE_SEQUENCES[s.id] = {
+          name: s.name,
+          desc: s.desc || '',
+          tpls: s.tpls || [],
+          defaultTpl: s.defaultTpl || (s.tpls && s.tpls[0]) || 'standard',
+          owner: s.owner || '',
+          createdAt: s.createdAt || '',
+          builtin: false
+        };
+      }
+    });
+  }
+} catch (e) { /* localStorage 损坏时忽略，不影响页面渲染 */ }
 
 // 全局卡片存储（支持删除持久化）
 const moduleConfigs = {
@@ -368,13 +434,13 @@ const moduleConfigs = {
     cards: [
       {title:'行政村居民点',sub:'Excel 表格 · 1,284 条 · 2026-08-17 入库',tag:'表格数据',cat:'基础',type:'表格数据',fmt:'CSV/EXCEL',mine:true,status:'待发布',dataAssetType:'static',crs:'WGS84',geom:'point',thumb:'from-green-100 to-green-200',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'},
       {title:'建三江_大豆长势指数_2026夏',sub:'遥感影像 · GeoTIFF · 27.3 MB · 2026-07-31 拍摄',tag:'影像图片',cat:'遥感',type:'影像图片',fmt:'GeoTIFF',mine:true,status:'已发布',dataAssetType:'static',crs:'中国大地坐标',geom:'raster',svcCount:1,datasetFiles:[{f:'建三江_大豆长势指数_2026夏.tif',d:'2026-07-31',ver:'当前数据',rel:'覆盖',latest:true}],thumb:'from-brand-light to-brand/20',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg>'},
-      {title:'中晚稻_2025_wgs84',sub:'影像图片 · 已发布为服务',tag:'影像图片',cat:'遥感',type:'影像图片',fmt:'GeoTIFF',mine:false,status:'已发布',dataAssetType:'dynamic',crs:'WGS84',geom:'raster',svcCount:3,timeField:'采集时间',datasetFiles:[{f:'中晚稻_2025_0701.tif',d:'2026-07-01',ver:'第1期',rel:'时序'},{f:'中晚稻_2025_0715.tif',d:'2026-07-15',ver:'第2期',rel:'时序'},{f:'中晚稻_2025_0805.tif',d:'2026-08-05',ver:'第3期 · 最新',rel:'时序',latest:true}],thumb:'from-brand-light to-brand/20',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg>'},
+      {title:'中晚稻_2025_wgs84',sub:'影像图片 · 已发布为服务',tag:'影像图片',cat:'遥感',type:'影像图片',fmt:'GeoTIFF',mine:false,status:'已发布',crs:'WGS84',geom:'raster',svcCount:3,datasetFiles:[{f:'中晚稻_2025.gpkg',d:'2026-08-05',ver:'中晚稻_2025（栅格数据包）',isPackage:true,latest:true,children:[{f:'中晚稻_2025_0701.tif',d:'2026-07-01',ver:'2026-07-01'},{f:'中晚稻_2025_0715.tif',d:'2026-07-15',ver:'2026-07-15'},{f:'中晚稻_2025_0805.tif',d:'2026-08-05',ver:'2026-08-05',latest:true}]}],thumb:'from-brand-light to-brand/20',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg>'},
       {title:'二龙山农场_草地资源',sub:'数据库查询 · 已关联2个服务',tag:'数据库查询',cat:'耕地',type:'数据库查询',fmt:'DbSQL',mine:true,status:'已发布',dataAssetType:'static',crs:'中国大地坐标',svcCount:2,thumb:'from-orange-100 to-orange-200',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>'},
       {title:'宗地权属调查_2026Q3',sub:'数据库表 · 待发布',tag:'数据库表',cat:'耕地',type:'数据库表',fmt:'DbTable',mine:true,status:'待发布',dataAssetType:'static',crs:'中国大地坐标',svcCount:0,thumb:'from-cyan-100 to-cyan-200',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>'},
       {title:'鹤山农场_灌区水系_2026',sub:'数据库表 · 已发布 1 个服务',tag:'数据库表',cat:'水利',type:'数据库表',fmt:'DbTable',mine:false,status:'已发布',dataAssetType:'static',crs:'中国大地坐标',svcCount:1,thumb:'from-teal-100 to-teal-200',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>'},
       {title:'耕地承包经营权地块',sub:'矢量面 · GeoJSON · 已发布',tag:'矢量数据',cat:'耕地',type:'矢量数据',fmt:'GeoJSON',mine:true,status:'已发布',dataAssetType:'static',crs:'中国大地坐标',geom:'polygon',svcCount:1,thumb:'from-green-300 to-green-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>'},
       {title:'灌区骨干渠系中心线',sub:'矢量线 · SHP · 已发布',tag:'矢量数据',cat:'水利',type:'矢量数据',fmt:'SHP',mine:false,status:'已发布',dataAssetType:'static',crs:'中国大地坐标',geom:'line',svcCount:1,thumb:'from-cyan-300 to-cyan-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4 18 L9 12 L13 15 L20 6"/></svg>'},
-      {title:'作物种植地块_2026时序',sub:'矢量面 · 动态数据集 · 已发布',tag:'矢量数据',cat:'耕地',type:'矢量数据',fmt:'GeoJSON',mine:true,status:'已发布',dataAssetType:'dynamic',crs:'中国大地坐标',geom:'polygon',svcCount:2,timeField:'调查期',datasetFiles:[{f:'crop_plot_202604.shp',d:'2026-04-30',ver:'第1期',rel:'时序'},{f:'crop_plot_202607.shp',d:'2026-07-31',ver:'第2期',rel:'时序'},{f:'crop_plot_202608.shp',d:'2026-08-15',ver:'第3期 · 最新',rel:'时序',latest:true}],thumb:'from-brand-light to-brand/20',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>'},
+      {title:'作物种植地块_2026时序',sub:'矢量面 · 多份数据 · 已发布',tag:'矢量数据',cat:'耕地',type:'矢量数据',fmt:'GeoJSON',mine:true,status:'已发布',crs:'中国大地坐标',geom:'polygon',svcCount:2,datasetFiles:[{f:'crop_plot_202604.shp',d:'2026-04-30',ver:'2026-04-30'},{f:'crop_plot_202607.shp',d:'2026-07-31',ver:'2026-07-31'},{f:'crop_plot_202608.shp',d:'2026-08-15',ver:'2026-08-15',latest:true}],thumb:'from-brand-light to-brand/20',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>'},
       {title:'黑龙江耕地质量监测样点',sub:'Excel 表格 · 312 个采样点 · 2026-08-02 入库',tag:'表格数据',cat:'基础',type:'表格数据',fmt:'CSV/EXCEL',mine:true,status:'已发布',dataAssetType:'static',crs:'WGS84',geom:'point',svcCount:0,thumb:'from-green-100 to-green-200',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'},
       {title:'黑龙江林草资源分布',sub:'矢量面 · 国土三调 · 已发布',tag:'矢量数据',cat:'生态',type:'矢量数据',fmt:'GeoJSON',mine:false,status:'已发布',dataAssetType:'static',crs:'中国大地坐标',geom:'polygon',svcCount:1,thumb:'from-green-300 to-green-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>'},
     ]
@@ -398,6 +464,16 @@ const moduleConfigs = {
       ],tsActive:0},
       {title:'二龙山农场草地边界',sub:'WMS · 网络地图服务',tag:'WMS',cat:'遥感',type:'WMS',fmt:'WMS',mine:true,source:'平台发布',formal:true,serviceRole:'业务',assetRef:'二龙山农场_草地资源',thumb:'from-teal-300 to-teal-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg>',crs:'Web墨卡托'},
       {title:'实时地块权属（动态矢量瓦片）',sub:'实时 MVT · 平台发布 · 高频更新',tag:'REAL_MVT',cat:'耕地',type:'REAL_MVT',fmt:'REAL_MVT',mine:true,source:'平台发布',formal:true,serviceRole:'业务',health:'正常',crs:'中国大地坐标',assetRef:'耕地承包经营权地块',thumb:'from-orange-300 to-orange-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg>'},
+      {title:'建三江遥感影像（时序）',sub:'WMS · 遥感监测科发布 · 绑定服务序列（8 期）',tag:'WMS',cat:'遥感',type:'WMS',fmt:'WMS',mine:true,source:'平台发布',formal:true,serviceRole:'业务',assetRef:'建三江_大豆长势指数_2026夏',crs:'中国大地坐标',thumb:'from-emerald-300 to-emerald-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg>',timeSeries:[
+        {v:'2026-08-15',date:'2026-08-15',sub:'WMS · 第 8 期 · 遥感监测科发布'},
+        {v:'2026-08-01',date:'2026-08-01',sub:'WMS · 第 7 期 · 遥感监测科发布'},
+        {v:'2026-07-15',date:'2026-07-15',sub:'WMS · 第 6 期 · 遥感监测科发布'},
+      ],tsActive:0},
+      {title:'土壤湿度雷达（时序）',sub:'WMS · 王磊发布 · 绑定服务序列（12 期）',tag:'WMS',cat:'雷达',type:'WMS',fmt:'WMS',mine:true,source:'平台发布',formal:true,serviceRole:'业务',assetRef:'中晚稻_2025_wgs84',crs:'中国大地坐标',thumb:'from-sky-300 to-sky-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg>',timeSeries:[
+        {v:'2026-12-05',date:'2026-12-05',sub:'WMS · 第 12 期 · 王磊发布'},
+        {v:'2026-11-05',date:'2026-11-05',sub:'WMS · 第 11 期 · 王磊发布'},
+        {v:'2026-10-05',date:'2026-10-05',sub:'WMS · 第 10 期 · 王磊发布'},
+      ],tsActive:0},
     ]
   },
   layer: {
@@ -409,6 +485,9 @@ const moduleConfigs = {
       {title:'草稿_高标准农田图层',sub:'0 个表达层 · 草稿图层',tag:'基础',cat:'基础',type:'要素图层',svcCount:0,mine:true,thumb:'from-gray-100 to-gray-200',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',empty:true},
       {title:'鹤山农场_林草边界',sub:'被1个专题引用',tag:'基础',cat:'基础',type:'要素图层',svcCount:1,mine:true,thumb:'from-green-300 to-green-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 3h6"/><path d="M10 3v10l-5 7a1 1 0 0 0 .8 1.6h12.4a1 1 0 0 0 .8-1.6l-5-7V3"/></svg>'},
       {title:'灌溉水系组合',sub:'被2个专题引用 · 2026-06-20',tag:'水利',cat:'水利',type:'要素图层',svcCount:1,mine:true,thumb:'from-cyan-300 to-cyan-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>'},
+      {title:'建三江遥感影像图层',sub:'栅格时序 · 8 期（服务序列）',tag:'遥感',cat:'遥感',type:'要素图层',svc:'遥感影像·建三江',raster:'sequence',svcCount:8,mine:true,thumb:'from-emerald-300 to-emerald-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>'},
+      {title:'土壤湿度雷达图层',sub:'栅格时序 · 12 期（服务序列）',tag:'雷达',cat:'雷达',type:'要素图层',svc:'土壤湿度·雷达',raster:'sequence',svcCount:12,mine:true,thumb:'from-sky-300 to-sky-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>'},
+      {title:'地形晕渲DEM图层',sub:'栅格单张 · 地形晕渲',tag:'地形',cat:'地形',type:'要素图层',svc:'DEM·地形晕渲',raster:'single',svcCount:1,mine:true,thumb:'from-amber-300 to-amber-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>'},
     ]
   },
   map: {
@@ -438,6 +517,7 @@ function selectTree(filter, path) {
 
 function setKeyword(v) {
   uiFilter.kw = v;
+  uiFilter.page = 1;
   const pos = (() => { const el = document.getElementById('mainSearch'); return el ? el.selectionStart : null; })();
   document.getElementById('mainContent').innerHTML = renderMain(activeModule);
   const n = document.getElementById('mainSearch');
@@ -446,11 +526,13 @@ function setKeyword(v) {
 
 function setTypeFilter(v) {
   uiFilter.type = v;
+  uiFilter.page = 1;
   document.getElementById('mainContent').innerHTML = renderMain(activeModule);
 }
 
 function setOnlyMine(checked) {
   uiFilter.mine = checked;
+  uiFilter.page = 1;
   document.getElementById('mainContent').innerHTML = renderMain(activeModule);
 }
 
@@ -464,18 +546,21 @@ function setServiceRole(v) {
   uiFilter.serviceRole = v;
   uiFilter.tree = '*';
   uiFilter.treePath = '';
+  uiFilter.page = 1;
   document.getElementById('mainContent').innerHTML = renderMain(activeModule);
 }
 
 // ── 地图服务：来源筛选（平台发布 / 外部注册）─────────────
 function setSourceFilter(v) {
   uiFilter.source = v;
+  uiFilter.page = 1;
   document.getElementById('mainContent').innerHTML = renderMain(activeModule);
 }
 
 // ── 地图服务：坐标系筛选 ────────────────────────────────
 function setCrsFilter(v) {
   uiFilter.crs = v;
+  uiFilter.page = 1;
   document.getElementById('mainContent').innerHTML = renderMain(activeModule);
 }
 
@@ -554,11 +639,11 @@ function serviceTagsHTML(c) {
       title: '归属数据分类（服务继承自数据）'
     });
   }
-  // 时序期服务（条件，可能较长 → 优先收入标签集）
+  // 时序服务（条件，可能较长 → 优先收入标签集）
   if (c.timeSeries) {
     tags.push({
-      html: `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 font-medium border border-purple-200">${c.timeSeries.length} 期 · ${c.timeSeries[(c.tsActive || 0)].date}</span>`,
-      title: '期服务平铺：' + c.timeSeries.map(t => t.v + '(' + t.date + ')').join('、')
+      html: `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 font-medium border border-purple-200">${c.timeSeries.length} 份 · ${c.timeSeries[(c.tsActive || 0)].date}</span>`,
+      title: '服务按时间平铺：' + c.timeSeries.map(t => t.v + '(' + t.date + ')').join('、')
     });
   }
 
@@ -611,7 +696,9 @@ function toggleTagSet(btn, key) {
 function switchModule(m) {
   activeModule = m;
   filterOpen = false;
-  uiFilter = { tree: '*', treePath: '', kw: '', type: '全部', status: '全部', mine: false, formal: true, page: 1, serviceRole: '全部', source: '全部', crs: '全部' };
+  selectMode = false;
+  selectedSet.clear();
+  uiFilter = { tree: '*', treePath: '', kw: '', type: '全部', status: '全部', mine: false, formal: true, page: 1, view: 'card', serviceRole: '全部', source: '全部', crs: '全部' };
   // Update nav
   document.querySelectorAll('.nav-btn').forEach(b => {
     b.classList.remove('text-brand-hover', 'active');
@@ -819,9 +906,11 @@ function cardCover(c, m) {
 }
 
 function renderMain(m) {
+  if (m === 'symbol') return renderSymbolLibrary();
   const cfg = moduleConfigs[m];
   const cards = cfg.cards.filter(matchCard);
   cardReg = cards;
+  currentPageIdxs = [];
   const cfgTypes = [...new Set(cfg.cards.map(c => c.type))];
 
   return `<div class="flex-1 flex flex-col min-h-0">
@@ -830,6 +919,10 @@ function renderMain(m) {
         <h1 class="text-lg font-bold text-gray-900">${cfg.title}</h1>
         <span class="text-xs text-muted bg-gray-100 px-2.5 py-1 rounded-full font-medium">${cfg.subtitle}</span>
         <span class="text-xs text-gray-400">共 ${cfg.total} 条</span>
+        ${m === 'data' ? `<div class="flex items-center gap-2">
+          <span class="stat-pill"><span class="stat-pill-label">已发布服务</span><b class="stat-pill-num">${cards.filter(c => c.svcCount).length}</b></span>
+          <span class="stat-pill stat-pill-accent"><span class="stat-pill-label">可发布</span><b class="stat-pill-num">${cards.filter(c => !c.svcCount).length}</b></span>
+        </div>` : ''}
       </div>
       <div class="flex items-center gap-3">
         <div class="relative">
@@ -840,6 +933,14 @@ function renderMain(m) {
           <span>筛选</span>
           <svg class="filter-chev" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.52861 5.52876C3.78896 5.26841 4.21107 5.26841 4.47141 5.52876L8.00001 9.05735L11.5286 5.52876C11.789 5.26841 12.2111 5.26841 12.4714 5.52876C12.7318 5.78911 12.7318 6.21122 12.4714 6.47157L8.47141 10.4716C8.21107 10.7319 7.78896 10.7319 7.52861 10.4716L3.52861 6.47157C3.26826 6.21122 3.26826 5.78911 3.52861 5.52876Z" fill="currentColor" fill-opacity="0.88"/></svg>
         </button>
+        ${m === 'data' ? `
+        <div class="view-seg">
+          <button type="button" class="${uiFilter.view === 'card' ? 'active' : ''}" onclick="setView('card')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>卡片</button>
+          <button type="button" class="${uiFilter.view === 'list' ? 'active' : ''}" onclick="setView('list')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>列表</button>
+        </div>
+        <button type="button" onclick="toggleSelectMode()" class="px-3 py-1.5 border ${selectMode ? 'border-brand text-brand bg-brand-light' : 'border-line text-gray-600 hover:border-brand hover:text-brand-hover'} rounded-lg text-sm flex items-center gap-1.5 transition-all">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>${selectMode ? '退出批量' : '批量'}
+        </button>` : ''}
         <div class="h-5 w-px bg-gray-200"></div>
         <button onclick="${cfg.btnAction}" class="px-4 py-1.5 bg-brand hover:bg-brand-hover active:bg-brand-dark text-white rounded text-sm font-semibold flex items-center gap-1.5 transition-all shadow-sm hover:shadow-md active:scale-95">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -864,110 +965,204 @@ function renderMain(m) {
       </div>
     </div>
     <div class="flex-1 overflow-y-auto scroll-thin px-6 pb-6">
-      <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
-        ${cards.length ? cards.map((c, idx) => `
-          <div data-idx="${idx}" class="card-hover relative bg-panel rounded-lg overflow-hidden cursor-pointer group" onclick="openCardDetail(${idx})">
-            <div class="h-44 relative overflow-hidden card-thumb bg-[#eef4f2]">
-              ${cardCover(c, m)}
-              ${(m === 'map' || m === 'service') && getShare(c.title) && getShare(c.title).active ? `<div class="absolute top-2 left-2 z-10 flex items-center gap-1 bg-white/90 backdrop-blur-sm text-[10px] text-brand-dark font-medium px-2 py-0.5 rounded-full shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>已推送服务超市</div>` : ''}
-              <div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent"></div>
-              ${m === 'data' ? `
-              <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <button onclick="event.stopPropagation();updateCard('${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 更新</button>
-                <button onclick="event.stopPropagation();openPublishFor('${c.title}')" class="flex-1 px-3 py-1 bg-brand hover:bg-brand-hover text-white rounded text-xs font-medium shadow-sm transition-all hover:shadow-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/></svg> 发布</button>
-              </div>
-              ` : m === 'service' ? `
-              <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <button onclick="event.stopPropagation();copyServiceUrl('${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> 复制地址</button>
-                <button onclick="event.stopPropagation();openShareModal('${c.title}','service')" class="flex-1 px-3 py-1.5 bg-brand hover:bg-brand-hover text-white rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 共享</button>
-              </div>
-              ` : m === 'layer' ? `
-              <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <button onclick="event.stopPropagation();openLayerDesign('edit','${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg> 编辑</button>
-                <button onclick="event.stopPropagation();openLayerEditor('${c.title}')" class="flex-1 px-3 py-1 bg-brand hover:bg-brand-hover text-white rounded text-xs font-medium shadow-sm transition-all hover:shadow-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="13.5" cy="6.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".6" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".6" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".6" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/></svg> 设计</button>
-              </div>
-              ` : m === 'map' ? `
-              <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <button onclick="event.stopPropagation();openShareModal('${c.title}','map')" class="flex-1 px-2 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow inline-flex items-center justify-center gap-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg>共享</button>
-                <button onclick="event.stopPropagation();openMapDesign('edit','${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg> 编辑</button>
-                <button onclick="event.stopPropagation();openEditorPrototype()" class="flex-1 px-3 py-1 bg-brand hover:bg-brand-hover text-white rounded text-xs font-medium shadow-sm transition-all hover:shadow-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="13.5" cy="6.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".6" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".6" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".6" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/></svg> 设计</button>
-              </div>
-              ` : ''}
-            </div>
-            <div class="p-3.5">
-              <h3 class="font-semibold text-gray-900 truncate text-sm mb-2" title="${c.title}">${c.title}</h3>
-              <div class="flex items-center gap-2 text-xs text-muted">
-                ${m === 'data' ? `${statusChip(c.status)}<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-brand-light text-brand-dark font-medium border border-brand-light">${c.type}</span>${c.dataAssetType === 'dynamic' ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 font-medium border border-purple-200" title="动态数据集：一卡多份，按时序叠加，各期保留"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>时序 · ${(c.datasetFiles||[]).length || 3}份</span>` : `${c.datasetFiles && c.datasetFiles.length ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 font-medium border border-gray-200" title="静态数据：单份覆盖，更新即覆盖当前">覆盖</span>` : ''}`}<span class="truncate">${c.sub}</span>`
-                : m === 'service' ? serviceTagsHTML(c)
-                : m === 'layer' ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md ${c.svcCount === 0 ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : 'bg-brand-light text-brand-dark border border-brand-light'} font-medium" title="要素图层=单一数据制图表达（主体数据 + 辅助表达层）">${c.svcCount === 0 ? '暂无表达服务' : '单一数据 · ' + c.svcCount + ' 个表达层'}</span><span class="truncate">${c.sub}</span>`
-                : m === 'map' ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md ${c.layerCount === 0 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-brand-light text-brand border border-brand-light'} font-medium">包含${c.layerCount}个要素图层</span><span class="truncate">${c.sub}</span>`
-                : `<span>${c.sub}</span>`}
-              </div>
-            </div>
-            <!-- 卡片操作：详情 / 移动 / 删除 -->
-            <div class="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <button onclick="toggleCardMenu(event,'${idx}')" class="w-7 h-7 text-sm flex items-center justify-center bg-white/90 hover:bg-white rounded-lg font-medium shadow-sm border border-gray-200 hover:border-gray-300 hover:shadow transition-all" title="操作">⋯</button>
-              <div id="cardMenu-${idx}" class="card-menu hidden absolute right-0 top-full mt-1 w-32 bg-white border border-line rounded-lg shadow-lg py-1 z-30">
-                <button onclick="cardAction(event,'detail','${idx}')" class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 whitespace-nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> 查看详情</button>
-                ${m !== 'service' ? `<button onclick="cardAction(event,'move','${idx}')" class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 whitespace-nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 移动到</button>` : ''}
-                <button onclick="cardAction(event,'delete','${idx}')" class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-red-500 hover:bg-red-50 whitespace-nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> 删除</button>
-              </div>
-              <div id="cardConfirm-${idx}" class="card-confirm hidden absolute right-0 top-full mt-1 w-60 bg-white border border-red-200 rounded-lg shadow-lg p-3 z-30">
-                <div class="text-sm text-gray-800 mb-1">确认删除「<span class="font-medium">${c.title}</span>」？</div>
-                <div class="text-xs text-gray-400 mb-3">删除后不可恢复</div>
-                <div class="flex justify-end gap-2">
-                  <button onclick="closeCardConfirm(event,'${idx}')" class="px-3 py-1 text-xs border border-line rounded text-gray-600 hover:border-brand">取消</button>
-                  <button onclick="confirmDeleteCard(event,'${idx}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">确认删除</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `).join('') : (cfg.cards.length === 0 ? (m==='data' ? `
-          <div class="col-span-full text-center py-20">
-            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-brand-light to-brand-light flex items-center justify-center text-4xl shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg></div>
-            <div class="text-gray-800 font-semibold text-base mb-2">还没有上传数据</div>
-            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">这里是你存放所有空间数据的地方。上传 Excel 表格、卫星影像、地理数据文件——发布后变成在线地图服务。</div>
-            <button onclick="${cfg.btnAction}" class="px-4 py-1.5 text-sm bg-brand hover:bg-brand-hover text-white rounded font-medium transition-all shadow-sm hover:shadow-md active:scale-95"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 上传第一份数据</button>
-          </div>`
-        : m==='service' ? `
-          <div class="col-span-full text-center py-20">
-            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-brand-light to-brand-light flex items-center justify-center text-4xl shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg></div>
-            <div class="text-gray-800 font-semibold text-base mb-2">还没有可用的地图服务</div>
-            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">地图服务是在线可访问的地图图层。从「数据资产」上传并发布，或从外部服务器注册。</div>
-            <div class="flex items-center justify-center gap-3">
-              <button onclick="goModule('data')" class="px-5 py-2.5 text-sm border-2 border-gray-200 hover:border-brand text-gray-600 hover:text-brand-hover rounded-lg font-medium transition-all hover:shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 去上传数据</button>
-              <button onclick="${cfg.btnAction}" class="px-5 py-2.5 text-sm bg-brand hover:bg-brand-hover text-white rounded font-medium transition-all shadow-sm hover:shadow-md active:scale-95"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/><path d="M2 12h20"/></svg> 注册外部服务</button>
-            </div>
-          </div>`
-        : m==='layer' ? `
-          <div class="col-span-full text-center py-20">
-            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center text-4xl shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></div>
-            <div class="text-gray-800 font-semibold text-base mb-2">还没有要素图层</div>
-            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">要素图层是「单一数据的制图表达」——先选定一份主体数据，再组织它衍生的服务与标注/符号等辅助表达层。创建后可在专题地图中反复使用。</div>
-            <button onclick="${cfg.btnAction}" class="px-4 py-1.5 text-sm bg-brand hover:bg-brand-hover text-white rounded font-medium transition-all shadow-sm hover:shadow-md active:scale-95"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 创建第一个要素图层</button>
-          </div>`
-        : `
-          <div class="col-span-full text-center py-20">
-            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-brand-light to-brand-light flex items-center justify-center text-4xl shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg></div>
-            <div class="text-gray-800 font-semibold text-base mb-2">还没有专题地图</div>
-            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">专题地图是最终成品——一张图、大屏、驾驶舱。创建一张专题地图开始。</div>
-            <button onclick="${cfg.btnAction}" class="px-4 py-1.5 text-sm bg-brand hover:bg-brand-hover text-white rounded font-medium transition-all shadow-sm hover:shadow-md active:scale-95"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="13.5" cy="6.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".6" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".6" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".6" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/></svg> 创建专题地图</button>
-          </div>`
-        ) : `
-          <div class="col-span-full text-center py-20">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-lg bg-gray-100 flex items-center justify-center text-3xl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
-            <div class="text-gray-700 font-semibold text-base mb-1">没有符合条件的结果</div>
-            <div class="text-gray-400 text-sm mb-5">试试调整左侧分类、清空搜索词或更换筛选条件</div>
-            <button onclick="uiFilter={tree:'*',treePath:'',kw:'',type:'全部',mine:false};applyFilter()" class="px-5 py-2.5 text-sm text-brand bg-brand-light hover:bg-brand-50 border border-brand/20 rounded font-medium transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> 重置全部筛选</button>
-          </div>
-        `)}
-      </div>
-    </div>
+      ${renderContentArea(m, cards)}    </div>
     <div class="px-6 py-3 border-t border-gray-200 flex items-center justify-end gap-4 flex-shrink-0">
       ${renderPagination(cfg.total, uiFilter.page)}
     </div>
+    ${batchBarHTML()}
   </div>`;
 }
+
+/* ================= 符号库模块（独立资源层，与数据/服务资源并列） ================= */
+// 图标 SVG 源（全局素材池，对应前端 sprite 的图标资源）。真实符号库应使用 PNG sprite；此处以内联 SVG 做原型占位，真实引擎下即打包进雪碧图。
+const ICON_PATHS = {
+  hospital:'<path d="M12 2v20M2 12h20"/>',
+  sensor:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
+  pin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  dot:'<circle cx="12" cy="12" r="5"/>',
+  flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z M4 22V4"/>',
+  star:'<polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2"/>',
+  warning:'<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  building:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/>',
+  wheat:'<path d="M12 22V8M12 8c-2-2-5-1-6 1 2 0 4 1 6 2M12 8c2-2 5-1 6 1-2 0-4 1-6 2M12 12c-2-2-5-1-6 1 2 0 4 1 6 2M12 12c2-2 5-1 6 1-2 0-4 1-6 2"/>',
+  seedling:'<path d="M12 22V11M12 11C9 11 7 9 7 6c3 0 5 2 5 5M12 11c3-1 5-3 5-6-3 0-5 2-5 5"/>',
+  corn:'<path d="M12 22V6M9 6c0-3 6-3 6 0M10 10c-2 0-3 2-3 4 2 0 3-1 3-3M14 10c2 0 3 2 3 4-2 0-3-1-3-3"/>',
+  leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>',
+  tractor:'<path d="M3 15l2-7h6l3 4h4a2 2 0 0 1 2 2v3M3 15h15M3 15a3 3 0 1 0 0 .01M18 15a3 3 0 1 0 0 .01"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
+  rain:'<path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25M16 13l-4 6M8 13l-4 6"/>',
+  drop:'<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+  wave:'<path d="M2 8c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2M2 14c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2"/>',
+  faucet:'<path d="M3 9h4v8M7 13h6a3 3 0 0 0 3-3V9a2 2 0 0 1 2-2M16 9V6a2 2 0 0 1 4 0v3"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  factory:'<path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4H2z"/>',
+  wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-2.5z"/>',
+  fire:'<path d="M12 2c1 3 4 5 4 9a4 4 0 0 1-8 0c0-1 .5-2 1-3 .5 2 2 2 2 0 1-2 2-4 1-6z"/>',
+  valve:'<circle cx="12" cy="12" r="6"/><path d="M12 6v6l4 2M12 2v2M12 20v2"/>',
+  antenna:'<path d="M12 20v-8M8 12a4 4 0 0 1 8 0M5 9a8 8 0 0 1 14 0M2 6a12 12 0 0 1 20 0"/>',
+  satellite:'<path d="M13 7 17 3M14 8l2-2M5 13l4 4M3 15l6-6 4 4-6 6zM14 10a4 4 0 0 1 0 6"/>',
+  tower:'<path d="M12 2v20M5 7l7-3 7 3M4 12l8-4 8 4M6 17l6-4 6 4"/>',
+  bolt:'<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',
+  battery:'<rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2"/>',
+  chart:'<path d="M3 3v18h18M7 15l4-4 3 3 5-6"/>',
+  flask:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>',
+  wifi:'<path d="M5 12.5a10 10 0 0 1 14 0M8 15.5a6 6 0 0 1 8 0M2 9.5a14 14 0 0 1 20 0"/><circle cx="12" cy="19" r="1"/>'
+};
+function iconSVG(name, size, color){
+  const p = ICON_PATHS[name] || '<circle cx="12" cy="12" r="4"/>';
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="' + (color || 'currentColor') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:' + (size || '1.2em') + ';height:' + (size || '1.2em') + ';vertical-align:-0.125em;flex-shrink:0">' + p + '</svg>';
+}
+
+// 符号库（独立资源层）数据源：符号集（sprite set）= 公共集池 + 项目私有集；图标源 = 全局素材池（按分类）；字体 = PBF glyphs
+const SYMBOL_LIBRARY = {
+  spriteSets: [
+    { id:'std', name:'标准符号集', scope:'公共集池', project:'平台', category:'基础', icons:['hospital','sensor','pin','dot','flag','star','warning','building'], status:'已发布', desc:'平台预置通用图标，覆盖基础点线面' },
+    { id:'agri', name:'农业符号集', scope:'公共集池', project:'平台', category:'农业', icons:['wheat','seedling','corn','leaf','tractor','drop','sun','rain'], status:'已发布', desc:'农业主题图标' },
+    { id:'crop', name:'作物专用符号集', scope:'公共集池', project:'平台', category:'农业', icons:['wheat','corn','leaf','seedling','tractor','sun','drop','rain'], status:'已发布', desc:'作物专题图标' },
+    { id:'water', name:'水利符号集', scope:'项目私有集', project:'建三江分公司', category:'水利', icons:['drop','wave','faucet','gear','factory','wrench','fire','valve'], status:'已发布', desc:'建三江定制' },
+    { id:'monitor', name:'监测符号集', scope:'项目私有集', project:'建三江分公司', category:'IoT', icons:['antenna','satellite','pin','tower','bolt','battery','chart','flask'], status:'草稿', desc:'物联监测定制（编辑中）' }
+  ],
+  iconPool: {
+    '基础': ['hospital','sensor','pin','dot','flag','star','warning','building'],
+    '农业': ['wheat','seedling','corn','leaf','tractor','sun','rain','drop'],
+    '水利': ['drop','wave','faucet','gear','factory','wrench','fire','valve'],
+    'IoT': ['antenna','satellite','tower','bolt','battery','chart','flask','wifi']
+  },
+  fonts: [
+    { id:'noto-sans-sc', name:'Noto Sans SC', style:'常规 / 粗体', status:'已发布', used: 12 },
+    { id:'source-han-sans', name:'Source Han Sans', style:'常规', status:'已发布', used: 5 }
+  ]
+};
+
+let symbolTab = 'set';
+let symbolSetPage = 1; // 符号集分页（2026-08-31 统一分页器：右下角 + 始终显示）
+function renderSpriteSetCard(s){
+  const scopeColor = s.scope === '公共集池' ? 'bg-brand-light text-brand' : 'bg-amber-50 text-amber-700';
+  const statusColor = s.status === '已发布' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500';
+  const icons = s.icons.map(function(n){ return '<span class="w-9 h-9 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-brand">' + iconSVG(n,'1.1em') + '</span>'; }).join('');
+  return '<div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">' +
+    '<div class="flex items-start justify-between"><div><div class="font-semibold text-gray-900">' + s.name + '</div>' +
+    '<div class="text-xs text-gray-400 mt-0.5">' + s.project + ' · ' + s.category + '</div></div>' +
+    '<div class="flex flex-col items-end gap-1"><span class="text-[10px] px-2 py-0.5 rounded-full ' + scopeColor + '">' + s.scope + '</span>' +
+    '<span class="text-[10px] px-2 py-0.5 rounded-full ' + statusColor + '">' + s.status + '</span></div></div>' +
+    '<div class="flex flex-wrap gap-1.5 mt-3">' + icons + '</div>' +
+    '<div class="flex items-center justify-between mt-3 text-xs text-gray-500"><span>' + s.icons.length + ' 图标 · 取材 ' + s.category + '</span>' +
+    '<button onclick="showNotification(\'\',\'查看 ' + s.name + ' 组成（从图标库勾选）\')" class="text-brand hover:underline">查看 / 编辑</button></div></div>';
+}
+function renderIconPool(){
+  const cats = Object.keys(SYMBOL_LIBRARY.iconPool);
+  let html = cats.map(function(cat){
+    const grid = SYMBOL_LIBRARY.iconPool[cat].map(function(n){
+      return '<span class="w-10 h-10 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-brand hover:border-brand cursor-pointer" title="' + n + '" onclick="showNotification(\'\',\'已选图标 ' + n + '（可加入项目符号集）\')">' + iconSVG(n,'1.2em') + '</span>';
+    }).join('');
+    return '<div class="mb-5"><div class="text-sm font-semibold text-gray-700 mb-2">' + cat + '</div><div class="flex flex-wrap gap-2">' + grid + '</div></div>';
+  }).join('');
+  html += '<div class="mt-2"><button onclick="showNotification(\'\',\'打开上传图标（SVG 校验：viewbox 与宽高一致、避免 defs class）\')" class="px-4 py-1.5 border border-brand text-brand rounded text-sm">＋ 上传图标</button></div>';
+  return html;
+}
+function renderFontList(){
+  let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' + SYMBOL_LIBRARY.fonts.map(function(f){
+    const c = f.status === '已发布' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500';
+    return '<div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex items-center justify-between"><div><div class="font-semibold text-gray-900">' + f.name + '</div>' +
+      '<div class="text-xs text-gray-400 mt-0.5">' + f.style + ' · 被 ' + f.used + ' 个符号集引用</div></div>' +
+      '<span class="text-[10px] px-2 py-0.5 rounded-full ' + c + '">' + f.status + '</span></div>';
+  }).join('') + '</div>';
+  html += '<div class="mt-3 text-xs text-gray-400">字体为 PBF glyphs（文本标注必需），与符号集并列挂载于渲染服务。多源 sprite 可叠加（style 的 sprite 支持数组）。</div>';
+  return html;
+}
+function renderSymbolLibrary(){
+  const sets = SYMBOL_LIBRARY.spriteSets;
+  const list = sets.filter(function(s){ return !uiFilter.kw || s.name.indexOf(uiFilter.kw) >= 0 || s.category.indexOf(uiFilter.kw) >= 0; });
+  const tabBtn = function(id, label){
+    return '<button onclick="symbolTab=\'' + id + '\';document.getElementById(\'mainContent\').innerHTML=renderSymbolLibrary()" class="px-4 py-2 text-sm font-medium rounded-lg ' + (symbolTab === id ? 'bg-brand text-white' : 'text-gray-600 hover:bg-gray-100') + '">' + label + '</button>';
+  };
+  // 符号集分页（右下角，始终显示；统一分页器 2026-08-31）
+  const SYM_PAGE_SIZE = 6;
+  const totalPages = Math.max(1, Math.ceil(list.length / SYM_PAGE_SIZE));
+  if (symbolSetPage > totalPages) symbolSetPage = totalPages;
+  const pagerHTML = function(){
+    const cur = symbolSetPage;
+    const nums = [];
+    const push = p => { if (!nums.includes(p)) nums.push(p); };
+    push(1);
+    for (let p = cur - 2; p <= cur + 2; p++) if (p >= 1 && p <= totalPages) push(p);
+    push(totalPages);
+    nums.sort((a, b) => a - b);
+    let btns = '';
+    let prev = 0;
+    nums.forEach(p => {
+      if (p - prev > 1) btns += '<span class="w-8 h-8 flex items-center justify-center text-gray-400 text-sm">…</span>';
+      btns += '<button onclick="symbolSetPage=' + p + ';document.getElementById(\'mainContent\').innerHTML=renderSymbolLibrary()" class="w-8 h-8 rounded-md text-sm flex items-center justify-center transition-colors ' + (p === cur ? 'page-current' : 'bg-white text-gray-700 hover:text-brand-hover hover:bg-brand-light border border-line') + '">' + p + '</button>';
+      prev = p;
+    });
+    return '<div class="px-6 py-3 border-t border-gray-200 flex items-center justify-end gap-4 flex-shrink-0">'
+      + '<span class="text-sm text-gray-500">共 ' + list.length + ' 个符号集</span>'
+      + '<div class="flex items-center gap-1">'
+      + '<button onclick="symbolSetPage=' + (cur - 1) + ';document.getElementById(\'mainContent\').innerHTML=renderSymbolLibrary()" ' + (cur === 1 ? 'disabled' : '') + ' class="w-8 h-8 rounded-md text-sm flex items-center justify-center text-gray-500 hover:text-brand-hover hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">‹</button>'
+      + btns
+      + '<button onclick="symbolSetPage=' + (cur + 1) + ';document.getElementById(\'mainContent\').innerHTML=renderSymbolLibrary()" ' + (cur === totalPages ? 'disabled' : '') + ' class="w-8 h-8 rounded-md text-sm flex items-center justify-center text-gray-500 hover:text-brand-hover hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">›</button>'
+      + '</div></div>';
+  };
+  let body = '';
+  if (symbolTab === 'set') {
+    const slice = list.slice((symbolSetPage - 1) * SYM_PAGE_SIZE, symbolSetPage * SYM_PAGE_SIZE);
+    body = '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">' + slice.map(renderSpriteSetCard).join('') + '</div>';
+  }
+  else if (symbolTab === 'icon') body = renderIconPool();
+  else body = renderFontList();
+  return '<div class="flex-1 flex flex-col min-h-0">' +
+    '<div class="px-6 pt-6 pb-4 flex items-center justify-between flex-shrink-0"><div class="flex items-center gap-3">' +
+    '<h1 class="text-lg font-bold text-gray-900">符号库</h1>' +
+    '<span class="text-xs text-muted bg-gray-100 px-2.5 py-1 rounded-full font-medium">图标 + 字体资产</span>' +
+    '<span class="text-xs text-gray-400">共 ' + sets.length + ' 个符号集</span></div>' +
+    '<button onclick="showNotification(\'\',\'已打开新建符号集向导（从图标库勾选组合）\')" class="px-4 py-1.5 bg-brand hover:bg-brand-hover active:bg-brand-dark text-white rounded text-sm font-semibold flex items-center gap-1.5 transition-all shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> 新建符号集</button></div>' +
+    '<div class="px-6 flex gap-2 border-b border-gray-100">' + tabBtn('set','符号集') + tabBtn('icon','图标源') + tabBtn('font','字体资源') + '</div>' +
+    '<div class="flex-1 overflow-y-auto scroll-thin px-6 py-5"><div id="symbolBody">' + body + '</div>' +
+    '<div class="mt-6 p-4 rounded-xl bg-brand-light/40 border border-brand/20 text-sm text-gray-600">' +
+    '<b class="text-brand">后端编译说明</b>：雪碧图（sprite）由所选 SVG 图标经后端编译生成（sprite.png + sprite.json + @2x），产物入 CDN 并强缓存。公共集池由平台预置；项目私有集在保存符号集时由后端一次性编译。专题图 / 要素图层仅<b>引用</b> sprite（style 写 icon-image），<b>不在渲染时生成</b>。' +
+    '</div></div>' +
+    (symbolTab === 'set' ? pagerHTML() : '') +
+    '</div>';
+}
+
+// 自动注入「符号库」顶级导航 tab —— ⚠️ 2026-08-31 屏蔽：符号库入口暂不展示，保留函数以便后续恢复
+function ensureSymbolNav(){
+  const nav = document.getElementById('topNav');
+  if (!nav) return;
+  if (nav.querySelector('[data-module="symbol"]')) return;
+  const a = document.createElement('a');
+  a.href = '符号库.html';
+  a.setAttribute('data-module', 'symbol');
+  a.className = 'nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5';
+  a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg> 符号库';
+  nav.appendChild(a);
+}
+// ensureSymbolNav(); // 2026-08-31 屏蔽：符号库入口暂不展示（恢复时取消注释即可）
+
+// ── 服务序列导航入口（2026-08-31 新增 · 仅管理员可见）────────────────
+// 「服务序列」为管理员专属模块（管理员可管理，所有用户可查看）：
+// 登录身份为管理员时向 #topNav 追加「服务序列」tab，否则不渲染（权限门控）。
+// 角色存 localStorage（hetu_role，默认 admin 便于演示走查），在「服务序列管理.html」
+// 顶部的身份切换按钮切换；其他已打开页面需硬刷新（Ctrl+Shift+R）后生效。
+// ⚠️ 地图服务-重设计.html 不引用 common.js，其 nav 注入由该页内联脚本同源实现。
+function getHetuRole() {
+  try { return localStorage.getItem('hetu_role') || 'admin'; } catch (e) { return 'admin'; }
+}
+function setHetuRole(role) {
+  try { localStorage.setItem('hetu_role', role === 'admin' ? 'admin' : 'user'); } catch (e) {}
+}
+function ensureSeqNav() {
+  if (getHetuRole() !== 'admin') return;
+  const nav = document.getElementById('topNav');
+  if (!nav || nav.querySelector('[data-module="seq"]')) return;
+  const a = document.createElement('a');
+  a.href = '服务序列管理.html';
+  a.setAttribute('data-module', 'seq');
+  a.className = 'nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5';
+  a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg> 服务序列';
+  nav.appendChild(a);
+}
+ensureSeqNav(); // 登录身份为管理员时注入「服务序列」导航 tab（业务人员不可见）
 
 function closeWizard(id) {
   document.getElementById(id).classList.add('hidden');
@@ -975,6 +1170,11 @@ function closeWizard(id) {
 
 // ── 卡片操作：详情 / 移动 / 删除 ───────────────────────
 let cardReg = [];
+// 批量选择状态（仅 data 模块启用选择模式）
+let selectMode = false;
+let selectedSet = new Set();
+let currentPageIdxs = [];
+let batchMoveFlag = false;
 let dtCard = null, dtModule = null;
 
 function switchDetailTab(idx) {
@@ -1124,22 +1324,47 @@ function updateDetailActions(card, m, tabIdx) {
   document.getElementById('dtActions').innerHTML = actionsHTML;
 }
 
-// 数据集内文件清单：一卡多份数据的覆盖/时序关系 + 版本标记
+// 数据集内文件清单：与「更新弹窗」同一口径——按「一份数据 / 多份数据」判定（2026-08-31 03:02 用户口径）
+//   一份 → 更新时不提供选择、默认选中；多份 → 更新时提供数据列表供选择。
+//   数据包本身不作为可选层级，其内部的每份数据直接计入（不再下钻）。
 function renderDatasetFiles(card) {
   const files = card.datasetFiles;
   if (!files || !files.length) return '';
-  const isDynamic = card.dataAssetType === 'dynamic';
-  const title = isDynamic ? '数据集内数据（时序叠加）' : '数据集内数据（覆盖更新）';
-  const hint = isDynamic
-    ? '按时序堆积的多份数据，各期保留、支持时间轴播放'
-    : '每份数据彼此覆盖，仅保留最新一份生效';
-  const rows = files.map((ft, fi) => `
-    <div class="flex items-center gap-2 py-1.5 border-b border-gray-100 last:border-0">
-      <span class="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 ${ft.latest ? 'bg-brand-light text-brand-dark' : 'bg-gray-100 text-gray-400'} text-xs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
-      <span class="text-xs text-gray-700 font-mono flex-1 truncate" title="${ft.f}">${ft.f}</span>
-      <span class="text-[10px] text-gray-400">${ft.d || ''}</span>
-      <span class="text-[10px] px-1.5 py-0.5 rounded-md font-medium ${ft.rel === '时序' ? 'bg-purple-50 text-purple-700 border border-purple-200' : ft.latest ? 'bg-brand-light text-brand-dark border border-brand-light' : 'bg-gray-100 text-gray-600 border border-gray-200'}">${ft.ver}</span>
-    </div>`).join('');
+  const hasPkg = files.some(f => f.isPackage || (f.children && f.children.length));
+  // 扁平份数：含子数据的按其子数据计，普通项按 1 计
+  const flatCount = files.reduce((n, f) => n + (((f && f.children) || []).length || 1), 0);
+  const multi = flatCount > 1;
+  const title = multi
+    ? (hasPkg ? '数据包（' + flatCount + ' 份数据）' : '多份数据（' + flatCount + ' 份）')
+    : '数据（1 份）';
+  const hint = multi
+    ? '该数据含 ' + flatCount + ' 份数据；更新时需从数据列表中选择要操作的那份数据。时间属性由发布服务时界定。'
+    : '该数据仅一份，更新时默认选中，无需选择。';
+  const pkgIcon = '<span class="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 bg-purple-50 text-purple-600 text-xs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg></span>';
+  const fileIcon = (latest) => '<span class="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 ' + (latest ? 'bg-brand-light text-brand-dark' : 'bg-gray-100 text-gray-400') + ' text-xs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>';
+  const rows = files.map((ft, fi) => {
+    const isPkg = !!(ft.isPackage || (ft.children && ft.children.length));
+    const icon = isPkg ? pkgIcon : fileIcon(ft.latest);
+    const kids = isPkg && ft.children
+      ? ft.children.map(k => `
+        <div class="flex items-center gap-2 py-1 pl-10 border-b border-gray-100 last:border-0">
+          <span class="w-4 h-4 rounded flex items-center justify-center flex-shrink-0 ${k.latest ? 'bg-brand-light text-brand-dark' : 'bg-gray-100 text-gray-400'} text-[9px]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:0.7em;height:0.7em;vertical-align:-0.125em"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg></span>
+          <span class="text-[11px] text-gray-600 font-mono flex-1 truncate" title="${k.f}">${k.f}</span>
+          <span class="text-[10px] text-gray-400">${k.d || ''}</span>
+          <span class="text-[10px] px-1 py-0.5 rounded ${k.latest ? 'bg-brand-light text-brand-dark' : 'bg-white text-gray-500'}">${k.ver}</span>
+        </div>`).join('')
+      : '';
+    return `
+    <div class="py-1.5 border-b border-gray-100 last:border-0">
+      <div class="flex items-center gap-2">
+        ${icon}
+        <span class="text-xs text-gray-700 font-mono flex-1 truncate" title="${ft.f}">${ft.f}</span>
+        <span class="text-[10px] text-gray-400">${ft.d || ''}</span>
+        <span class="text-[10px] px-1.5 py-0.5 rounded-md font-medium ${isPkg ? 'bg-purple-50 text-purple-700 border border-purple-200' : ft.latest ? 'bg-brand-light text-brand-dark border border-brand-light' : 'bg-gray-100 text-gray-600 border border-gray-200'}">${isPkg ? '数据包' : (ft.ver || '数据')}</span>
+      </div>
+      ${kids}
+    </div>`;
+  }).join('');
   return `<div class="border-t border-line pt-3 mt-3">
     <div class="flex items-center gap-2 mb-1">
       <span class="text-xs font-semibold text-gray-700">数据集内文件</span>
@@ -1148,7 +1373,7 @@ function renderDatasetFiles(card) {
     <div class="bg-gray-50 rounded-lg p-2">
       ${rows}
     </div>
-    <div class="text-[10px] text-gray-400 mt-1.5">${hint} — ${isDynamic ? '共享按数据集整体进行（不允许只共享一期）' : '更新即覆盖上一份'}</div>
+    <div class="text-[10px] text-gray-400 mt-1.5">${hint}</div>
   </div>`;
 }
 
@@ -1184,17 +1409,9 @@ function renderDetailInfo(card, m) {
     ${renderDatasetFiles(card)}
     <div class="border-t border-line pt-3 mt-3"><span class="text-xs font-semibold text-gray-700">时间信息</span></div>
     <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs mt-1">
-      ${card.dataAssetType === 'dynamic' ? `
-        <div class="col-span-2 mb-1"><span class="text-purple-600 font-medium">⏱ 动态数据集</span> <span class="text-gray-500">— 增量版本化存储，每期独立服务</span></div>
-        <div><span class="text-gray-400">时间属性</span> <span class="text-gray-700 ml-2">${card.timeField || '采集时间'}</span></div>
-        <div><span class="text-gray-400">已存期数</span> <span class="text-gray-700 ml-2">3 期</span></div>
-        <div><span class="text-gray-400">最近一期</span> <span class="text-gray-700 ml-2">2026-08-05</span></div>
-        <div><span class="text-gray-400">下一期计划</span> <span class="text-gray-700 ml-2">2026-08-12（自动发布）</span></div>
-        <div class="col-span-2 mt-1.5"><button onclick="openMapViewer('${card.title}','data')" class="px-3 py-1.5 bg-purple-50 border border-purple-200 text-purple-700 hover:bg-purple-100 rounded-lg text-xs font-medium inline-flex items-center gap-1.5 transition-colors"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 打开时间轴预览（播放各期变化）</button></div>
-      ` : `
-        <div><span class="text-gray-400">创建时间</span> <span class="text-gray-700 ml-2">2026-07-31 11:29:30</span></div>
-        <div><span class="text-gray-400">更新时间</span> <span class="text-gray-700 ml-2">2026-07-31 11:35:01</span></div>
-      `}
+      <div><span class="text-gray-400">创建时间</span> <span class="text-gray-700 ml-2">2026-07-31 11:29:30</span></div>
+      <div><span class="text-gray-400">更新时间</span> <span class="text-gray-700 ml-2">2026-07-31 11:35:01</span></div>
+      ${card.timeEnabled ? `<div class="col-span-2 mt-1 text-gray-500">该数据已发布过含时间维度的服务（时序由发布界定）</div>` : ''}
     </div>`;
   } else if (m === 'service') {
     html = `
@@ -1299,15 +1516,6 @@ function renderDetailInfo(card, m) {
       <div class="flex-1"><div class="text-gray-800 font-medium">${card.layerCount === 0 ? '未配置图层' : '耕地种植监测组合'}</div><div class="text-gray-400">服务数量:${card.layerCount || 0}</div></div>
       <span class="text-gray-400 cursor-pointer">⟩</span>
     </div>
-    <div class="border-t border-line pt-3 mt-3"><span class="text-xs font-semibold text-gray-700">时序组件</span></div>
-    <div class="flex items-center gap-2 text-xs bg-purple-50 border border-purple-200 rounded-lg p-3 mt-1">
-      <span class="text-purple-600"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-      <div class="flex-1">
-        <div class="text-gray-800 font-medium">已挂载时序组件 <span class="text-gray-400 font-normal">（时序双层呈现：数据层动态数据集 + 专题图时序组件）</span></div>
-        <div class="text-gray-500 mt-0.5">画布顶部时间轴 + 播放，跨图层编排各期数据变化</div>
-      </div>
-      <button onclick="showNotification('<svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' style=\'width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0\'><circle cx=\'12\' cy=\'12\' r=\'10\'/><polyline points=\'12 6 12 12 16 14\'/></svg>','时序组件配置（模拟）：绑定动态数据集期数、时间轴粒度、默认起始期')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-medium flex-shrink-0 transition-colors">配置</button>
-    </div>
     <div class="border-t border-line pt-3 mt-3"><span class="text-xs font-semibold text-gray-700">时间信息</span></div>
     <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs mt-1">
       <div><span class="text-gray-400">创建时间</span> <span class="text-gray-700 ml-2">2026-07-28 13:52:21</span></div>
@@ -1370,8 +1578,16 @@ function openMoveModal(title) {
 
 function doMove(e, btn) {
   e.stopPropagation();
-  const title = document.getElementById('mvTitle').textContent;
   const target = btn.textContent.trim();
+  if (batchMoveFlag) {
+    const n = selectedSet.size;
+    batchMoveFlag = false;
+    closeWizard('moveModal');
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg>', '「' + n + ' 项数据」已移动到「' + target + '」');
+    clearSelection();
+    return;
+  }
+  const title = document.getElementById('mvTitle').textContent;
   closeWizard('moveModal');
   showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg>', '「' + title + '」已移动到「' + target + '」');
 }
@@ -1554,7 +1770,7 @@ function openMapViewer(title, moduleOverride) {
   }
   const shareBtn = document.getElementById('mvShareBtn');
   if (shareBtn) shareBtn.classList.toggle('hidden', m !== 'map');
-  // 动态数据集：显示时间轴 + 播放（时序双层，前端时间轴）
+  // 时序数据：显示时间轴 + 播放（时序双层，前端时间轴）
   const tl = document.getElementById('mvTimeline');
   if (tl) {
     const dyn = isDynamicDatasetRef(title);
@@ -1583,7 +1799,7 @@ function renderTimelineTicks() {
 function setTimeline(i) {
   tlTimelineIdx = i;
   renderTimelineTicks();
-  showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', '已切换到 ' + TL_TICKS[i] + ' 期数据（模拟）');
+  showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', '已切换到 ' + TL_TICKS[i] + ' 时点数据（模拟）');
 }
 function toggleTimelinePlay() {
   const btn = document.getElementById('mvTimelinePlay');
@@ -1711,7 +1927,7 @@ document.addEventListener('keydown', function(e) {
             <div class="flex items-center gap-1.5 text-white/80"><span class="w-3 h-3 rounded-sm inline-block" style="background:rgba(82,196,26,0.45);border:1px solid #52c41a;"></span> 种植区域</div>
             <div class="flex items-center gap-1.5 text-white/80"><span class="w-3 h-3 rounded-sm inline-block" style="background:rgba(250,173,20,0.4);border:1px solid #faad14;"></span> 其他作物</div>
           </div>
-          <!-- 时序时间轴 + 播放（动态数据集专用，模拟） -->
+          <!-- 时序时间轴 + 播放（时序数据专用，模拟） -->
           <div id="mvTimeline" class="hidden absolute left-0 right-0 bottom-8 px-4 py-2 bg-black/70 backdrop-blur-sm">
             <div class="flex items-center gap-3">
               <button id="mvTimelinePlay" onclick="toggleTimelinePlay()" class="w-7 h-7 rounded-full bg-brand hover:bg-brand-hover text-white flex items-center justify-center flex-shrink-0 transition-colors"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><polygon points="6 4 20 12 6 20 6 4"/></svg></button>
@@ -1795,6 +2011,286 @@ function statusChip(status) {
   return `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-medium ${map[norm] || 'bg-gray-100 text-gray-500'}">${norm}</span>`;
 }
 
+// 数据卡片封面状态角标（P0：发布状态常驻醒目，替代原 hover 才出现的操作条）
+function dataStatusRibbon(c, shift) {
+  const norm = (!c.status || c.status === '入库中' || c.status === '入库失败' || c.status === '发布失败') ? '待发布' : c.status;
+  const map = {
+    '待发布': 'bg-amber-50 text-amber-700 border border-amber-200',
+    '已发布': 'bg-brand-light text-brand-dark border border-brand-light',
+    '测试':   'bg-gray-100 text-gray-600 border border-gray-200'
+  };
+  const cls = map[norm] || map['待发布'];
+  const left = shift ? 'left-9' : 'left-2';
+  return `<div class="absolute top-2 ${left} z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-medium border ${cls}" style="font-size:11px;backdrop-filter:blur(2px);">${norm}</div>`;
+}
+
+// 待发布判定（与 dataStatusRibbon 归一化一致）：无状态 / 待发布 / 入库中等均视为待处理
+function cardIsPending(c) {
+  const s = c.status;
+  return !s || s === '待发布' || s === '入库中' || s === '入库失败' || s === '发布失败';
+}
+
+// ── 数据资产：列表视图 / 批量选择（仅 data 模块启用选择模式）────────────
+// 卡片视图：单卡 HTML（从 renderMain 抽离，规避模板字面量嵌套解析歧义）
+function dataCardHTML(c, idx, m) {
+  const sel = (m === 'data' && selectMode && selectedSet.has(c.title));
+  const selChk = (m === 'data' && selectMode) ? `<label class="absolute top-2 left-2 z-30 flex items-center justify-center w-5 h-5 rounded-md bg-white/90 border border-brand/40 cursor-pointer" onclick="event.stopPropagation()"><input type="checkbox" ${sel ? 'checked' : ''} onchange="toggleSelect('${c.title}', this.checked)" class="accent-[#2bbaa0] w-4 h-4"></label>` : '';
+  return `
+          <div data-idx="${idx}" class="card-hover relative bg-panel rounded-lg overflow-hidden cursor-pointer group flex flex-col ${m === 'data' && cardIsPending(c) ? 'card-todo' : ''} ${sel ? 'card-selected' : ''}" onclick="onCardClick(${idx})">
+            <div class="h-44 relative overflow-hidden card-thumb bg-[#eef4f2] flex-shrink-0">
+              ${cardCover(c, m)}
+              ${m === 'data' ? dataStatusRibbon(c, selectMode) : ((m === 'map' || m === 'service') && getShare(c.title) && getShare(c.title).active ? `<div class="absolute top-2 left-2 z-10 flex items-center gap-1 bg-white/90 backdrop-blur-sm text-[10px] text-brand-dark font-medium px-2 py-0.5 rounded-full shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>已推送服务超市</div>` : '')}
+              ${selChk}
+              <div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent"></div>
+              ${m === 'data' ? '' : m === 'service' ? `
+              <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                <button onclick="event.stopPropagation();copyServiceUrl('${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> 复制地址</button>
+                <button onclick="event.stopPropagation();openShareModal('${c.title}','service')" class="flex-1 px-3 py-1.5 bg-brand hover:bg-brand-hover text-white rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 共享</button>
+              </div>
+              ` : m === 'layer' ? `
+              <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                <button onclick="event.stopPropagation();openLayerDesign('edit','${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg> 编辑</button>
+                <button onclick="event.stopPropagation();openLayerEditor('${c.title}','${c.svc||''}')" class="flex-1 px-3 py-1 bg-brand hover:bg-brand-hover text-white rounded text-xs font-medium shadow-sm transition-all hover:shadow-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="13.5" cy="6.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".6" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".6" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".6" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/></svg> 设计</button>
+              </div>
+              ` : m === 'map' ? `
+              <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                <button onclick="event.stopPropagation();openShareModal('${c.title}','map')" class="flex-1 px-2 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow inline-flex items-center justify-center gap-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg>共享</button>
+                <button onclick="event.stopPropagation();openMapDesign('edit','${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg> 编辑</button>
+                <button onclick="event.stopPropagation();openEditorPrototype()" class="flex-1 px-3 py-1 bg-brand hover:bg-brand-hover text-white rounded text-xs font-medium shadow-sm transition-all hover:shadow-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="13.5" cy="6.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".6" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".6" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".6" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/></svg> 设计</button>
+              </div>
+              ` : ''}
+            </div>
+            <div class="p-3.5 ${m !== 'data' ? 'flex-1 min-h-0' : ''} flex flex-col">
+              <h3 class="font-semibold text-gray-900 truncate text-sm mb-2" title="${c.title}">${c.title}</h3>
+              <div class="flex flex-wrap gap-1.5 text-xs text-muted min-h-[44px] overflow-hidden" style="align-content:flex-start">
+                ${m === 'data' ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-brand-light text-brand-dark font-medium border border-brand-light">${c.type}</span>${(c.datasetFiles && c.datasetFiles.length) ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 font-medium border border-gray-200">${(c.datasetFiles||[]).length} 份数据</span>` : ''}${c.svcCount ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 font-medium border border-gray-200">已发布 ${c.svcCount} 服务</span>` : `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 font-medium border border-gray-200">未发布服务</span>`}`
+                : m === 'service' ? serviceTagsHTML(c)
+                : m === 'layer' ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md ${c.svcCount === 0 ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : (c.raster ? 'bg-orange-50 text-orange-700 border border-orange-200' : 'bg-brand-light text-brand-dark border border-brand-light')} font-medium" title="${c.raster ? '栅格图层=单一栅格服务制图表达（单张/时序序列）' : '要素图层=单一数据制图表达（主体数据 + 辅助表达层）'}">${c.svcCount === 0 ? '暂无表达服务' : (c.raster === 'sequence' ? '栅格时序 · ' + c.svcCount + ' 期' : (c.raster === 'single' ? '栅格单张' : '单一数据 · ' + c.svcCount + ' 个表达层'))}</span>`
+                : m === 'map' ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md ${c.layerCount === 0 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-brand-light text-brand border border-brand-light'} font-medium">包含${c.layerCount}个要素图层</span>`
+                : ''}
+              </div>
+              ${m !== 'service' ? `<div class="mt-2 text-xs text-gray-400 truncate">${c.sub}</div>` : ''}
+            </div>
+            ${m === 'data' ? `
+            <div class="px-3.5 pt-3 flex items-center gap-2">
+              <button onclick="event.stopPropagation();openPublishFor('${c.title}')" class="flex-1 btn btn-sm btn-primary !h-8">发布服务</button>
+              <button onclick="event.stopPropagation();updateCard('${c.title}')" class="flex-1 btn btn-sm btn-default !h-8">更新</button>
+            </div>
+            <div class="flex-1" style="min-height:20px"></div>` : ''}
+            <!-- 卡片操作：详情 / 移动 / 删除 -->
+            <div class="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <button onclick="toggleCardMenu(event,'${idx}')" class="w-7 h-7 text-sm flex items-center justify-center bg-white/90 hover:bg-white rounded-lg font-medium shadow-sm border border-gray-200 hover:border-gray-300 hover:shadow transition-all" title="操作">⋯</button>
+              <div id="cardMenu-${idx}" class="card-menu hidden absolute right-0 top-full mt-1 w-32 bg-white border border-line rounded-lg shadow-lg py-1 z-30">
+                <button onclick="cardAction(event,'detail','${idx}')" class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 whitespace-nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> 查看详情</button>
+                ${m !== 'service' ? `<button onclick="cardAction(event,'move','${idx}')" class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 whitespace-nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 移动到</button>` : ''}
+                <button onclick="cardAction(event,'delete','${idx}')" class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-red-500 hover:bg-red-50 whitespace-nowrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> 删除</button>
+              </div>
+              <div id="cardConfirm-${idx}" class="card-confirm hidden absolute right-0 top-full mt-1 w-60 bg-white border border-red-200 rounded-lg shadow-lg p-3 z-30">
+                <div class="text-sm text-gray-800 mb-1">确认删除「<span class="font-medium">${c.title}</span>」？</div>
+                <div class="text-xs text-gray-400 mb-3">删除后不可恢复</div>
+                <div class="flex justify-end gap-2">
+                  <button onclick="closeCardConfirm(event,'${idx}')" class="px-3 py-1 text-xs border border-line rounded text-gray-600 hover:border-brand">取消</button>
+                  <button onclick="confirmDeleteCard(event,'${idx}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">确认删除</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+}
+
+function renderContentArea(m, cards) {
+  if (!cards.length) return emptyStateHTML(m);
+  const _tp = getPageCount(cards.length);
+  const _cp = Math.min(Math.max(1, uiFilter.page), _tp);
+  const _st = (_cp - 1) * PAGE_SIZE;
+  const pageIdxs = cards.map((c, gi) => gi).slice(_st, _st + PAGE_SIZE);
+  currentPageIdxs = pageIdxs;
+  if (m === 'data' && uiFilter.view === 'list') return dataListHTML(cards, pageIdxs);
+  return `<div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">${pageIdxs.map(gi => dataCardHTML(cards[gi], gi, m)).join('')}</div>`;
+}
+
+function emptyStateHTML(m) {
+  const cfg = moduleConfigs[m];
+  return cfg.cards.length === 0 ? (m==='data' ? `
+
+          <div class="col-span-full text-center py-20">
+            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-brand-light to-brand-light flex items-center justify-center text-4xl shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg></div>
+            <div class="text-gray-800 font-semibold text-base mb-2">还没有上传数据</div>
+            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">这里是你存放所有空间数据的地方。上传 Excel 表格、卫星影像、地理数据文件——发布后变成在线地图服务。</div>
+            <button onclick="${cfg.btnAction}" class="px-4 py-1.5 text-sm bg-brand hover:bg-brand-hover text-white rounded font-medium transition-all shadow-sm hover:shadow-md active:scale-95"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 上传第一份数据</button>
+          </div>`
+        : m==='service' ? `
+          <div class="col-span-full text-center py-20">
+            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-brand-light to-brand-light flex items-center justify-center text-4xl shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg></div>
+            <div class="text-gray-800 font-semibold text-base mb-2">还没有可用的地图服务</div>
+            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">地图服务是在线可访问的地图图层。从「数据资产」上传并发布，或从外部服务器注册。</div>
+            <div class="flex items-center justify-center gap-3">
+              <button onclick="goModule('data')" class="px-5 py-2.5 text-sm border-2 border-gray-200 hover:border-brand text-gray-600 hover:text-brand-hover rounded-lg font-medium transition-all hover:shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 去上传数据</button>
+              <button onclick="${cfg.btnAction}" class="px-5 py-2.5 text-sm bg-brand hover:bg-brand-hover text-white rounded font-medium transition-all shadow-sm hover:shadow-md active:scale-95"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/><path d="M2 12h20"/></svg> 注册外部服务</button>
+            </div>
+          </div>`
+        : m==='layer' ? `
+          <div class="col-span-full text-center py-20">
+            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center text-4xl shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></div>
+            <div class="text-gray-800 font-semibold text-base mb-2">还没有要素图层</div>
+            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">要素图层是「单一数据的制图表达」——先选定一份主体数据，再组织它衍生的服务与标注/符号等辅助表达层。创建后可在专题地图中反复使用。</div>
+            <button onclick="${cfg.btnAction}" class="px-4 py-1.5 text-sm bg-brand hover:bg-brand-hover text-white rounded font-medium transition-all shadow-sm hover:shadow-md active:scale-95"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 创建第一个要素图层</button>
+          </div>`
+        : `
+          <div class="col-span-full text-center py-20">
+            <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-brand-light to-brand-light flex items-center justify-center text-4xl shadow-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg></div>
+            <div class="text-gray-800 font-semibold text-base mb-2">还没有专题地图</div>
+            <div class="text-gray-500 text-sm mb-6 max-w-md mx-auto leading-relaxed">专题地图是最终成品——一张图、大屏、驾驶舱。创建一张专题地图开始。</div>
+            <button onclick="${cfg.btnAction}" class="px-4 py-1.5 text-sm bg-brand hover:bg-brand-hover text-white rounded font-medium transition-all shadow-sm hover:shadow-md active:scale-95"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="13.5" cy="6.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".6" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".6" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".6" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/></svg> 创建专题地图</button>
+          </div>`
+        ) : `
+          <div class="col-span-full text-center py-20">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-lg bg-gray-100 flex items-center justify-center text-3xl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+            <div class="text-gray-700 font-semibold text-base mb-1">没有符合条件的结果</div>
+            <div class="text-gray-400 text-sm mb-5">试试调整左侧分类、清空搜索词或更换筛选条件</div>
+            <button onclick="uiFilter={tree:'*',treePath:'',kw:'',type:'全部',status:'全部',mine:false,formal:true,page:1,view:'card',serviceRole:'全部',source:'全部',crs:'全部'};applyFilter()" class="px-5 py-2.5 text-sm text-brand bg-brand-light hover:bg-brand-50 border border-brand/20 rounded font-medium transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> 重置全部筛选</button>
+          </div>`
+        ;
+}
+
+function dataListHTML(cards, pageIdxs) {
+  const rows = pageIdxs.map(gi => {
+    const c = cards[gi];
+    const sel = selectedSet.has(c.title);
+    const norm = (!c.status || c.status === '入库中' || c.status === '入库失败' || c.status === '发布失败') ? '待发布' : c.status;
+    const statusCls = norm === '待发布' ? 'st-amber' : norm === '测试' ? 'st-gray' : 'st-brand';
+    const org = c.mine ? '张建国' : '聂聪';
+    return `<tr class="${sel ? 'row-selected' : ''}" onclick="onRowClick(${gi})">
+      <td class="w-10 text-center" onclick="event.stopPropagation()">
+        <input type="checkbox" ${sel ? 'checked' : ''} onchange="toggleSelect('${c.title}', this.checked)" class="accent-[#2bbaa0] w-4 h-4 cursor-pointer">
+      </td>
+      <td>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-brand-light flex items-center justify-center text-brand-dark flex-shrink-0 text-lg">${c.icon || ''}</div>
+          <div class="min-w-0">
+            <div class="font-medium text-gray-900 truncate">${c.title}</div>
+            <div class="text-xs text-gray-400 truncate">${c.sub}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="text-xs text-gray-600">${c.fmt || c.type}</span></td>
+      <td class="text-xs">
+        ${(c.datasetFiles && c.datasetFiles.some(f => f.isPackage || (f.children && f.children.length))) ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-600 font-medium border border-purple-200">数据包</span>` : `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-50 text-sky-600 font-medium border border-sky-200">单点数据</span>`}
+        <span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-brand-light text-brand-dark font-medium border border-brand-light">${c.type}</span>
+        ${c.datasetFiles && c.datasetFiles.length ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 font-medium border border-gray-200">${(c.datasetFiles || []).length} 份数据</span>` : ''}
+        ${c.svcCount ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 font-medium border border-gray-200">已发布 ${c.svcCount} 服务</span>` : `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 font-medium border border-gray-200">未发布服务</span>`}
+      </td>
+      <td class="text-xs text-gray-500">${org}</td>
+      <td><span class="st-pill ${statusCls}">${norm}</span></td>
+      <td class="text-right whitespace-nowrap" onclick="event.stopPropagation()">
+        <button onclick="openPublishFor('${c.title}')" class="btn btn-sm btn-primary !h-7">发布服务</button>
+        <button onclick="updateCard('${c.title}')" class="btn btn-sm btn-default !h-7">更新</button>
+        <button onclick="openCardDetail(${gi})" class="btn btn-sm btn-ghost !h-7">查看</button>
+      </td>
+    </tr>`;
+  }).join('');
+  return `<div class="bg-white border border-line rounded-xl overflow-hidden">
+    <table class="data-table"><thead><tr>
+      <th class="w-10"></th>
+      <th>数据信息</th><th>格式</th><th>类型 / 合集</th><th>创建人</th><th>状态</th><th class="text-right">操作</th>
+    </tr></thead><tbody>${rows}</tbody></table>
+  </div>`;
+}
+
+function batchBarHTML() {
+  if (activeModule !== 'data' || !selectMode || selectedSet.size === 0) return '';
+  return `<div class="batch-bar">
+    <label class="flex items-center gap-2 text-sm text-white/80 cursor-pointer select-none">
+      <input type="checkbox" ${pageAllSelected() ? 'checked' : ''} onchange="selectAllOnPage(this.checked)" class="accent-white w-4 h-4"> 本页全选
+    </label>
+    <span class="text-sm text-white/70">已选 <b class="text-white font-semibold">${selectedSet.size}</b> 项</span>
+    <div class="flex-1"></div>
+    <button onclick="openBatchMove()" class="b-btn">移动到</button>
+    <button onclick="batchDelete()" class="b-btn b-danger">批量删除</button>
+    <button onclick="clearSelection()" class="b-btn">取消选择</button>
+  </div>`;
+}
+
+function onCardClick(gi) {
+  const c = cardReg[gi];
+  if (!c) return;
+  if (selectMode && activeModule === 'data') toggleSelect(c.title, !selectedSet.has(c.title));
+  else openCardDetail(gi);
+}
+
+function onRowClick(gi) {
+  const c = cardReg[gi];
+  if (!c) return;
+  if (selectMode && activeModule === 'data') toggleSelect(c.title, !selectedSet.has(c.title));
+  else openCardDetail(gi);
+}
+
+function toggleSelect(title, checked) {
+  if (checked) selectedSet.add(title); else selectedSet.delete(title);
+  document.getElementById('mainContent').innerHTML = renderMain(activeModule);
+}
+
+function setView(v) {
+  uiFilter.view = v;
+  document.getElementById('mainContent').innerHTML = renderMain(activeModule);
+}
+
+function toggleSelectMode() {
+  selectMode = !selectMode;
+  if (!selectMode) selectedSet.clear();
+  document.getElementById('mainContent').innerHTML = renderMain(activeModule);
+}
+
+function selectAllOnPage(checked) {
+  currentPageIdxs.forEach(gi => {
+    const c = cardReg[gi];
+    if (!c) return;
+    if (checked) selectedSet.add(c.title); else selectedSet.delete(c.title);
+  });
+  document.getElementById('mainContent').innerHTML = renderMain(activeModule);
+}
+
+function pageAllSelected() {
+  if (!currentPageIdxs.length) return false;
+  return currentPageIdxs.every(gi => { const c = cardReg[gi]; return c && selectedSet.has(c.title); });
+}
+
+function clearSelection() {
+  selectMode = false;
+  selectedSet.clear();
+  document.getElementById('mainContent').innerHTML = renderMain(activeModule);
+}
+
+function batchDelete() {
+  const store = moduleConfigs[activeModule];
+  let n = 0;
+  selectedSet.forEach(title => {
+    const i = store.cards.findIndex(c => c.title === title);
+    if (i !== -1) { store.cards.splice(i, 1); n++; }
+  });
+  selectedSet.clear();
+  selectMode = false;
+  document.getElementById('mainContent').innerHTML = renderMain(activeModule);
+  showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>', '已删除 ' + n + ' 项数据');
+}
+
+function openBatchMove() {
+  if (selectedSet.size === 0) return;
+  batchMoveFlag = true;
+  const tree = moduleTrees[activeModule] || moduleTrees.data;
+  const targets = [];
+  const collect = (nodes) => nodes.forEach(n => {
+    if (n.filter && n.filter !== '*' && n.filter !== 'mine') targets.push(n.name);
+    if (n.children) collect(n.children);
+  });
+  collect(tree);
+  document.getElementById('mvTitle').textContent = selectedSet.size + ' 项数据';
+  document.getElementById('mvTargets').innerHTML = targets.length ? targets.map(t =>
+    `<button onclick="doMove(event, this)" class="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-brand-light hover:text-brand-hover transition-colors">${t}</button>`
+  ).join('') : `<div class="text-xs text-gray-400 text-center py-4">暂无其他分类</div>`;
+  document.getElementById('moveModal').classList.remove('hidden');
+}
+
 // ── 状态横幅（详情弹窗发布状态区用：图标 + 状态 + 描述 + 操作，一行紧凑）──
 function statusBanner(card) {
   const raw = card.status;
@@ -1830,6 +2326,7 @@ function statusBanner(card) {
 
 function setStatusFilter(v) {
   uiFilter.status = v;
+  uiFilter.page = 1;
   document.getElementById('mainContent').innerHTML = renderMain(activeModule);
 }
 
@@ -2165,7 +2662,7 @@ let shareTitle = null, sharePayloadType = 'map';
 
 // 打开共享弹窗（推送到服务超市：不设时限、不可取消、限制由超市侧做）
 function isDynamicDatasetRef(title) {
-  // 服务/专题图引用的归属数据是否为动态数据集（模拟：按 assetRef 或名称匹配动态数据集）
+  // 服务/专题图引用的归属数据是否为时序数据（模拟：按 assetRef 或名称匹配时序数据）
   const dynamicAssets = (moduleConfigs.data.cards || []).filter(c => c.dataAssetType === 'dynamic');
   if (!dynamicAssets.length) return null;
   const svc = (moduleConfigs.service.cards || []).find(c => c.title === title);
@@ -2181,11 +2678,11 @@ function openShareModal(title, payloadType) {
   const dyn = isDynamicDatasetRef(title);
   document.getElementById('shareMapName').textContent = title;
   document.getElementById('sharePayloadType').textContent = sharePayloadType === 'service' ? '地图服务' : '专题地图';
-  // 动态数据集/期服务：共享按数据集层级整体进行（不允许只共享一期）
+  // 时序数据/时间切片服务：共享按数据集层级整体进行（不允许只共享一份）
   const dynHint = document.getElementById('shareDynamicHint');
   if (dynHint) {
     dynHint.classList.toggle('hidden', !dyn);
-    if (dyn) document.getElementById('shareDynamicHintText').textContent = '该服务归属于动态数据集「' + dyn.title + '」，共享将按数据集层级整体进行（全部期服务一并上架/更新/下线，不允许只共享一期）。';
+    if (dyn) document.getElementById('shareDynamicHintText').textContent = '该服务归属于时序数据集「' + dyn.title + '」，共享将按数据集层级整体进行（全部时间切片服务一并上架/更新/下线，不允许只共享一份）。';
   }
   document.getElementById('shareSetup').classList.toggle('hidden', !!(s && s.active));
   document.getElementById('shareResult').classList.toggle('hidden', !(s && s.active));
@@ -2226,9 +2723,8 @@ function openPublishFor(title) {
   publishTarget = title;
   const el = document.getElementById('publishTitle');
   if (el) el.value = title;
-  // 任务4：发布弹窗打开时按目标数据刷新 数据处理方式/模板/场景推荐
-  if (typeof renderPublishProcess === 'function') renderPublishProcess();
-  if (typeof renderPublishTemplate === 'function') renderPublishTemplate();
+  // 08-28 v4：发布信息卡动态渲染 + 内容区/渲染区 + 服务角色智能默认
+  if (typeof initPublishContent === 'function') initPublishContent();
   if (typeof renderPublishCards === 'function') renderPublishCards();
   if (typeof updatePublishRecommendation === 'function') updatePublishRecommendation();
   // 2026-08-20：时序（动态）服务 → 刷新「默认渲染时间段」配置区（仅时序显示并预填默认窗口）

@@ -25,7 +25,7 @@
         <a href="数据资产.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
         </a>
-        <a href="地图服务.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+        <a href="地图服务-重设计.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg> 地图服务
         </a>
         <a href="要素图层.html" data-module="layer" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
@@ -33,9 +33,6 @@
         </a>
         <a href="专题地图.html" data-module="map" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 专题地图
-        </a>
-        <a href="制图规范原型.html" data-module="spec" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M12 22a10 10 0 1 1 10-10c0 1.7-1.3 3-3 3h-2.5a2.5 2.5 0 0 0-1.9 4.1c.6.7.4 1.9-.6 1.9Z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="11" cy="7.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/></svg> 制图规范
         </a>
         <a href="任务中心.html" data-module="task" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> 任务中心
@@ -138,15 +135,25 @@
         <label class="block text-sm font-medium text-gray-700 mb-1.5">地图描述 <span class="text-gray-400 text-xs font-normal">（选填）</span></label>
         <textarea id="cmDesc" rows="2" placeholder="简单描述这张地图的用途，方便同事查找" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 resize-none"></textarea>
       </div>
-      <div class="flex items-center gap-3 bg-purple-50 border border-purple-200 rounded-lg p-3">
-        <input type="checkbox" id="cmTimeline" class="rounded border-purple-300 text-purple-600 focus:ring-purple-400 w-4 h-4">
-        <div class="flex-1">
-          <label for="cmTimeline" class="text-sm font-medium text-gray-800 cursor-pointer">挂载时序组件 <span class="text-[10px] bg-purple-100 text-purple-700 rounded-full px-2 py-0.5 ml-1 font-medium">时序双层</span></label>
-          <div class="text-xs text-gray-500 mt-0.5">画布顶部提供时间轴 + 播放，跨图层编排动态数据集各期变化（需引用了动态数据集）</div>
+      <!-- ══ 初始要素图层（选填）：创建时可选已有要素图层加入本次制图 ══ -->
+      <div class="border border-line rounded-lg overflow-hidden">
+        <div class="flex items-center justify-between px-3 py-2.5 bg-gray-50 border-b border-line cursor-pointer" onclick="toggleCreateLayerPicker()">
+          <div class="flex items-center gap-2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg>
+            <span class="text-sm font-medium text-gray-800">初始要素图层 <span class="text-gray-400 text-xs font-normal">（选填）</span></span>
+            <span id="cmLayerCount" class="text-[10px] bg-gray-100 text-gray-500 rounded-full px-2 py-0.5 font-medium">已选 0</span>
+          </div>
+          <span id="cmLayerArrow" class="text-gray-400 text-xs transition-transform">▼</span>
+        </div>
+        <div id="cmLayerPicker" class="hidden">
+          <div class="px-3 py-2 border-b border-line">
+            <input type="text" id="cmLayerKw" placeholder="搜索要素图层名称 / 分类" oninput="filterCreateLayers(this.value)" class="w-full px-2.5 py-1.5 border border-line rounded text-xs focus:outline-none focus:border-brand">
+          </div>
+          <div id="cmLayerList" class="max-h-52 overflow-y-auto divide-y divide-line"></div>
         </div>
       </div>
       <div class="bg-gray-50 border border-line rounded-lg p-3 text-xs text-gray-500">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 创建后进入地图设计页，自由添加要素图层、底图、图例，再发布为一张图 / 大屏 / 驾驶舱。
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 创建后进入地图设计页，可继续添加要素图层、底图、图例，再发布为一张图 / 大屏 / 驾驶舱。
       </div>
     </div>
     <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50">
@@ -161,6 +168,89 @@
 
 <script src="common.js"></script>
 <script>
+// ── 创建专题地图：初始要素图层选择器（选填）──────────────
+// 数据源 = common.js 的 moduleConfigs.layer.cards（要素图层资产）
+function createLayerCandidates() {
+  return (typeof moduleConfigs !== 'undefined' && moduleConfigs.layer && moduleConfigs.layer.cards) ? moduleConfigs.layer.cards : [];
+}
+function cmEsc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// 渲染可勾选的要素图层列表（草稿/无表达层的图层禁选）
+function renderCreateLayerPicker() {
+  const box = document.getElementById('cmLayerList');
+  if (!box) return;
+  const cards = createLayerCandidates();
+  if (!cards.length) { box.innerHTML = '<div class="px-3 py-4 text-xs text-gray-400 text-center">暂无可选要素图层</div>'; return; }
+  box.innerHTML = cards.map(function (c, i) {
+    const draft = !!c.empty || c.svcCount === 0;
+    const kind = c.raster === 'sequence' ? '栅格时序' : (c.raster === 'single' ? '栅格单张' : '矢量');
+    return '<label class="flex items-start gap-2.5 px-3 py-2 ' + (draft ? 'opacity-50' : 'hover:bg-brand/5 cursor-pointer') + '" data-lname="' + cmEsc(c.title) + '">' +
+      '<input type="checkbox" class="mt-0.5 rounded border-line text-brand focus:ring-brand/30 w-3.5 h-3.5 cm-layer-cb" data-idx="' + i + '"' + (draft ? ' disabled' : '') + ' onchange="syncCreateLayerCount()">' +
+      '<span class="flex-1 min-w-0">' +
+        '<span class="block text-xs font-medium text-gray-800 truncate">' + cmEsc(c.title) + '</span>' +
+        '<span class="block text-[10px] text-gray-400 truncate">' + cmEsc(c.sub) + '</span>' +
+      '</span>' +
+      '<span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 flex-shrink-0">' + kind + '</span>' +
+    '</label>';
+  }).join('');
+  syncCreateLayerCount();
+}
+
+// 展开 / 收起选择器
+function toggleCreateLayerPicker() {
+  const box = document.getElementById('cmLayerPicker');
+  const arrow = document.getElementById('cmLayerArrow');
+  if (!box) return;
+  const open = !box.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+// 关键字过滤（按图层名 + 描述）
+function filterCreateLayers(kw) {
+  const q = (kw || '').trim().toLowerCase();
+  document.querySelectorAll('#cmLayerList label').forEach(function (el) {
+    const hay = ((el.getAttribute('data-lname') || '') + ' ' + (el.textContent || '')).toLowerCase();
+    el.style.display = (!q || hay.indexOf(q) !== -1) ? '' : 'none';
+  });
+}
+
+// 当前已勾选的要素图层名
+function selectedCreateLayers() {
+  const out = [];
+  document.querySelectorAll('#cmLayerList .cm-layer-cb').forEach(function (cb) {
+    if (!cb.checked) return;
+    const c = createLayerCandidates()[parseInt(cb.getAttribute('data-idx'), 10)];
+    if (c) out.push(c.title);
+  });
+  return out;
+}
+
+// 同步「已选 N」徽章
+function syncCreateLayerCount() {
+  const n = selectedCreateLayers().length;
+  const el = document.getElementById('cmLayerCount');
+  if (!el) return;
+  el.textContent = '已选 ' + n;
+  el.className = n
+    ? 'text-[10px] bg-brand/10 text-brand rounded-full px-2 py-0.5 font-medium'
+    : 'text-[10px] bg-gray-100 text-gray-500 rounded-full px-2 py-0.5 font-medium';
+}
+
+// 创建后复位选择器
+function resetCreateLayers() {
+  document.querySelectorAll('#cmLayerList .cm-layer-cb').forEach(function (cb) { cb.checked = false; });
+  const kw = document.getElementById('cmLayerKw');
+  if (kw) { kw.value = ''; filterCreateLayers(''); }
+  syncCreateLayerCount();
+  const box = document.getElementById('cmLayerPicker');
+  if (box) box.classList.add('hidden');
+  const arrow = document.getElementById('cmLayerArrow');
+  if (arrow) arrow.style.transform = '';
+}
+
 // ── 专题地图：确认创建 ─────────────────────────────────
 function confirmCreateMap() {
   const name = (document.getElementById('cmName').value || '').trim();
@@ -172,20 +262,19 @@ function confirmCreateMap() {
   if (!notified.map) {
     notified.map = true;
   }
-  const useTimeline = !!(document.getElementById('cmTimeline') && document.getElementById('cmTimeline').checked);
-  showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m12 2 2.4 7.4H22l-6 4.3 2.3 7.3L12 16.7 5.7 21l2.3-7.3-6-4.3h7.6z"/></svg>', `✅ 专题地图「<strong>${name}</strong>」创建成功！${useTimeline ? '已挂载时序组件（画布顶部时间轴+播放）。' : ''}正在打开地图设计器…`);
-  if (useTimeline) {
-    setTimeout(() => {
-      const tl = document.getElementById('mvTimeline');
-      if (tl) { tl.classList.remove('hidden'); renderTimelineTicks(); }
-    }, 600);
-  }
+  const picks = selectedCreateLayers();
+  showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m12 2 2.4 7.4H22l-6 4.3 2.3 7.3L12 16.7 5.7 21l2.3-7.3-6-4.3h7.6z"/></svg>', `✅ 专题地图「<strong>${name}</strong>」创建成功！${picks.length ? '已加入 ' + picks.length + ' 个要素图层（' + picks.join('、') + '）。' : ''}正在打开地图设计器…`);
+  // 时序组件为默认能力，创建后即挂载（无勾选、不额外提示）
+  setTimeout(() => {
+    const tl = document.getElementById('mvTimeline');
+    if (tl) { tl.classList.remove('hidden'); renderTimelineTicks(); }
+  }, 600);
   openEditorPrototype();
   // 重置表单
   document.getElementById('cmName').value = '';
   document.getElementById('cmCode').value = '';
   document.getElementById('cmDesc').value = '';
-  if (document.getElementById('cmTimeline')) document.getElementById('cmTimeline').checked = false;
+  resetCreateLayers();
 }
 
 // ── 专题地图：编辑 / 设计 ──────────────────────────────
@@ -201,6 +290,8 @@ function openMapDesign(action, title) {
 document.getElementById('appShell').classList.remove('hidden');
 activeModule = 'map';
 switchModule('map');
+// 创建弹窗内的「初始要素图层」选择器：初始渲染（数据源 = 要素图层资产）
+renderCreateLayerPicker();
 showWelcomeIfNeeded();
 </script>
 </body>

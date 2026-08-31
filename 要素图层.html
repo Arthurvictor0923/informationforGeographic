@@ -25,7 +25,7 @@
         <a href="数据资产.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
         </a>
-        <a href="地图服务.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+        <a href="地图服务-重设计.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg> 地图服务
         </a>
         <a href="要素图层.html" data-module="layer" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
@@ -33,9 +33,6 @@
         </a>
         <a href="专题地图.html" data-module="map" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 专题地图
-        </a>
-        <a href="制图规范原型.html" data-module="spec" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M12 22a10 10 0 1 1 10-10c0 1.7-1.3 3-3 3h-2.5a2.5 2.5 0 0 0-1.9 4.1c.6.7.4 1.9-.6 1.9Z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="11" cy="7.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/></svg> 制图规范
         </a>
         <a href="任务中心.html" data-module="task" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> 任务中心
@@ -163,55 +160,61 @@
           </div>
         </div>
       </div>
-      <!-- 主体数据（08-17 决策：要素图层=单一数据的制图表达，先选主体数据唯一） -->
+      <!-- 步骤 1 · 确认是否时序（下拉单选；时序 = 选服务序列，非时序 = 选数据 → 选该数据发布的服务） -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">主体数据 <span class="text-red-400">*</span> <span class="text-[11px] text-gray-400 font-normal">（要素图层 = 一份主体数据的制图表达）</span></label>
-        <select id="lwMainData" onchange="onLwMainDataChange(this.value)" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
-          <option value="">请选择主体数据...</option>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-brand text-white text-[11px] font-bold mr-1">1</span>是否时序 <span class="text-[11px] text-gray-400 font-normal">（时序 = 选<b>服务序列</b>；非时序 = 选<b>数据</b> → 选该数据发布的服务）</span></label>
+        <select id="lwTsSelect" onchange="setLwTimeSeries(this.value)" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
+          <option value="" selected>请选择图层时序性质...</option>
+          <option value="true">🕒 时序图层（栅格 + 绑定服务序列 · 带时间轴）</option>
+          <option value="false">🗂 非时序图层（矢量 或 单张栅格 · 静态呈现）</option>
         </select>
-        <p class="text-[11px] text-gray-400 mt-1">选定主体数据后，下方仅可选择<b>该数据衍生的服务</b>；不同数据的服务不可混用。</p>
       </div>
-      <!-- Service selection (tree structure, constrained to main data's derived services) -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">选择该数据的表达服务 <span class="text-red-400">*</span> <span class="text-[11px] text-gray-400 font-normal">（主服务：保持原样 / 取描边 / 取中心点）</span></label>
+
+      <!-- 步骤 2（仅时序）· 选择服务序列（时序图层必绑其一；不选数据） -->
+      <div id="lwSeqPickWrap" class="hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5"><span id="lwStepNumSeq" class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-brand text-white text-[11px] font-bold mr-1">2</span>选择服务序列 <span class="text-[11px] text-gray-400 font-normal">（时序图层绑定栅格多期地图服务序列，序列由「服务序列」模块维护）</span></label>
         <div class="border border-line rounded-lg overflow-hidden">
-          <div class="p-3 bg-gray-50 border-b border-line">
+          <div class="p-2.5 bg-gray-50 border-b border-line flex items-center justify-between gap-2">
+            <span id="lwSeqPickCap" class="text-xs text-gray-500">服务序列（栅格多期地图服务的有序集合）</span>
+            <span id="lwSeqPickCount" class="text-xs text-brand font-medium">未选择</span>
+          </div>
+          <div id="lwSeqList" class="max-h-44 overflow-y-auto scroll-thin p-2"></div>
+        </div>
+        <div class="mt-2 text-[11px] text-gray-400">时序图层<b>按服务序列取数</b>，不直接选数据；序列自带期数、时间跨度与默认制图样式组。</div>
+      </div>
+
+      <!-- 步骤 2（仅非时序）· 选择数据 -->
+      <div id="lwDataPickWrap" class="hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5"><span id="lwStepNumData" class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-brand text-white text-[11px] font-bold mr-1">2</span>选择数据 <span class="text-[11px] text-gray-400 font-normal">（仅列出已发布对应服务的数据）</span></label>
+        <div class="border border-line rounded-lg overflow-hidden">
+          <div class="p-2.5 bg-gray-50 border-b border-line">
             <div class="relative flex items-center">
-            <span class="absolute left-3 text-gray-400 pointer-events-none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
-            <input type="text" placeholder="搜索该数据的衍生服务..." class="w-full pl-8 pr-3 py-1.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand" oninput="filterLayerServiceTree(this.value)">
+              <span class="absolute left-3 text-gray-400 pointer-events-none text-sm">🔍</span>
+              <input type="text" id="lwDataSearch" placeholder="搜索数据名称 / 类型 / 格式..." class="w-full pl-8 pr-3 py-1.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand" oninput="renderLwDataList()">
+            </div>
           </div>
-          </div>
-          <div id="lwServiceTree" class="max-h-56 overflow-y-auto scroll-thin p-2"></div>
-        </div>
-        <div class="mt-2 flex items-center gap-2">
-          <span class="text-xs text-gray-500">已选：<strong id="lwSvcCount" class="text-brand">0</strong> 个服务</span>
-          <span id="lwSvcHint" class="text-xs text-orange-500 hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> 请先选择主体数据，再选择该数据衍生的表达服务</span>
+          <div id="lwDataList" class="max-h-44 overflow-y-auto scroll-thin p-2"></div>
         </div>
       </div>
-      <!-- 辅助表达层（标注/符号，仅可引用同一主体数据衍生服务） -->
-      <div id="lwAuxWrap">
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">辅助表达层 <span class="text-[11px] text-gray-400 font-normal">（标注 / 符号 / 描边，选填）</span></label>
-        <div id="lwAuxList" class="border border-line rounded-lg p-3 min-h-[64px] bg-gray-50/50 text-xs text-gray-400">请先选择主体数据——辅助表达层仅可引用同一主体数据衍生的服务</div>
-      </div>
-      <!-- 基础样式与颜色（一步创建：预览基础样式 + 选基础颜色） -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">基础样式与颜色</label>
-        <div class="border border-line rounded-lg p-3 flex items-center gap-3" style="flex-wrap:wrap;">
-          <div style="width:96px;height:64px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #f0f0f0;flex-shrink:0;background:linear-gradient(135deg,#eef2f5 0%,#dde6ec 100%);">
-            <div id="lwStyleShape" style="width:56px;height:32px;border-radius:4px;background:#2bbaa0;"></div>
+
+      <!-- 步骤 3（仅非时序）· 选择该数据发布的一组服务（多选，不区分主体/辅助） -->
+      <div id="lwSvcPickWrap" class="hidden">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5"><span id="lwStepNumSvc" class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-brand text-white text-[11px] font-bold mr-1">3</span>选择该数据发布的服务 <span class="text-[11px] text-gray-400 font-normal">（可多选，组成一组服务；坐标系须一致）</span></label>
+        <div class="border border-line rounded-lg overflow-hidden">
+          <div class="p-2.5 bg-gray-50 border-b border-line flex items-center justify-between gap-2">
+            <span id="lwSvcPickCap" class="text-xs text-gray-500">请先选择数据</span>
+            <span id="lwSvcPickCount" class="text-xs text-brand font-medium">已选 0 个</span>
           </div>
-          <div style="flex:1;min-width:0;">
-            <div class="text-xs text-gray-500 mb-2">选择基础颜色（进入设计页后可精细调整）</div>
-            <div id="lwColorSwatches" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"></div>
-          </div>
+          <div id="lwDataServiceList" class="max-h-44 overflow-y-auto scroll-thin p-2"></div>
         </div>
+        <div class="mt-2 text-[11px] text-gray-400">服务由所选数据发布而来，此处只做<b>引用</b>，不区分主体 / 辅助服务；样式在<b>要素图层编辑器</b>中调整。</div>
       </div>
       <!-- Preview button -->
       <div class="flex items-center gap-3">
         <button onclick="openLayerPreview()" class="btn btn-md btn-outline">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> 预览表达效果
         </button>
-        <span class="text-xs text-gray-400">点击预览主体数据及其表达服务在地图上的渲染效果</span>
+        <span class="text-xs text-gray-400">点击预览主体服务在地图上的渲染效果（数据仅辅助）</span>
       </div>
       <!-- 描述 -->
       <div>
@@ -235,7 +238,7 @@
     <div class="px-6 py-4 border-b border-line flex items-center justify-between">
       <div>
         <h3 class="text-base font-semibold text-gray-900"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 要素图层表达预览</h3>
-        <p id="lpvSubtitle" class="text-xs text-gray-500 mt-0.5">主体数据：<span id="lpvMainDataName">未选择</span> · 已选 <span id="lpvSvcCountLabel">0</span> 个表达服务</p>
+        <p id="lpvSubtitle" class="text-xs text-gray-500 mt-0.5">主体服务：<span id="lpvMainServiceName">未选择</span> · 数据 <span id="lpvDataName">—</span> · 样式 <span id="lpvSvcCountLabel">0</span></p>
       </div>
       <button onclick="closeLayerPreview()" class="btn btn-icon btn-md btn-text">✕</button>
     </div>
@@ -265,293 +268,356 @@
 function confirmLayer() {
   const name = (document.getElementById('lwName').value || '').trim();
   const code = (document.getElementById('lwCode').value || '').trim();
-  const mainData = (document.getElementById('lwMainData') || {}).value || '';
   if (!name) {
-    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请先填写图层名称');
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请先填写图层名称');
     return;
   }
   if (!code) {
-    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请先填写图层编码');
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请先填写图层编码');
     return;
   }
-  if (!mainData) {
-    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请先选择主体数据——要素图层是这份数据的制图表达');
+  if (lwTimeSeries === null) {
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请先确认「是否时序」（步骤 1）——时序选服务序列，非时序选数据与服务');
     return;
   }
-  const checked = getLwSelectedServices();
-  if (checked.length === 0) {
-    document.getElementById('lwSvcHint').classList.remove('hidden');
-    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请至少选择一个该数据衍生的表达服务');
+  // 时序分支：必选服务序列（不选数据）
+  if (lwTimeSeries === true) {
+    const seq = lwPickedSeq();
+    if (!seq) {
+      showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请选择服务序列（时序图层必绑其一，步骤 2）');
+      return;
+    }
+    closeWizard('layerWizard');
+    if (!notified.layer) {
+      notified.layer = true;
+      showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>', '时序图层「' + name + '」创建成功！绑定服务序列「' + seq.name + '」' + (seq.frames ? '（' + seq.frames + ' 期）' : '') + '，<strong>已打开设计器</strong>完善样式表达；完成后再把图层组织进<strong>专题地图</strong>（一张图/大屏）。<button onclick="goModule(\'map\')" class="text-brand underline font-medium ml-2">去专题地图 →</button>');
+      openLayerEditor(name, seq.editorService); // 时序 → 落入该序列对应的栅格时序服务
+    }
     return;
   }
-  document.getElementById('lwSvcHint').classList.add('hidden');
+  if (!lwDataTitle) {
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请选择数据（步骤 2）——服务由所选数据发布而来');
+  return;
+  }
+  const svcNames = getLwSelectedServices();
+  const svcCount = svcNames.length;
+  if (!svcCount) {
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '请选择该数据发布的服务（步骤 3，可多选组成一组服务）');
+    return;
+  }
   closeWizard('layerWizard');
   if (!notified.layer) {
     notified.layer = true;
-    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>', '要素图层「' + name + '」创建成功！它以「' + mainData + '」为主体数据，<strong>已打开设计器</strong>完善样式表达；完成后再把图层组织进<strong>专题地图</strong>（一张图/大屏）。<button onclick="goModule(\'map\')" class="text-brand underline font-medium ml-2">去专题地图 →</button>');
-    openLayerEditor(name); // 创建完成元数据后 → 进入要素图层编辑器
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>', '要素图层「' + name + '」创建成功！' + (lwTimeSeries ? '时序' : '非时序') + '图层，引用数据「' + lwDataTitle + '」发布的 ' + svcCount + ' 个服务，<strong>已打开设计器</strong>完善样式表达；完成后再把图层组织进<strong>专题地图</strong>（一张图/大屏）。<button onclick="goModule(\'map\')" class="text-brand underline font-medium ml-2">去专题地图 →</button>');
+    openLayerEditor(name, svcNames[0]); // 创建完成元数据后 → 进入要素图层编辑器（落到所选服务）
   }
 }
 
-// ── 要素图层创建：主体数据 + 服务树（08-17 决策：单一数据制图表达）──
-let lwSelectedServices = {};
-let lwServiceTreeData = [];
-let lwMainDataTitle = '';
-let lwAuxServices = {};
+// ── 要素图层创建：先确认「是否时序」→ 分两支（08-31 新流程）──
+// 说明：
+//   ① 时序图层 = 选<b>服务序列</b>（栅格多期地图服务的有序集合，不选数据）；
+//   ② 非时序图层 = 选<b>数据</b> → 选该数据发布的一组服务；
+//   ③ 不再区分主体服务 / 辅助服务，服务只做「引用」；
+//   ④ 不再提供样式绑定选择 —— 样式由系统「样式管理」预置并随服务/序列携带，此处只读展示。
+let lwTimeSeries = null;          // null=未选 / true=时序图层 / false=非时序图层
+let lwSeqId = '';                 // 时序分支：选中的服务序列 id（时序图层选序列，不选数据）
+let lwDataTitle = '';             // 非时序分支：选中的数据
+let lwPickedServices = {};        // 步骤 3 选中的一组服务（数据发布的服务，多选）
+let lwFocusTitle = '';            // 兼容旧引用：当前聚焦的服务
 
-// 主体数据 → 衍生服务匹配（assetRef 精确关联；无关联则按名称前缀兜底）
-function getLwDerivedServices(dataTitle) {
+function getAllLwServices() { return (moduleConfigs.service.cards || []).slice(); }
+function getAllLwData() { return (moduleConfigs.data.cards || []).slice(); }
+
+// 服务是否为栅格类（WMS 影像 / WMTS 影像瓦片）
+function lwSvcIsRaster(svc) {
+  const t = ((svc && (svc.type || svc.fmt)) || '').toUpperCase();
+  return t === 'WMS' || t === 'WMTS';
+}
+// 服务是否为时序（绑定服务序列）
+function lwSvcIsTs(svc) { return !!(svc && svc.timeSeries && svc.timeSeries.length); }
+// 服务是否匹配当前所选的时序性质
+function lwSvcMatchesMode(svc) {
+  if (lwTimeSeries === null) return false;
+  if (lwTimeSeries === true) return lwSvcIsRaster(svc) && lwSvcIsTs(svc);
+  return !lwSvcIsTs(svc);
+}
+// 某数据发布的服务（assetRef 精确 / 归一化模糊兜底），并按时序性质过滤
+function lwServicesOfData(dataTitle) {
   if (!dataTitle) return [];
-  const cards = moduleConfigs.service.cards || [];
-  return cards.filter(svc => {
-    if (svc.assetRef && svc.assetRef === dataTitle) return true;
-    const a = (svc.title || '').replace(/_/g, '').toLowerCase();
-    const b = dataTitle.replace(/_/g, '').toLowerCase();
-    return (a && b && (a.startsWith(b) || b.startsWith(a)));
+  const key = String(dataTitle).replace(/_/g, '').toLowerCase();
+  return getAllLwServices().filter(function (s) {
+    const ref = s.assetRef || '';
+    const hit = (ref === dataTitle)
+      || ref.replace(/_/g, '').toLowerCase() === key
+      || String(s.title || '').replace(/_/g, '').toLowerCase() === key;
+    return hit && lwSvcMatchesMode(s);
   });
 }
-
-// 主体数据下拉填充（数据资产卡片）
-function initLwMainData() {
-  const sel = document.getElementById('lwMainData');
-  if (!sel) return;
-  const cards = moduleConfigs.data.cards || [];
-  sel.innerHTML = '<option value="">请选择主体数据...</option>'
-    + cards.map(c => '<option value="' + c.title.replace(/"/g, '&quot;') + '">' + c.title + ' <span class="text-gray-400">（' + (c.type || '') + '）</span></option>').join('');
+// 可选数据：至少发布了 1 个符合当前时序性质的服务
+function lwDataCandidates() {
+  if (lwTimeSeries === null) return [];
+  return getAllLwData().filter(function (d) { return lwServicesOfData(d.title).length > 0; });
+}
+// 当前选中的一组服务
+function getLwSelectedServices() {
+  return Object.keys(lwPickedServices).filter(function (k) { return lwPickedServices[k]; });
 }
 
-// 主体数据切换 → 重置服务选择 + 重建树 + 渲染辅助层 + 更新坐标系
-function onLwMainDataChange(val) {
-  lwMainDataTitle = val || '';
-  lwSelectedServices = {};
-  lwAuxServices = {};
-  renderLayerServiceTree();
-  renderLwAuxList();
-  updateLwSelectedCount();
+// 步骤 1：确认是否时序（下拉单选）—— 决定后续分支（时序=选服务序列；非时序=选数据→选服务）
+function setLwTimeSeries(v) {
+  lwTimeSeries = (v === true || v === 'true') ? true : (v === false || v === 'false') ? false : null;
+  lwSeqId = '';
+  lwDataTitle = '';
+  lwPickedServices = {};
+  // 分支显隐：时序 → 服务序列；非时序 → 数据 + 该数据发布的服务
+  const qw = document.getElementById('lwSeqPickWrap');
+  const dw = document.getElementById('lwDataPickWrap');
+  const sw = document.getElementById('lwSvcPickWrap');
+  if (qw) qw.classList.toggle('hidden', lwTimeSeries !== true);
+  if (dw) dw.classList.toggle('hidden', lwTimeSeries !== false);
+  if (sw) sw.classList.toggle('hidden', lwTimeSeries !== false);
+  renderLwSeqList();
+  renderLwDataList();
+  renderLwDataServiceList();
+  updateLwPickState();
   updateLwCrsDisplay();
-  if (val && !getLwDerivedServices(val).length) {
-    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '「' + val + '」尚未发布衍生服务，请先在「数据资产」中发布后再来创建要素图层');
-  }
 }
 
-// 辅助表达层（标注/符号/描边）：仅列同一主体数据衍生服务
-function renderLwAuxList() {
-  const wrap = document.getElementById('lwAuxList');
-  if (!wrap) return;
-  if (!lwMainDataTitle) {
-    wrap.innerHTML = '<div class="text-xs text-gray-400">请先选择主体数据——辅助表达层仅可引用同一主体数据衍生的服务</div>';
+// 步骤 2（时序分支）：选择服务序列
+function lwGetSequences() {
+  const all = (typeof SERVICE_SEQUENCES !== 'undefined') ? SERVICE_SEQUENCES : {};
+  return Object.keys(all).map(function (k) {
+    const s = all[k] || {};
+    const dates = s.dates || [];
+    return {
+      id: k, name: s.name || k, frames: s.frames || dates.length || 0, dates: dates,
+      service: s.service || '', editorService: s.editorService || s.service || '',
+      defaultTpl: s.defaultTpl || 'standard', desc: s.desc || ''
+    };
+  });
+}
+function lwPickedSeq() {
+  const list = lwGetSequences();
+  return list.find(function (s) { return s.id === lwSeqId; }) || null;
+}
+function pickLwSeq(id) {
+  if (lwSeqId === id) return;
+  lwSeqId = id;
+  renderLwSeqList();
+  updateLwPickState();
+  updateLwCrsDisplay();
+}
+function renderLwSeqList() {
+  const box = document.getElementById('lwSeqList');
+  if (!box) return;
+  const list = lwGetSequences();
+  if (!list.length) {
+    box.innerHTML = '<div class="text-xs text-gray-400 text-center py-6">暂无可用服务序列<br><span class="text-[10px]">服务序列由「服务序列」模块维护</span></div>';
     return;
   }
-  const derived = getLwDerivedServices(lwMainDataTitle);
-  if (!derived.length) {
-    wrap.innerHTML = '<div class="text-xs text-gray-400">该数据暂无衍生服务，辅助表达层留空即可（进入设计页后可补充）</div>';
+  box.innerHTML = list.map(function (s) {
+    const sel = s.id === lwSeqId;
+    // 新口径自建序列无 frames/dates（纯样式模板组容器）→ 不渲染期数徽标与时间跨度
+    const hasFrames = !!s.frames;
+    const span = (s.dates && s.dates.length) ? (s.dates[0] + ' ~ ' + s.dates[s.dates.length - 1]) : '';
+    return '<label class="flex items-center gap-2 py-2 px-2 rounded-lg cursor-pointer text-sm ' + (sel ? 'lw-svc-checked' : 'hover:bg-gray-50') + '">'
+      + '<input type="radio" name="lwSeq" ' + (sel ? 'checked' : '') + ' onchange="pickLwSeq(\'' + s.id + '\')" class="rounded-full text-brand focus:ring-brand/30">'
+      + '<span class="flex-1 min-w-0">'
+      +   '<span class="flex items-center gap-1 flex-wrap"><span class="font-medium text-gray-800 truncate">' + s.name + '</span>'
+      +   (hasFrames ? '<span class="text-[10px] shrink-0 px-1 rounded bg-purple-50 text-purple-600 border border-purple-200">' + s.frames + ' 期</span>' : '')
+      +   '<span class="text-[10px] shrink-0 px-1 rounded bg-amber-50 text-amber-600">栅格</span></span>'
+      +   (span ? '<span class="text-[11px] text-gray-400 mt-0.5 block">' + span + '</span>' : '')
+      +   (s.desc ? '<span class="text-[11px] text-gray-400 block">' + s.desc + '</span>' : '')
+      + '</span></label>';
+  }).join('');
+}
+
+// 步骤 2：选择数据
+function pickLwData(title) {
+  if (lwDataTitle === title) return;
+  lwDataTitle = title;
+  lwPickedServices = {};
+  renderLwDataList();
+  renderLwDataServiceList();
+  updateLwPickState();
+  updateLwCrsDisplay();
+}
+
+// 步骤 3：勾选 / 取消该数据发布的某个服务（多选；坐标系须一致）
+function toggleLwService(box, title) {
+  const all = getAllLwServices();
+  const card = all.find(function (c) { return c.title === title; });
+  if (!card) return;
+  if (lwPickedServices[title]) {
+    delete lwPickedServices[title];
+  } else {
+    const picked = getLwSelectedServices();
+    if (picked.length) {
+      const first = all.find(function (c) { return c.title === picked[0]; });
+      const a = first ? (first.crs || '未知') : '未知';
+      const b = card.crs || '未知';
+      if (a !== b) {
+        showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '不允许混用不同坐标系的服务：已选「<strong>' + a + '</strong>」，而「' + title + '」为「<strong>' + b + '</strong>」');
+        if (box && box.checked !== undefined) box.checked = false;
+        return;
+      }
+    }
+    lwPickedServices[title] = true;
+  }
+  renderLwDataServiceList();
+  updateLwPickState();
+  updateLwCrsDisplay();
+}
+
+// 步骤 2 列表渲染
+function renderLwDataList() {
+  const box = document.getElementById('lwDataList');
+  if (!box) return;
+  const kwEl = document.getElementById('lwDataSearch');
+  const kw = ((kwEl && kwEl.value) || '').trim().toLowerCase();
+  const list = lwDataCandidates().filter(function (d) {
+    if (!kw) return true;
+    return ((d.title || '') + ' ' + (d.type || '') + ' ' + (d.fmt || '')).toLowerCase().indexOf(kw) >= 0;
+  });
+  if (!list.length) {
+    box.innerHTML = '<div class="text-xs text-gray-400 text-center py-6">没有匹配的数据<br><span class="text-[10px]">' + (lwTimeSeries === null ? '请先在步骤 1 选择是否时序' : '该时序性质下暂无已发布对应服务的数据') + '</span></div>';
     return;
   }
-  wrap.innerHTML = derived.map(svc => {
-    const checked = lwAuxServices[svc.title] ? 'checked' : '';
-    return '<label class="flex items-center gap-2 py-1.5 px-1 hover:bg-white rounded cursor-pointer text-sm">'
-      + '<input type="checkbox" ' + checked + ' onchange="toggleLwAux(this, \'' + svc.title.replace(/'/g, "\\'") + '\')" class="rounded border-gray-300 text-brand focus:ring-brand/30">'
-      + '<span class="flex-1 text-gray-700 truncate">' + svc.title + '</span>'
-      + '<span class="text-[10px] text-gray-400 shrink-0">' + (svc.type || '') + '</span>'
+  box.innerHTML = list.map(function (d) {
+    const sel = d.title === lwDataTitle;
+    const n = lwServicesOfData(d.title).length;
+    const geomLabel = ({ point: '点', line: '线', polygon: '面', raster: '栅格' }[d.geom] || d.geom || '—');
+    return '<label class="flex items-center gap-2 py-2 px-2 rounded-lg cursor-pointer text-sm ' + (sel ? 'lw-svc-checked' : 'hover:bg-gray-50') + '">'
+      + '<input type="radio" name="lwData" ' + (sel ? 'checked' : '') + ' onchange="pickLwData(\'' + String(d.title).replace(/'/g, "\\'") + '\')" class="rounded-full text-brand focus:ring-brand/30">'
+      + '<span class="flex-1 min-w-0">'
+      +   '<span class="flex items-center gap-1 flex-wrap"><span class="font-medium text-gray-800 truncate">' + d.title + '</span>'
+      +   '<span class="text-[10px] shrink-0 px-1 rounded bg-brand-light text-brand">' + n + ' 个可用服务</span></span>'
+      +   '<span class="text-[11px] text-gray-400 mt-0.5 block">' + (d.type || '—') + ' · ' + (d.fmt || '') + ' · ' + geomLabel + '</span>'
+      + '</span>'
+      + '<span class="text-[10px] shrink-0 px-1 rounded ' + (d.crs === '中国大地坐标' ? 'bg-orange-50 text-orange-600' : 'bg-brand-light text-brand') + '">' + (d.crs || '') + '</span>'
       + '</label>';
   }).join('');
 }
 
-function toggleLwAux(cb, title) {
-  if (cb.checked) lwAuxServices[title] = true;
-  else delete lwAuxServices[title];
-}
-
-function buildLayerServiceTreeData() {
-  // 08-17 决策：只展示主体数据衍生的服务（assetRef/名称关联），其余服务不出现在树中
-  const derived = getLwDerivedServices(lwMainDataTitle);
-  if (!lwMainDataTitle || !derived.length) return [];
-  // 按 serviceRole × cat 分组（业务/底图两段，服务模块同口径）
-  function groupBy(role) {
-    const groups = {};
-    derived.filter(c => (c.serviceRole || '业务') === role).forEach(c => {
-      const cat = c.cat || '其他';
-      if (!groups[cat]) groups[cat] = [];
-      groups[cat].push(c);
-    });
-    return groups;
-  }
-  const bizGroups = groupBy('业务');
-  const baseGroups = groupBy('底图');
-  const tree = [];
-  if (Object.keys(bizGroups).length) {
-    tree.push({
-      name: '业务服务（' + lwMainDataTitle + ' 衍生）',
-      id: 'lw_biz',
-      open: true,
-      children: Object.keys(bizGroups).map(cat => ({
-        name: catLabel(cat),
-        id: 'lw_biz_' + cat,
-        open: true,
-        services: bizGroups[cat]
-      }))
-    });
-  }
-  if (Object.keys(baseGroups).length) {
-    tree.push({
-      name: '底图服务（' + lwMainDataTitle + ' 衍生）',
-      id: 'lw_base',
-      open: true,
-      children: Object.keys(baseGroups).map(cat => ({
-        name: catLabel(cat),
-        id: 'lw_base_' + cat,
-        open: true,
-        services: baseGroups[cat]
-      }))
-    });
-  }
-  return tree;
-
-  function catLabel(cat) {
-    const map = { '遥感': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg> 遥感影像', '外部': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/><path d="M2 12h20"/></svg> 在线底图', '耕地': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg> 耕地业务', '底图': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg> 行政区划' };
-    return map[cat] || ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2"/></svg> ' + cat);
-  }
-}
-
-function renderLayerServiceTree(filterText) {
-  lwServiceTreeData = buildLayerServiceTreeData();
-  const container = document.getElementById('lwServiceTree');
-  if (!container) return;
-  if (!lwMainDataTitle) {
-    container.innerHTML = '<div class="text-xs text-gray-400 text-center py-8">请先选择<b>主体数据</b>，此处将列出该数据衍生的表达服务</div>';
-    updateLwSelectedCount();
+// 步骤 3 列表渲染：所选数据发布的服务（多选）
+function renderLwDataServiceList() {
+  const box = document.getElementById('lwDataServiceList');
+  const cap = document.getElementById('lwSvcPickCap');
+  if (!box) return;
+  if (!lwDataTitle) {
+    if (cap) cap.textContent = '请先选择数据';
+    box.innerHTML = '<div class="text-xs text-gray-400 text-center py-6">请先在步骤 2 选择数据<br><span class="text-[10px]">服务由所选数据发布而来</span></div>';
     return;
   }
-  if (!lwServiceTreeData.length) {
-    container.innerHTML = '<div class="text-xs text-gray-400 text-center py-8">「' + lwMainDataTitle + '」暂无衍生服务<br><span class="text-[10px]">请先在「数据资产」中把该数据发布为地图服务</span></div>';
-    updateLwSelectedCount();
+  if (cap) cap.textContent = '数据「' + lwDataTitle + '」已发布的服务';
+  const list = lwServicesOfData(lwDataTitle);
+  if (!list.length) {
+    box.innerHTML = '<div class="text-xs text-gray-400 text-center py-6">该数据暂无符合当前时序性质的服务</div>';
     return;
   }
-  let html = '';
-  function renderNodes(nodes, level) {
-    nodes.forEach(node => {
-      if (node.children) {
-        // Category node with expand/collapse
-        const isOpen = typeof node.open !== 'undefined' ? node.open : true;
-        html += '<div class="lw-tree-cat" style="padding-left:' + (level * 24) + 'px">';
-        html += '<div class="flex items-center gap-1.5 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer text-sm font-medium text-gray-700" onclick="toggleLwTreeNode(this, \'' + node.id + '\')">';
-        html += '<span class="text-[10px] w-3 text-center transition-transform lw-arrow' + (isOpen ? ' rotate-90' : '') + '">▶</span>';
-        html += '<span>' + node.name + '</span>';
-        html += '</div>';
-        html += '<div class="lw-tree-children' + (isOpen ? '' : ' hidden') + '">';
-        renderNodes(node.children, level + 1);
-        html += '</div>';
-        html += '</div>';
-      } else if (node.services) {
-        // Leaf node with service checkboxes
-        html += '<div class="lw-tree-leaf" style="padding-left:' + (level * 24) + 'px">';
-        html += '<div class="flex items-center gap-1.5 py-1 px-2 rounded-lg hover:bg-gray-50 cursor-pointer text-xs font-medium text-gray-600" onclick="toggleLwTreeNode(this, \'' + node.id + '\')">';
-        html += '<span class="text-[10px] w-3 text-center transition-transform lw-arrow' + (node.open !== false ? ' rotate-90' : '') + '">▶</span>';
-        html += '<span>' + node.name + ' <span class="text-gray-400 font-normal">(' + node.services.length + ')</span></span>';
-        html += '</div>';
-        html += '<div class="lw-tree-children' + (node.open !== false ? '' : ' hidden') + '">';
-        node.services.forEach(svc => {
-          const checked = lwSelectedServices[svc.title] ? 'checked' : '';
-          const match = !filterText || svc.title.includes(filterText) || (svc.type || '').includes(filterText) || (svc.cat || '').includes(filterText);
-          html += '<label class="flex items-center gap-2 py-1.5 px-2 hover:bg-gray-50 cursor-pointer text-sm' + (match ? '' : ' hidden') + '" style="padding-left:24px">';
-          html += '<input type="checkbox" ' + checked + ' onchange="toggleLwService(this, \'' + svc.title.replace(/'/g, "\\'") + '\')" class="rounded border-gray-300 text-brand focus:ring-brand/30">';
-          html += '<span class="flex-1 text-gray-800 truncate">' + svc.title + '</span>';
-          html += '<span class="text-[10px] text-gray-400 shrink-0">' + (svc.type || '') + '</span>';
-          html += '<span class="text-[10px] shrink-0 ml-1 px-1 rounded ' + (svc.crs === '中国大地坐标' ? 'bg-orange-50 text-orange-600' : 'bg-brand-light text-brand') + '">' + (svc.crs || '') + '</span>';
-          html += '</label>';
-        });
-        html += '</div>';
-        html += '</div>';
-      }
-    });
-  }
-  renderNodes(lwServiceTreeData, 0);
-  container.innerHTML = html;
-  updateLwSelectedCount();
+  box.innerHTML = list.map(function (s) {
+    const checked = !!lwPickedServices[s.title];
+    const tsBadge = lwSvcIsTs(s) ? '<span class="text-[10px] shrink-0 ml-1 px-1 rounded bg-purple-50 text-purple-600 border border-purple-200">时序</span>' : '';
+    const kindBadge = lwSvcIsRaster(s)
+      ? '<span class="text-[10px] shrink-0 ml-1 px-1 rounded bg-amber-50 text-amber-600">栅格</span>'
+      : '<span class="text-[10px] shrink-0 ml-1 px-1 rounded bg-brand-light text-brand">矢量</span>';
+    return '<label class="flex items-center gap-2 py-2 px-2 rounded-lg cursor-pointer text-sm ' + (checked ? 'lw-svc-checked' : 'hover:bg-gray-50') + '">'
+      + '<input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="toggleLwService(this,\'' + String(s.title).replace(/'/g, "\\'") + '\')" class="rounded text-brand focus:ring-brand/30">'
+      + '<span class="flex-1 min-w-0">'
+      +   '<span class="flex items-center gap-1 flex-wrap"><span class="font-medium text-gray-800 truncate">' + s.title + '</span>' + kindBadge + tsBadge + '</span>'
+      +   '<span class="text-[11px] text-gray-400 mt-0.5 block">' + (s.type || s.fmt || '') + ' · ' + (s.sub || '') + '</span>'
+      + '</span>'
+      + '<span class="text-[10px] shrink-0 px-1 rounded ' + (s.crs === '中国大地坐标' ? 'bg-orange-50 text-orange-600' : 'bg-brand-light text-brand') + '">' + (s.crs || '') + '</span>'
+      + '</label>';
+  }).join('');
 }
 
-function toggleLwTreeNode(el, nodeId) {
-  const children = el.parentElement.querySelector('.lw-tree-children');
-  const arrow = el.querySelector('.lw-arrow');
-  if (children) {
-    children.classList.toggle('hidden');
-    if (arrow) arrow.classList.toggle('rotate-90');
+// 已选数量（时序=序列；非时序=服务数）
+function updateLwPickState() {
+  const cnt = document.getElementById('lwSvcPickCount');
+  if (cnt) cnt.textContent = '已选 ' + getLwSelectedServices().length + ' 个';
+  const qcnt = document.getElementById('lwSeqPickCount');
+  if (qcnt) {
+    const seq = lwPickedSeq();
+    qcnt.textContent = seq ? ('已选：' + seq.name + '（' + seq.frames + ' 期）') : '未选择';
   }
 }
 
-function toggleLwService(cb, title) {
-  if (cb.checked) {
-    // Check CRS compatibility
-    const allCards = moduleConfigs.service.cards;
-    const thisCard = allCards.find(c => c.title === title);
-    const thisCrs = thisCard ? (thisCard.crs || '未知') : '未知';
-    const selected = getLwSelectedServices();
-    if (selected.length > 0) {
-      const firstTitle = selected[0];
-      const firstCard = allCards.find(c => c.title === firstTitle);
-      const activeCrs = firstCard ? (firstCard.crs || '未知') : '未知';
-      if (thisCrs !== activeCrs) {
-        cb.checked = false;
-        showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '不允许混用不同坐标系的服务：已选「<strong>' + activeCrs + '</strong>」，而「' + title + '」的坐标系是「<strong>' + thisCrs + '</strong>」');
-        return;
-      }
-    }
-    lwSelectedServices[title] = true;
-  } else {
-    delete lwSelectedServices[title];
+// 服务名 → 对应数据卡（精确 assetRef 或归一化兜底）
+function findLwDataOfService(svcTitle) {
+  const svc = getAllLwServices().find(function (s) { return s.title === svcTitle; });
+  if (!svc) return null;
+  const dcards = getAllLwData();
+  if (svc.assetRef) {
+    const exact = dcards.find(function (d) { return d.title === svc.assetRef; });
+    if (exact) return exact;
   }
-  updateLwSelectedCount();
-  updateLwCrsDisplay();
+  const key = String(svcTitle).replace(/_/g, '').toLowerCase();
+  return dcards.find(function (d) { return String(d.title || '').replace(/_/g, '').toLowerCase() === key; }) || null;
 }
 
-function getLwSelectedServices() {
-  return Object.keys(lwSelectedServices).filter(k => lwSelectedServices[k]);
-}
-
-function updateLwSelectedCount() {
-  const count = getLwSelectedServices().length;
-  const el = document.getElementById('lwSvcCount');
-  const hint = document.getElementById('lwSvcHint');
-  if (el) el.textContent = count;
-  if (hint) {
-    if (count === 0) hint.classList.remove('hidden');
-    else hint.classList.add('hidden');
+// 预览弹窗信息（时序=序列；非时序=数据+服务）
+function updateLwPreviewInfo() {
+  const picked = getLwSelectedServices();
+  const seq = lwPickedSeq();
+  const dataName = document.getElementById('lpvDataName');
+  if (dataName) dataName.textContent = (lwTimeSeries === true) ? (seq ? (seq.name + '（服务序列）') : '—') : (lwDataTitle || '—');
+  const svcCount = document.getElementById('lpvSvcCountLabel');
+  if (svcCount) svcCount.textContent = (lwTimeSeries === true) ? (seq ? (seq.frames + ' 期') : '0') : (picked.length ? ('已选 ' + picked.length) : '0');
+  const subtitle = document.getElementById('lpvSubtitle');
+  if (subtitle) {
+    const head = (lwTimeSeries === true ? '时序图层' : lwTimeSeries === false ? '非时序图层' : '未定时序');
+    const body = (lwTimeSeries === true)
+      ? ' · 服务序列 ' + (seq ? (seq.name + ' · ' + seq.frames + ' 期') : '—')
+      : ' · 数据 ' + (lwDataTitle || '—') + ' · 已选 ' + picked.length + ' 个服务';
+    subtitle.textContent = head + body;
   }
-  updateLwCrsDisplay();
 }
 
+// ── 坐标系联动（时序=序列服务；非时序=已选服务） ──
 function updateLwCrsDisplay() {
-  const selected = getLwSelectedServices();
   const icon = document.getElementById('lwCrsIcon');
   const text = document.getElementById('lwCrsText');
   const display = document.getElementById('lwCrsDisplay');
   if (!text || !display) return;
-  if (selected.length === 0) {
+  const setNeutral = function () {
     if (icon) { icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/><path d="M2 12h20"/></svg>'; icon.className = 'text-gray-400'; }
-    text.textContent = '选择服务后自动确定';
+    text.textContent = '选择后自动确定';
     text.className = 'text-gray-500';
     display.className = display.className.replace(' border-green-300 bg-green-50', '');
     if (!display.className.includes(' bg-gray-50')) display.className += ' bg-gray-50';
-  } else {
-    const allCards = moduleConfigs.service.cards;
-    const firstCard = allCards.find(c => c.title === selected[0]);
-    const crs = firstCard ? (firstCard.crs || '未知') : '未知';
-    const sameCount = selected.filter(t => {
-      const c = allCards.find(x => x.title === t);
-      return c && (c.crs || '未知') === crs;
-    }).length;
+  };
+  const setCrs = function (crs, note) {
     if (icon) { icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'; icon.className = 'text-brand'; }
-    text.textContent = crs + '（' + sameCount + ' 个服务统一）';
+    text.textContent = crs + note;
     text.className = 'text-brand font-medium text-sm';
     display.className = display.className.replace(' bg-gray-50', '').replace(' border-line', ' border-green-300 bg-green-50');
+  };
+  const all = getAllLwServices();
+
+  // 时序：坐标系 = 所选服务序列绑定的服务
+  if (lwTimeSeries === true) {
+    const seq = lwPickedSeq();
+    if (!seq) { setNeutral(); return; }
+    const svcCard = all.find(function (c) { return c.title === seq.service; });
+    const crs = svcCard ? (svcCard.crs || '未知') : '未知';
+    setCrs(crs, '（服务序列统一）');
+    return;
   }
+
+  // 非时序：已选服务（须一致）
+  const picked = getLwSelectedServices();
+  if (!picked.length) { setNeutral(); return; }
+  const first = all.find(function (c) { return c.title === picked[0]; });
+  const crs = first ? (first.crs || '未知') : '未知';
+  const sameCount = picked.filter(function (t) {
+    const c = all.find(function (x) { return x.title === t; });
+    return c && (c.crs || '未知') === crs;
+  }).length;
+  setCrs(crs, '（' + sameCount + '/' + picked.length + ' 个服务统一）');
 }
 
-function filterLayerServiceTree(text) {
-  renderLayerServiceTree(text.trim());
-}
-
-// Auto-init service tree when wizard opens
+// Auto-init service list when wizard opens
 (function() {
   const origOpen = document.getElementById('layerWizard');
   if (origOpen) {
@@ -561,7 +627,7 @@ function filterLayerServiceTree(text) {
         if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
           if (!document.getElementById('layerWizard').classList.contains('hidden')) {
             if (typeof resetLayerWizard === 'function') resetLayerWizard();
-            else { initLwMainData(); renderLayerServiceTree(); renderLwAuxList(); renderLwColorSwatches(); }
+            else { renderLwSeqList(); renderLwDataList(); renderLwDataServiceList(); }
           }
         }
       });
@@ -648,14 +714,30 @@ function openLayerPreview() {
 
   if (!popup) return;
 
-  const mainName = document.getElementById('lpvMainDataName');
-  if (mainName) mainName.textContent = lwMainDataTitle || '未选择';
+  const seq = lwPickedSeq();
+  const first = selected[0] || '';
+  const mainName = document.getElementById('lpvMainServiceName');
+  const dataName = document.getElementById('lpvDataName');
   const svcCountLabel = document.getElementById('lpvSvcCountLabel');
-  if (svcCountLabel) svcCountLabel.textContent = selected.length;
-  if (subtitle) subtitle.textContent = '主体数据：' + (lwMainDataTitle || '未选择') + ' · 已选 ' + selected.length + ' 个表达服务';
+  // 时序：主体=服务序列，数据来源=序列绑定的服务；非时序：主体=首个服务，数据=所选数据
+  const mainLabel = (lwTimeSeries === true) ? (seq ? seq.name : '未选择') : (first || '未选择');
+  const dataLabel = (lwTimeSeries === true) ? (seq ? (seq.service + '（序列数据）') : '—') : (lwDataTitle || '—');
+  const countLabel = (lwTimeSeries === true) ? (seq ? (seq.frames + ' 期') : '0') : (selected.length ? ('已选 ' + selected.length) : '0');
+  if (mainName) mainName.textContent = mainLabel;
+  if (dataName) dataName.textContent = dataLabel;
+  if (svcCountLabel) svcCountLabel.textContent = countLabel;
+  if (subtitle) {
+    subtitle.textContent = (lwTimeSeries === true ? '时序图层' : lwTimeSeries === false ? '非时序图层' : '未定时序')
+      + (lwTimeSeries === true
+        ? ' · 服务序列 ' + (seq ? (seq.name + ' · ' + seq.frames + ' 期') : '—')
+        : ' · 数据 ' + (lwDataTitle || '—') + ' · 已选 ' + selected.length + ' 个服务');
+  }
   if (list) {
-    if (selected.length === 0) {
-      list.textContent = '尚未选择任何表达服务';
+    if (selected.length === 0 && lwTimeSeries !== true) {
+      list.textContent = '尚未选择服务（步骤 3）';
+    } else if (lwTimeSeries === true && seq) {
+      list.innerHTML = '<span class="inline-block px-2 py-0.5 bg-white/70 rounded text-xs text-gray-700 m-0.5 shadow-sm">' + seq.service + '</span>'
+        + '<span class="inline-block px-2 py-0.5 bg-white/70 rounded text-xs text-gray-700 m-0.5 shadow-sm">' + seq.frames + ' 期时间序列</span>';
     } else {
       list.innerHTML = selected.map(s => '<span class="inline-block px-2 py-0.5 bg-white/70 rounded text-xs text-gray-700 m-0.5 shadow-sm">' + s + '</span>').join('');
     }
@@ -688,30 +770,13 @@ function closeLayerPreview() {
   if (popup) popup.classList.add('hidden');
 }
 
-// ── 基础样式与颜色 ─────────────────────────────────────
-const LW_BASE_COLORS = ['#2bbaa0', '#1677ff', '#fa8c16', '#52c41a', '#722ed1', '#f5222d'];
-let lwBaseColor = LW_BASE_COLORS[0];
-
-function renderLwColorSwatches() {
-  const wrap = document.getElementById('lwColorSwatches');
-  if (!wrap) return;
-  wrap.innerHTML = LW_BASE_COLORS.map(c =>
-    '<button type="button" onclick="selectLwBaseColor(\'' + c + '\')" style="width:32px;height:32px;border-radius:9999px;background:' + c + ';border:2px solid ' + (c === lwBaseColor ? '#0f947c' : 'transparent') + ';transform:scale(' + (c === lwBaseColor ? '1.15' : '1') + ');transition:transform .15s ease,border-color .15s ease;cursor:pointer;" title="' + c + '"></button>'
-  ).join('');
-  const shape = document.getElementById('lwStyleShape');
-  if (shape) shape.style.background = lwBaseColor;
-}
-
-function selectLwBaseColor(c) {
-  lwBaseColor = c;
-  renderLwColorSwatches();
-}
-
 // Reset layer wizard state when opened
 function resetLayerWizard() {
-  lwSelectedServices = {};
-  lwAuxServices = {};
-  lwMainDataTitle = '';
+  lwTimeSeries = null;
+  lwSeqId = '';
+  lwDataTitle = '';
+  lwPickedServices = {};
+  lwFocusTitle = '';
   lwTags = [];
   lwTypeTags = ['矢量图层'];
   lwIconIdx = 0;
@@ -720,8 +785,13 @@ function resetLayerWizard() {
   const descInput = document.getElementById('lwDesc');
   const iconDisplay = document.getElementById('lwIconDisplay');
   const iconLabel = document.getElementById('lwIconLabel');
-  const mainDataSel = document.getElementById('lwMainData');
-  if (mainDataSel) mainDataSel.value = '';
+  const dataSearch = document.getElementById('lwDataSearch');
+  if (dataSearch) dataSearch.value = '';
+  const tsSel = document.getElementById('lwTsSelect');
+  if (tsSel) tsSel.value = '';
+  ['lwSeqPickWrap', 'lwDataPickWrap', 'lwSvcPickWrap'].forEach(function (id) {
+    const e = document.getElementById(id); if (e) e.classList.add('hidden');
+  });
   if (nameInput) nameInput.value = 'XX农场耕地监测要素图层';
   if (codeInput) codeInput.value = '';
   if (descInput) descInput.value = '';
@@ -730,12 +800,12 @@ function resetLayerWizard() {
   document.getElementById('lwTitle').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg> 创建要素图层';
   renderLwTags();
   renderLwTypeTags();
-  initLwMainData();
-  renderLayerServiceTree();
-  renderLwAuxList();
-  updateLwSelectedCount();
+  renderLwSeqList();
+  renderLwDataList();
+  renderLwDataServiceList();
+  updateLwPickState();
   updateLwCrsDisplay();
-  document.getElementById('lwSvcHint').classList.add('hidden');
+  updateLwPreviewInfo();
 }
 
 // ── 要素图层：编辑 / 设计 ──────────────────────────────
@@ -745,9 +815,9 @@ function openLayerDesign(action, title) {
     const nameInput = document.getElementById('lwName');
     if (nameInput) nameInput.value = title;
     document.getElementById('layerWizard').classList.remove('hidden');
-    initLwMainData();
-    renderLayerServiceTree();
-    renderLwAuxList();
+    renderLwSeqList();
+    renderLwDataList();
+    renderLwDataServiceList();
   } else {
     openMapViewer(title); // 设计 = 打开图层表达预览
   }

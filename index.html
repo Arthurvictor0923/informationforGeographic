@@ -25,7 +25,7 @@
         <a href="数据资产.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
         </a>
-        <a href="地图服务.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+        <a href="地图服务-重设计.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg> 地图服务
         </a>
         <a href="要素图层.html" data-module="layer" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
@@ -33,9 +33,6 @@
         </a>
         <a href="专题地图.html" data-module="map" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 专题地图
-        </a>
-        <a href="制图规范原型.html" data-module="spec" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M12 22a10 10 0 1 1 10-10c0 1.7-1.3 3-3 3h-2.5a2.5 2.5 0 0 0-1.9 4.1c.6.7.4 1.9-.6 1.9Z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="11" cy="7.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/></svg> 制图规范
         </a>
         <a href="任务中心.html" data-module="task" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> 任务中心
@@ -275,51 +272,6 @@
           <span class="w-1 h-4 bg-brand rounded-full"></span>
           <h3 class="text-sm font-semibold text-gray-900">数据元数据</h3>
           <span class="text-xs text-gray-400">三种创建方式共用</span>
-          <div class="ml-auto flex items-center gap-2">
-            <span class="text-xs text-gray-400">数据集：</span>
-            <select id="cmDataset" onchange="syncDatasetField()" class="px-2 py-1.5 border border-line rounded text-xs bg-white text-gray-700">
-              <option value="">请选择或新建数据集…</option>
-              <option value="无人机巡检">无人机巡检</option>
-              <option value="耕地监测">耕地监测</option>
-              <option value="水利监测">水利监测</option>
-              <option value="遥感监测">遥感监测</option>
-              <option value="__new">＋ 新建数据集…</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- 更新方式（静态 / 动态，入口一次区分） -->
-        <div class="mb-4">
-          <div class="text-sm font-medium text-gray-700 mb-2">更新方式 <span class="text-xs text-gray-400 font-normal">（入口一次区分，之后不可更改）</span></div>
-          <div class="grid grid-cols-2 gap-3">
-            <button type="button" onclick="selectAssetType('static')" id="assetTypeStatic" class="border-2 border-brand bg-brand-light rounded-lg p-4 text-left transition-all">
-              <div class="flex items-center justify-between">
-                <span class="font-semibold text-gray-800">静态数据（单份覆盖）</span>
-                <span class="text-[10px] bg-brand text-white rounded-full px-2 py-0.5 font-medium">推荐</span>
-              </div>
-              <div class="text-xs text-gray-500 mt-1 leading-relaxed">卡片内只存 <b>一份数据</b>，需要更新时手动覆盖。<br>无历史版本、不出现时间轴。</div>
-            </button>
-            <button type="button" onclick="selectAssetType('dynamic')" id="assetTypeDynamic" class="border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded-lg p-4 text-left transition-all">
-              <div class="flex items-center justify-between">
-                <span class="font-semibold text-gray-800">动态数据集（多份时序）</span>
-                <span class="text-[10px] bg-gray-100 text-gray-500 rounded-full px-2 py-0.5 font-medium">时序</span>
-              </div>
-              <div class="text-xs text-gray-500 mt-1 leading-relaxed">卡片内存 <b>多份数据</b>，按时序叠加（无人机 / 遥感影像）。每期保留历史、支持时间轴播放，<b>必须指定时间属性</b>。</div>
-            </button>
-          </div>
-        </div>
-
-        <!-- 动态数据集：时间属性必填（时序标识，08-14 拍板） -->
-        <div id="ndTimeFieldWrap" class="hidden mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">时间属性 <span class="text-red-400">*</span> <span class="text-xs text-gray-400 font-normal">动态数据集必填——系统按这个字段区分每一期数据</span></label>
-          <select id="ndTimeField" class="w-full px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white">
-            <option value="">请选择时间字段</option>
-            <option value="采集时间">采集时间</option>
-            <option value="数据日期">数据日期</option>
-            <option value="监测周期">监测周期</option>
-            <option value="期号">期号</option>
-          </select>
-          <p class="text-xs text-gray-400 mt-1">选择后每期数据会保留历史快照，可在地图查看器用时间轴 + 播放查看变化。</p>
         </div>
 
         <div class="space-y-3">
@@ -328,9 +280,14 @@
             <input type="text" id="ndName" placeholder="如：XX农场2026年夏季耕地调查" class="w-full px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">数据集 <span class="text-xs text-gray-400 font-normal">（选填，上方数据集下拉已选将自动带出）</span></label>
-            <input type="text" id="ndDataset" placeholder="如：无人机巡检" class="w-full px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white">
-            <p class="text-xs text-brand mt-1 hidden" id="ndDatasetHint"></p>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">数据集 <span class="text-xs text-gray-400 font-normal">（选填，系统自有字段：数据归类）</span></label>
+            <select id="ndDataset" class="w-full px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white">
+              <option value="">（未指定，系统自动归类）</option>
+              <option value="无人机巡检">无人机巡检</option>
+              <option value="耕地监测">耕地监测</option>
+              <option value="水利监测">水利监测</option>
+              <option value="遥感监测">遥感监测</option>
+            </select>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1.5">坐标系 <span class="text-red-400">*</span> <span class="text-xs text-gray-400 font-normal">系统无法自动判别，需手动确认</span></label>
@@ -398,31 +355,26 @@
       <button onclick="closeWizard('publishModal')" class="btn btn-icon btn-md btn-text">✕</button>
     </div>
     <div class="p-6 space-y-4 flex-1 overflow-y-auto scroll-thin">
-      <!-- Data source info -->
+      <!-- Data source info（08-28 v4：按真实数据卡动态渲染） -->
       <div class="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
         <span class="text-xl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg></span>
-        <div>
-          <div class="text-sm font-medium text-gray-800">数据：XX农场2026年夏季耕地调查</div>
-          <div class="text-xs text-gray-500">表格数据 · 刚刚上传</div>
+        <div id="publishSourceInfo">
+          <div class="text-sm font-medium text-gray-800">数据：<span id="publishSourceName">——</span></div>
+          <div class="text-xs text-gray-500" id="publishSourceMeta">——</div>
         </div>
       </div>
 
-      <!-- 数据处理方式（08-17：数据↔服务一对多，按几何类型动态可用） -->
-      <div>
-        <div class="text-sm font-medium text-gray-700 mb-2">数据处理方式 <span class="text-xs text-muted font-normal">— 决定服务呈现的几何形态</span></div>
-        <div class="grid grid-cols-3 gap-2" id="publishProcessCards">
-          <!-- Rendered by renderPublishProcess() -->
-        </div>
-        <p id="publishProcessNote" class="text-xs text-gray-400 mt-1.5 hidden"></p>
-      </div>
+      <!-- 名称字段已合并：仅保留底部「服务标题」(publishTitle)，作为发布后的服务标识 -->
 
-      <!-- 发布模板（单个服务 / 自动拆分 描边+填充+标注） -->
-      <div>
-        <div class="text-sm font-medium text-gray-700 mb-2">发布模板 <span class="text-xs text-muted font-normal">— 一次发布产出</span></div>
-        <div class="grid grid-cols-2 gap-2" id="publishTemplateCards">
-          <!-- Rendered by renderPublishTemplate() -->
-        </div>
-        <p id="publishTemplateNote" class="text-xs text-gray-400 mt-1.5 hidden"></p>
+      <!-- 内容显示设置已移出发布阶段：图层显隐在「要素图层编辑器 / 专题图」消费端配置 -->
+      <div id="publishVectorExprSection" class="hidden">
+        <div class="text-sm font-medium text-gray-700 mb-2">发布类型 <span class="text-xs text-muted font-normal">— 由几何类型与字段结构决定可选项</span></div>
+        <div id="publishExprBody" class="flex flex-wrap gap-2"></div>
+        <p class="text-[11px] text-gray-400 mt-1.5">灰色项=当前数据不适用（已自动禁用并说明原因）；可用项已自动勾选。</p>
+      </div>
+      <div id="publishRenderSection" class="hidden">
+        <div class="text-sm font-medium text-gray-700 mb-2">选择发布的栅格 <span class="text-xs text-muted font-normal">— 从数据包中选择一张栅格发布（单张发布）</span></div>
+        <div id="publishRasterPickBody" class="bg-gray-50 border border-line rounded-lg p-3 space-y-2"></div>
       </div>
 
       <!-- 服务方式：由数据与场景派生（而非让用户直接选协议，降低心智负担） -->
@@ -433,47 +385,29 @@
         </div>
       </div>
 
-      <!-- 两步推荐：场景问卷（第一步） -->
-      <div class="border border-line rounded-lg overflow-hidden">
-        <button type="button" onclick="togglePublishScenario()" class="w-full px-4 py-2.5 bg-gray-50 hover:bg-gray-100 flex items-center justify-between text-sm font-medium text-gray-700 transition-colors">
-          <span class="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v3l2 2"/></svg> 使用场景（决定服务方式）</span>
-          <span id="publishScenarioArrow" class="text-gray-400 transition-transform">▾</span>
-        </button>
-        <div id="publishScenarioPanel" class="hidden p-4 space-y-3">
-          <div class="grid grid-cols-2 gap-x-4 gap-y-2.5">
-            <div>
-              <span class="text-xs text-gray-500 block mb-1">数据规模</span>
-              <select id="psScale" onchange="updatePublishRecommendation()" class="w-full px-2.5 py-1.5 border border-line rounded-lg text-sm bg-white">
-                <option value="small">小（&lt;1万要素）</option>
-                <option value="large">大（≥1万要素）</option>
-              </select>
-            </div>
-            <div>
-              <span class="text-xs text-gray-500 block mb-1">更新频率</span>
-              <select id="psUpdate" onchange="updatePublishRecommendation()" class="w-full px-2.5 py-1.5 border border-line rounded-lg text-sm bg-white">
-                <option value="low">低频（天级以上）</option>
-                <option value="high">高频（分钟~小时级）</option>
-              </select>
-            </div>
-            <div>
-              <span class="text-xs text-gray-500 block mb-1">并发访问</span>
-              <select id="psConcurrency" onchange="updatePublishRecommendation()" class="w-full px-2.5 py-1.5 border border-line rounded-lg text-sm bg-white">
-                <option value="low">低（内部少量用户）</option>
-                <option value="high">高（大屏/多部门并发）</option>
-              </select>
-            </div>
-            <div>
-              <span class="text-xs text-gray-500 block mb-1">交互需求</span>
-              <select id="psInteraction" onchange="updatePublishRecommendation()" class="w-full px-2.5 py-1.5 border border-line rounded-lg text-sm bg-white">
-                <option value="view">仅查看（渲染展示）</option>
-                <option value="query">查询分析（点选/属性查询）</option>
-              </select>
-            </div>
-          </div>
-          <div id="publishRecommend" class="bg-brand-light/60 border border-brand/15 rounded-lg p-3 text-xs text-gray-700 leading-relaxed">
-            <!-- Rendered by updatePublishRecommendation() -->
-          </div>
+      <!-- 服务用途（必选，替代原使用场景问卷） -->
+      <div>
+        <div class="text-sm font-medium text-gray-700 mb-2">服务用途 <span class="text-xs text-red-500">*</span> <span class="text-xs text-muted font-normal">— 该服务用于哪类场景（必选）</span></div>
+        <div class="grid grid-cols-3 gap-2" id="pubPurposeSeg">
+          <label class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white cursor-pointer text-sm text-gray-700 hover:border-brand transition-colors"><input type="radio" name="pubPurpose" value="业务" class="text-brand" checked> 业务</label>
+          <label class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white cursor-pointer text-sm text-gray-700 hover:border-brand transition-colors"><input type="radio" name="pubPurpose" value="地图" class="text-brand"> 地图</label>
+          <label class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white cursor-pointer text-sm text-gray-700 hover:border-brand transition-colors"><input type="radio" name="pubPurpose" value="综合" class="text-brand"> 综合</label>
         </div>
+        <p class="text-xs text-gray-400 mt-1.5">业务=支撑业务分析；地图=作为底图/专题图层；综合=既用于业务也对外共享。</p>
+      </div>
+
+      <!-- 坐标系：由上传数据带出，允许发布时调整（服务投影/发布坐标系） -->
+      <div>
+        <div class="text-sm font-medium text-gray-700 mb-2">坐标系 <span class="text-xs text-muted font-normal">— 默认取自上传数据，可在此调整</span></div>
+        <select id="pubCrs" onchange="togglePubCrsOther()" class="w-full px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white">
+          <option value="中国大地坐标 (CGCS2000 / EPSG:4490)">中国大地坐标（CGCS2000 / EPSG:4490）——推荐，国内国土业务默认</option>
+          <option value="Web 墨卡托（EPSG:3857）">Web 墨卡托（EPSG:3857）——互联网地图默认</option>
+          <option value="北京54（EPSG:4214）">北京54（EPSG:4214）——旧版测绘成果</option>
+          <option value="西安80（EPSG:4610）">西安80（EPSG:4610）——旧版测绘成果</option>
+          <option value="其他（搜索框输入 EPSG 编码）">其他（在下方输入 EPSG 编码）</option>
+        </select>
+        <input id="pubCrsOther" type="text" placeholder="若选『其他』，在此输入坐标系名称或 EPSG 编码（如 EPSG:32650）" class="hidden w-full mt-2 px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white">
+        <p class="text-xs text-gray-400 mt-1.5">说明：坐标系默认取上传该数据时确认的坐标系；若数据实际投影不同，可在此重新指定。选错会导致位置偏移。</p>
       </div>
 
       <!-- 手动覆盖服务类型（高级，默认隐藏，去心智负担） -->
@@ -497,6 +431,22 @@
           <span id="publishAdvancedArrow" class="text-gray-400 transition-transform">▾</span>
         </button>
         <div id="publishAdvancedPanel" class="hidden p-4">
+          <!-- 数据子集（08-28 v4 / S4）：能力集=数据子集，对应服务身份三元组第 3 元；可空=全量 -->
+          <div class="bg-gray-50 border border-line rounded-lg p-3 mb-3 space-y-2 text-sm">
+            <div class="text-xs font-medium text-gray-500 mb-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 数据子集 <span class="text-[10px] text-gray-400 font-normal ml-1">高级 · 默认发布全部数据；如需只发布部分，可设置过滤条件（对应服务身份）</span></div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">属性过滤表达式</label>
+              <input type="text" id="pubSubsetFilter" value="" placeholder="如：crop_type in ('稻','麦')（留空=全部）" class="w-full px-2.5 py-1.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">输出字段子集</label>
+              <input type="text" id="pubSubsetFields" value="" placeholder="留空=全部字段；如：name,area,crop_type" class="w-full px-2.5 py-1.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">空间范围限制</label>
+              <input type="text" id="pubSubsetBbox" value="" placeholder="可选：west,south,east,north（经纬度，留空=全图）" class="w-full px-2.5 py-1.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+            </div>
+          </div>
           <!-- Service-specific options (WMTS/MVT/REAL_MVT) -->
           <div id="publishOptionsArea"></div>
         </div>
@@ -509,21 +459,37 @@
         <p class="text-xs text-gray-400 mt-1">默认为数据名称，可以修改。这个名字会显示在列表和服务详情中。</p>
       </div>
 
-      <!-- 默认渲染时间段（仅时序/动态服务显示，2026-08-20 时序数据模型：发布时序服务时配置默认渲染窗口） -->
-      <div id="publishTimeRangeArea" class="bg-brand-light/50 border border-brand/20 rounded-lg p-4 hidden">
-        <div class="flex items-center gap-2 mb-1.5">
-          <span class="text-sm font-semibold text-gray-800"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 默认渲染时间段</span>
-          <span class="text-[10px] bg-brand text-white rounded-full px-2 py-0.5 font-medium">时序服务</span>
-        </div>
-        <p class="text-xs text-gray-500 leading-relaxed mb-3">默认渲染时间段：要素图层/专题图引用本时序服务时，默认按此时间段渲染（起止窗口内的要素），避免多时相叠加显示。开始/结束日期可留空，留空时渲染全部时相。</p>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">开始日期</label>
-            <input type="date" id="publishTimeStart" value="2026-07-01" class="w-full px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+      <!-- 本次发布：是否启用时间维度（时序服务，仅栅格服务；对齐 GeoServer Time / ArcGIS Time-Enabled Service） -->
+      <div id="publishTimeBlock" class="border border-line rounded-lg overflow-hidden">
+        <button type="button" onclick="togglePublishTime()" class="w-full px-4 py-2.5 bg-gray-50 hover:bg-gray-100 flex items-center justify-between text-sm font-medium text-gray-700 transition-colors">
+          <span class="flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 时间维度（时序服务） <span class="text-[10px] text-gray-400 font-normal">本次发布的服务是否按时间提供</span></span>
+          <span id="publishTimeArrow" class="text-gray-400 transition-transform">▾</span>
+        </button>
+        <div id="publishTimePanel" class="hidden p-4 space-y-3">
+          <!-- 开关：是否启用时间维度 -->
+          <div class="flex items-center justify-between bg-gray-50 border border-line rounded-lg px-3 py-2.5">
+            <div>
+              <div class="text-sm font-medium text-gray-800">发布为时序服务</div>
+              <div class="text-xs text-gray-500 mt-0.5">启用后该栅格服务成为时序服务：需绑定一个服务序列并指定本栅格在该序列中的时间戳，要素图层/时间轴即可按时间筛选、播放。</div>
+            </div>
+            <button type="button" id="pubTimeToggle" onclick="togglePublishTimeEnabled()" role="switch" aria-checked="false" class="relative inline-flex items-center flex-shrink-0 rounded-full cursor-pointer transition-colors" style="width:44px;height:24px;background:#d1d5db;">
+              <span id="pubTimeKnob" class="bg-white rounded-full transition-transform duration-200 ease-in-out" style="display:block;width:20px;height:20px;margin-left:2px;box-shadow:0 1px 3px rgba(0,0,0,.3);"></span>
+            </button>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">结束日期</label>
-            <input type="date" id="publishTimeEnd" value="2026-07-31" class="w-full px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+          <!-- 启用后：绑定服务序列 + 时间戳（仅栅格时序） -->
+          <div id="pubTimeConfig" class="hidden space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">绑定服务序列 <span class="text-xs text-gray-400 font-normal">— 该栅格时序服务所属的时间序列</span></label>
+              <select id="pubTimeSeq" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+                <option value="">请选择服务序列</option>
+              </select>
+              <p class="text-xs text-gray-400 mt-1">服务序列在「服务序列管理」中维护，为该时序服务提供绑定的制图样式模板组（含默认模板）；时间点由下方「绑定时间戳」表达。</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">绑定时间戳</label>
+              <input type="date" id="pubTimeStamp" class="w-full px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+              <p class="text-xs text-gray-400 mt-1">该栅格在这条服务序列中的具体时间点（如 2026-07-01）。</p>
+            </div>
           </div>
         </div>
       </div>
@@ -538,7 +504,7 @@
   </div>
 </div>
 
-<!-- UPDATE DATA MODAL（数据资产卡片 hover → 更新：静态=覆盖更新 / 动态时序=追加新一期，按数据类型判断，08-19 对齐数据合集语义） -->
+<!-- UPDATE DATA MODAL（数据资产卡片 hover → 更新：容器两操作——覆盖/追加，覆盖需先选容器内目标对象，08-31 移除「新增」） -->
 <div id="updateModal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
   <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 560px;">
     <div class="px-6 py-4 border-b border-line flex items-center justify-between">
@@ -550,42 +516,47 @@
         <span class="text-xl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg></span>
         <div>
           <div class="text-sm font-medium text-gray-800" id="updTitle">数据名称</div>
-          <!-- 按数据类型显示的语义行：静态=覆盖 / 动态时序=追加 -->
+          <!-- 按数据类型显示的语义行：静态=覆盖 / 时序=追加 -->
           <div class="text-xs text-gray-500" id="updModeDesc">上传新的数据文件将覆盖原数据</div>
         </div>
       </div>
 
-      <!-- 动态（时序）数据集：追加新一期 提示条 -->
-      <div id="updAppendInfo" class="hidden flex items-start gap-2 bg-purple-50 border border-purple-200 rounded-lg p-3 text-xs text-purple-700">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <div><span class="font-medium">动态数据集 · 时序</span>：选择的新文件将作为<b>新一期</b>数据追加到本合集，保留历史快照，可在详情/时间轴查看各期变化。</div>
-      </div>
-      <!-- 静态数据：覆盖更新 提示条 -->
-      <div id="updCoverWarn" class="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;flex-shrink:0;margin-top:1px"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-        <div><span class="font-medium">静态数据</span>：新文件将<b>覆盖</b>当前数据（覆盖更新，无历史版本、不出现时间轴）。</div>
-      </div>
-
-      <!-- 当前配置确认区：追加/覆盖的新数据将自动沿用合集现有配置（只读展示） -->
-      <div class="bg-brand-light/40 border border-brand/20 rounded-lg p-3">
-        <div class="flex items-center gap-1.5 text-xs font-semibold text-brand-dark mb-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> 将自动沿用以下配置</div>
-        <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs" id="updCfg">
-          <div><span class="text-gray-400">坐标系</span> <span class="text-gray-700 ml-1" id="updCfgCrs">—</span></div>
-          <div><span class="text-gray-400">数据集</span> <span class="text-gray-700 ml-1" id="updCfgDataset">—</span></div>
-          <div><span class="text-gray-400">所属目录</span> <span class="text-gray-700 ml-1" id="updCfgCat">—</span></div>
-          <div><span class="text-gray-400">标签</span> <span class="text-gray-700 ml-1" id="updCfgTag">—</span></div>
-          <div><span class="text-gray-400">组织机构</span> <span class="text-gray-700 ml-1 col-span-2" id="updCfgOrg">—</span></div>
+      <!-- 容器操作（一份数据→默认选中不选择；多份数据→在二级弹窗的数据列表中选择） -->
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <!-- 操作类型：紧凑分段（说明改为 hover title；下方放数据详情区） -->
+          <div class="inline-flex items-center gap-0.5 bg-gray-100 rounded-lg p-0.5" id="updOpWrap">
+            <button type="button" id="updOpCover" onclick="setUpdOp('cover')" title="用新文件替换所选的那份数据" class="upd-op-btn px-3 py-1.5 rounded-md text-xs font-medium transition-colors bg-white text-gray-800 shadow-sm">覆盖</button>
+            <button type="button" id="updOpAdd" onclick="setUpdOp('add')" title="往该数据再追加一份新数据" class="upd-op-btn px-3 py-1.5 rounded-md text-xs font-medium transition-colors text-gray-500 hover:text-gray-700">追加</button>
+          </div>
+          <!-- 已选数据：仅「多份数据」时显示（需选具体那份）；一份数据默认选中，整行隐藏（见 setUpdOp 的 needsChoice 控制） -->
+          <div id="updTargetRow" class="flex items-center gap-2 flex-1 min-w-0">
+            <span class="text-xs text-gray-500 flex-1 truncate">目标：<strong id="updObjPicked" class="text-brand">未选择</strong></span>
+            <button type="button" id="updPickObjBtn" onclick="openUpdObjPicker()" class="btn btn-sm btn-text text-brand flex-shrink-0 hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:0.9em;height:0.9em;vertical-align:-0.125em;flex-shrink:0"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 8v13a1 1 0 0 1-1 1H8"/><path d="M3 8v13a1 1 0 0 0 1 1h5"/><path d="M14 12h4"/><path d="M14 16h4"/><path d="M6 12h2"/><path d="M6 16h2"/></svg> 选择数据</button>
+          </div>
+        </div>
+        <!-- 数据详情区（当前容器对象概览 + 选中目标详情；替代原操作说明条） -->
+        <div id="updDataDetail" class="hidden rounded-lg border border-line overflow-hidden mb-2">
+          <div class="flex items-center justify-between px-3 py-2 bg-gray-50 border-b border-line">
+            <span class="text-xs font-medium text-gray-700">数据详情</span>
+            <button type="button" id="updManageObjBtn" onclick="openUpdObjPicker()" class="text-[11px] text-brand hover:underline flex-shrink-0">选择数据 ›</button>
+          </div>
+          <div id="updDataDetailBody" class="px-3 py-2.5 text-xs text-gray-600"></div>
         </div>
       </div>
 
-      <!-- 动态追加时：本期时间属性（用户单独添加） -->
-      <div id="updPeriodWrap" class="hidden">
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">本期时间 <span class="text-red-400">*</span> <span class="text-xs text-gray-400 font-normal">该期数据的期号 / 日期</span></label>
-        <div class="flex gap-3">
-          <input id="updPeriodNo" type="text" placeholder="期号（如：2026-08 第4期）" class="flex-1 px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white">
-          <input id="updPeriodDate" type="date" class="px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white text-gray-700">
+      <!-- 精简提醒区（其余配置如所属目录/数据集/标签静默沿用元数据卡片，不逐一展示） -->
+      <div class="space-y-2">
+        <!-- 坐标系提醒（新文件坐标系需与本卡片一致，不一致会出位置偏移） -->
+        <div id="updCrsRemind" class="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:0.9em;height:0.9em;flex-shrink:0;margin-top:1px"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+          <span>新数据将沿用本卡片坐标系 <b id="updCrsVal">—</b>；若新文件坐标系不同，请先确认（选错会位置偏移）。</span>
         </div>
-        <p class="text-xs text-gray-400 mt-1.5">该期将以此时刻进入时序时间轴，与既有各期共同播放。</p>
+        <!-- 组织机构提醒（新数据归属该组织） -->
+        <div id="updOrgRemind" class="flex items-start gap-2 bg-gray-50 border border-line rounded-lg p-3 text-xs text-gray-600">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:0.9em;height:0.9em;flex-shrink:0;margin-top:1px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>新数据将归属本卡片组织机构 <b id="updOrgVal">—</b>。</span>
+        </div>
       </div>
 
       <div id="updDrop" onclick="document.getElementById('updFile').click()" class="border-2 border-dashed border-gray-300 hover:border-brand hover:bg-brand-light rounded p-6 text-center cursor-pointer transition-all">
@@ -598,12 +569,12 @@
         <span class="text-green-500 text-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></span>
         <div>
           <div class="text-sm font-medium text-gray-800" id="updFileName">未选择文件</div>
-          <div class="text-xs text-green-700" id="updFileInfoDesc">已选择，系统将自动校验字段并更新</div>
+          <div class="text-xs text-green-700" id="updFileInfoDesc">已选择文件，确认后将更新该数据</div>
         </div>
       </div>
     </div>
     <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50">
-      <span class="text-xs text-gray-400" id="updFooterNote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 动态数据追加新一期，静态数据覆盖当前</span>
+      <span class="text-xs text-gray-400" id="updFooterNote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 上传新文件后覆盖/追加该数据</span>
       <div class="flex items-center gap-3">
         <button onclick="closeWizard('updateModal')" class="btn btn-md btn-text">取消</button>
         <button id="updConfirm" onclick="confirmUpdate()" class="btn btn-md btn-primary" disabled style="opacity:.4;cursor:not-allowed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 确认</button>
@@ -612,10 +583,58 @@
   </div>
 </div>
 
+<!-- 二级弹窗：选择数据（扁平数据列表，无层级下钻；含搜索/筛选/分页，适配大数据量） -->
+<div id="updObjPickerModal" class="fixed inset-0 z-[70] hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
+  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in flex flex-col" style="width: 600px; max-height: 78vh;">
+    <!-- 头部：标题 + 层级面包屑 -->
+    <div class="px-5 py-3.5 border-b border-line">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-gray-900" id="updPickTitle">选择数据对象</h3>
+        <button onclick="closeUpdObjPicker()" class="btn btn-icon btn-md btn-text">✕</button>
+      </div>
+      <div class="flex items-center gap-1.5 mt-1.5 text-xs text-gray-500" id="updPickBreadcrumb"></div>
+    </div>
+    <div class="p-4 flex-1 overflow-hidden flex flex-col">
+      <!-- 面包屑：当前数据 › 数据列表 -->
+      <div id="updPickLevelBar" class="hidden mb-2 text-xs text-gray-500"></div>
+      <div class="flex items-center gap-2 mb-3">
+        <!-- 搜索 -->
+        <div class="relative flex-1">
+          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:0.9em;height:0.9em"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+          <input id="updPickKw" type="text" placeholder="搜索文件名 / 数据对象…" oninput="renderUpdObjPicker()" class="w-full pl-8 pr-3 py-2 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+        </div>
+        <!-- 筛选 -->
+        <select id="updPickFilter" onchange="renderUpdObjPicker()" class="px-2.5 py-2 border border-line rounded-lg text-xs bg-white focus:outline-none focus:border-brand">
+          <option value="">全部</option>
+          <option value="latest">仅最新</option>
+          <option value="normal">仅普通</option>
+        </select>
+      </div>
+      <div id="updObjPickerList" class="border border-line rounded-lg divide-y divide-line overflow-y-auto scroll-thin flex-1"></div>
+      <!-- 分页 -->
+      <div class="flex items-center justify-between mt-3" id="updPickPager">
+        <span class="text-xs text-gray-400" id="updPickTotal"></span>
+        <div class="flex items-center gap-1">
+          <button type="button" id="updPickPrev" onclick="updPickPage(-1)" class="btn btn-sm btn-text text-xs">‹ 上一页</button>
+          <span class="text-xs text-gray-500 mx-1" id="updPickPageInfo"></span>
+          <button type="button" id="updPickNext" onclick="updPickPage(1)" class="btn btn-sm btn-text text-xs">下一页 ›</button>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 py-3 border-t border-line flex items-center justify-end gap-2 bg-gray-50">
+      <button onclick="closeUpdObjPicker()" class="btn btn-md btn-text">取消</button>
+      <button type="button" id="updPickBack" class="btn btn-md btn-default hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:0.9em;height:0.9em;vertical-align:-0.125em;flex-shrink:0"><polyline points="15 18 9 12 15 6"/></svg> 返回数据对象</button>
+      <button id="updPickConfirm" onclick="confirmUpdObjPick()" class="btn btn-md btn-primary">确定选择</button>
+    </div>
+  </div>
+</div>
+
 <script src="common.js"></script>
 <script>
 // ── 数据资产：新增数据 三步向导（创建方式 → 数据源配置 → 数据元数据，08-19 重做） ──
-let wizardAssetType = 'static'; // 'static' 静态数据资源 | 'dynamic' 动态数据集（08-14：入口一次区分）
+// dataAssetType 保持 'static' 兼容下游；"时序"不再由数据声明——发布服务时决定（对齐 GeoServer/ArcGIS time-enabled 服务）
+let wizardAssetType = 'static';
+let wizardDataModel = '';       // 数据模型自动识别：矢量 / 栅格 / 地形 / 3D / 瓦片
 let wizardCrs = ''; // 坐标系必填取值（08-19 反馈①）
 let currentCreateMethod = 'file'; // 当前创建方式：'file' 上传文件 | 'draw' 在线绘制 | 'db' 从数据库导入
 let wizStep = 1; // 三步向导当前步骤：1 创建方式 | 2 数据源配置 | 3 数据元数据
@@ -625,18 +644,8 @@ const ICO_ALERT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 const ICO_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>';
 const ICO_BAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>';
 
-// 更新方式选择（静态/动态，入口锁定后不可更改；动态时显示时间属性必填）
-function selectAssetType(type) {
-  wizardAssetType = type;
-  const st = document.getElementById('assetTypeStatic');
-  const dy = document.getElementById('assetTypeDynamic');
-  const sel = 'border-2 border-brand bg-brand-light rounded-lg p-4 text-left transition-all';
-  const nor = 'border-2 border-gray-200 hover:border-brand hover:bg-brand-light rounded-lg p-4 text-left transition-all';
-  if (st) st.className = type === 'static' ? sel : nor;
-  if (dy) dy.className = type === 'dynamic' ? sel : nor;
-  const wrap = document.getElementById('ndTimeFieldWrap');
-  if (wrap) wrap.classList.toggle('hidden', type !== 'dynamic');
-}
+// 注：不再在新增数据阶段声明"是否时序"——时序 = 发布服务时的配置（对齐 GeoServer Time / ArcGIS Time-Enabled Service）；
+// 数据只登记客观信息，时间维度在发布弹窗绑定。
 
 // 创建方式选择：步骤1入口卡片点击 → 设置创建方式 + 展示对应步骤2数据源区 + 进入步骤2
 function switchCreateMethod(m) {
@@ -651,7 +660,6 @@ function switchCreateMethod(m) {
     const card = document.getElementById(cards[k]);
     if (card) card.className = k === m ? sel : nor;
   });
-  syncDatasetField();
   goStep(2);
 }
 
@@ -703,7 +711,7 @@ function switchDrawMode(mode) {
   if (eBtn) eBtn.className = mode === 'empty' ? on : off;
 }
 
-// 选择文件：渲染已选文件名 chips（listId 可指定其它列表容器）
+// 选择文件：渲染已选文件名 chips（上传后由系统异步入库解析，向导内不做内容识别展示）
 function onFilePick(input, listId) {
   const list = document.getElementById(listId || 'fbFileList');
   if (!list) return;
@@ -730,6 +738,12 @@ function addFieldRow() {
   tbody.appendChild(tr);
 }
 
+// ⚠️ 数据模型/几何/CSV列/预切片 识别不在向导内进行：真实系统上传后全部异步，
+// 向导提交仅登记文件，识别结果由后端入库任务异步回填（08-26 撤销 P0 的教训，勿再在向导内做内容识别展示）。
+function resetWizardModel() {
+  wizardDataModel = '';
+}
+
 // 标签多选（#ndTags）：点击 toggle 选中态，品牌绿边框 = 选中
 const CREATE_TAG_OPTIONS = ['耕地','遥感','水利','农机','畜牧'];
 function renderTagSelect() {
@@ -747,18 +761,7 @@ function toggleTag(tag) {
   renderTagSelect();
 }
 
-// 步骤3元数据表单「数据集」下拉 → 自动带出到表单字段
-function syncDatasetField() {
-  const sel = document.getElementById('cmDataset');
-  const nd = document.getElementById('ndDataset');
-  const hint = document.getElementById('ndDatasetHint');
-  if (!sel || !nd) return;
-  if (sel.value && sel.value !== '__new') {
-    nd.value = sel.value;
-    if (hint) { hint.textContent = '已从上方「数据集」下拉自动带出：' + sel.value; hint.classList.remove('hidden'); }
-  }
-}
-
+// 数据集 / 容器：不在创建向导收集（08-27 用户确认：容器由系统在后端自动创建，原系统自带数据集字段还原不动，向导内不出现）
 // 数据库导入：表/视图 全选
 function toggleDbSelectAll(cb) {
   document.querySelectorAll('.db-table-cb').forEach(c => { c.checked = cb.checked; });
@@ -796,18 +799,18 @@ function submitUpload() {
   if (!crsVal) { showNotification(ICO_ALERT, '请选择数据坐标系——系统无法自动判别，坐标选错会让数据位置偏移'); return; }
   if (!org) { showNotification(ICO_ALERT, '请选择组织机构'); return; }
   if (!cat) { showNotification(ICO_ALERT, '请选择所属目录'); return; }
-  // 动态数据集：时间属性必填（时序标识）
-  const isDynamic = wizardAssetType === 'dynamic';
-  const timeFieldEl = document.getElementById('ndTimeField');
-  const timeField = isDynamic && timeFieldEl ? timeFieldEl.value : '';
-  if (isDynamic && !timeField) { showNotification(ICO_ALERT, '动态数据集必须指定时间属性（时序标识），请选择时间字段'); return; }
+  // 注：是否时序不再在新增数据时声明——发布服务时才绑定时间维度（对齐 GeoServer/ArcGIS time-enabled 服务）；此处仅登记客观信息
   wizardCrs = crsVal;
   closeWizard('uploadWizard');
   // 08-17 决策：数据业务态仅「待发布/已发布」两态；入库是任务态（进任务中心），不回写数据卡
   const nowDate = new Date().toISOString().slice(0,10);
   const tag = selectedTags.size ? Array.from(selectedTags)[0] : '耕地';
-  const dataset = (document.getElementById('ndDataset') || {}).value || '';
-  moduleConfigs.data.cards.unshift({ title:name, sub:'表格数据 · 待发布', tag:tag, cat:cat, type:'表格数据', fmt:'CSV/EXCEL', mine:true, status:'待发布', svcCount:0, pendingRange:true, dataAssetType:wizardAssetType, timeField:timeField, crs:wizardCrs, dataset:dataset, datasetFiles:[{ f: name+'.csv', d: nowDate, ver: isDynamic ? '第1期' : '当前数据', rel: isDynamic ? '时序' : '覆盖', latest:true }], thumb:'from-green-100 to-green-200', icon:ICO_BAR });
+  const dsSel = document.getElementById('ndDataset');
+  const dataset = dsSel && dsSel.value ? dsSel.value : ''; // 系统自有「数据集」字段（单选，选填）
+  const modelLabel = ''; // 数据模型由入库任务异步识别回填，向导内不猜测（08-26 撤销 P0 教训）
+  const formLabel = '数据';
+  const subLabel = '待发布 · 入库后自动识别格式';
+  moduleConfigs.data.cards.unshift({ title:name, sub:subLabel, tag:tag, cat:cat, type:formLabel, fmt:modelLabel, mine:true, status:'待发布', svcCount:0, pendingRange:true, dataAssetType:wizardAssetType, crs:wizardCrs, dataset:dataset, datasetFiles:[{ f: name+'.csv', d: nowDate, ver: '当前数据', rel: '覆盖', latest:true }], thumb:'from-green-100 to-green-200', icon:ICO_BAR });
   publishTarget = name;
   const _ov = getDataStatusOverrides(); _ov[name] = '待发布'; saveDataStatusOverrides(_ov);
   addTask({ type:'data', title:'入库：' + name, target:name });
@@ -815,27 +818,27 @@ function submitUpload() {
   document.getElementById('mainContent').innerHTML = renderMain('data');
   if (!notified.upload) {
     notified.upload = true;
-    showNotification(ICO_OK, '✅ 数据上传成功！' + (isDynamic ? '该数据集「' + name + '」已标记为动态数据集，后续每期数据将自动保留为多份时序快照，可在详情查看「数据集内文件」。' : '该数据集「' + name + '」为静态数据，后续更新将覆盖当前数据。') + '入库任务已提交，可在顶栏铃铛查看进度；入库完成后数据即可发布为地图服务。<button onclick="document.getElementById(\'publishModal\').classList.remove(\'hidden\');refreshPublishTimeRange()" class="text-brand underline font-medium ml-2">一键发布 →</button>');
+    showNotification(ICO_OK, '✅ 数据上传成功！数据「' + name + '」已登记，入库任务已提交（顶栏铃铛可看进度）。入库完成后即可发布为地图服务；若数据含时间信息，可在发布时绑定时间维度。<button onclick="document.getElementById(\'publishModal\').classList.remove(\'hidden\');refreshPublishTimeRange()" class="text-brand underline font-medium ml-2">一键发布 →</button>');
   }
 }
 
 // 提交成功后重置抽屉表单
 function resetUploadDrawer() {
   selectedTags.clear();
-  ['ndName','ndDataset','ndCrs','ndCrsOther','ndOrg','ndCatalog','ndDesc'].forEach(id => {
+  ['ndName','ndCrs','ndCrsOther','ndOrg','ndCatalog','ndDesc'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  const dsSel = document.getElementById('ndDataset');
+  if (dsSel) dsSel.value = '';
   const fb = document.getElementById('fbInput');
   if (fb) fb.value = '';
   const list = document.getElementById('fbFileList');
   if (list) { list.innerHTML = ''; list.classList.add('hidden'); }
-  const hint = document.getElementById('ndDatasetHint');
-  if (hint) { hint.textContent = ''; hint.classList.add('hidden'); }
+  resetWizardModel();
   const dbs = document.getElementById('dbSelectAll');
   if (dbs) dbs.checked = false;
   document.querySelectorAll('.db-table-cb').forEach(c => { c.checked = false; });
-  selectAssetType('static');
   switchCreateMethod('file');
   switchDrawMode('file');
   renderTagSelect();
@@ -845,24 +848,178 @@ function resetUploadDrawer() {
 // ── 数据资产：发布服务弹窗 (S-04 aligned) ────────────────
 const PUBLISH_SERVICE_TYPES = [
   { key:'WMS',  label:'WMS', summary:'动态图片，慢但灵活', chName:'网络地图服务', desc:'WMS 是一种通过 HTTP 请求向客户端返回地理空间数据可视化地图的服务。它将地理数据（如矢量或栅格数据）渲染为 PNG、JPEG 等图片格式，支持叠加多层地图数据。' },
-  { key:'WMTS', label:'WMTS', summary:'预切图片，快但固定', chName:'网络地图瓦片服务', desc:'WMTS 是一种高效的地图服务模式，基于预生成的地图切片（Tile）提供服务。它将地图按不同比例尺（层级）和网格划分成固定尺寸的小块（如 256×256 像素），提前渲染并存储在服务器。', options:{ '切片格式':['PNG','JPEG'], '切片网格':['GoogleMapsCompatible','GlobalCRS84Scale','GlobalCRS84Pixel'] } },
+  { key:'WMTS', label:'WMTS', summary:'预切图片，快但固定', chName:'网络地图瓦片服务', desc:'WMTS 是一种高效的地图服务模式，基于预生成的地图切片（Tile）提供服务。它将地图按不同比例尺（层级）和网格划分成固定尺寸的小块（如 256×256 像素），提前渲染并存储在服务器。', options:{ '切片格式':['PNG','JPEG'], '瓦片方案（含发布坐标系）':['GoogleMapsCompatible','GlobalCRS84Scale','GlobalCRS84Pixel'], '瓦片层级范围':['自动（按数据范围）','1–12 级','1–18 级'] } },
   { key:'WFS',  label:'WFS', summary:'传输原始数据，可编辑', chName:'网络要素服务', desc:'WFS 是一种面向地理空间要素数据的网络服务，专注于矢量数据的传输与交互。它支持通过 HTTP 请求获取、插入、更新或删除地理要素（如点、线、面），返回的是原始数据而非图片，常见格式包括 GML、JSON、GeoJSON 等。' },
-  { key:'MVT',  label:'MVT 矢量瓦片', summary:'预切片矢量，流畅可变', chName:'矢量瓦片（预切片）', desc:'MVT（Mapbox Vector Tile）是预切片矢量瓦片：与 WMTS 同源，同样按层级提前烘焙瓦片，只是内容为矢量几何而非栅格图片，由客户端渲染、样式可变，是矢量数据的默认推荐。Real-time MVT 是其实时生成版本，两者仅差“是否预切片”。', options:{ '执行策略':['默认','高性能','低延迟'], '输出字段':['名称','面积','作物类型','产量','行政区划'], '切片网格':['GoogleMapsCompatible','GlobalCRS84Scale'], '切片参数':['默认','自定义'] } },
-  { key:'REAL_MVT', label:'实时 MVT', summary:'实时生成的矢量瓦片', chName:'实时矢量瓦片', desc:'实时 MVT（Real-time MVT）是 MVT 的实时生成版本：不预烘焙，按请求即时生成矢量瓦片，支持亚秒级~分钟级更新可见，适合小规模、高频更新的矢量数据；大体积实时切片成本高，应改用预切片 MVT。', options:{ '输出字段':['名称','面积','作物类型','产量','行政区划'], '切片网格':['GoogleMapsCompatible','GlobalCRS84Scale'] } },
+  { key:'MVT',  label:'MVT 矢量瓦片', summary:'预切片矢量，流畅可变', chName:'矢量瓦片（预切片）', desc:'MVT（Mapbox Vector Tile）是预切片矢量瓦片：与 WMTS 同源，同样按层级提前烘焙瓦片，只是内容为矢量几何而非栅格图片，由客户端渲染、样式可变，是矢量数据的默认推荐。Real-time MVT 是其实时生成版本，两者仅差“是否预切片”。', options:{ '执行策略':['默认','高性能','低延迟'], '输出字段':['名称','面积','作物类型','产量','行政区划'], '瓦片方案（含发布坐标系）':['GoogleMapsCompatible','GlobalCRS84Scale'], '瓦片层级范围':['自动（按数据范围）','1–12 级','1–18 级'], '切片参数':['默认','自定义'] } },
+  { key:'REAL_MVT', label:'实时 MVT', summary:'实时生成的矢量瓦片', chName:'实时矢量瓦片', desc:'实时 MVT（Real-time MVT）是 MVT 的实时生成版本：不预烘焙，按请求即时生成矢量瓦片，支持亚秒级~分钟级更新可见，适合小规模、高频更新的矢量数据；大体积实时切片成本高，应改用预切片 MVT。', options:{ '输出字段':['名称','面积','作物类型','产量','行政区划'], '瓦片方案（含发布坐标系）':['GoogleMapsCompatible','GlobalCRS84Scale'] } },
 ];
+
+// （交付方式 显式控件已移除：预切片/实时/动态由推荐引擎在「服务方式」中自动确定，不再单独提供翻转控件）
+
 let publishSelectedType = 'WFS'; // default recommendation for CSV/Excel
 let publishManualOverride = false; // 是否手动覆盖服务类型（高级）
 let lastRec = null; // 最近一次推荐结果（派生结果区展示理由用）
 
-// ── 任务4：发布向导升级（数据处理方式 / 模板 / 两步场景推荐）──
-const PUBLISH_PROCESS = [
-  { key:'keep',   label:'保持原样',  desc:'按数据原始几何发布' },
-  { key:'stroke', label:'取描边',    desc:'只保留面边界线' },
-  { key:'center', label:'取中心点',  desc:'面转中心点' },
-];
-let publishProcess = 'keep';
-let publishTemplate = 'single'; // single | split
+// ── 发布弹窗状态（08-28 v4）──────────────────────
+let publishRender = null;         // 栅格：默认渲染呈现 {mode, bandMap, stretch}
+let publishTimeRange = null;      // 栅格合集：默认时相范围 {from,to,exclude}
+let publishDataForm = 'vector';    // 发布数据形态：vector | raster（由数据卡推断）
 const publishScenario = { scale:'small', update:'low', concurrency:'low', interaction:'view' };
+let publishRasterSel = '';          // 栅格单张发布：选中的那张栅格 key
+const DATA_ASSET_SEQUENCES = ['大豆长势年度序列', '玉米估产月度序列', '耕地质量季度序列', '气象遥感旬序列']; // 服务序列（示例；真实由「服务序列管理」维护）
+
+// 渲染模式可选项（栅格默认渲染呈现）
+const PUBLISH_RENDER_MODES = [
+  { key:'rgb',  label:'真彩合成', desc:'RGB 多波段合成（默认推荐）' },
+  { key:'gray', label:'单波段灰度', desc:'单波段影像按灰度渲染' },
+  { key:'classify', label:'分类色带', desc:'按像元值分级配色（如高程/温度）' },
+  { key:'hillshade', label:'DEM 晕渲', desc:'地形阴影渲染（DEM 专用）' },
+];
+
+// 获取数据卡并推断发布数据形态与内容项
+function getPublishCard(title) {
+  const t = title || publishTarget || (document.getElementById('publishTitle') || {}).value || '';
+  return (moduleConfigs.data.cards || []).find(c => c.title === t);
+}
+// （矢量「内容显示设置」已移出发布阶段：图层显隐在「要素图层编辑器 / 专题图」消费端配置）
+// 初始化发布内容区（互斥：矢量=发布类型派生，栅格=渲染呈现+时相）
+function initPublishContent() {
+  const card = getPublishCard();
+  // L1：信息卡动态渲染（真实数据卡）
+  const nameEl = document.getElementById('publishSourceName');
+  const metaEl = document.getElementById('publishSourceMeta');
+  if (nameEl) nameEl.textContent = card ? card.title : '——';
+  if (metaEl) {
+    const type = (card && card.type) || '数据';
+    const fmt = (card && card.fmt) || '';
+    const crs = (card && card.crs) || '';
+    const files = (card && card.datasetFiles) || [];
+    const isPkg = files.some(f => f.isPackage || (f.children && f.children.length));
+    const cnt = isPkg ? ((files[0] && files[0].children || []).length || files.length) : files.length;
+    metaEl.textContent = (type + (fmt ? ' · ' + fmt : ''))
+      + (crs ? ' · ' + crs : '')
+      + (files.length > 1 || isPkg ? ' · ' + cnt + ' 份数据' : (files.length === 1 ? ' · 单份数据' : ''));
+  }
+  const geom = getDataGeomType(card ? card.title : '');
+  publishDataForm = geom === 'raster' ? 'raster' : 'vector';
+  const rSec = document.getElementById('publishRenderSection');
+  const exprSec = document.getElementById('publishVectorExprSection');
+  const timeBlock = document.getElementById('publishTimeBlock');
+  if (rSec) rSec.classList.toggle('hidden', publishDataForm !== 'raster');
+  if (exprSec) exprSec.classList.toggle('hidden', publishDataForm !== 'vector');
+  // 时序服务仅栅格支持（2026-08-28 会议决策：矢量时序改在制图层面表达）
+  if (timeBlock) timeBlock.classList.toggle('hidden', publishDataForm !== 'raster');
+  if (publishDataForm === 'vector') {
+    renderPublishExpr(card);   // 发布类型按数据自动派生（填充/描边/标注/符号/整体服务）
+  } else {
+    renderPublishRasterPick();
+  }
+  populatePublishTimeSeq();
+  initPublishCrs(card);   // 坐标系：带出上传数据已选坐标系（并在 initPublishCrs 内允许调整）
+}
+// 坐标系：发布弹窗带出上传数据已选坐标系，并允许在发布时调整
+function initPublishCrs(card) {
+  const sel = document.getElementById('pubCrs');
+  const other = document.getElementById('pubCrsOther');
+  if (!sel) return;
+  const val = (card && card.crs) || '';
+  let matched = false;
+  Array.from(sel.options).forEach(o => { if (o.value && o.value === val) { sel.value = o.value; matched = true; } });
+  if (!matched) {
+    // 未命中预设（如历史卡存为简码 CGCS2000/WGS84 等）→ 选「其他」并回填原始值
+    sel.value = '其他（搜索框输入 EPSG 编码）';
+    if (other) other.value = val;
+  }
+  togglePubCrsOther();
+}
+// 坐标系「其他」→ 显示 EPSG 输入框
+function togglePubCrsOther() {
+  const crs = document.getElementById('pubCrs');
+  const other = document.getElementById('pubCrsOther');
+  if (!crs || !other) return;
+  const isOther = crs.value.indexOf('其他') === 0;
+  other.classList.toggle('hidden', !isOther);
+  if (!isOther) other.value = '';
+}
+// 当前发布坐标系取值（含「其他」输入）
+function pubCrsValue() {
+  const crs = document.getElementById('pubCrs');
+  if (!crs || !crs.value) return '';
+  if (crs.value.indexOf('其他') === 0) {
+    const o = document.getElementById('pubCrsOther');
+    return (o && o.value.trim()) ? o.value.trim() : '';
+  }
+  return crs.value;
+}
+
+// 发布类型按数据自动派生（填充/描边/标注/符号/整体服务 的可选项由几何类型与字段结构决定）
+// 灰色项=当前数据不适用（已自动禁用并说明原因）；可用项已自动勾选。
+function renderPublishExpr(card) {
+  const body = document.getElementById('publishExprBody');
+  if (!body) return;
+  const geom = getDataGeomType(card ? card.title : '');
+  // 系统自动附加字段：名称 / 面积 / 类型（见数据卡构造），故「标注」恒可用
+  const hasClassField = !!(card && (card.classField || (card.fields || []).some(f => f && (f.type === 'category' || f.type === '分类'))));
+  const opts = [
+    { key:'fill',   label:'填充', ok: geom === 'polygon', reason:'仅面状数据可填充' },
+    { key:'stroke', label:'描边', ok: geom === 'polygon' || geom === 'line', reason:'仅面/线状数据可描边' },
+    { key:'label',  label:'标注', ok: true, reason:'系统自动附加 名称/面积/类型 字段，恒可标注' },
+    { key:'symbol', label:'符号', ok: geom === 'point' || hasClassField, reason:'仅点状数据或含分类字段时可用符号分级' },
+    { key:'overall', label:'整体服务', ok: true, reason:'作为整体服务发布（含全部渲染表达与要素能力）' },
+  ];
+  body.innerHTML = opts.map(o => {
+    if (!o.ok) {
+      return '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-line bg-gray-100 text-gray-400 text-xs cursor-not-allowed" title="' + o.reason + '">'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:0.9em;height:0.9em"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg> '
+        + o.label + ' <span class="text-[10px] text-gray-400">' + o.reason + '</span></span>';
+    }
+    return '<label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-brand/30 bg-brand-light text-brand text-xs cursor-pointer">'
+      + '<input type="checkbox" value="' + o.key + '" checked class="text-brand"> ' + o.label + '</label>';
+  }).join('');
+}
+// 收集可发布的栅格清单（数据包→展开 children；单份→直接用）
+function gatherRasterSheets(card) {
+  if (!card) return [];
+  const files = card.datasetFiles || [];
+  const sheets = [];
+  files.forEach(f => {
+    if (f.isPackage || (f.children && f.children.length)) {
+      (f.children || []).forEach(ch => sheets.push({ label: (f.f || '数据包') + ' › ' + (ch.f || ch.ver || ''), key: ch.f || ch.ver || '' }));
+    } else {
+      sheets.push({ label: f.f || f.ver || card.title, key: f.f || f.ver || '' });
+    }
+  });
+  return sheets;
+}
+// 渲染栅格「单张发布」选择器（替代原默认渲染呈现）
+function renderPublishRasterPick() {
+  const body = document.getElementById('publishRasterPickBody');
+  if (!body) return;
+  const card = getPublishCard();
+  const sheets = gatherRasterSheets(card);
+  if (!sheets.length) { body.innerHTML = '<p class="text-xs text-gray-400">该数据暂无可发布的栅格文件。</p>'; return; }
+  if (!publishRasterSel || !sheets.some(s => s.key === publishRasterSel)) publishRasterSel = sheets[0].key;
+  body.innerHTML = sheets.map(s => {
+    const sel = s.key === publishRasterSel;
+    return '<label class="flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all ' + (sel ? 'border-brand bg-brand-light' : 'border-line bg-white hover:border-brand') + '">'
+      + '<input type="radio" name="pubRasterSel" value="' + s.key + '" ' + (sel ? 'checked' : '') + ' onchange="publishRasterSel=\'' + s.key + '\'" class="text-brand">'
+      + '<span class="text-sm text-gray-700 truncate">' + s.label + '</span></label>';
+  }).join('');
+}
+// 填充服务序列下拉（页内示例常量 + common.js SERVICE_SEQUENCES 注册表，含「服务序列管理」管理员自建序列，去重后展示）
+function populatePublishTimeSeq() {
+  const sel = document.getElementById('pubTimeSeq');
+  if (!sel) return;
+  const cur = sel.value;
+  const names = DATA_ASSET_SEQUENCES.slice();
+  try {
+    Object.keys(SERVICE_SEQUENCES || {}).forEach(k => {
+      const n = (SERVICE_SEQUENCES[k] || {}).name;
+      if (n && names.indexOf(n) < 0) names.push(n);
+    });
+  } catch (e) { /* 注册表缺失时仅用页内示例 */ }
+  sel.innerHTML = '<option value="">请选择服务序列</option>' + names.map(s => '<option value="' + s + '" ' + (s === cur ? 'selected' : '') + '>' + s + '</option>').join('');
+}
 
 // 数据几何类型推断（栅格/矢量面/点线/表格）
 function getDataGeomType(dataTitle) {
@@ -874,70 +1031,6 @@ function getDataGeomType(dataTitle) {
   if (/矢量|geojson|shp|shape|面|多边形|polygon|地块|plot|林斑/i.test(t)) return 'polygon';
   if (/线|road|道路|line|管线|河流/i.test(t)) return 'line';
   return 'point'; // 表格/数据库（含经纬度）→ 点
-}
-
-function renderPublishProcess() {
-  const wrap = document.getElementById('publishProcessCards');
-  if (!wrap) return;
-  const geom = getDataGeomType(publishTarget || (document.getElementById('publishTitle') || {}).value || '');
-  // 取描边/取中心点 仅矢量面数据可用；非面数据只展示「保持原样」，不堆灰按钮
-  const visible = PUBLISH_PROCESS.filter(p => p.key === 'keep' || geom === 'polygon');
-  if (publishProcess !== 'keep' && geom !== 'polygon') publishProcess = 'keep'; // 非面数据强制保持原样
-  wrap.innerHTML = visible.map(p => {
-    const isSel = publishProcess === p.key;
-    return '<div onclick="selectPublishProcess(\'' + p.key + '\')" class="publish-card cursor-pointer rounded-lg border-2 p-3 text-center transition-all ' + (isSel ? 'border-brand bg-brand-light shadow-sm' : 'border-gray-200 bg-white hover:border-brand') + '" title="' + p.desc + '">'
-      + '<div class="text-sm font-bold text-gray-800">' + p.label + '</div>'
-      + '<div class="text-[11px] text-gray-500 mt-0.5 leading-tight">' + p.desc + '</div>'
-      + '</div>';
-  }).join('');
-  // 说明行：让用户清楚当前数据为何只开放部分选项
-  const note = document.getElementById('publishProcessNote');
-  if (note) {
-    if (geom === 'polygon') { note.classList.add('hidden'); }
-    else {
-      note.classList.remove('hidden');
-      note.textContent = geom === 'raster' ? '当前为栅格影像，仅支持「保持原样」（影像按原始像素发布）。'
-        : (geom === 'line' ? '当前为线数据，仅支持「保持原样」（线数据无需描边/中心点处理）。'
-          : '当前为点/表格数据，仅支持「保持原样」（点数据无需描边或转中心点）。');
-    }
-  }
-}
-function selectPublishProcess(key) {
-  publishProcess = key;
-  renderPublishProcess();
-}
-
-function renderPublishTemplate() {
-  const wrap = document.getElementById('publishTemplateCards');
-  if (!wrap) return;
-  const geom = getDataGeomType(publishTarget || '');
-  const canSplit = geom === 'polygon';
-  const templates = [
-    { key:'single', label:'单个服务', desc:'发布为一个服务条目' },
-    { key:'split',  label:'自动拆分', desc:'描边 + 填充 + 标注 三个服务' },
-  ];
-  // 自动拆分 仅矢量面数据可用；非面数据只展示「单个服务」，不堆灰按钮
-  const visible = templates.filter(t => t.key === 'single' || canSplit);
-  if (publishTemplate !== 'single' && !canSplit) publishTemplate = 'single';
-  wrap.innerHTML = visible.map(t => {
-    const isSel = publishTemplate === t.key;
-    return '<div onclick="selectPublishTemplate(\'' + t.key + '\')" class="publish-card cursor-pointer rounded-lg border-2 p-3 text-center transition-all ' + (isSel ? 'border-brand bg-brand-light shadow-sm' : 'border-gray-200 bg-white hover:border-brand') + '" title="' + (t.key === 'split' ? '自动拆分仅支持矢量面数据' : '') + '">'
-      + '<div class="text-sm font-bold text-gray-800">' + t.label + '</div>'
-      + '<div class="text-[11px] text-gray-500 mt-0.5 leading-tight">' + t.desc + '</div>'
-      + '</div>';
-  }).join('');
-  const note = document.getElementById('publishTemplateNote');
-  if (note) {
-    if (canSplit) { note.classList.add('hidden'); }
-    else {
-      note.classList.remove('hidden');
-      note.textContent = '当前为' + (geom === 'raster' ? '栅格' : (geom === 'line' ? '线' : '点/表格')) + '数据，仅需「单个服务」；「自动拆分」仅矢量面数据可用。';
-    }
-  }
-}
-function selectPublishTemplate(key) {
-  publishTemplate = key;
-  renderPublishTemplate();
 }
 
 function togglePublishScenario() {
@@ -977,8 +1070,7 @@ function updatePublishRecommendation() {
   }
   renderPublishCards();
   updatePublishDerived();
-  renderPublishProcess();
-  renderPublishTemplate();
+  initPublishContent();
   const hint = document.getElementById('publishFooterHint');
   if (hint) hint.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 系统已为你的数据与场景自动确定服务方式：<b>' + rec.label + '</b> —— ' + rec.short;
 }
@@ -989,8 +1081,9 @@ function recommendService(geom, s) {
   const highCon = s.concurrency === 'high';
   const query = s.interaction === 'query';
   const freq = s.update === 'high';
+  // 预切片 = ① 服务协议维度的显式 case：栅格大/高并发→WMTS(预切)；矢量高频→实时MVT；矢量大/高并发→MVT(预切)
   if (geom === 'raster') {
-    if (large || highCon) return { key:'WMTS', label:'WMTS 预切瓦片', short:'大/高并发场景预切片，加载最快', reason:'栅格影像，数据量大且需要高并发/快速加载 → 推荐 <b>WMTS（预切瓦片）</b>：提前按层级切片，访问快、带宽省；数据规模小、仅内部低频查看时可选 WMS。' };
+    if (large || highCon) return { key:'WMTS', label:'WMTS 预切瓦片', short:'大/高并发场景预切片，加载最快', reason:'栅格影像，数据量大且需要高并发/快速加载 → 推荐 <b>WMTS（预切瓦片）</b>：提前按层级切片，访问快、带宽省；数据规模小、仅内部低频查看时可选 WMS（动态出图）。' };
     return { key:'WMS', label:'WMS 动态出图', short:'栅格小规模动态出图即可', reason:'栅格影像且规模小/低频访问 → 推荐 <b>WMS（动态出图）</b>：按需渲染，灵活叠加；若后续规模变大或并发升高，可切换预切 WMTS。' };
   }
   // 矢量
@@ -1005,6 +1098,8 @@ function recommendService(geom, s) {
   }
   return { key:'MVT', label:'MVT 矢量瓦片', short:'常规展示推荐 MVT', reason:'常规展示场景 → 推荐 <b>MVT（矢量瓦片）</b>：客户端渲染流畅、样式可变；需要属性查询时改用 WFS。' };
 }
+
+// （交付方式 显式控件已移除；对应逻辑见上方注释。setDeliveryMode / updatePublishDelivery 已删除。）
 
 function renderPublishCards() {
   const container = document.getElementById('publishTypeCards');
@@ -1101,6 +1196,9 @@ function updatePublishOptions() {
       html += '</div></div>';
     }
   });
+  if (t.key === 'WMTS') {
+    html += '<div class="mt-2 text-[11px] text-gray-400 leading-relaxed">瓦片方案即发布坐标系与瓦片矩阵集：GoogleMapsCompatible≈Web Mercator(EPSG:3857)；GlobalCRS84Scale/GlobalCRS84Pixel≈经纬度(CGCS2000/4490)。栅格默认按源坐标系发布。</div>';
+  }
   html += '</div>';
   area.innerHTML = html;
 }
@@ -1117,104 +1215,358 @@ function togglePublishOverride() {
 // Render publish cards on page load
 setTimeout(function () {
   renderPublishCards();
-  renderPublishProcess();
-  renderPublishTemplate();
+  initPublishContent();
   updatePublishRecommendation();
 }, 100);
 
-// ── 默认渲染时间段（时序/动态服务专用，2026-08-20 时序数据模型：发布时序服务时必须配置默认渲染窗口）──
-// 时序/动态判断：数据卡带 dataAssetType:'dynamic' 或 timeField / defaultRange 标记即视为时序服务
-function isDynamicAsset(title) {
-  const card = (moduleConfigs.data.cards || []).find(c => c.title === title);
-  return !!(card && (card.dataAssetType === 'dynamic' || card.timeField || card.defaultRange));
+// ── 发布弹窗：时间维度（时序服务）──
+// 时序在"发布"时声明（对齐 GeoServer Time / ArcGIS Time-Enabled Service），不再由数据入库时决定
+let pubTimeEnabled = false; // 本次发布是否启用时间维度
+
+function togglePublishTime() {
+  const p = document.getElementById('publishTimePanel');
+  const a = document.getElementById('publishTimeArrow');
+  if (!p) return;
+  p.classList.toggle('hidden');
+  if (a) a.style.transform = p.classList.contains('hidden') ? '' : 'rotate(180deg)';
 }
-// 打开发布弹窗时按目标数据刷新「默认渲染时间段」：仅时序/动态服务显示，并预填默认窗口
+function togglePublishTimeEnabled() {
+  pubTimeEnabled = !pubTimeEnabled;
+  const toggle = document.getElementById('pubTimeToggle');
+  const knob = document.getElementById('pubTimeKnob');
+  const config = document.getElementById('pubTimeConfig');
+  if (toggle) { toggle.style.background = pubTimeEnabled ? '#7c3aed' : '#d1d5db'; toggle.setAttribute('aria-checked', String(pubTimeEnabled)); }
+  if (knob) knob.style.transform = pubTimeEnabled ? 'translateX(20px)' : 'translateX(0)';
+  if (config) config.classList.toggle('hidden', !pubTimeEnabled);
+  return pubTimeEnabled;
+}
+
+// 打开发布弹窗：重置时间维度面板为"关"（默认普通服务；用户按需开启时序）
 function refreshPublishTimeRange() {
-  const area = document.getElementById('publishTimeRangeArea');
-  if (!area) return;
-  const title = publishTarget || (document.getElementById('publishTitle') || {}).value || '';
-  const dynamic = isDynamicAsset(title);
-  area.classList.toggle('hidden', !dynamic);
-  if (dynamic) {
-    const card = (moduleConfigs.data.cards || []).find(c => c.title === title);
-    const rg = (card && card.defaultRange && card.defaultRange.length === 2) ? card.defaultRange : ['2026-07-01', '2026-07-31'];
-    const s = document.getElementById('publishTimeStart');
-    const e = document.getElementById('publishTimeEnd');
-    if (s) s.value = rg[0] || '';
-    if (e) e.value = rg[1] || '';
-  }
+  pubTimeEnabled = false;
+  const toggle = document.getElementById('pubTimeToggle');
+  const knob = document.getElementById('pubTimeKnob');
+  const config = document.getElementById('pubTimeConfig');
+  if (toggle) { toggle.style.background = '#d1d5db'; toggle.setAttribute('aria-checked', 'false'); }
+  if (knob) knob.style.transform = 'translateX(0)';
+  if (config) config.classList.add('hidden');
+  const seq = document.getElementById('pubTimeSeq');
+  if (seq) seq.value = '';
+  const stamp = document.getElementById('pubTimeStamp');
+  if (stamp) stamp.value = '';
 }
 
 function confirmPublish() {
-  closeWizard('publishModal');
   const title = publishTarget || (document.getElementById('publishTitle') || {}).value || 'XX农场2026年夏季耕地调查';
-  // 2026-08-20：时序（动态）服务 → 把「默认渲染时间段（起/止）」存储到服务配置（源数据卡 defaultRange，供要素图层/专题图引用时作为默认渲染窗口）
-  if (isDynamicAsset(title)) {
-    const card = (moduleConfigs.data.cards || []).find(c => c.title === title);
-    const sEl = document.getElementById('publishTimeStart');
-    const eEl = document.getElementById('publishTimeEnd');
-    if (card) card.defaultRange = [ (sEl && sEl.value) || '', (eEl && eEl.value) || '' ];
+  // 服务用途必填校验（2026-08-28 会议：发布/注册均须绑定 业务/地图/综合）
+  const purposeEl = document.querySelector('input[name="pubPurpose"]:checked');
+  const purpose = purposeEl ? purposeEl.value : '';
+  if (!purpose) { showNotification(ICO_ALERT, '请先选择「服务用途」（业务 / 地图 / 综合）后再发布'); return; }
+  // 坐标系（带出上传数据值，允许发布时调整）
+  const crsVal = pubCrsValue();
+  // 栅格时序：启用时必须绑定服务序列 + 时间戳
+  if (pubTimeEnabled) {
+    const seqEl = document.getElementById('pubTimeSeq');
+    const stampEl = document.getElementById('pubTimeStamp');
+    if (!seqEl || !seqEl.value) { showNotification(ICO_ALERT, '时序服务需先绑定一个「服务序列」'); return; }
+    if (!stampEl || !stampEl.value) { showNotification(ICO_ALERT, '时序服务需绑定本栅格在该序列中的「时间戳」'); return; }
   }
-  const proc = PUBLISH_PROCESS.find(p => p.key === publishProcess);
+  closeWizard('publishModal');
+  const card = (moduleConfigs.data.cards || []).find(c => c.title === title);
+  // 2026-08-28：时序仅栅格；开启后绑定服务序列 + 具体时间戳
+  if (pubTimeEnabled) {
+    const seqEl = document.getElementById('pubTimeSeq');
+    const stampEl = document.getElementById('pubTimeStamp');
+    if (card) {
+      card.timeEnabled = true;
+      card.timeSeq = seqEl ? seqEl.value : '';
+      card.timeStamp = stampEl ? stampEl.value : '';
+    }
+  }
   const proto = PUBLISH_SERVICE_TYPES.find(t => t.key === publishSelectedType);
-  const tmpl = publishTemplate === 'split' ? ' · 自动拆分（描边+填充+标注）' : '';
-  addTask({ type:'service', title:'发布服务：' + title + (proc ? ' · ' + proc.label : '') + (proto ? ' · ' + proto.label : '') + tmpl, target:title });
+  if (card) {
+    card.publishPurpose = purpose;
+    card.publishCrs = crsVal;   // 发布坐标系（默认带出上传数据坐标系，允许调整）
+    card.serviceName = title;   // 服务名称统一取「服务标题」(publishTitle)，发布弹窗仅保留一个名称字段
+    if (publishDataForm === 'vector') {
+      const exprEls = document.querySelectorAll('#publishVectorExprSection input:checked');
+      card.publishExpr = Array.from(exprEls).map(e => e.value);
+    } else {
+      // 栅格：单张发布（选中数据包中的一张栅格）
+      card.publishedRaster = publishRasterSel;
+    }
+    const fEl2 = document.getElementById('pubSubsetFilter');
+    const fEl3 = document.getElementById('pubSubsetFields');
+    const fEl4 = document.getElementById('pubSubsetBbox');
+    const subset = {
+      filter: (fEl2 && fEl2.value.trim()) || '',
+      fields: (fEl3 && fEl3.value.trim()) || '',
+      bbox: (fEl4 && fEl4.value.trim()) || '',
+    };
+    card.publishSubset = subset;
+  }
+  const EXPR_LABEL = { fill:'填充', stroke:'描边', label:'标注', symbol:'符号', overall:'整体服务' };
+  const exprInfo = (publishDataForm === 'vector' && card && card.publishExpr && card.publishExpr.length) ? (' · 发布类型 ' + card.publishExpr.map(k => EXPR_LABEL[k] || k).join('/')) : '';
+  const rasterInfo = (publishDataForm === 'raster' && publishRasterSel) ? (' · 栅格 ' + publishRasterSel) : '';
+  const svcName = (card && card.serviceName) ? card.serviceName : title;
+  addTask({ type:'service', title:'发布服务：' + svcName + (proto ? ' · ' + proto.label : '') + exprInfo + rasterInfo + (purpose ? ' · 用途:' + purpose : '') + (crsVal ? ' · 坐标系:' + crsVal : '') + (pubTimeEnabled ? ' · 时序服务' : ''), target:title });
   if (!notified.publish) {
     notified.publish = true;
-    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>', '✅ 已提交发布任务' + (publishTemplate === 'split' ? '（将自动拆分为 3 个服务）' : '') + '，数据将变成「地图服务」。发布完成会自动通知你。<button onclick="goModule(\'task\')" class="text-brand underline font-medium ml-2">查看进度 →</button>');
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>', '✅ 已提交发布任务' + (pubTimeEnabled ? '（时序服务：已绑定服务序列 ' + (card ? card.timeSeq : '') + '）' : '') + '，数据将变成「地图服务」。发布完成会自动通知你。<button onclick="goModule(\'task\')" class="text-brand underline font-medium ml-2">查看进度 →</button>');
   }
 }
 
-// ── 数据资产：更新数据（按数据类型判断：静态=覆盖更新 / 动态时序=追加新一期） ──
-let updTargetCard = null; // 当前更新目标对应的数据卡（用于按类型判断交互）
+// ── 数据资产：更新数据（数据卡=容器；操作：覆盖 / 追加 / 新增；覆盖需先选目标对象） ──
+let updTargetCard = null;      // 当前更新目标数据卡（容器）
+let updOp = 'add';             // 本次操作：cover 覆盖选中对象 | add 追加一份 | new 新增一个对象
+let updSelectedObj = -1;       // 容器内选中数据对象下标（覆盖操作需选定）
+let updSelSubIdx = -1;         // 选中对象为数据包时，包内选中地图数据下标（-1=对象本身）
+
+// 是否为「数据包」对象（含 children 或 isPackage）
+function isPkgObj(f) { return !!(f && (f.isPackage || (f.children && f.children.length))); }
+// 默认选择（对齐更新弹窗规则：非数据包→无对象选择，默认选中上传数据；数据包→需选包内数据对象）
+function applyUpdDefaultSelection() {
+  const flat = updFlatDataList();
+  const picked = document.getElementById('updObjPicked');
+  if (!flat.length) { updSelectedObj = -1; updSelSubIdx = -1; if (picked) picked.textContent = '—'; return; }
+  // 一份数据 → 默认选中（不提供选择）；多份数据 → 默认取最新的一份，用户可在数据列表中改选
+  const it = flat.length === 1 ? flat[0] : (flat.find(x => x.node && x.node.latest) || flat[0]);
+  updSelectedObj = it.objIdx;
+  updSelSubIdx = it.subIdx;
+  if (picked) picked.textContent = updFlatLabel(it);
+}
+
+function setUpdOp(op) {
+  updOp = op;
+  const btns = { cover:'updOpCover', add:'updOpAdd' };
+  const onCls = 'upd-op-btn px-3 py-1.5 rounded-md text-xs font-medium transition-colors bg-white text-gray-800 shadow-sm';
+  const offCls = 'upd-op-btn px-3 py-1.5 rounded-md text-xs font-medium transition-colors text-gray-500 hover:text-gray-700';
+  Object.keys(btns).forEach(k => {
+    const el = document.getElementById(btns[k]);
+    if (el) el.className = k === op ? onCls : offCls;
+  });
+  // 底部提示
+  const note = document.getElementById('updFooterNote');
+  if (note) note.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 上传新文件后覆盖/追加该数据';
+  // 确认按钮
+  const btn = document.getElementById('updConfirm');
+  if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> ' + ({cover:'确认覆盖', add:'确认追加'}[op]);
+  // 是否需要「选择目标」：一份数据→默认选中、不提供选择；多份数据→提供数据列表选择
+  const files = (updTargetCard && updTargetCard.datasetFiles) || [];
+  const pkgCard = files.some(isPkgObj);
+  const needsChoice = updFlatDataList().length > 1;
+  const pickBtn = document.getElementById('updPickObjBtn');
+  if (pickBtn) pickBtn.classList.toggle('hidden', !needsChoice);
+  const manageBtn = document.getElementById('updManageObjBtn');
+  if (manageBtn) manageBtn.classList.toggle('hidden', !needsChoice);
+  const targetRow = document.getElementById('updTargetRow');
+  if (targetRow) targetRow.classList.toggle('hidden', !needsChoice);
+  // 默认选择：一份→选中该数据；多份→默认取最新的一份，用户可在数据列表改选
+  if (updSelectedObj < 0 && files.length) applyUpdDefaultSelection();
+  // 确认按钮可用性：仅在异常态（选中了含子数据但未定位到具体那份）才拦截（仅覆盖强制）
+  const selObj = (updSelectedObj >= 0 && updSelectedObj < files.length) ? files[updSelectedObj] : null;
+  const needSub = selObj && isPkgObj(selObj) && updSelSubIdx < 0;
+  const blocked = files.length === 0 || (op === 'cover' && !!needSub);
+  const btn2 = document.getElementById('updConfirm');
+  if (btn2) { btn2.disabled = blocked; btn2.style.opacity = blocked ? '.4' : '1'; btn2.style.cursor = blocked ? 'not-allowed' : 'pointer'; }
+  // 底部提示（复用上方已声明的 note）
+  if (note) {
+    note.innerHTML = (op === 'cover' && needSub)
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 该数据含多份数据，请先选择要覆盖的那份数据'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink-0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 上传新文件后覆盖/追加该数据';
+  }
+  renderUpdDataDetail();
+}
+
+// 数据详情区：容器内对象概览 + 选中目标详情（替代原操作说明评论；覆盖/追加时显示）
+function renderUpdDataDetail() {
+  const wrap = document.getElementById('updDataDetail');
+  const body = document.getElementById('updDataDetailBody');
+  if (!wrap || !body) return;
+  const files = (updTargetCard && updTargetCard.datasetFiles) || [];
+  if (!files.length) { wrap.classList.add('hidden'); body.innerHTML = ''; return; }
+  // 一份数据→不提供选择（隐藏详情）；多份数据→展示数据列表供选择
+  const needsChoice = updFlatDataList().length > 1;
+  if (!needsChoice) { wrap.classList.add('hidden'); body.innerHTML = ''; return; }
+  wrap.classList.remove('hidden');
+  // 数据列表（扁平：数据包内的每份数据直接列出，不再显示"数据包"这一层）
+  const flat = updFlatDataList();
+  const rows = flat.slice(0, 3).map(it => {
+    const sel = (it.objIdx === updSelectedObj && it.subIdx === updSelSubIdx);
+    return '<div class="flex items-center gap-1.5 py-0.5">'
+      + '<span class="text-[10px] px-1 rounded ' + (it.parent ? 'bg-purple-50 text-purple-600' : 'bg-gray-100 text-gray-500') + '">' + (it.parent ? '包内数据' : '数据') + '</span>'
+      + '<span class="truncate flex-1 ' + (sel ? 'text-brand font-medium' : 'text-gray-700') + '">' + updFlatLabel(it) + '</span>'
+      + (it.node && it.node.latest ? '<span class="text-[10px] text-brand">最新</span>' : '')
+      + '</div>';
+  }).join('');
+  const more = flat.length > 3 ? '<div class="text-[11px] text-gray-400 pt-0.5">… 共 ' + flat.length + ' 份数据</div>' : '';
+  const cur = flat.find(it => it.objIdx === updSelectedObj && it.subIdx === updSelSubIdx);
+  const targetHtml = cur ? ('目标：' + updFlatLabel(cur)) : '目标：未选择';
+  body.innerHTML =
+    '<div class="mb-1.5 flex items-center gap-2 text-[11px] text-gray-500"><span class="text-brand font-medium">' + targetHtml + '</span></div>'
+    + rows + more;
+}
+
+// ── 二级弹窗：选择容器内已有数据对象（以录入文件名标识；含搜索/筛选/分页） ──
+let updPickPageNum = 1;           // 二级弹窗当前页
+const UPD_PICK_PAGE_SIZE = 6;     // 每页条目
+function updObjLabel(f, i) {
+  if (f && (f.isPackage || (f.children && f.children.length))) {
+    return (f.f || f.ver || ('数据对象 ' + (i+1))) + '（数据包 · ' + ((f.children || []).length) + ' 份）';
+  }
+  return (f && (f.f || f.ver || f.d)) ? f.f || f.ver || f.d : ('数据对象 ' + (i+1));
+}
+
+// ── 扁平数据列表（2026-08-31 03:02 口径）──────────────────────────
+// 卡片 =「数据」（一份）/「数据包」（多份）；展开后只有两种情形：
+//   一份数据 → 不提供选择、默认选中；多份数据 → 提供数据列表供选择。
+// 数据包本身不再作为可选层级——其内部的每一份数据直接进列表（不再下钻选包）。
+let updPickFlatSel = 0;         // 扁平列表当前选中下标
+function updFlatDataList() {
+  const files = (updTargetCard && updTargetCard.datasetFiles) || [];
+  const out = [];
+  files.forEach((f, oi) => {
+    const kids = (f && f.children) || [];
+    if (kids.length) kids.forEach((k, ci) => out.push({ objIdx: oi, subIdx: ci, node: k, parent: f }));
+    else out.push({ objIdx: oi, subIdx: -1, node: f, parent: null });
+  });
+  return out;
+}
+// 扁平项名称（数据包内的数据带上所属包名前缀，便于区分）
+function updFlatLabel(it) {
+  const base = updObjLabel(it.node, it.subIdx >= 0 ? it.subIdx : it.objIdx);
+  return it.parent ? ((it.parent.f || '数据包') + ' › ' + base) : base;
+}
+// 当前选择在扁平列表中的下标（-1 = 未命中）
+function updFlatIndexOfSelection() {
+  return updFlatDataList().findIndex(it => it.objIdx === updSelectedObj && it.subIdx === updSelSubIdx);
+}
+
+function openUpdObjPicker() {
+  const modal = document.getElementById('updObjPickerModal');
+  if (!modal) return;
+  const flat = updFlatDataList();
+  if (!flat.length) { showNotification(ICO_ALERT, '该数据暂无数据，无法选择——请使用「追加」'); return; }
+  const kwEl = document.getElementById('updPickKw');
+  const fltEl = document.getElementById('updPickFilter');
+  if (kwEl) kwEl.value = '';
+  if (fltEl) fltEl.value = '';
+  updPickPageNum = 1;
+  updPickFlatSel = updFlatIndexOfSelection();
+  if (updPickFlatSel < 0) updPickFlatSel = 0;
+  renderUpdObjPicker();
+  modal.classList.remove('hidden');
+}
+function closeUpdObjPicker() {
+  const modal = document.getElementById('updObjPickerModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+// 按搜索/筛选条件过滤后的扁平列表
+function updPickFlatFiltered() {
+  const kw = ((document.getElementById('updPickKw') || {}).value || '').trim().toLowerCase();
+  const flt = (document.getElementById('updPickFilter') || {}).value || '';
+  let filtered = updFlatDataList();
+  if (flt === 'latest') filtered = filtered.filter(it => it.node && it.node.latest);
+  if (flt === 'normal') filtered = filtered.filter(it => !(it.node && it.node.latest));
+  if (kw) filtered = filtered.filter(it => updFlatLabel(it).toLowerCase().indexOf(kw) >= 0);
+  return filtered;
+}
+
+// 标题/面包屑（扁平列表：无层级导航，返回按钮恒隐藏）
+function updPickRenderNav() {
+  const title = document.getElementById('updPickTitle');
+  const bread = document.getElementById('updPickBreadcrumb');
+  const backBtn = document.getElementById('updPickBack');
+  if (title) title.textContent = '选择数据';
+  if (bread) bread.innerHTML = '<span class="text-gray-400">' + (updTargetCard ? updTargetCard.title : '') + ' › 数据列表</span>';
+  if (backBtn) backBtn.classList.add('hidden');
+}
+
+function renderUpdObjPicker() {
+  const list = document.getElementById('updObjPickerList');
+  if (!list) return;
+  const filtered = updPickFlatFiltered();
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / UPD_PICK_PAGE_SIZE));
+  if (updPickPageNum > pages) updPickPageNum = pages;
+  const start = (updPickPageNum - 1) * UPD_PICK_PAGE_SIZE;
+  const pageItems = filtered.slice(start, start + UPD_PICK_PAGE_SIZE);
+  const flatAll = updFlatDataList();
+  list.innerHTML = pageItems.length
+    ? pageItems.map(it => {
+        const ri = flatAll.indexOf(it);
+        return '<label class="flex items-center gap-2 px-3 py-2.5 hover:bg-gray-50 cursor-pointer text-sm">'
+          + '<input type="radio" name="updObjPick" ' + (ri === updPickFlatSel ? 'checked' : '') + ' onchange="updPickFlatSel=' + ri + '" class="text-brand">'
+          + '<span class="w-4 h-4 rounded flex items-center justify-center bg-gray-100 text-gray-500 text-[10px] flex-shrink-0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:0.8em;height:0.8em"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg></span>'
+          + '<span class="flex-1 text-gray-700 truncate font-mono">' + updFlatLabel(it) + '</span>'
+          + (it.node && it.node.latest ? '<span class="text-[10px] px-1 rounded bg-brand-light text-brand shrink-0">最新</span>' : '')
+          + '</label>';
+      }).join('')
+    : '<div class="px-3 py-6 text-xs text-gray-400 text-center">无匹配的数据</div>';
+  const totalEl = document.getElementById('updPickTotal');
+  if (totalEl) totalEl.textContent = '共 ' + total + ' 份数据';
+  const infoEl = document.getElementById('updPickPageInfo');
+  if (infoEl) infoEl.textContent = pages > 1 ? (updPickPageNum + ' / ' + pages) : '';
+  const prevEl = document.getElementById('updPickPrev');
+  const nextEl = document.getElementById('updPickNext');
+  if (prevEl) prevEl.style.visibility = pages > 1 && updPickPageNum > 1 ? 'visible' : 'hidden';
+  if (nextEl) nextEl.style.visibility = pages > 1 && updPickPageNum < pages ? 'visible' : 'hidden';
+  updPickRenderNav();
+}
+
+// 扁平分页（无层级导航）
+function updPickPage(delta) {
+  const pages = Math.max(1, Math.ceil(updPickFlatFiltered().length / UPD_PICK_PAGE_SIZE));
+  updPickPageNum = Math.min(pages, Math.max(1, updPickPageNum + delta));
+  renderUpdObjPicker();
+}
+function confirmUpdObjPick() {
+  const flat = updFlatDataList();
+  if (updPickFlatSel < 0 || updPickFlatSel >= flat.length) {
+    showNotification(ICO_ALERT, '请选择要操作的数据');
+    return;
+  }
+  const it = flat[updPickFlatSel];
+  updSelectedObj = it.objIdx;
+  updSelSubIdx = it.subIdx;
+  closeUpdObjPicker();
+  const picked = document.getElementById('updObjPicked');
+  if (picked) picked.textContent = updFlatLabel(it);
+  renderUpdDataDetail();
+}
 
 function updateCard(title) {
   const card = (moduleConfigs.data.cards || []).find(c => c.title === title);
-  const isDynamic = !!(card && card.dataAssetType === 'dynamic');
   updTargetCard = card || null;
+  updSelectedObj = -1;
+  updSelSubIdx = -1;
+  updPickFlatSel = 0;
   document.getElementById('updTitle').textContent = title;
-  const titleEl = document.getElementById('updateModalTitle');
-  // 标题与语义行随数据类型切换
-  titleEl.innerHTML = isDynamic
-    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 添加新数据 — ' + title
-    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 更新数据 — ' + title;
-  document.getElementById('updModeDesc').textContent = isDynamic
-    ? '动态数据集 · 为合集追加新一期数据'
-    : '静态数据 · 上传新文件覆盖当前数据';
-  // 提示条切换
-  const append = document.getElementById('updAppendInfo');
-  const cover = document.getElementById('updCoverWarn');
-  if (append) append.classList.toggle('hidden', !isDynamic);
-  if (cover) cover.classList.toggle('hidden', isDynamic);
-  // 当前配置确认区：自动沿用合集已有配置（只读展示）
-  const cfg = {
-    crs: card && card.crs ? card.crs : '—',
-    dataset: card && card.dataset ? card.dataset : '—',
-    cat: card && card.cat ? card.cat : '—',
-    tag: card && card.tag ? card.tag : '—',
-    org: card && card.org ? card.org : '北大荒农垦集团有限公司(86)'
-  };
-  const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  setTxt('updCfgCrs', cfg.crs); setTxt('updCfgDataset', cfg.dataset);
-  setTxt('updCfgCat', cfg.cat); setTxt('updCfgTag', cfg.tag); setTxt('updCfgOrg', cfg.org);
-  // 动态追加时：显示本期时间字段（用户单独添加）
-  const pWrap = document.getElementById('updPeriodWrap');
-  if (pWrap) pWrap.classList.toggle('hidden', !isDynamic);
-  const pNo = document.getElementById('updPeriodNo');
-  const pDate = document.getElementById('updPeriodDate');
-  if (pNo) pNo.value = '';
-  if (pDate) { const t = new Date(); pDate.value = t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0') + '-' + String(t.getDate()).padStart(2,'0'); }
-  // 底部提示
-  const note = document.getElementById('updFooterNote');
-  if (note) note.innerHTML = isDynamic
-    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 将追加为新一期，已保存各期均保留'
-    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> 覆盖更新，无历史版本';
-  // 确认按钮文字
-  const btn = document.getElementById('updConfirm');
-  if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> ' + (isDynamic ? '确认追加' : '确认更新');
-  // 重置选择态
+  document.getElementById('updateModalTitle').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 更新数据 — ' + title;
+  // 判断容器内是否有基础数据对象（无 → 仅「新增」可用；绘制/首次新增即此类）
+  const hasBase = !!((card && card.datasetFiles) || []).length;
+  const coverBtn = document.getElementById('updOpCover');
+  const addBtn = document.getElementById('updOpAdd');
+  if (coverBtn) coverBtn.classList.toggle('hidden', !hasBase);
+  if (addBtn) addBtn.classList.remove('hidden'); // 删除「新增」后仅 覆盖/追加，追加始终可用
+  const modeDesc = document.getElementById('updModeDesc');
+  const descCnt = updFlatDataList().length;
+  if (modeDesc) modeDesc.innerHTML = descCnt > 1
+    ? '该数据含 ' + descCnt + ' 份数据，请选择要操作的那份数据后覆盖/追加。'
+    : '该数据仅一份，已默认选中，上传新文件即可覆盖/追加。';
+  // 默认选择：一份→直接选中该数据；多份→默认最新一份，用户可在数据列表改选
+  applyUpdDefaultSelection();
+  setUpdOp(hasBase ? 'cover' : 'add');
+  // 精简提醒：仅坐标系（一致性风险）与组织机构（归属责任）；其余（数据集/目录/标签）静默沿用元数据卡片
+  const crsEl = document.getElementById('updCrsVal');
+  if (crsEl) crsEl.textContent = (card && card.crs) ? card.crs : '—';
+  const orgEl = document.getElementById('updOrgVal');
+  if (orgEl) orgEl.textContent = (card && card.org) ? card.org : '北大荒农垦集团有限公司(86)';
+  // 重置选择态（操作默认已在上面按有无基础数据 setUpdOp）
   document.getElementById('updFileInfo').classList.add('hidden');
   document.getElementById('updFile').value = '';
+  const btn = document.getElementById('updConfirm');
   btn.disabled = true; btn.style.opacity = '.4'; btn.style.cursor = 'not-allowed';
   document.getElementById('updateModal').classList.remove('hidden');
 }
@@ -1233,38 +1585,59 @@ function selectUpdateFile(input) {
 
 function confirmUpdate() {
   const title = document.getElementById('updTitle').textContent;
-  const isDynamic = !!(updTargetCard && updTargetCard.dataAssetType === 'dynamic');
+  if (!updTargetCard) { showNotification(ICO_ALERT, '未找到目标数据，请刷新重试'); return; }
+  // 以录入/上传的文件名为准标识数据对象（用户要求：不用日期区分）
+  const updFileEl = document.getElementById('updFile');
+  const fileName = updFileEl && updFileEl.files && updFileEl.files[0] ? updFileEl.files[0].name : (new Date().toISOString().slice(0,10) + '_' + updTargetCard.title + '.csv');
   closeWizard('updateModal');
-  // 重置弹窗状态
   document.getElementById('updFileInfo').classList.add('hidden');
   document.getElementById('updFile').value = '';
   const btn = document.getElementById('updConfirm');
-  btn.disabled = true;
-  btn.style.opacity = '.4';
-  btn.style.cursor = 'not-allowed';
-  // 按数据类型落库：动态=追加新一期到合集；静态=覆盖当前
-  if (isDynamic && updTargetCard) {
-    // 动态追加：校验本期时间（期号/日期 至少填一项）
-    const pNoEl = document.getElementById('updPeriodNo');
-    const pDateEl = document.getElementById('updPeriodDate');
-    const pNo = pNoEl && pNoEl.value.trim() ? pNoEl.value.trim() : '';
-    const pDate = pDateEl && pDateEl.value ? pDateEl.value : '';
-    if (!pNo && !pDate) {
-      showNotification(ICO_ALERT, '请填写本期的期号或日期——时间属性用于标识这一期数据进入时序');
+  btn.disabled = true; btn.style.opacity = '.4'; btn.style.cursor = 'not-allowed';
+  const nowDate = new Date().toISOString().slice(0,10);
+  const files = updTargetCard.datasetFiles || [];
+  if (updOp === 'cover') {
+    // 覆盖：替换选中的对象本身（无 children）或该对象（数据包）内选中的那份地图数据
+    if (updSelectedObj < 0 || updSelectedObj >= files.length) {
+      showNotification(ICO_ALERT, '请先选择要覆盖的那份数据');
       document.getElementById('updateModal').classList.remove('hidden');
       return;
     }
-    const files = updTargetCard.datasetFiles || [];
-    const nextNo = files.length + 1;
-    files.forEach(f => { if (f.latest) f.latest = false; });
-    const label = pNo || (pDate + ' 第' + nextNo + '期');
-    files.push({ f: (pNo || pDate) + '_' + updTargetCard.title + '.csv', d: pDate || new Date().toISOString().slice(0,10), ver: label, rel: '时序', latest: true });
+    const obj = files[updSelectedObj];
+    const isPkg = !!(obj && (obj.isPackage || (obj.children && obj.children.length)));
+    const targetChild = isPkg && updSelSubIdx >= 0 && (obj.children || [])[updSelSubIdx];
+    if (isPkg && !targetChild) {
+      showNotification(ICO_ALERT, '请先选择要覆盖的那份数据');
+      document.getElementById('updateModal').classList.remove('hidden');
+      return;
+    }
+    const target = targetChild || obj;
+    target.f = fileName;
+    target.d = nowDate;
+    target.ver = fileName;
     updTargetCard.datasetFiles = files;
-    updTargetCard.timeField = updTargetCard.timeField || '采集时间';
     document.getElementById('mainContent').innerHTML = renderMain('data');
-    showNotification(ICO_OK, '✅ 已为动态数据集「' + title + '」追加「' + label + '」，历史各期已保留，可打开时间轴查看。');
-  } else {
-    showNotification(ICO_OK, '数据更新成功！<span class="text-gray-400 text-xs">已用新文件覆盖原数据（静态数据，无历史版本）</span>');
+    showNotification(ICO_OK, '✅ 已覆盖数据「' + title + '」中' + (isPkg ? '数据包「' + updObjLabel(obj, updSelectedObj) + '」的「' : '的「') + fileName + '」。');
+  } else if (updOp === 'add') {
+    // 追加：选中对象为数据包 → 往包内追加一份地图数据；普通对象 → 往容器末尾追加一个对象
+    if (updSelectedObj >= 0 && updSelectedObj < files.length) {
+      const obj = files[updSelectedObj];
+      const isPkg = !!(obj && (obj.isPackage || (obj.children && obj.children.length)));
+      if (isPkg) {
+        if (!obj.children) obj.children = [];
+        obj.children.forEach(c => { if (c.latest) c.latest = false; });
+        obj.children.push({ f: fileName, d: nowDate, ver: fileName, latest: true });
+        updTargetCard.datasetFiles = files;
+        document.getElementById('mainContent').innerHTML = renderMain('data');
+        showNotification(ICO_OK, '✅ 已向数据「' + title + '」的数据包「' + updObjLabel(obj, updSelectedObj) + '」追加一份地图数据「' + fileName + '」。');
+        return;
+      }
+    }
+    files.forEach(f => { if (f.latest) f.latest = false; });
+    files.push({ f: fileName, d: nowDate, ver: fileName, latest: true });
+    updTargetCard.datasetFiles = files;
+    document.getElementById('mainContent').innerHTML = renderMain('data');
+    showNotification(ICO_OK, '✅ 已为数据「' + title + '」追加数据对象「' + fileName + '」。');
   }
 }
 
@@ -1274,9 +1647,8 @@ activeModule = 'data';
 switchModule('data');
 showWelcomeIfNeeded();
 
-// 新增数据向导：初始化步骤1（创建方式卡片页）/ 更新方式 / 标签多选
+// 新增数据向导：初始化步骤1（创建方式卡片页）/ 标签多选
 goStep(1);
-selectAssetType('static');
 renderTagSelect();
 
 // 从任务中心「查看结果」跳转而来：自动打开对应数据的详情

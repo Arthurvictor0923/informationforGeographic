@@ -85,14 +85,58 @@ a{color:var(--brand);text-decoration:none}
 .pnl-section{padding:10px 12px}
 
 /* 主体数据卡 */
-.subject-card{border:1px solid var(--brand-light);background:#f4fbf9;border-radius:8px;padding:10px 12px;margin-bottom:10px}
-.subject-card .sc-label{font-size:10px;color:var(--text-3);display:flex;align-items:center;gap:4px;margin-bottom:6px}
-.subject-card .sc-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--gray-900)}
-.subject-card .sc-tags{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
-.tag-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:1px 7px;border-radius:5px;background:var(--brand-light);color:var(--brand-active)}
+.subject-card{border:1px solid var(--brand-light);background:#f4fbf9;border-radius:8px;padding:9px 11px;margin-bottom:9px}
+.subject-card .sc-label{font-size:10px;color:var(--text-3);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:5px}
+.subject-card .sc-note{font-size:9px;color:var(--text-3);font-weight:400;background:var(--gray-50);border:1px solid var(--gray-100);border-radius:4px;padding:0 5px;margin-left:2px}
+.subject-card .sc-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--gray-900);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.subject-card .sc-from{font-size:10px;color:var(--brand-active);background:#eafaf5;border:1px solid var(--brand-light);border-radius:5px;padding:3px 7px;margin-top:6px;display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.subject-card .sc-tags{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.tag-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:1px 7px;border-radius:5px;background:var(--brand-light);color:var(--brand-active);white-space:nowrap}
 .tag-pill.gray{background:var(--gray-50);color:var(--text-2);border:1px solid var(--gray-100)}
 .tag-pill.purple{background:#f5f0ff;color:#7a5af8;border:1px solid #e6dfff}
-.subject-card .lockline{font-size:10px;color:var(--text-3);margin-top:7px;display:flex;align-items:center;gap:4px}
+.subject-card .sc-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;margin-top:8px;border-top:1px dashed var(--gray-100);padding-top:7px}
+.subject-card .sc-meta-grid .meta-line{font-size:11px;padding:1px 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.subject-card .sc-meta-grid .meta-line .k{flex-shrink:0}
+.subject-card .sc-meta-grid .meta-line > span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.raster-style-pick{border:1px solid var(--gray-100);border-radius:8px;padding:9px 11px;margin-bottom:9px;background:#fbfdff}
+.raster-style-pick .rsp-head{font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.raster-style-pick .rsp-sub{font-size:9px;color:var(--text-3);font-weight:400;background:var(--gray-50);border:1px solid var(--gray-100);border-radius:4px;padding:0 5px}
+.raster-style-pick .rsp-templates{display:flex;flex-direction:column;gap:7px}.raster-style-pick .rsp-tpl{display:flex;align-items:center;gap:9px;text-align:left;background:#fff;border:1px solid var(--gray-100);border-radius:8px;padding:7px 9px;cursor:pointer;transition:all .15s}
+.raster-style-pick .rsp-tpl:hover{border-color:var(--brand);box-shadow:0 2px 8px rgba(43,186,160,.12)}
+.raster-style-pick .rsp-tpl.on{border-color:var(--brand);background:var(--brand-light);box-shadow:inset 0 0 0 2px rgba(43,186,160,.3)}
+.raster-style-pick .rsp-thumb{width:56px;height:36px;border-radius:6px;flex-shrink:0;overflow:hidden;border:1px solid var(--gray-100);display:block;background:#eef2f5}
+.raster-style-pick .rsp-tpl-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.raster-style-pick .rsp-tpl-body b{font-size:12px;color:var(--text-2);font-weight:600}
+.raster-style-pick .rsp-tpl.on .rsp-tpl-body b{color:var(--brand-active)}
+.raster-style-pick .rsp-tpl-body small{font-size:10px;color:var(--text-3);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.raster-style-pick .rsp-note{font-size:10px;color:var(--text-3);margin-top:7px;line-height:1.5}
+
+/* 时序栅格：底部时间序列播放插件内的「批量绑定样式模板」面板 */
+.rtl-batch-btn{margin-left:8px;font-size:11px;color:var(--brand-active);background:#fff;border:1px solid var(--brand);border-radius:6px;padding:3px 9px;cursor:pointer;transition:all .15s}
+.rtl-batch-btn:hover{background:var(--brand-light)}
+.rl-batch{margin-top:8px;border:1px solid var(--brand);border-radius:8px;background:#fbfdff;padding:10px 12px}
+.rl-batch.hidden{display:none}
+.rl-batch .rbb-head{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px}
+.rl-batch .rbb-head .x{font-size:14px;color:var(--text-3);cursor:pointer;line-height:1;padding:0 4px}
+.rl-batch .rbb-head .x:hover{color:var(--brand-active)}
+.rl-batch .rbb-tpls{display:flex;gap:8px;margin-bottom:10px}
+.rl-batch .rbb-tpl{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;background:#fff;border:1px solid var(--gray-100);border-radius:8px;padding:7px 4px;cursor:pointer;transition:all .15s}
+.rl-batch .rbb-tpl:hover{border-color:var(--brand)}
+.rl-batch .rbb-tpl.on{border-color:var(--brand);background:var(--brand-light);box-shadow:inset 0 0 0 2px rgba(43,186,160,.3)}
+.rl-batch .rbb-tpl .rt{width:100%;height:34px;border-radius:6px;overflow:hidden;border:1px solid var(--gray-100)}
+.rl-batch .rbb-tpl b{font-size:11px;color:var(--text-2);font-weight:600}
+.rl-batch .rbb-tpl small{font-size:9px;color:var(--text-3)}
+.rl-batch .rbb-frames{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;max-height:118px;overflow-y:auto;padding:2px;margin-bottom:9px}
+.rl-batch .rbb-frame{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);background:#fff;border:1px solid var(--gray-100);border-radius:6px;padding:4px 6px;cursor:pointer}
+.rl-batch .rbb-frame input{accent-color:var(--brand)}
+.rl-batch .rbb-frame small{font-size:9px;color:var(--text-3);margin-left:auto}
+.rl-batch .rbb-frame.sel{background:var(--brand-light);border-color:var(--brand)}
+.rl-batch .rbb-bar{display:flex;align-items:center;gap:10px}
+.rl-batch .rbb-bar label{font-size:11px;color:var(--text-2);display:flex;align-items:center;gap:4px;cursor:pointer}
+.rl-batch .rbb-bar .cnt{font-size:11px;color:var(--text-3)}
+.rl-batch .rbb-bar .apply{margin-left:auto;font-size:12px;font-weight:600;color:#fff;background:var(--brand-active);border:none;border-radius:6px;padding:5px 12px;cursor:pointer}
+.rl-batch .rbb-bar .apply:hover{background:var(--brand)}
+.rl-batch .rbb-bar .apply:disabled{opacity:.5;cursor:not-allowed}
 
 /* 主体图层（重点）vs 表达层（辅助）——主次视觉分级 */
 .primary-layer-box{border:1.5px solid var(--brand);border-radius:8px;background:#f0fbf8;margin-bottom:8px;overflow:hidden}
@@ -126,6 +170,13 @@ a{color:var(--brand);text-decoration:none}
 .lt-eye.off{color:var(--gray-300);opacity:.5}
 .lt-row .lt-eye{margin-left:auto;margin-right:-2px}
 .lt-sub .lt-eye{margin-left:auto;margin-right:-2px}
+/* 栅格：服务序列（逐帧选某一张地图服务） */
+.lt-parent{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;cursor:pointer;color:var(--text-2);font-size:13px}
+.lt-parent:hover{background:var(--brand-bg)}
+.lt-parent.selected{background:var(--brand-bg);color:var(--brand-active);font-weight:600}
+.lt-caret{width:12px;flex-shrink:0;color:var(--text-3);font-size:11px;text-align:center}
+.ss-chip{font-size:10px;font-weight:600;color:var(--brand-active);background:var(--brand-bg);border:1px solid var(--brand);border-radius:4px;padding:1px 6px;margin-left:6px;white-space:nowrap}
+.ss-sub{font-size:11px;color:var(--text-3);margin:-2px 0 8px;line-height:1.4}
 /* 顺序两维度 */
 .order-block{border:1px solid var(--gray-100);border-radius:8px;overflow:hidden}
 .order-block .ob-head{background:var(--gray-25);padding:5px 10px;font-size:12px;font-weight:600;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:6px}
@@ -150,7 +201,15 @@ a{color:var(--brand);text-decoration:none}
 .info-banner.warn{background:#fff8ec;border-color:#ffe3b3;color:#8a5b00}
 .info-banner.purple{background:#f7f5ff;border-color:#e3dcff;color:#5a3fd6}
 .meta-line{display:flex;justify-content:space-between;font-size:12px;color:var(--text-2);padding:2px 0}
-.meta-line .k{color:var(--text-3)}
+.meta-line .k{color:var(--text-3);flex-shrink:0}
+.meta-card{border:1px solid var(--gray-100);border-radius:8px;padding:4px 10px;background:var(--white)}
+.meta-card .meta-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta-card .meta-line > span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sec-title.mini{font-size:11px;margin:8px 0 5px}
+.btn-ghost{background:transparent;border-color:var(--gray-200);color:var(--text-3);height:22px;padding:0 8px;font-size:11px;font-weight:500}
+.btn-ghost:hover{border-color:var(--brand);color:var(--brand)}
+.st-tag{font-weight:600}
+.st-unshared{color:var(--brand-active)}
 
 /* ── 右：可折叠属性抽屉（悬浮在地图上） ── */
 /* ── 右：right-container（功能栏 + 多功能抽屉）——对齐地图编辑器原型 ── */
@@ -242,6 +301,31 @@ input[type=range]{flex:1;accent-color:var(--brand)}
 
 /* 画布时间指示（动态数据：当前渲染时间段，随筛选实时更新） */
 .time-indicator{position:absolute;top:12px;left:12px;z-index:900;background:rgba(255,255,255,.95);border:1px solid var(--gray-100);border-radius:8px;box-shadow:var(--shadow-sm);padding:6px 12px;font-size:12px;color:var(--text-2)}
+
+/* 画布底部：服务序列 · 时间序列（逐帧选某一张地图服务）选择条 */
+.raster-timeline{position:absolute;left:0;right:0;bottom:0;z-index:920;background:rgba(255,255,255,.96);border-top:1px solid var(--gray-100);box-shadow:0 -2px 10px rgba(0,0,0,.06);backdrop-filter:blur(2px);padding:8px 12px 10px}
+.rtl-head{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.rtl-title{font-size:12px;font-weight:600;color:var(--gray-900)}
+.rtl-count{font-size:11px;color:var(--text-3)}
+.rtl-active{font-size:11px;font-weight:600;color:var(--brand-active);background:var(--brand-light);border-radius:6px;padding:1px 8px}
+.rtl-hint{margin-left:auto;font-size:10px;color:var(--text-3)}
+.rtl-track{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.rtl-frame{flex-shrink:0;width:86px;border:1px solid var(--gray-200);border-radius:8px;background:#fff;padding:6px 8px;cursor:pointer;transition:all var(--t-fast) var(--ease-in-out);position:relative}
+.rtl-frame:hover{border-color:var(--brand);background:var(--brand-bg)}
+.rtl-frame.active{border-color:var(--brand);border-width:2px;background:#f0fbf8;box-shadow:var(--shadow-sm)}
+.rtl-frame .rf-idx{font-size:10px;color:var(--text-3)}
+.rtl-frame .rf-date{font-size:12px;font-weight:600;color:var(--gray-900);margin-top:1px}
+.rtl-frame .rf-swatch{height:6px;border-radius:3px;margin-top:6px;background:linear-gradient(90deg,#2f8f4f,#7ec8a0)}
+.rtl-frame.active .rf-swatch{background:linear-gradient(90deg,#0f947c,#2bbaa0)}
+.rtl-frame .rf-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#cbd5e1}
+.rtl-frame.active .rf-dot{background:var(--brand)}
+.lt-tip{font-size:10px;color:var(--text-3);padding:2px 8px 4px;line-height:1.4}
+.lt-tip b{color:var(--brand-active)}
+.rtl-play{flex-shrink:0;width:28px;height:28px;border-radius:50%;border:1px solid var(--brand);background:var(--brand);color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rtl-play:hover{background:var(--brand-active)}
+.rtl-play.playing{background:var(--brand-active)}
+.raster-class-inline{margin-top:10px;padding-top:10px;border-top:1px dashed var(--gray-100)}
+.raster-class-inline .info-banner{font-size:11px;color:var(--text-3);background:var(--gray-25);border-radius:6px;padding:6px 8px;line-height:1.5}
 /* 画布右下角图例框（对齐地图编辑器原型：实时渲染已配置图例） */
 .map-legend-box{position:absolute;right:60px;bottom:18px;z-index:940;width:220px;background:rgba(255,255,255,.97);border:1px solid var(--gray-100);border-radius:10px;box-shadow:var(--shadow-md);overflow:hidden}
 .map-legend-box .mlb-hd{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--gray-100);font-weight:600;font-size:12px;color:var(--gray-900)}
@@ -254,6 +338,8 @@ input[type=range]{flex:1;accent-color:var(--brand)}
 .map-legend-box .mlb-note{font-size:10px;color:var(--text-3);margin-top:2px;line-height:1.5}
 /* 抽屉展开时，图例框贴右容器左缘（390=抽屉330+功能栏46+边距14），避免被样式抽屉遮盖 */
 .drawer-open .map-legend-box{right:390px}
+/* 栅格态（底部服务序列条出现）时，图例框抬到时间序列条之上，避免遮挡主体图层/底部条 */
+.main.raster-on .map-legend-box{bottom:150px !important}
 
 /* 图层详情条（底部信息框，对齐地图编辑器原型） */
 .layer-detail-bar{height:36px;background:var(--gray-25);border-top:1px solid var(--gray-100);display:flex;align-items:center;gap:14px;padding:0 14px;font-size:11px;color:var(--text-2);z-index:20;flex-shrink:0;overflow-x:auto;white-space:nowrap}
@@ -277,7 +363,47 @@ input[type=range]{flex:1;accent-color:var(--brand)}
 .modal-close{width:26px;height:26px;border:none;background:transparent;color:var(--text-3);font-size:17px;border-radius:6px}
 .modal-close:hover{background:var(--gray-50)}
 .modal-body{padding:18px 20px}
-.modal-foot{padding:12px 20px;border-top:1px solid var(--gray-100);display:flex;justify-content:flex-end;gap:8px}
+.modal-body{padding:16px 20px;max-height:74vh;overflow-y:auto}
+.modal-foot{padding:12px 20px;border-top:1px solid var(--gray-100);display:flex;justify-content:flex-end;gap:8px;align-items:center}
+/* ── 选择服务弹窗：同屏选择（主体/辅助）+ 数据联动框 ── */
+.svc-section{margin-bottom:14px}
+.svc-data-box{margin:0 0 14px;padding:12px  14px;border:1px solid var(--brand-light);background:var(--brand-bg);border-radius:var(--r-md)}
+.sd-head{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--brand-active);margin-bottom:8px}
+.sd-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);display:inline-block}
+.sd-note{font-weight:400;color:var(--text-3);font-size:11px;margin-left:auto}
+.sd-body{font-size:13px;color:var(--text)}
+.sd-empty{color:var(--text-3);font-size:12px;padding:6px 0}
+.sd-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 14px}
+.sd-grid div{font-size:12px;color:var(--text-2)}
+.sd-grid b{color:var(--text);font-weight:600}
+.svc-pane{margin-top:4px}
+.svc-cap{font-size:12px;color:var(--text-2);margin-bottom:10px}
+.svc-cap b{color:var(--brand-active)}
+.svc-list{max-height:160px;overflow-y:auto;scrollbar-width:thin}
+.svc-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--gray-100);border-radius:var(--r-md);margin:5px 0;cursor:pointer;transition:all var(--t-fast) var(--ease-in-out)}
+.svc-row:hover{background:var(--gray-50);border-color:var(--brand-soft)}
+.svc-row.sel{border-color:var(--brand);background:var(--brand-bg)}
+.svc-row.aux{border-style:dashed}
+.svc-row.disabled{opacity:.5;cursor:not-allowed}
+.svc-check{width:15px;height:15px;border:1.5px solid var(--gray-300);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;color:#fff}
+.svc-row.sel .svc-check{background:var(--brand);border-color:var(--brand)}
+.svc-thumb{font-size:14px;width:28px;height:28px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--brand-bg);color:var(--brand-active);border:1px solid var(--brand-light)}
+.svc-info{flex:1;min-width:0}
+.svc-top{display:flex;align-items:center;gap:6px}
+.svc-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.svc-status{font-size:9px;color:#10a37f;background:#e6f7f1;border:1px solid #bfe9da;border-radius:999px;padding:0 6px;flex-shrink:0;white-space:nowrap}
+.svc-meta{font-size:10px;color:var(--text-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.svc-preview{font-size:10px;padding:2px 7px;border:1px solid var(--gray-100);border-radius:5px;background:#fff;color:var(--brand-active);cursor:pointer;flex-shrink:0}
+.svc-preview:hover{background:var(--brand-bg);border-color:var(--brand-soft)}
+.svc-role{font-size:9px;padding:1px 6px;border-radius:999px;flex-shrink:0}
+.svc-role.main{background:var(--brand);color:#fff}
+.svc-role.aux{background:var(--brand-light);color:var(--brand-active)}
+.svc-filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.svc-filters select{font-size:12px;padding:6px 8px;border:1px solid var(--gray-100);border-radius:var(--r-md);background:#fff;color:var(--text);flex:1;min-width:0}
+.svc-pg{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--gray-100)}
+.svc-pg-info{font-size:12px;color:var(--text-3)}
+.svc-pg button{font-size:12px;padding:4px 10px;border:1px solid var(--gray-100);border-radius:var(--r-md);background:#fff;color:var(--text);cursor:pointer}
+.svc-pg button:disabled{opacity:.45;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -313,32 +439,51 @@ input[type=range]{flex:1;accent-color:var(--brand)}
         <div class="pnl-body" id="pnl-layer">
           <div class="pnl-header"><span>🗺 图层结构</span><span class="pnl-hint">作为图层设计组织</span></div>
           <div class="pnl-section">
-            <!-- 一套数据（唯一定位；可更换 → 服务随数据派生） -->
+            <!-- 服务（图层主体；明确：主体＝来自数据集的某一服务/某一期，非抽象“以服务为主体”） -->
             <div class="subject-card">
-              <div class="sc-label">📦 一套数据 <span style="color:var(--text-3);font-weight:400">· 唯一定位</span><button class="btn btn-sm" style="margin-left:auto;height:24px;padding:0 10px" onclick="openDataSelect()">更换数据</button></div>
-              <div class="sc-name" id="scDataName">🌾 中晚稻·2025·地块</div>
-              <div class="sc-tags">
-                <span class="tag-pill" id="scDataType">面 · Polygon</span>
+              <div class="sc-label">📦 服务 <span class="sc-note">图层数据主体</span></div>
+              <div class="sc-name" id="scDataName">🗺 中晚稻·地块服务</div>
+              <div class="sc-from" id="scFromLine">📎 发布自数据资产 · 中晚稻监测</div>
+              <div class="sc-tags" id="scTags">
+                <span class="tag-pill" id="scDataType">要素 · 面 · Polygon</span>
                 <span class="tag-pill">CGCS2000</span>
                 <span class="tag-pill purple" id="scDataCount">3,218 个要素</span>
               </div>
-              <div class="lockline">主体图层 + 表达层 <b>均源自这一套数据</b>（不混入其它数据）。</div>
-              <button class="btn btn-sm" style="width:100%;margin-top:6px" onclick="openUpdateCheck()">🔄 检测数据更新</button>
+              <!-- 栅格关键数据属性，与上方服务信息合为顶部一张卡；矢量态隐藏 -->
+              <div id="scRasterMeta" class="hidden sc-meta-grid">
+                <div class="meta-line"><span class="k">类型</span><span id="roType">—</span></div>
+                <div class="meta-line"><span class="k">坐标系</span><span id="roCrs">—</span></div>
+                <div class="meta-line"><span class="k">分辨率</span><span id="roRes">—</span></div>
+                <div class="meta-line"><span class="k">波段</span><span id="roBands">—</span></div>
+                <div class="meta-line"><span class="k">获取</span><span id="roDate">—</span></div>
+                <div class="meta-line"><span class="k">来源</span><span id="roSource">—</span></div>
+              </div>
             </div>
 
-            <!-- 主体图层：本数据的主渲染（重点，高亮卡片） -->
-            <div class="primary-layer-box">
-              <div class="plb-head">🗺 主体图层 <span class="plb-badge">主渲染 · 重点</span></div>
+            <!-- 矢量：主体图层 + 表达层（两级；多渲染目标） -->
+            <div class="primary-layer-box" id="vecLayerBox">
+              <div class="plb-head">🗺 主体图层 <span class="plb-badge" id="plbBadge">主渲染 · 重点</span></div>
               <div class="plb-body">
+                <!-- 矢量主体 -->
                 <div class="lt" id="treeSubject">
                   <div class="lt-sub selected" data-target="fill" onclick="selectNode(this,'fill')"><span class="lts-dot" style="background:#2bbaa0"></span><span class="lt-name" id="subjectServiceName">耕地面</span> <span class="lt-node-chip" id="subjectChip">面 · 主体</span><button class="lt-eye on" onclick="event.stopPropagation();toggleLayerVis('subject',this)" title="显示/隐藏主体图层">👁</button></div>
                 </div>
               </div>
             </div>
 
-            <!-- 表达层：辅助表达（次级，灰卡片） -->
-            <div class="aux-layer-box">
-              <div class="alb-head">🏷 表达层 <span class="alb-badge">辅助 · 派生服务</span></div>
+            <!-- 栅格：统一影像表达（无主体/表达二分，单面板） -->
+            <div class="primary-layer-box hidden" id="rasterLayerBox">
+              <div class="plb-head">🛰 影像图层 <span class="plb-badge" id="plbBadgeR">栅格 · 统一影像表达</span></div>
+              <div class="plb-body">
+                <div class="lt" id="treeRasterFlat">
+                  <div class="lt-sub selected" data-target="raster" onclick="selectNode(this,'raster')"><span class="lts-dot" style="background:#2bbaa0"></span><span class="lt-name" id="rasterLayerName">影像渲染</span> <span class="lt-node-chip" id="rasterLayerChip">栅格 · 统一影像表达</span><button class="lt-eye on" onclick="event.stopPropagation();toggleLayerVis('raster',this)" title="显示/隐藏影像">👁</button></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 矢量表达层（辅助表达；次级，灰卡片） -->
+            <div class="aux-layer-box" id="vecAuxBox">
+              <div class="alb-head">🏷 表达层 <span class="alb-badge" id="albBadge">辅助 · 派生服务</span></div>
               <div class="alb-body">
                 <div class="lt" id="treeAux">
                   <div class="lt-children open" id="ch-aux">
@@ -348,13 +493,20 @@ input[type=range]{flex:1;accent-color:var(--brand)}
                 </div>
               </div>
             </div>
-            <div class="sec-title">📋 图层信息 <button class="btn btn-sm" style="height:24px;padding:0 10px" onclick="openLayerEdit()">编辑</button></div>
-            <div class="legend-editor">
-              <div class="le-layer">图层</div>
-              <div class="meta-line"><span class="k">图层名称</span><span id="infoLayerName">中晚稻·地块图层</span></div>
-              <div class="meta-line"><span class="k">图层编码</span><span id="infoLayerCode">LY-AGRI-001</span></div>
-              <div class="meta-line"><span class="k">图层分类</span><span id="infoLayerCat">农业资源 / 耕地</span></div>
-              <div class="meta-line"><span class="k">共享状态</span><span id="infoShareState" style="color:var(--brand-active);font-weight:600">未共享</span></div>
+
+            <!-- 时序栅格：选用「样式管理」预置的制图样式模板（仅时序显示；单张无样式选择；矢量隐藏） -->
+            <div class="raster-style-pick hidden" id="rasterStylePick">
+              <div class="rsp-head">🎨 样式模板 <span class="rsp-sub" id="rspSeqLabel">来自样式管理</span></div>
+              <div class="rsp-templates" id="rspTplList"></div>
+              <div class="rsp-note" id="rspNote">模板由系统<b>「样式管理」</b>功能预先配置（业务化制图预设），此处<b>仅选用</b>，不在此定义渲染方式；时序栅格的默认模板由所绑服务序列带出。逐期（帧）样式独立保存，可在下方序列「批量绑定样式模板」分别套用不同模板。</div>
+            </div>
+
+            <div class="sec-title mini">📋 图层信息 <button class="btn btn-sm btn-ghost" onclick="openLayerEdit()">编辑</button></div>
+            <div class="meta-card">
+              <div class="meta-line"><span class="k">名称</span><span id="infoLayerName">中晚稻·地块图层</span></div>
+              <div class="meta-line"><span class="k">编码</span><span id="infoLayerCode">LY-AGRI-001</span></div>
+              <div class="meta-line"><span class="k">分类</span><span id="infoLayerCat">农业资源 / 耕地</span></div>
+              <div class="meta-line"><span class="k">共享</span><span id="infoShareState" class="st-tag st-unshared">未共享</span></div>
             </div>
           </div>
         </div>
@@ -372,6 +524,7 @@ input[type=range]{flex:1;accent-color:var(--brand)}
               <div class="le-row" id="lgFillRow"><span class="sw" id="lgSwFill" style="background:#2bbaa0"></span><input class="le-name" id="lgNameFill" value="中晚稻种植区" oninput="updateLegendBox()" style="flex:1"><span class="lg-desc">填充 · 主体</span></div>
               <div class="le-row" id="lgStrokeRow"><span class="sw" id="lgSwStroke" style="background:#0f947c"></span><input class="le-name" id="lgNameStroke" value="地块边界" oninput="updateLegendBox()" style="flex:1"><span class="lg-desc">描边 · 表达层</span></div>
               <div class="le-row" id="lgSymRow" style="display:none"><span class="sw circ" id="lgSwSym" style="background:#f56a00"></span><input class="le-name" id="lgNameSym" value="监测点" oninput="updateLegendBox()" style="flex:1"><span class="lg-desc">点 · 主体</span></div>
+              <div class="le-row" id="lgRasterRow" style="display:none"><span class="sw" id="lgSwRaster" style="background:#2f8f4f"></span><input class="le-name" id="lgNameRaster" value="影像渲染" oninput="updateLegendBox()" style="flex:1"><span class="lg-desc">影像 · 主体（栅格）</span></div>
               <div class="le-layer">② 全局图层描述（随分享携带，可编辑）</div>
               <div class="le-row"><input class="le-name" id="lgNameGlobal" value="来源：遥感监测科 · 2026年晚稻期" style="flex:1" oninput="updateLegendBox()"></div>
             </div>
@@ -400,6 +553,28 @@ input[type=range]{flex:1;accent-color:var(--brand)}
     <div class="map-area" id="mapArea">
       <div id="mapCanvas"></div>
       <div class="time-indicator hidden" id="timeIndicator">⏱ 当前时段：—</div>
+      <!-- 画布底部：时序栅格的「时间序列播放插件」（绑定服务序列）；单张栅格不显示，改用静态预览 -->
+      <div class="raster-timeline hidden" id="rasterTimeline">
+        <div class="rtl-head">
+          <button class="rtl-play" id="rtlPlay" onclick="playRasterSequence()" title="播放时间序列">▶</button>
+          <span class="rtl-title" id="rtlTitle">🛰 时间序列播放插件</span>
+          <span class="rtl-count" id="rtlCount"></span>
+          <span class="rtl-active" id="rtlActive">服务 1 · 2026-05-01</span>
+          <button class="rtl-batch-btn" onclick="toggleRasterBatch()">🎨 批量绑定样式</button>
+          <span class="rtl-hint">下方为绑定的服务序列（多张地图服务）；点击某服务切换当前编辑对象，逐张样式独立保存。</span>
+        </div>
+        <div class="rl-batch hidden" id="rlBatch">
+          <div class="rbb-head"><span>批量绑定样式模板 · 分别套用到所选帧 <span style="font-weight:400;font-size:10px;color:var(--text-3)">（模板来自「样式管理」预置）</span></span><span class="x" onclick="toggleRasterBatch()">✕</span></div>
+          <div class="rbb-tpls" id="rbbTpls"></div>
+          <div class="rbb-frames" id="rbbFrames"></div>
+          <div class="rbb-bar">
+            <label><input type="checkbox" id="rbbAll" onchange="toggleBatchAll(this.checked)"> 全选</label>
+            <span class="cnt" id="rbbCount">已选 0 帧</span>
+            <button class="apply" id="rbbApply" onclick="applyBatchTemplate()" disabled>应用到选中帧</button>
+          </div>
+        </div>
+        <div class="rtl-track" id="rtlTrack"></div>
+      </div>
     </div>
 
     <!-- ===== 右侧：功能栏 + 多功能抽屉（对齐地图编辑器原型） ===== -->
@@ -414,7 +589,7 @@ input[type=range]{flex:1;accent-color:var(--brand)}
             <div class="sec-title" style="margin-top:0">📌 当前选中节点</div>
             <div class="meta-line"><span class="k">节点</span><span id="propNodeName">填充 · 主体图层</span></div>
             <div class="meta-line"><span class="k">所属</span><span id="propNodeBelong">主体图层 · 耕地面 (MVT)</span></div>
-            <div class="meta-line"><span class="k">数据源</span><span>中晚稻·2025·地块（一套数据，唯一）</span></div>
+            <div class="meta-line"><span class="k">服务</span><span id="propDataSource">中晚稻·地块服务</span></div>
             <div class="meta-line"><span class="k">坐标系</span><span>CGCS2000 (EPSG:4490)</span></div>
             <div class="meta-line"><span class="k">可见性</span><span>随左树节点 👁 显隐联动</span></div>
             <div class="sec-title">🖱 交互设置</div>
@@ -432,7 +607,7 @@ input[type=range]{flex:1;accent-color:var(--brand)}
             <div class="field-row"><span style="font-size:12px;color:var(--text-2)">最大 <b id="visMaxVal">20</b></span><input type="range" id="visRangeMax" min="0" max="20" value="20" oninput="applyVisRange()" style="flex:1"></div>
             <div style="font-size:11px;color:var(--text-3);margin-top:4px">缩放级别超出范围时隐藏图层（对齐 ArcGIS 可见范围）</div>
             <div style="height:10px"></div>
-            <div class="info-banner">💡 本要素图层基于<b>一套数据</b>制图：主体图层 + 表达层均源自同一数据；样式请在「🎨 样式」功能页调整。</div>
+            <div class="info-banner">💡 本要素图层基于<b>已发布服务</b>制图（服务来自数据集）：主体图层 + 表达层均源自同一服务；样式请在「🎨 样式」功能页调整。</div>
           </div>
         </div>
         <!-- 样式（统一面板：预选样式 + 三个服务各自样式） -->
@@ -483,7 +658,7 @@ input[type=range]{flex:1;accent-color:var(--brand)}
                   <span style="color:var(--text-3);flex-shrink:0">至</span>
                   <input type="date" class="input" id="timeEnd" value="2026-05-31" onchange="onTimeChange()" style="flex:1">
                 </div>
-                <div style="font-size:11px;color:var(--text-3);margin-top:4px" id="timeSegmentLabel">选择时间段筛选要素（最新一期服务 · 要素带时间属性）</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:4px" id="timeSegmentLabel">选择时间段筛选要素（最新数据 · 要素带时间属性）</div>
               </div>
               <div id="fillClassList" style="display:none"></div>
               <div class="field" id="renderCfgRow" style="display:none">
@@ -558,10 +733,93 @@ input[type=range]{flex:1;accent-color:var(--brand)}
               <div class="ss-head">📍 点标记 · 符号</div>
               <div class="prop-label">标记符号</div>
               <div class="field-row">
-                <span class="input" id="markerSymbolBox" style="flex:1;display:flex;align-items:center;gap:8px;padding:0 10px;height:34px;background:var(--gray-25)"><span id="markerSymbolPreview" style="font-size:16px;line-height:1">📍</span><span style="font-size:12px;color:var(--text-3)">当前符号</span></span>
+                <span class="input" id="markerSymbolBox" style="flex:1;display:flex;align-items:center;gap:8px;padding:0 10px;height:34px;background:var(--gray-25)"><span id="markerSymbolPreview" style="font-size:16px;line-height:1"><svg viewBox="0 0 24 24" fill="none" stroke="#2bbaa0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-0.125em"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span style="font-size:12px;color:var(--text-3)">当前符号</span></span>
                 <button class="btn btn-sm" onclick="openSymbolPicker()">选择符号</button>
               </div>
               <div class="field-row" style="margin-top:10px"><label class="toggle on" id="markerToggle" onclick="toggleMarker()"></label><span style="font-size:12px;color:var(--text-2)">点标记可见</span></div>
+            </div>
+
+            <!-- 栅格·基础样式：单张栅格 = 样式调整主入口（渲染方式+细节）；时序栅格 = 模板细节控制 -->
+            <div class="style-sec hidden" id="sec-raster">
+              <div class="ss-head">🎨 样式参数 <span class="ss-chip" id="rasterActiveSvc">—</span></div>
+              <div class="ss-sub" id="secRasterSub">参数化调整，对标 ArcGIS 影像图层 / QGIS 栅格渲染：拉伸方式与范围、亮度 / 对比度 / Gamma、色带与反转、波段组合、透明度、分类渲染；渲染方式由数据自动决定（时序由左列「样式管理预置」模板卡带出）。</div>
+
+              <!-- ① 渲染增强（拉伸）：拉伸方式 + 范围 + 亮度/对比度/Gamma -->
+              <div class="prop-label">拉伸方式</div>
+              <div class="field"><select class="input" id="rasterStretchMode" onchange="onRasterStretchChange()">
+                <option value="none">无（原始范围）</option>
+                <option value="pct">百分比裁剪（2% – 98%）</option>
+                <option value="std">标准差（±2σ）</option>
+              </select></div>
+              <div class="field" id="rasterStretchRangeRow" style="display:none">
+                <div class="prop-label">拉伸范围（最小 / 最大）</div>
+                <div class="field-row">
+                  <input type="number" class="input" id="rasterStretchMin" value="0" min="0" max="255" onchange="applyRasterRender()">
+                  <span style="color:var(--text-3);font-size:12px">~</span>
+                  <input type="number" class="input" id="rasterStretchMax" value="255" min="0" max="255" onchange="applyRasterRender()">
+                </div>
+              </div>
+              <div class="prop-label">亮度 <span id="rasterBrightnessVal">100</span></div>
+              <div class="field"><input type="range" id="rasterBrightness" min="50" max="200" value="100" oninput="document.getElementById('rasterBrightnessVal').textContent=this.value;applyRasterRender()"></div>
+              <div class="prop-label">对比度 <span id="rasterContrastVal">100</span></div>
+              <div class="field"><input type="range" id="rasterContrast" min="50" max="200" value="100" oninput="document.getElementById('rasterContrastVal').textContent=this.value;applyRasterRender()"></div>
+              <div class="prop-label">Gamma <span id="rasterGammaVal">1.0</span></div>
+              <div class="field"><input type="range" id="rasterGamma" min="30" max="300" step="10" value="100" oninput="document.getElementById('rasterGammaVal').textContent=(this.value/100).toFixed(1);applyRasterRender()"></div>
+
+              <!-- ② 色彩显示（单波段）：色带 + 反转（灰度/晕渲/分级色带均可换色带） -->
+              <div class="field" id="rasterColorRow">
+                <div class="prop-label">显示色带</div>
+                <div class="field-row">
+                  <select class="input" id="rasterDisplayRamp" onchange="applyRasterRender()">
+                    <option value="gray">灰度</option>
+                    <option value="hill">地形晕渲（棕褐）</option>
+                    <option value="gr">绿-黄-红</option>
+                    <option value="br">蓝-白-红</option>
+                    <option value="mono">单色渐变</option>
+                  </select>
+                  <label class="toggle" id="rasterRampRev" onclick="toggleRasterRampRev()" title="反转色带"></label>
+                  <span style="font-size:11px;color:var(--text-3)">反转</span>
+                </div>
+              </div>
+
+              <!-- ③ 波段组合（多波段影像，真彩时显示） -->
+              <div class="field" id="rasterBandRow">
+                <div class="prop-label">波段组合（R / G / B）</div>
+                <div class="field-row">
+                  <select class="input" id="rasterBandR" onchange="applyRasterRender()"><option>R 红波段</option><option>G 绿波段</option><option>B 蓝波段</option><option>NIR 近红外</option></select>
+                  <select class="input" id="rasterBandG" onchange="applyRasterRender()"><option>G 绿波段</option><option>R 红波段</option><option>B 蓝波段</option><option>NIR 近红外</option></select>
+                  <select class="input" id="rasterBandB" onchange="applyRasterRender()"><option>B 蓝波段</option><option>R 红波段</option><option>G 绿波段</option><option>NIR 近红外</option></select>
+                </div>
+              </div>
+
+              <!-- ④ 透明度 -->
+              <div class="field-row"><label class="toggle on" id="rasterMaskToggle" onclick="toggleRasterMask()"></label><span style="font-size:12px;color:var(--text-2)">掩膜透明（nodata 透明）</span></div>
+              <div class="prop-label">整体不透明度 <span id="rasterOpVal">85%</span></div>
+              <div class="field"><input type="range" id="rasterOp" min="20" max="100" value="85" oninput="applyRasterRender()"></div>
+
+              <!-- ⑤ 分类渲染（分类色带模板带出时展开） -->
+              <div id="rasterClassInline" class="raster-class-inline hidden">
+                <div class="prop-label">分类波段</div>
+                <div class="field"><select class="input" id="rasterClassBand" onchange="applyRasterRender()"><option>NIR 近红外</option><option>SWIR 短波红外</option><option>R 红波段</option></select></div>
+                <div class="prop-label">分类方法</div>
+                <div class="field"><select class="input" id="rasterClassMethod" onchange="applyRasterRender()">
+                  <option value="equal">等间隔</option>
+                  <option value="quantile">分位数</option>
+                  <option value="jenks">自然间断（Jenks）</option>
+                </select></div>
+                <div class="prop-label">分类色带</div>
+                <div class="field"><select class="input" id="rasterRamp" onchange="applyRasterRender()"><option value="gr">绿-黄-红</option><option value="br">蓝-白-红</option><option value="mono">单色渐变</option></select></div>
+                <div class="prop-label">分级数 <span id="rasterClassVal">5</span></div>
+                <div class="field"><input type="range" id="rasterClass" min="3" max="10" value="5" oninput="document.getElementById('rasterClassVal').textContent=this.value;applyRasterRender()"></div>
+                <div class="info-banner" style="margin-top:8px">分类色带渲染后，画布右下角图例自动生成分级注记图例。</div>
+              </div>
+            </div>
+            <div class="style-sec hidden" id="sec-rtime">
+              <div class="ss-head">🕒 表达层 · 时相轴 · 时间切换</div>
+              <div class="prop-label">当前时相 <span id="rasterSceneLabel">2026-05-01</span></div>
+              <div class="field"><input type="range" id="rasterScene" min="0" max="7" value="0" oninput="applyRasterTime()"></div>
+              <div class="field-row"><label class="toggle on" id="rasterTimeToggle" onclick="toggleRasterTimeVis()"></label><span style="font-size:12px;color:var(--text-2)">时相图层可见</span></div>
+              <div style="font-size:11px;color:var(--text-3);margin-top:6px">时序栅格的「服务序列」（多期地图服务）可逐期选服务并分别设样式；此时间轴是同一栅格服务的时序呈现，不另开图层资产（对标 ArcGIS 镶嵌数据集 / GEE ImageCollection）。</div>
             </div>
           </div>
         </div>
@@ -594,7 +852,7 @@ input[type=range]{flex:1;accent-color:var(--brand)}
   <!-- ════ 图层详情（底部信息框，对齐地图编辑器原型） ════ -->
   <div class="layer-detail-bar">
     <b>📋 图层详情</b>
-    <span class="k">类型</span><span>面图层 · Polygon</span>
+    <span class="k">类型</span><span>要素图层 · Polygon</span>
     <span class="k">要素数量</span><span>3,218 个地块</span>
     <span class="k">坐标系</span><span>CGCS2000 (EPSG:4490)</span>
     <span class="k">来源</span><span>平台发布 · 遥感监测科</span>
@@ -610,7 +868,7 @@ input[type=range]{flex:1;accent-color:var(--brand)}
     <span class="st-sep"></span>
     <span>图层数据：中晚稻·地块（一份，固定）</span>
     <span class="st-sep"></span>
-    <span>一套数据 → 主体图层 + 表达层</span>
+    <span>服务 → 主体图层 + 表达层</span>
     <span class="st-current" id="stCurrent">当前选中：填充层</span>
   </div>
 </div>
@@ -620,7 +878,7 @@ input[type=range]{flex:1;accent-color:var(--brand)}
   <div class="modal" style="width:440px">
     <div class="modal-head">选择符号（雪碧图） <button class="modal-close" onclick="closeSymbolPicker()">✕</button></div>
     <div class="modal-body">
-      <div style="font-size:11px;color:var(--text-3);margin-bottom:6px">当前项目：<b id="symbolProjectLab" style="color:var(--text-2)">八五六农场</b> · 下列为该项目的雪碧图组</div>
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:6px">当前符号集归属：<b id="symbolProjectLab" style="color:var(--text-2)">公共集池</b> · 下列为该归属下的雪碧图组</div>
       <div class="prop-label">雪碧图组</div>
       <div class="sprite-tabs" id="spriteTabs"></div>
       <div class="prop-label" style="margin-top:12px">符号（当前组）</div>
@@ -635,29 +893,15 @@ input[type=range]{flex:1;accent-color:var(--brand)}
   <div class="modal" style="width:460px">
     <div class="modal-head">选择雪碧图组 <button class="modal-close" onclick="closeSpriteGroupSelect()">✕</button></div>
     <div class="modal-body">
-      <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">💡 雪碧图组在【制图规范 → 符号规范】统一管理（每组由图标库组合），此处为图层引用。</div>
-      <div class="prop-label">项目</div>
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">💡 雪碧图组（符号集）在独立的【符号库】模块统一管理（每组由图标库组合），此处为图层引用、只引用不生成。</div>
+      <div class="prop-label">符号集归属</div>
       <select class="input" id="spriteProjectSelect" onchange="onSpriteProjectChange(this.value)"></select>
       <div style="height:8px"></div>
-      <div class="prop-label">该项目下的雪碧图组</div>
-      <div style="font-size:12px;color:var(--text-3);margin-bottom:8px">先选项目 → 再选该项目下的一组，然后在「选择符号」中选组内符号</div>
+      <div class="prop-label">该归属下的雪碧图组</div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:8px">先选符号集归属 → 再选该归属下的一组，然后在「选择符号」中选组内图标</div>
       <div id="spriteGroupList"></div>
     </div>
     <div class="modal-foot"><button class="btn" onclick="closeSpriteGroupSelect()">取消</button><button class="btn btn-primary" onclick="confirmSpriteGroup()">确定</button></div>
-  </div>
-</div>
-
-<!-- 数据更新同步提示（对齐真值 BR23：源数据更新 → 提示同步引用新版） -->
-<div class="mask" id="updateMask">
-  <div class="modal" style="width:440px">
-    <div class="modal-head">数据更新提示 <button class="modal-close" onclick="closeUpdateCheck()">✕</button></div>
-    <div class="modal-body">
-      <div class="info-banner" style="margin-bottom:12px">🔄 检测到<b>源数据存在更新</b>（2026-08-21 遥感监测科 更新）</div>
-      <div class="meta-line"><span class="k">当前引用</span><span id="updateOldVer">数据版本 3</span></div>
-      <div class="meta-line"><span class="k">最新版本</span><span id="updateNewVer">数据版本 4（新增 12 个要素）</span></div>
-      <div class="info-banner" style="margin-top:12px">💡 同步后：图层将引用新版数据（样式可能需微调）。</div>
-    </div>
-    <div class="modal-foot"><button class="btn" onclick="closeUpdateCheck()">暂不处理</button><button class="btn btn-primary" onclick="confirmUpdateSync()">同步更新</button></div>
   </div>
 </div>
 
@@ -740,26 +984,47 @@ input[type=range]{flex:1;accent-color:var(--brand)}
   </div>
 </div>
 
-<!-- 选择主体数据（对齐地图编辑器原型弹窗样式；单选） -->
+<!-- 选择服务（同屏选择：主体服务 单选 + 辅助服务 多选；显式区分，非按顺序） -->
 <div class="mask" id="dataMask">
-  <div class="modal" style="width:460px">
-    <div class="modal-head">选择主体数据 <button class="modal-close" onclick="closeDataSelect()">✕</button></div>
+  <div class="modal" style="width:560px">
+    <div class="modal-head">更换服务 · 以已发布服务为主体 <button class="modal-close" onclick="closeDataSelect()">✕</button></div>
     <div class="modal-body">
-      <div class="field" style="margin-bottom:12px;position:relative">
-        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text-3)">🔍</span>
-        <input class="input" id="dataSearchInput" style="padding-left:32px" placeholder="搜索数据名称…" oninput="filterSubjectData(this)">
+      <!-- 数据信息框（与选中/聚焦服务联动） -->
+      <div class="svc-data-box">
+        <div class="sd-head"><span class="sd-dot"></span>服务关联数据<span class="sd-note" id="svcDataHint">选中服务后展示</span></div>
+        <div class="sd-body" id="svcDataBody"><div class="sd-empty">👆 在下方选择服务，此处展示其关联数据</div></div>
       </div>
-      <div id="subjectDataList"></div>
-      <div class="pg-bar">
-        <span class="pg-count" id="dataPgCount">共 8 条</span>
-        <span style="display:flex;align-items:center;gap:6px">
-          <button class="pg-btn" id="dataPgPrev" onclick="dataPg(-1)">← 上一页</button>
-          <span id="dataPgInfo" style="min-width:44px;text-align:center">1 / 2</span>
-          <button class="pg-btn" id="dataPgNext" onclick="dataPg(1)">下一页 →</button>
-        </span>
+
+      <div class="field" style="margin-bottom:12px;position:relative">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text- 3)">🔍</span>
+        <input class="input" id="svcSearchInput" style="padding-left:32px" placeholder="搜索服务名称…" oninput="svcFilter()">
+      </div>
+
+      <div class="svc-filters">
+        <select id="svcTypeFilter" class="input" onchange="svcFilter()"><option value="">类型 · 全部</option></select>
+        <select id="svcCrsFilter" class="input" onchange="svcFilter()"><option value="">坐标系 · 全部</option></select>
+        <select id="svcSort" class="input" onchange="svcFilter()"><option value="">排序 · 默认</option><option value="name">名称</option><option value="count">要素量</option></select>
+      </div>
+
+      <div class="svc-section">
+        <div class="svc-cap"><b>选择主源服务</b>（已发布·可预览服务，单选为图层制图唯一主体）<span style="color:var(--text-3);font-weight:400">· 时序栅格绑定服务序列、单张栅格一次选入</span></div>
+        <div id="svcMainList" class="svc-list"></div>
+      </div>
+
+      <div class="svc-pg">
+        <span class="svc-pg-info" id="svcPgInfo">共 0 条</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button id="svcPgPrev" onclick="svcPg(-1)">← 上一页</button>
+          <span id="svcPgPage" style="font-size:12px;color:var(--text-2);min-width:48px;text-align:center">1 / 1</span>
+          <button id="svcPgNext" onclick="svcPg(1)">下一页 →</button>
+        </div>
       </div>
     </div>
-    <div class="modal-foot"><button class="btn" onclick="closeDataSelect()">取消</button><button class="btn btn-primary" onclick="confirmSubjectData()">确定</button></div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeDataSelect()">取消</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-primary" onclick="confirmServiceSelection()">确定</button>
+    </div>
   </div>
 </div>
 
@@ -945,12 +1210,12 @@ function expandPanel() {
   if (tabEl) tabEl.classList.add('active');
 }
 /* ================= 右抽屉：功能栏 + 多功能面板（对齐地图编辑器原型） ================= */
-const NODE_PANEL = { fill:'style', label:'style', symbol:'style' };
+const NODE_PANEL = { fill:'style', label:'style', symbol:'style', raster:'style', rtime:'style', rclass:'style', rnote:'style', rlegend:'style' };
 function selectNode(el, target) {
   document.querySelectorAll('.lt-sub, .lt-row').forEach(function (n) { n.classList.remove('selected'); });
   el.classList.add('selected');
   S.current = target;
-  const nameMap = { fill:'填充 · 主体图层', label:'标注 · 面中心点', symbol:'边界 · 描边服务' };
+  const nameMap = { fill:'填充 · 主体图层', label:'标注 · 面中心点', symbol:'边界 · 描边服务', raster:'影像渲染 · 主体图层', rtime:'时相轴 · 时间切换', rclass:'分类色带', rnote:'注记 · 影像', rlegend:'色带图例' };
   const nm = nameMap[target] || target;
   const pt = $('propTarget'); if (pt) pt.textContent = nm;
   const pn = $('propNodeName'); if (pn) pn.textContent = nm;
@@ -968,7 +1233,7 @@ function openRightPanel(func, target) {
   document.querySelectorAll('.func-btn').forEach(function (b) { b.classList.toggle('active', b.dataset.func === func); });
   S.activeRightFunc = func;
   if (target) {
-    const secMap = { fill:'sec-fill', label:'sec-label', symbol:'sec-symbol' };
+    const secMap = { fill:'sec-fill', label:'sec-label', symbol:'sec-symbol', raster:'sec-raster', rtime:'sec-rtime', rclass:'sec-raster', rnote:'sec-raster', rlegend:'sec-raster' };
     document.querySelectorAll('.style-sec').forEach(function (s) { s.classList.remove('active'); });
     const sec = $(secMap[target]); if (sec) sec.classList.add('active');
   }
@@ -1031,7 +1296,7 @@ function applyStyleSnapshot(snap) {
   fillRenderMode = snap.fillMode;
   const rm = $('fillRenderMode'); if (rm) rm.value = snap.fillMode;
   currentSymbol = snap.sym; currentSpriteGroup = snap.sprite;
-  const pv = $('markerSymbolPreview'); if (pv) pv.textContent = snap.sym;
+  const pv = $('markerSymbolPreview'); if (pv) pv.innerHTML = iconSVG(snap.sym, '16px');
   const sg = $('spriteGroupName'); if (sg) sg.textContent = snap.sprite;
   const rf = $('renderField'); if (rf) rf.value = snap.renderField;
   const rr = $('renderRamp'); if (rr) rr.value = snap.renderRamp;
@@ -1278,7 +1543,7 @@ function onFillModeChange() {
   applyFill();
 }
 
-/* 动态数据：时间筛选（最新一期服务，要素带时间属性；时间段=起止筛选，渲染窗口内要素） */
+/* 时序数据：时间筛选（最新数据，要素带时间属性；时间段=起止筛选，渲染窗口内要素） */
 const PARCEL_TIME = [
   { t: '2026-05-08', ndvi: '0.72', soil: '黑土' },
   { t: '2026-05-25', ndvi: '0.66', soil: '草甸土' },
@@ -1295,6 +1560,7 @@ function applyTimeFilter() {
 /* 统一显隐：综合 时间筛选(面+边界按索引同步) × 可见范围(缩放级别) × 点模式守卫 */
 function applyVisibility() {
   if (!map || !parcelLayers.length) return;
+  if (isRasterMode) return; // 栅格态由 showRaster 管理，避免矢量图层被误加回
   if (isPointMode) return; // 点模式由 showPoints 统一管理
   const z = map.getZoom();
   const visRangeOk = z >= visMin && z <= visMax;
@@ -1514,24 +1780,66 @@ function checkVisRange() {
   applyVisibility();
 }
 
-/* ================= 符号雪碧图选择（两级：先选【项目】→ 再选该项目下的【雪碧图组】→ 选组内符号） ================= */
-const SYMBOL_PROJECTS = ['八五六农场','建三江分公司','红兴隆分公司'];
-const SYMBOL_SPRITES = [
-  { name: '标准符号集',    project: '八五六农场',   icons: ['📍','⭐','🔺','◆','⬟','⬢','🔷','🔸','🔵','🔴'] },
-  { name: '农业符号集',    project: '八五六农场',   icons: ['🌾','🌱','🌽','🌿','🚜','💧','☀️','🌧','🦠','🌡'] },
-  { name: '作物专用符号集', project: '八五六农场',   icons: ['🌾','🌽','🌿','🌱','🚜','☀️','💧','🌧','🌡','🦠'] },
-  { name: '水利符号集',    project: '建三江分公司', icons: ['💧','🌊','🚰','⚙️','🏭','🔧','📡','🧯','🚧','⛽'] },
-  { name: '监测符号集',    project: '建三江分公司', icons: ['📡','🛰','📍','🗼','⚡','🔋','📊','🧪','⚠️','✅'] },
-  { name: '红兴隆作物集',  project: '红兴隆分公司', icons: ['🌾','🌽','🌿','🚜','☀️','💧','🌡','🦠','🔶','🔵'] },
+/* ================= 符号选择：引用「符号库」独立模块（只引用、不生成） =================
+   图标名取自全局素材池 ICON_PATHS（与符号库.html 同源）；sprite 集即符号库模块的符号集。
+   选择器交互参考 Mapbox Studio Images 面板：先选「符号集归属」(owner) → 选「雪碧图组」(sprite 集) → 选组内图标。*/
+const ICON_PATHS = {
+  hospital:'<path d="M12 2v20M2 12h20"/>',
+  sensor:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
+  pin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  dot:'<circle cx="12" cy="12" r="5"/>',
+  flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z M4 22V4"/>',
+  star:'<polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2"/>',
+  warning:'<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  building:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/>',
+  wheat:'<path d="M12 22V8M12 8c-2-2-5-1-6 1 2 0 4 1 6 2M12 8c2-2 5-1 6 1-2 0-4 1-6 2M12 12c-2-2-5-1-6 1 2 0 4 1 6 2M12 12c2-2 5-1 6 1-2 0-4 1-6 2"/>',
+  seedling:'<path d="M12 22V11M12 11C9 11 7 9 7 6c3 0 5 2 5 5M12 11c3-1 5-3 5-6-3 0-5 2-5 5"/>',
+  corn:'<path d="M12 22V6M9 6c0-3 6-3 6 0M10 10c-2 0-3 2-3 4 2 0 3-1 3-3M14 10c2 0 3 2 3 4-2 0-3-1-3-3"/>',
+  leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>',
+  tractor:'<path d="M3 15l2-7h6l3 4h4a2 2 0 0 1 2 2v3M3 15h15M3 15a3 3 0 1 0 0 .01M18 15a3 3 0 1 0 0 .01"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
+  rain:'<path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25M16 13l-4 6M8 13l-4 6"/>',
+  drop:'<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+  wave:'<path d="M2 8c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2M2 14c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2"/>',
+  faucet:'<path d="M3 9h4v8M7 13h6a3 3 0 0 0 3-3V9a2 2 0 0 1 2-2M16 9V6a2 2 0 0 1 4 0v3"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  factory:'<path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4H2z"/>',
+  wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-2.5z"/>',
+  fire:'<path d="M12 2c1 3 4 5 4 9a4 4 0 0 1-8 0c0-1 .5-2 1-3 .5 2 2 2 2 0 1-2 2-4 1-6z"/>',
+  valve:'<circle cx="12" cy="12" r="6"/><path d="M12 6v6l4 2M12 2v2M12 20v2"/>',
+  antenna:'<path d="M12 20v-8M8 12a4 4 0 0 1 8 0M5 9a8 8 0 0 1 14 0M2 6a12 12 0 0 1 20 0"/>',
+  satellite:'<path d="M13 7 17 3M14 8l2-2M5 13l4 4M3 15l6-6 4 4-6 6zM14 10a4 4 0 0 1 0 6"/>',
+  tower:'<path d="M12 2v20M5 7l7-3 7 3M4 12l8-4 8 4M6 17l6-4 6 4"/>',
+  bolt:'<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',
+  battery:'<rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2"/>',
+  chart:'<path d="M3 3v18h18M7 15l4-4 3 3 5-6"/>',
+  flask:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>',
+  wifi:'<path d="M5 12.5a10 10 0 0 1 14 0M8 15.5a6 6 0 0 1 8 0M2 9.5a14 14 0 0 1 20 0"/><circle cx="12" cy="19" r="1"/>'
+};
+function iconSVG(name, size, color){
+  const p = ICON_PATHS[name] || '<circle cx="12" cy="12" r="4"/>';
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="' + (color || '#2bbaa0') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:' + (size || '1.2em') + ';height:' + (size || '1.2em') + ';vertical-align:-0.125em;flex-shrink:0">' + p + '</svg>';
+}
+// 符号集（sprite 集）= 与「符号库」模块同源；编辑器仅引用，不生成
+const SYMBOL_OWNERS = [
+  { id:'public', name:'公共集池' },
+  { id:'jjs',    name:'建三江分公司私有集' }
 ];
-let selSpriteIdx = 0, selSymbolIdx = 0, selProjectIdx = 0, currentSymbol = '📍', currentSpriteGroup = '标准符号集', currentSpriteProject = '八五六农场', markerOn = true, markerLayers = [];
+const LAYER_SPRITE_SETS = [
+  { id:'std',     name:'标准符号集',     owner:'公共集池',           category:'基础', icons:['hospital','sensor','pin','dot','flag','star','warning','building'] },
+  { id:'agri',    name:'农业符号集',     owner:'公共集池',           category:'农业', icons:['wheat','seedling','corn','leaf','tractor','drop','sun','rain'] },
+  { id:'crop',    name:'作物专用符号集', owner:'公共集池',           category:'农业', icons:['wheat','corn','leaf','seedling','tractor','sun','drop','rain'] },
+  { id:'water',   name:'水利符号集',     owner:'建三江分公司私有集', category:'水利', icons:['drop','wave','faucet','gear','factory','wrench','fire','valve'] },
+  { id:'monitor', name:'监测符号集',     owner:'建三江分公司私有集', category:'IoT',  icons:['antenna','satellite','pin','tower','bolt','battery','chart','flask'] }
+];
+let selSpriteIdx = 0, selSymbolIdx = 0, currentSymbol = 'pin', currentSpriteGroup = '标准符号集', currentSpriteOwner = '公共集池', markerOn = true, markerLayers = [];
 function buildMarkers() {
   if (!map || !parcelLayers.length) return;
   markerLayers.forEach(function (m) { map.removeLayer(m); });
   markerLayers = [];
   parcelLayers.forEach(function (p) {
     const c = p.getBounds().getCenter();
-    const icon = L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1">' + currentSymbol + '</div>', iconSize: [22,22], iconAnchor: [11,11] });
+    const icon = L.divIcon({ className: '', html: '<div style="display:flex;align-items:center;justify-content:center;width:22px;height:22px">' + iconSVG(currentSymbol, '18px') + '</div>', iconSize: [22,22], iconAnchor: [11,11] });
     const mk = L.marker(c, { icon: icon });
     if (markerOn) mk.addTo(map);
     markerLayers.push(mk);
@@ -1544,20 +1852,20 @@ function toggleMarker() {
   if (markerOn && !markerLayers.length) buildMarkers();
 }
 function openSymbolPicker() {
-  const gi = SYMBOL_SPRITES.findIndex(function (sp) { return sp.name === currentSpriteGroup && sp.project === currentSpriteProject; });
+  const gi = LAYER_SPRITE_SETS.findIndex(function (sp) { return sp.name === currentSpriteGroup && sp.owner === currentSpriteOwner; });
   selSpriteIdx = gi > -1 ? gi : 0;
-  currentSpriteProject = SYMBOL_SPRITES[selSpriteIdx].project;
-  selSymbolIdx = Math.max(0, SYMBOL_SPRITES[selSpriteIdx].icons.indexOf(currentSymbol));
+  currentSpriteOwner = LAYER_SPRITE_SETS[selSpriteIdx].owner;
+  selSymbolIdx = Math.max(0, LAYER_SPRITE_SETS[selSpriteIdx].icons.indexOf(currentSymbol));
   renderSpriteTabs(); renderSymbolGrid();
   $('symbolPickerMask').classList.add('on');
 }
 function closeSymbolPicker() { $('symbolPickerMask').classList.remove('on'); }
-/* 符号选择：只显示「当前项目」下的雪碧图组（两级中的第二级） */
+/* 符号选择：只显示「当前符号集归属」下的雪碧图组 */
 function renderSpriteTabs() {
-  const lab = $('symbolProjectLab'); if (lab) lab.textContent = currentSpriteProject;
-  const list = projectSpriteIdx(currentSpriteProject);
+  const lab = $('symbolProjectLab'); if (lab) lab.textContent = currentSpriteOwner;
+  const list = ownerSpriteIdx(currentSpriteOwner);
   $('spriteTabs').innerHTML = list.map(function (i) {
-    return '<button class="sprite-tab' + (i === selSpriteIdx ? ' sel' : '') + '" onclick="selectSprite(' + i + ')">' + SYMBOL_SPRITES[i].name + '</button>';
+    return '<button class="sprite-tab' + (i === selSpriteIdx ? ' sel' : '') + '" onclick="selectSprite(' + i + ')">' + LAYER_SPRITE_SETS[i].name + '</button>';
   }).join('');
 }
 function selectSprite(i) {
@@ -1565,9 +1873,9 @@ function selectSprite(i) {
   renderSpriteTabs(); renderSymbolGrid();
 }
 function renderSymbolGrid() {
-  const icons = SYMBOL_SPRITES[selSpriteIdx].icons;
+  const icons = LAYER_SPRITE_SETS[selSpriteIdx].icons;
   $('symbolGrid').innerHTML = icons.map(function (s, i) {
-    return '<div class="sym-cell' + (i === selSymbolIdx ? ' sel' : '') + '" onclick="selectSymbol(' + i + ')">' + s + '</div>';
+    return '<div class="sym-cell' + (i === selSymbolIdx ? ' sel' : '') + '" onclick="selectSymbol(' + i + ')">' + iconSVG(s, '20px') + '</div>';
   }).join('');
 }
 function selectSymbol(i) {
@@ -1575,75 +1883,73 @@ function selectSymbol(i) {
   document.querySelectorAll('#symbolGrid .sym-cell').forEach(function (c, j) { c.classList.toggle('sel', j === i); });
 }
 function confirmSymbolPick() {
-  currentSymbol = SYMBOL_SPRITES[selSpriteIdx].icons[selSymbolIdx];
-  currentSpriteGroup = SYMBOL_SPRITES[selSpriteIdx].name;
-  currentSpriteProject = SYMBOL_SPRITES[selSpriteIdx].project;
-  const pv = $('markerSymbolPreview'); if (pv) pv.textContent = currentSymbol;
+  currentSymbol = LAYER_SPRITE_SETS[selSpriteIdx].icons[selSymbolIdx];
+  currentSpriteGroup = LAYER_SPRITE_SETS[selSpriteIdx].name;
+  currentSpriteOwner = LAYER_SPRITE_SETS[selSpriteIdx].owner;
+  const pv = $('markerSymbolPreview'); if (pv) pv.innerHTML = iconSVG(currentSymbol, '16px');
   const g = $('spriteGroupName'); if (g) g.textContent = currentSpriteGroup;
   closeSymbolPicker();
   buildMarkers();
-  showToast('✅ 已应用标记符号「' + currentSymbol + '」（' + currentSpriteProject + ' · ' + currentSpriteGroup + '）');
+  showToast('✅ 已应用标记符号「' + currentSymbol + '」（' + currentSpriteOwner + ' · ' + currentSpriteGroup + '）');
 }
 
-/* 雪碧图组选择（两级：先选【项目】→ 再选该项目下的【雪碧图组】） */
-function projectSpriteIdx(project) {
-  return SYMBOL_SPRITES.map(function (sp, i) { return sp.project === project ? i : -1; }).filter(function (i) { return i > -1; });
+/* 雪碧图组选择：先选「符号集归属」→ 再选该归属下的一组 */
+function ownerSpriteIdx(owner) {
+  return LAYER_SPRITE_SETS.map(function (sp, i) { return sp.owner === owner ? i : -1; }).filter(function (i) { return i > -1; });
 }
 function renderSpriteProjectSelect() {
   const sel = $('spriteProjectSelect'); if (!sel) return;
-  sel.innerHTML = SYMBOL_PROJECTS.map(function (p) {
-    return '<option value="' + p + '"' + (p === currentSpriteProject ? ' selected' : '') + '>' + p + '</option>';
+  sel.innerHTML = SYMBOL_OWNERS.map(function (o) {
+    return '<option value="' + o.name + '"' + (o.name === currentSpriteOwner ? ' selected' : '') + '>' + o.name + '</option>';
   }).join('');
 }
 function openSpriteGroupSelect() {
-  const gi = SYMBOL_SPRITES.findIndex(function (sp) { return sp.name === currentSpriteGroup && sp.project === currentSpriteProject; });
+  const gi = LAYER_SPRITE_SETS.findIndex(function (sp) { return sp.name === currentSpriteGroup && sp.owner === currentSpriteOwner; });
   selSpriteIdx = gi > -1 ? gi : 0;
-  currentSpriteProject = SYMBOL_SPRITES[selSpriteIdx].project;
+  currentSpriteOwner = LAYER_SPRITE_SETS[selSpriteIdx].owner;
   renderSpriteProjectSelect();
   renderSpriteGroupList();
   $('spriteGroupMask').classList.add('on');
 }
 function closeSpriteGroupSelect() { $('spriteGroupMask').classList.remove('on'); }
 function onSpriteProjectChange(v) {
-  currentSpriteProject = v;
-  const gi = SYMBOL_SPRITES.findIndex(function (sp) { return sp.project === v; });
+  currentSpriteOwner = v;
+  const gi = LAYER_SPRITE_SETS.findIndex(function (sp) { return sp.owner === v; });
   selSpriteIdx = gi > -1 ? gi : 0;
   renderSpriteGroupList();
 }
 function renderSpriteGroupList() {
-  const list = projectSpriteIdx(currentSpriteProject);
+  const list = ownerSpriteIdx(currentSpriteOwner);
   $('spriteGroupList').innerHTML = list.map(function (i) {
-    const sp = SYMBOL_SPRITES[i];
+    const sp = LAYER_SPRITE_SETS[i];
+    const prev = sp.icons.slice(0, 3).map(function (n) { return iconSVG(n, '16px'); }).join('');
     return '<div class="radio-card' + (i === selSpriteIdx ? ' selected' : '') + '" data-idx="' + i + '" onclick="selectSpriteGroup(' + i + ')">' +
-      '<span class="rc-radio"></span><div class="rc-desc"><div class="rc-name">' + sp.name + '</div><div class="rc-meta">' + sp.icons.length + ' 个符号 · ' + sp.project + '</div></div>' +
-      '<span style="font-size:16px;flex-shrink:0">' + sp.icons[0] + sp.icons[1] + sp.icons[2] + '</span></div>';
+      '<span class="rc-radio"></span><div class="rc-desc"><div class="rc-name">' + sp.name + '</div><div class="rc-meta">' + sp.icons.length + ' 个符号 · ' + sp.owner + '</div></div>' +
+      '<span style="display:flex;gap:2px;flex-shrink:0">' + prev + '</span></div>';
   }).join('');
 }
 function selectSpriteGroup(i) {
   selSpriteIdx = i;
-  currentSpriteProject = SYMBOL_SPRITES[i].project;
+  currentSpriteOwner = LAYER_SPRITE_SETS[i].owner;
   document.querySelectorAll('#spriteGroupList .radio-card').forEach(function (c) {
     c.classList.toggle('selected', parseInt(c.getAttribute('data-idx'), 10) === i);
   });
 }
 function confirmSpriteGroup() {
-  currentSpriteGroup = SYMBOL_SPRITES[selSpriteIdx].name;
-  currentSpriteProject = SYMBOL_SPRITES[selSpriteIdx].project;
-  if (SYMBOL_SPRITES[selSpriteIdx].icons.indexOf(currentSymbol) < 0) {
-    currentSymbol = SYMBOL_SPRITES[selSpriteIdx].icons[0];
-    const pv = $('markerSymbolPreview'); if (pv) pv.textContent = currentSymbol;
+  currentSpriteGroup = LAYER_SPRITE_SETS[selSpriteIdx].name;
+  currentSpriteOwner = LAYER_SPRITE_SETS[selSpriteIdx].owner;
+  if (LAYER_SPRITE_SETS[selSpriteIdx].icons.indexOf(currentSymbol) < 0) {
+    currentSymbol = LAYER_SPRITE_SETS[selSpriteIdx].icons[0];
+    const pv = $('markerSymbolPreview'); if (pv) pv.innerHTML = iconSVG(currentSymbol, '16px');
   }
   const g = $('spriteGroupName'); if (g) g.textContent = currentSpriteGroup;
   closeSpriteGroupSelect();
   buildMarkers();
-  showToast('✅ 已切换雪碧图组「' + currentSpriteProject + ' · ' + currentSpriteGroup + '」');
+  showToast('✅ 已切换雪碧图组「' + currentSpriteOwner + ' · ' + currentSpriteGroup + '」');
 }
-function toggleHilite() {
-  hiliteOn = !hiliteOn;
-  $('hiliteToggle').classList.toggle('on');
-  if (!hiliteLayer) { buildHilite(); return; }
-  if (hiliteOn) map.addLayer(hiliteLayer); else map.removeLayer(hiliteLayer);
-}
+/* 初始化标记符号预览（与图标名同源） */
+if (typeof $ === 'function' && $('markerSymbolPreview')) $('markerSymbolPreview').innerHTML = iconSVG(currentSymbol, '16px');
+
 /* 左图层树 显示/隐藏眼睛（成熟产品图层列表）：按 表达节点 切换对应图层显隐 */
 function toggleLayerVis(target, iconEl) {
   const off = iconEl.classList.toggle('off');
@@ -1664,6 +1970,18 @@ function toggleLayerVis(target, iconEl) {
     case 'symbol':
       if (boundaryLayers.length) boundaryLayers.forEach(function (l) { off ? map.removeLayer(l) : l.addTo(map); });
       break;
+    case 'raster':
+      if (off) removeRaster(); else showRaster();
+      break;
+    case 'rtime':
+      rasterTimeVisible = !off;
+      if (rasterLabel) { off ? (map.hasLayer(rasterLabel) && map.removeLayer(rasterLabel)) : (rasterGroup && rasterLabel.addTo(rasterGroup)); }
+      break;
+    case 'rclass':
+    case 'rnote':
+    case 'rlegend':
+      showToast('该表达层为样式配置项（原型演示），其显隐随主体影像联动');
+      break;
   }
 }
 /* ================= 图例 ================= */
@@ -1680,6 +1998,18 @@ function toggleLegendVisible() {
 }
 function updateLegendBox() {
   if (!$('mlbSwFill')) return;
+  // ── 栅格态图例（L5）：复用画布图例框，呈现影像渲染 + 色带 ──
+  if (isRasterMode) {
+    const fr = $('mlbFillRow'), sr = $('mlbStrokeRow'), symr = $('mlbSymRow'), cls = $('mlbFillClasses');
+    if (fr) fr.style.display = ''; if (sr) sr.style.display = 'none'; if (symr) symr.style.display = 'none'; if (cls) cls.style.display = 'none';
+    const sw = $('mlbSwFill'); if (sw) sw.style.background = rasterColor();
+    const nm = $('mlbNameFill'); if (nm) nm.textContent = '影像渲染 · ' + rasterModeLabel();
+    const gf = $('lgSwFill'); if (gf) gf.style.background = rasterColor();
+    const gn = $('lgNameFill'); if (gn) gn.value = '影像渲染 · ' + rasterModeLabel();
+    const gr = $('lgSwRaster'); if (gr) gr.style.background = rasterColor();
+    const gn2 = $('lgNameRaster'); if (gn2) gn2.value = '影像渲染 · ' + rasterModeLabel();
+    return;
+  }
   // 图例 = 样式的只读说明：颜色从 STYLE 自动同步（样式是唯一编辑源），不独立编辑
   $('mlbSwFill').style.background = STYLE.fillColor;
   $('mlbSwStroke').style.background = STYLE.boundaryColor;
@@ -1746,73 +2076,307 @@ function confirmLayerEdit() {
   showToast('✅ 图层信息已保存');
 }
 
-/* ================= 选择主体数据（列表 + 搜索 + 分页；单选） ================= */
-const SUBJECT_DATA = [
-  { name: '中晚稻·2025·地块', type: '面', count: '3,218 个要素', crs: 'CGCS2000', owner: '遥感监测科', icon: '🗺', tag: '面', subject: '耕地面' },
-  { name: '大豆·2025·种植区', type: '面', count: '1,240 个要素', crs: 'CGCS2000', owner: '夏莹', icon: '🗺', tag: '面', subject: '大豆区' },
-  { name: '玉米·2025·种植区', type: '面', count: '2,105 个要素', crs: 'CGCS2000', owner: '夏莹', icon: '🗺', tag: '面', subject: '玉米区' },
-  { name: '水稻·2025·地块', type: '面', count: '5,012 个要素', crs: 'CGCS2000', owner: '遥感监测科', icon: '🗺', tag: '面', subject: '水稻区' },
-  { name: '水利·2025·监测点', type: '点', count: '86 个监测点', crs: 'CGCS2000', owner: '王磊', icon: '📍', tag: '点', subject: '监测点' },
-  { name: '土壤·2025·采样点', type: '点', count: '154 个采样点', crs: 'CGCS2000', owner: '王磊', icon: '📍', tag: '点', subject: '采样点' },
-  { name: '灌排渠系·2025', type: '线', count: '214 条渠系', crs: 'CGCS2000', owner: '聂聪', icon: '〰', tag: '线', subject: '渠系' },
-  { name: '道路·2025·路网', type: '线', count: '86 条道路', crs: 'CGCS2000', owner: '聂聪', icon: '〰', tag: '线', subject: '路网' },
-  { name: '作物长势·动态监测', type: '面', count: '3,218 个要素', crs: 'CGCS2000', owner: '遥感监测科', icon: '🌿', tag: '动态', subject: '长势区', dynamic: true, defaultRange: ['2026-07-01','2026-07-31'] },
+/* ================= 选择服务（分步骤：主体服务 → 辅助服务；显式区分，非按顺序） ================= */
+/* 以服务为主体：数据选择框改为服务目录；步骤 1 选主体（单选），步骤 2 选辅助（多选，坐标系须一致） */
+const SERVICE_CATALOG = [
+  // ── 要素服务（已发布·可预览）：几何 点/线/面 为二级属性；协议 = WFS 要素服务（对标 ArcGIS Feature Layer / GeoServer DataStore）──
+  { name: '中晚稻·地块服务', type: 'WFS 要素服务', dataModel: '矢量', geometry: '面', count: '3,218 个要素', crs: 'CGCS2000', owner: '遥感监测科', icon: '🗺', subject: '耕地面', role: '业务', timeSeries: false },
+  { name: '大豆·种植区服务', type: 'WFS 要素服务', dataModel: '矢量', geometry: '面', count: '1,240 个要素', crs: 'CGCS2000', owner: '夏莹', icon: '🗺', subject: '大豆区', role: '业务', timeSeries: false },
+  { name: '玉米·种植区服务', type: 'WFS 要素服务', dataModel: '矢量', geometry: '面', count: '2,105 个要素', crs: 'CGCS2000', owner: '夏莹', icon: '🗺', subject: '玉米区', role: '业务', timeSeries: false },
+  { name: '水稻·地块服务', type: 'WFS 要素服务', dataModel: '矢量', geometry: '面', count: '5,012 个要素',  crs: 'CGCS2000', owner: '遥感监测科', icon: '🗺', subject: '水稻区', role: '业务', timeSeries: false },
+  { name: '水利·监测点服务', type: 'WFS 要素服务', dataModel: '矢量', geometry: '点', count: '86 个监测点', crs: 'CGCS2000', owner: '王磊', icon: '📍', subject: '监测点', role: '业务', timeSeries: false },
+  { name: '土壤·采样点服务', type: 'WFS 要素服务', dataModel: '矢量', geometry: '点', count: '154 个采样点', crs: 'CGCS2000', owner: '王磊', icon: '📍', subject: '采样点', role: '业务', timeSeries: false },
+  { name: '灌排渠系服务', type: 'WFS 要素服务', dataModel: '矢量', geometry: '线', count: '214 条渠系', crs: 'CGCS2000', owner: '聂聪', icon: '〰', subject: '渠系', role: '业务', timeSeries: false },
+  { name: '道路·路网服务', type: 'WFS 要素服务', dataModel: '矢量', geometry: '线', count: '86 条道路', crs: 'CGCS2000', owner: '聂聪', icon: '〰', subject: '路网', role: '业务', timeSeries: false },
+  { name: '作物长势·动态监测服务', type: 'WFS 要素服务', dataModel: '矢量', geometry: '面', count: '3,218 个要素', crs: 'CGCS2000', owner: '遥感监测科', icon: '🌿', subject: '长势区', role: '业务', timeSeries: true, defaultRange: ['2026-07-01', '2026-07-31'] },
+  // ── 栅格服务（已发布·可预览）：栅格单张发布；时序栅格绑服务序列（sequenceId）；协议 = WMS / WMTS / WCS ──
+  { name: '遥感影像·建三江', type: 'WMS 影像服务', dataModel: '栅格', flavor: '影像', sensor: '多光谱', bands: 6, scenes: 8, crs: 'CGCS2000', owner: '遥感监测科', icon: '🛰', subject: '遥感影像', role: '业务', timeSeries: true, sequenceId: 'seq-jjs', resolution: '0.5 m', bandList: 'R/G/B/NIR/RedEdge/SWIR', dataType: 'UInt16', noData: 0, acquire: '2026-05-01 ~ 2026-08-20', source: '遥感监测科 · 建三江' },
+  { name: '土壤湿度·雷达', type: 'WMS 雷达服务', dataModel: '栅格', flavor: '雷达', bands: 4, scenes: 12, crs: 'CGCS2000', owner: '王磊', icon: '🛰', subject: '雷达影像', role: '业务', timeSeries: true, sequenceId: 'seq-radar', resolution: '10 m', bandList: 'HH/HV/VH/VV', dataType: 'Float32', noData: -9999, acquire: '2026 多期', source: '王磊 · 雷达' },
+  { name: 'DEM·地形晕渲', type: 'WMS 地形服务', dataModel: '栅格', flavor: '地形', bands: 1, scenes: 1, crs: 'CGCS2000', owner: '聂聪', icon: '🏔', subject: '地形晕渲', role: '业务', timeSeries: false, resolution: '12.5 m', bandList: '高程', dataType: 'Int16', noData: -32768, acquire: '2024', source: '聂聪 · DEM' },
 ];
-let selectedDataIdx = 0, dataPage = 1, dataPageSize = 5;
-function renderDataList() {
-  const q = ($('dataSearchInput').value || '').trim().toLowerCase();
-  const filtered = SUBJECT_DATA.filter(function (d) { return !q || d.name.toLowerCase().indexOf(q) >= 0; });
-  const totalPages = Math.max(1, Math.ceil(filtered.length / dataPageSize));
-  if (dataPage > totalPages) dataPage = totalPages;
-  const start = (dataPage - 1) * dataPageSize;
-  const pageItems = filtered.slice(start, start + dataPageSize);
-  $('subjectDataList').innerHTML = pageItems.map(function (d) {
-    const realIdx = SUBJECT_DATA.indexOf(d);
-    return '<div class="data-item' + (realIdx === selectedDataIdx ? ' sel' : '') + '" data-idx="' + realIdx + '" onclick="toggleSubjectData(this)">' +
-      '<span class="di-cb"></span><span class="di-icon">' + d.icon + '</span>' +
-      '<div class="di-info"><div class="di-name">' + d.name + '</div><div class="di-meta">' + d.type + '图层 · ' + d.count + ' · ' + d.crs + ' · ' + d.owner + ' 发布' + (d.dynamic ? ' · 最新一期 · 要素带时间属性' : '') + '</div></div>' +
-      '<span class="tag-pill" style="background:var(--brand-light);color:var(--brand-active)">' + d.tag + '</span></div>';
-  }).join('');
-  $('dataPgCount').textContent = '共 ' + filtered.length + ' 条';
-  $('dataPgInfo').textContent = dataPage + ' / ' + totalPages;
-  $('dataPgPrev').disabled = dataPage <= 1;
-  $('dataPgNext').disabled = dataPage >= totalPages;
+// 服务序列（独立模块，时序栅格在发布层绑定其一；要素图层按 sequenceId 引用）
+const SERVICE_SEQUENCES = {
+  'seq-jjs': { name: '建三江遥感影像序列', frames: 8, dates: ['2026-05-01','2026-05-15','2026-06-01','2026-06-15','2026-07-01','2026-07-15','2026-08-01','2026-08-15'] },
+  'seq-radar': { name: '土壤湿度雷达序列', frames: 12, dates: ['2026-01-05','2026-02-05','2026-03-05','2026-04-05','2026-05-05','2026-06-05','2026-07-05','2026-08-05','2026-09-05','2026-10-05','2026-11-05','2026-12-05'] }
+};
+// ── 样式模板库：由系统「样式管理」功能预先配置的业务化制图预设 ──
+// 要素图层编辑器**只选用**、不在此定义渲染方式；模板的增删改在「样式管理」模块完成。
+// render 字段＝模板内部绑定的渲染方式（技术实现，对用户不暴露）；thumb＝缩略图类型。
+const RASTER_STYLE_TEMPLATES = [
+  { key: 'standard', name: '标准影像底图',   desc: '日常浏览与底图服务 · 真彩 / 假彩合成',              short: '真彩 / 假彩', render: 'rgb',      thumb: 'rgb' },
+  { key: 'analysis', name: '地形强度分析图', desc: '高程、雷达强度等单波段分析 · 强度拉伸 / 地形晕渲呈现', short: '强度 / 地形', render: 'enhance',  thumb: 'gray' },
+  { key: 'graded',   name: '长势分级专题图', desc: '作物长势、土壤湿度等分级表达 · 分级色带 + 注记图例',   short: '分级色带',   render: 'classify', thumb: 'class' }
+];
+function rasterTplThumbSvg(type, cls, idp) {
+  const c = cls || 'rsp-thumb', p = idp || '';
+  if (type === 'rgb') {
+    return '<svg class="' + c + '" viewBox="0 0 64 40" preserveAspectRatio="none"><defs><linearGradient id="' + p + 'tgRgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset=".5" stop-color="#16a34a"/><stop offset="1" stop-color="#dc2626"/></linearGradient></defs><rect width="64" height="40" fill="url(#' + p + 'tgRgb)"/><path d="M0 26 L16 18 L30 24 L64 10 L64 40 L0 40Z" fill="#0b3d2e" opacity=".35"/><text x="5" y="33" font-size="9" font-weight="700" fill="#fff">影像</text></svg>';
+  }
+  if (type === 'class') {
+    return '<svg class="' + c + '" viewBox="0 0 64 40" preserveAspectRatio="none"><rect width="64" height="40" fill="#22c55e"/><rect x="22" width="20" height="40" fill="#eab308"/><rect x="42" width="22" height="40" fill="#ef4444"/><text x="5" y="33" font-size="9" font-weight="700" fill="#064e3b">分级</text></svg>';
+  }
+  return '<svg class="' + c + '" viewBox="0 0 64 40" preserveAspectRatio="none"><defs><linearGradient id="' + p + 'tgGray" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f5f9"/><stop offset="1" stop-color="#475569"/></linearGradient></defs><rect width="64" height="40" fill="url(#' + p + 'tgGray)"/><path d="M0 30 L18 16 L32 26 L48 12 L64 22 L64 40 L0 40Z" fill="#94a3b8" opacity=".55"/><text x="5" y="33" font-size="9" font-weight="700" fill="#1e293b">地形</text></svg>';
 }
-function dataPg(delta) { dataPage += delta; renderDataList(); }
+// 按模板库渲染左列「样式模板」卡
+function renderRasterStylePick() {
+  const box = $('rspTplList'); if (!box) return;
+  let html = '';
+  RASTER_STYLE_TEMPLATES.forEach(function (t) {
+    html += '<button class="rsp-tpl" data-tpl="' + t.key + '" data-mode="' + t.render + '" onclick="pickRasterStyle(\'' + t.render + '\')">'
+      + rasterTplThumbSvg(t.thumb, 'rsp-thumb', '')
+      + '<span class="rsp-tpl-body"><b>' + t.name + '</b><small>' + t.desc + '</small></span></button>';
+  });
+  box.innerHTML = html;
+}
+// 按模板库渲染批量绑定面板的模板卡
+function renderBatchTpls() {
+  const box = $('rbbTpls'); if (!box) return;
+  let html = '';
+  RASTER_STYLE_TEMPLATES.forEach(function (t) {
+    html += '<div class="rbb-tpl" data-tpl="' + t.render + '" onclick="selectBatchTpl(\'' + t.render + '\')">'
+      + rasterTplThumbSvg(t.thumb, 'rt', 'b')
+      + '<b>' + t.name + '</b><small>' + t.short + '</small></div>';
+  });
+  box.innerHTML = html;
+}
+let svcMainIdx = 0;         // 主体服务索引（单选 · 纯单源）
+let svcFocus = null;        // 当前联动展示数据的服务索引
+let svcPage = 1;            // 当前页码（分页）
+const SVC_PAGE = 6;         // 每页条数
+
+function svcFiltered() {
+  const q = ($('svcSearchInput').value || '').trim().toLowerCase();
+  const tf = ($('svcTypeFilter') ? $('svcTypeFilter').value : '');
+  const cf = ($('svcCrsFilter') ? $('svcCrsFilter').value : '');
+  const so = ($('svcSort') ? $('svcSort').value : '');
+  let list = SERVICE_CATALOG.filter(function (d) {
+    if (q && d.name.toLowerCase().indexOf(q) < 0) return false;
+    if (tf === '动态') { if (!d.timeSeries) return false; }
+    else if (tf && d.type !== tf) return false;
+    if (cf && d.crs !== cf) return false;
+    return true;
+  });
+  if (so === 'name') list = list.slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'zh'); });
+  else if (so === 'count') list = list.slice().sort(function (a, b) { return svcCountNum(b) - svcCountNum(a); });
+  return list;
+}
+function svcCountNum(d) { const m = (d.count || '').match(/\d+/); return m ? parseInt(m[0], 10) : 0; }
+// 数据联动框：展示选中/聚焦服务的关联数据（内容精简，随选中服务变化）
+function renderSvcData(idx) {
+  const box = $('svcDataBody'), hint = $('svcDataHint');
+  if (idx == null || !SERVICE_CATALOG[idx]) {
+    box.innerHTML = '<div class="sd-empty">👆 在下方选择服务，此处展示其关联数据</div>';
+    if (hint) hint.textContent = '选中服务后展示';
+    return;
+  }
+  const d = SERVICE_CATALOG[idx];
+  if (hint) hint.textContent = (idx === svcMainIdx) ? '主源服务（已选）' : '未选';
+  if (d.dataModel === '栅格') {
+    const rk = (d.flavor || '影像') + (d.timeSeries ? ' · 时序序列' : ' · 单张');
+    box.innerHTML =
+      '<div class="sd-grid">'
+      + '<div>数据集 / 服务：<b>' + d.name + '</b></div>'
+      + '<div>服务类型：<b>' + d.type + '</b></div>'
+      + '<div>数据模型：<b>栅格 · ' + rk + '</b></div>'
+      + '<div>波段数：<b>' + (d.bands || '—') + '</b></div>'
+      + (d.timeSeries ? '<div>序列期数：<b>' + (d.scenes || '—') + '</b></div>' : '<div>数据形态：<b>单一栅格地图服务</b></div>')
+      + '<div>坐标系：<b>' + d.crs + '</b></div>'
+      + '<div>分辨率：<b>' + (d.resolution || '—') + '</b></div>'
+      + '<div>发布方：<b>' + d.owner + '</b></div>'
+      + '<div>属性：<b>' + (d.timeSeries ? '时序 · 绑服务序列' : '静态 · 单张') + '</b></div>'
+      + (d.timeSeries ? '<div>序列：<b>' + ((SERVICE_SEQUENCES[d.sequenceId] && SERVICE_SEQUENCES[d.sequenceId].name) || '—') + '</b></div>' : '')
+      + '</div>'
+      + '<div class="sd-note" style="margin-top:6px;color:var(--text-3)">' + (d.timeSeries ? '时序栅格：选入后底部出现「时间序列播放插件」，逐期切换编辑对象。' : '单张栅格：选入后底部出现「静态预览 + 图例」，无时间播放。') + '</div>';
+    return;
+  }
+  box.innerHTML =
+    '<div class="sd-grid">'
+      + '<div>数据集 / 服务：<b>' + d.name + '</b></div>'
+      + '<div>服务类型：<b>' + d.type + '</b></div>'
+      + '<div>数据模型：<b>矢量 · ' + (d.geometry || '面') + '</b></div>'
+      + '<div>要素量：<b>' + d.count + '</b></div>'
+    + '<div>坐标系：<b>' + d.crs + '</b></div>'
+    + '<div>发布方：<b>' + d.owner + '</b></div>'
+    + '<div>属性：<b>' + (d.timeSeries ? '时序 · 要素带时间字段' : '静态') + '</b></div>'
+    + '</div>'
+    + (d.timeSeries ? '<div class="sd-grid" style="margin-top:6px"><div>默认时间窗：<b>' + (d.defaultRange ? d.defaultRange[0] + ' ~ ' + d.defaultRange[1] : '—') + '</b></div><div>表达建议：<b>按时间字段分级</b></div></div>' : '');
+}
+function renderSvcList() {
+  const all = svcFiltered();
+  const total = Math.max(1, Math.ceil(all.length / SVC_PAGE));
+  if (svcPage > total) svcPage = total;
+  const list = all.slice((svcPage - 1) * SVC_PAGE, svcPage * SVC_PAGE);
+  $('svcMainList').innerHTML = list.map(function (d) {
+    const idx = SERVICE_CATALOG.indexOf(d);
+    const sel = idx === svcMainIdx;
+    const isColl = d.dataModel === '栅格';
+    const meta = isColl
+      ? (d.type + ' · ' + (d.bands || '—') + ' 波段 · ' + d.crs + (d.timeSeries ? ' · 时序序列(' + (d.scenes || '?') + ')' : ' · 单张'))
+      : (d.type + ' · 矢量 · ' + (d.geometry || '面') + ' · ' + d.count + ' · ' + d.crs + (d.timeSeries ? ' · 时序' : ''));
+    const badge = isColl
+      ? '<span class="svc-role aux" style="background:#e7f0ff;color:#2f6fed;border:1px solid #cfe0ff">' + (d.timeSeries ? '栅格·时序' : '栅格·单张') + '</span>'
+      : '<span class="svc-role main">主源</span>';
+    return '<div class="svc-row' + (sel ? ' sel' : '') + (isColl ? ' aux' : '') + '" data-idx="' + idx + '" onclick="svcPickMain(' + idx + ')">'
+      + '<span class="svc-check">' + (sel ? '✓' : '') + '</span>'
+      + '<span class="svc-thumb">' + d.icon + '</span>'
+      + '<div class="svc-info">'
+        + '<div class="svc-top"><span class="svc-name">' + d.name + (isColl ? ' · ' + (d.flavor || '影像') + (d.timeSeries ? '序列' : '单张') : '') + '</span><span class="svc-status">已发布·可预览</span></div>'
+        + '<div class="svc-meta">' + meta + '</div>'
+      + '</div>'
+      + '<button class="svc-preview" onclick="event.stopPropagation();svcPreview(' + idx + ')" title="预览已发布服务">预览</button>'
+      + badge
+      + '</div>';
+  }).join('');
+  renderSvcPg();
+}
+function svcPickMain(idx) {
+  svcMainIdx = idx;
+  svcFocus = idx;
+  renderSvcData(idx);
+  renderSvcList();
+}
+// 预览已发布服务：这些条目本身已是「服务资源层」发布完成、可预览的服务
+function svcPreview(idx) {
+  const d = SERVICE_CATALOG[idx];
+  if (!d) return;
+  showToast('🔍 预览已发布服务：' + d.name + '（' + d.type + '）— 调用已发布服务预览接口');
+}
+function svcFilter() {
+  svcPage = 1;
+  renderSvcList();
+}
+function renderSvcPg() {
+  const all = svcFiltered();
+  const total = Math.max(1, Math.ceil(all.length / SVC_PAGE));
+  if (svcPage > total) svcPage = total;
+  $('svcPgInfo').textContent = '共 ' + all.length + ' 条 · 第 ' + svcPage + ' / ' + total + ' 页';
+  $('svcPgPage').textContent = svcPage + ' / ' + total;
+  $('svcPgPrev').disabled = svcPage <= 1;
+  $('svcPgNext').disabled = svcPage >= total;
+}
+function svcPg(d) {
+  const all = svcFiltered();
+  const total = Math.max(1, Math.ceil(all.length / SVC_PAGE));
+  svcPage = Math.min(total, Math.max(1, svcPage + d));
+  renderSvcList();
+}
+function svcInitFilters() {
+  const types = [], crss = [];
+  SERVICE_CATALOG.forEach(function (d) {
+    if (types.indexOf(d.type) < 0) types.push(d.type);
+    if (crss.indexOf(d.crs) < 0) crss.push(d.crs);
+  });
+  const tf = $('svcTypeFilter');
+  if (tf && tf.options.length <= 1) {
+    types.forEach(function (t) { const o = document.createElement('option'); o.value = t; o.textContent = '类型 · ' + t; tf.appendChild(o); });
+    if (SERVICE_CATALOG.some(function (d) { return d.timeSeries; })) {
+      const o = document.createElement('option'); o.value = '动态'; o.textContent = '类型 · 动态(时序)'; tf.appendChild(o);
+    }
+  }
+  const cf = $('svcCrsFilter');
+  if (cf && cf.options.length <= 1) {
+    crss.forEach(function (c) { const o = document.createElement('option'); o.value = c; o.textContent = '坐标系 · ' + c; cf.appendChild(o); });
+  }
+}
 function openDataSelect() {
-  selectedDataIdx = 0; dataPage = 1;
-  const si = $('dataSearchInput'); if (si) si.value = '';
-  renderDataList();
+  const curName = ($('scDataName') ? $('scDataName').textContent : '').replace(/^\S+\s/, '');
+  const found = SERVICE_CATALOG.findIndex(function (d) { return d.name === curName; });
+  svcMainIdx = found >= 0 ? found : 0;
+  svcPage = 1;
+  const si = $('svcSearchInput'); if (si) si.value = '';
+  const tf = $('svcTypeFilter'); if (tf) tf.value = '';
+  const cf = $('svcCrsFilter'); if (cf) cf.value = '';
+  const so = $('svcSort'); if (so) so.value = '';
+  svcInitFilters();
+  renderSvcList();
+  renderSvcData(svcMainIdx);
   $('dataMask').classList.add('on');
 }
 function closeDataSelect() { $('dataMask').classList.remove('on'); }
-function toggleSubjectData(el) {
-  document.querySelectorAll('#subjectDataList .data-item').forEach(function (it) { it.classList.remove('sel'); });
-  el.classList.add('sel');
-  selectedDataIdx = +el.dataset.idx;
-}
-function filterSubjectData(inp) { dataPage = 1; renderDataList(); }
-function confirmSubjectData() {
-  const d = SUBJECT_DATA[selectedDataIdx];
-  isPointMode = d.type === '点';
+function confirmServiceSelection() {
+  const d = SERVICE_CATALOG[svcMainIdx];
+  const isRaster = d.dataModel === '栅格';
   const dn = $('scDataName'); if (dn) dn.textContent = d.icon + ' ' + d.name;
-  const dt = $('scDataType'); if (dt) dt.textContent = d.type + ' · ' + d.crs;
-  const dc = $('scDataCount'); if (dc) dc.textContent = d.count;
-  // 主体服务名联动（演示：服务随数据派生；平铺展示主体服务）
+  // ── 左侧主体数据卡：类型感知（L2）──
+  const scTags = $('scTags');
+  if (scTags) {
+    if (isRaster) {
+      scTags.innerHTML =
+        '<span class="tag-pill">' + (d.flavor || '影像') + ' · ' + (d.timeSeries ? '时序序列' : '单张') + '</span>' +
+        '<span class="tag-pill">' + d.crs + '</span>' +
+        '<span class="tag-pill purple">' + (d.bands || '—') + ' 波段 · ' + d.resolution + '</span>';
+    } else {
+      const geom = d.geometry === '点' ? 'Point' : d.geometry === '线' ? 'Line' : 'Polygon';
+      scTags.innerHTML =
+        '<span class="tag-pill" id="scDataType">矢量 · ' + (d.geometry || '面') + ' · ' + geom + '</span>' +
+        '<span class="tag-pill">' + d.crs + '</span>' +
+        '<span class="tag-pill purple" id="scDataCount">' + d.count + '</span>';
+    }
+  }
+  // 主体来源说明（修正“以服务为主体”误导：主体＝来自数据集的某一服务/某一期）
+  const fromEl = $('scFromLine');
+  if (fromEl) {
+    fromEl.innerHTML = isRaster
+      ? (d.timeSeries
+          ? '📎 数据集时序 · 共 ' + (d.scenes || '?') + ' 期（图层主体取其中一期服务）'
+          : '📎 发布自数据资产 · ' + (d.source || '本平台数据资产'))
+      : '📎 发布自数据资产 · ' + (d.source || '本平台数据资产');
+  }
+  const pds = $('propDataSource'); if (pds) pds.textContent = d.name;
+
+  // ── 栅格：单张发布（2026-08-28 模型）；时序按 timeSeries 分派 ──
+  if (isRaster) {
+    isPointMode = false;
+    currentRasterTimeSeries = !!d.timeSeries;
+    currentRasterData = d;
+    setLayerMode('raster');
+    // 填充属性信息卡（栅格版「主体」＝服务元数据）
+    fillRasterProps(d);
+    // 影像图层名 / 芯片
+    const rln = $('rasterLayerName'); if (rln) rln.textContent = d.subject || '影像渲染';
+    const rlc = $('rasterLayerChip'); if (rlc) rlc.textContent = '栅格 · ' + (d.flavor || '影像') + (d.timeSeries ? ' · 时序' : ' · 单张');
+    const pnb = $('propNodeBelong'); if (pnb) pnb.textContent = (d.subject || '栅格') + ' (栅格 · ' + (d.timeSeries ? '时序序列' : '单张') + ')';
+    if (d.timeSeries) {
+      // 时序：底部时间序列播放插件（绑定服务序列）
+      const seq = SERVICE_SEQUENCES[d.sequenceId] || { frames: d.scenes || 8 };
+      const frames = seq.frames || d.scenes || RASTER_SCENES.length;
+      // 左列「样式模板」由服务序列带出：标注序列名
+      const rspSeq = $('rspSeqLabel');
+      if (rspSeq) rspSeq.textContent = '样式管理预置 · ' + (seq.name || (d.scenes + ' 期')) + ' 带出';
+      const rs = $('rasterScene'); if (rs) rs.max = Math.max(0, frames - 1);
+      buildRasterTimeline(d, frames);
+      showRasterTimeline();
+      setRasterActive(0, false); // 选中第 1 期 → 右侧样式作用于该期（恢复右侧样式可用性）
+      refreshRasterStyleBadges(); // 每帧缩略点按默认模板（rgb）着色
+      closeDataSelect();
+      showToast('🛰 已选栅格时序服务「' + d.name + '」绑定服务序列（' + d.bands + ' 波段 · ' + frames + ' 期）');
+    } else {
+      // 单张：底部静态预览 + 图例（无播放插件）；无基础样式选择（三类样式由服务序列带出）
+      setRasterStaticDefault(d);
+      showRasterStatic();
+      closeDataSelect();
+      showToast('🖼 已选栅格单张服务「' + d.name + '」（' + d.bands + ' 波段）');
+    }
+    return;
+  }
+
+  // ── 矢量：单源（L3）──
+  isPointMode = d.geometry === '点';
+  setLayerMode('vector');
   const ssn = $('subjectServiceName'); if (ssn) ssn.textContent = d.subject;
-  const sch = $('subjectChip'); if (sch) sch.textContent = (d.type === '点' ? '点' : '面') + ' · 主体';
+  const sch2 = $('subjectChip'); if (sch2) sch2.textContent = (d.geometry === '点' ? '点' : d.geometry === '线' ? '线' : '面') + ' · 主体';
+  selectNode(document.querySelector('#treeSubject .lt-sub'), 'fill');
+
   // 动态数据：显示「时间段」选择并按时间字段分级渲染；静态数据恢复单一
   const pr = $('periodRow'), rm = $('fillRenderMode'), fr = $('fillFieldRow');
-  if (d.dynamic) {
+  if (d.timeSeries) {
     showParcels();
     if (pr) pr.style.display = '';
     if (rm) rm.value = 'graduated';
     fillRenderMode = 'graduated';
     if (fr) fr.style.display = '';
     const fn = $('fillFieldName'); if (fn) fn.textContent = 'ndvi · 作物长势';
-    // 分级类目 = ndvi 标准分级（优/良/中/差），不随月份变化（数据为最新一期，要素带时间属性）
     FILL_CLASSES = SERVICE_FIELDS[1].values.map(function (v) { return { name: v[0], c: v[1] }; });
-    // 默认时间段 = 数据建模界定的「默认渲染时间窗口」（发布时序服务时配置；避免默认全部时相叠加）
     const ts = $('timeStart'), te = $('timeEnd');
     if (ts) ts.value = (d.defaultRange && d.defaultRange[0]) || '2026-07-01';
     if (te) te.value = (d.defaultRange && d.defaultRange[1]) || '2026-07-31';
@@ -1823,7 +2387,6 @@ function confirmSubjectData() {
     if (pr) pr.style.display = 'none';
     const ind2 = $('timeIndicator'); if (ind2) ind2.classList.add('hidden');
     if (isPointMode) {
-      // 点数据：切换为点服务渲染，默认热力图（点专属，成熟产品对齐）
       if (rm) rm.value = 'heatmap';
       fillRenderMode = 'heatmap';
       if (fr) fr.style.display = 'none';
@@ -1836,23 +2399,446 @@ function confirmSubjectData() {
       fillRenderMode = 'single';
       if (fr) fr.style.display = 'none';
       const cfg2 = $('renderCfgRow'); if (cfg2) cfg2.style.display = 'none';
-      // 恢复全部地块显示（无时间筛选）
       showParcels();
       renderFillClasses(); applyFill();
     }
   }
   closeDataSelect();
-  showToast('✅ 已选择主体数据「' + d.name + '」，服务随数据更新（原型演示）');
+  showToast('✅ 已设置「' + d.name + '」为主体服务（单源）');
 }
 function confirmShare() { closeShare(); showToast('✅ 已生成评审预览分享（7 天有效期）'); }
 
-/* ================= 数据更新同步提示（真值 BR23） ================= */
-function openUpdateCheck() { $('updateMask').classList.add('on'); }
-function closeUpdateCheck() { $('updateMask').classList.remove('on'); }
-function confirmUpdateSync() {
-  closeUpdateCheck();
-  showToast('✅ 已同步引用新版数据（数据版本 4）');
+
+/* ================= 栅格渲染（2026-08-28 单张发布模型：单张/时序序列，统一影像表达） ================= */
+let isRasterMode = false;
+let rasterSceneIdx = 0;
+let rasterTimeVisible = true;
+let rasterLayer = null, rasterGroup = null, rasterLabel = null;
+let rasterActiveService = 0;        // 当前选中的「某一张地图服务」序号（服务序列）
+let rasterServiceStyles = [];       // 逐张服务的样式状态（逻辑单源下可分别设样式）
+let currentRasterTimeSeries = false; // 当前栅格服务是否绑定时序序列
+let batchTplKey = null;             // 批量绑定样式模板：当前选中的模板 key
+let rasterRenderMode = 'rgb';       // 当前栅格渲染方式（内部状态：rgb/gray/hillshade/classify，由模板/数据类型驱动，不在右栏做类型选择）
+let rasterFrameDates = [];          // 当前序列每期日期标签
+let rasterPlayTimer = null;         // 时间序列播放定时器
+let currentRasterData = null;       // 当前选中的栅格服务（填充属性信息/静态图例用）
+const RASTER_BBOX = [[47.12, 132.42], [47.25, 132.56]];
+const RASTER_SCENES = [
+  { t: '2026-05-01' }, { t: '2026-05-15' }, { t: '2026-06-01' }, { t: '2026-06-15' },
+  { t: '2026-07-01' }, { t: '2026-07-15' }, { t: '2026-08-01' }, { t: '2026-08-15' }
+];
+function rasterColor() {
+  if (!map) return '#2f8f4f';
+  const m = rasterRenderMode || 'rgb';
+  // 单波段（灰度/晕渲）：基础色由「显示色带」决定
+  if (m === 'gray' || m === 'hillshade') {
+    const dr = $('rasterDisplayRamp') ? $('rasterDisplayRamp').value : 'gray';
+    if (dr === 'hill') return '#7a5a32';
+    if (dr === 'gr') return rampColor(0.6, 'gr');
+    if (dr === 'br') return rampColor(0.6, 'br');
+    if (dr === 'mono') return rampColor(0.6, 'mono');
+    return '#8d8d8d';
+  }
+  if (m === 'classify') { const ramp = $('rasterRamp') ? $('rasterRamp').value : 'gr'; return rampColor(0.6, ramp); }
+  return '#2f8f4f'; // rgb 真彩（植被绿调占位）
 }
+function rasterModeLabel() {
+  const m = rasterRenderMode || 'rgb';
+  return { rgb: 'RGB 真彩', gray: '灰度', hillshade: 'DEM 晕渲', classify: '分类色带' }[m] || m;
+}
+// 渲染增强参数：亮度 / 对比度 / Gamma 应用到基础色（模拟成熟产品的 Image Appearance）
+function rasterAdjustColor(hex, br, co, ga) {
+  if (!hex || hex.charAt(0) !== '#') return hex;
+  const n = parseInt(hex.slice(1), 16);
+  let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  const brF = (br == null ? 100 : br) / 100, coF = (co == null ? 100 : co) / 100, gaF = (ga == null ? 1 : ga);
+  const f = function (c) {
+    c = (c - 128) * coF + 128;      // 对比度
+    c = c * brF;                     // 亮度
+    c = 255 * Math.pow(Math.max(c, 0) / 255, 1 / Math.max(gaF, 0.1)); // Gamma
+    return Math.max(0, Math.min(255, Math.round(c)));
+  };
+  return 'rgb(' + f(r) + ',' + f(g) + ',' + f(b) + ')';
+}
+function rasterFillColor() {
+  let c = rasterAdjustColor(rasterColor(),
+    +($('rasterBrightness') ? $('rasterBrightness').value : 100),
+    +($('rasterContrast') ? $('rasterContrast').value : 100),
+    +($('rasterGamma') ? $('rasterGamma').value : 100) / 100);
+  const rev = $('rasterRampRev') && $('rasterRampRev').classList.contains('on');
+  if (rev) {
+    const mm = c.match(/rgb\((\d+),(\d+),(\d+)\)/);
+    if (mm) c = 'rgb(' + (255 - (+mm[1])) + ',' + (255 - (+mm[2])) + ',' + (255 - (+mm[3])) + ')';
+  }
+  return c;
+}
+// 拉伸方式：无 → 隐藏拉伸范围；百分比裁剪/标准差 → 展开并给默认值
+function onRasterStretchChange() {
+  const m = $('rasterStretchMode') ? $('rasterStretchMode').value : 'none';
+  const row = $('rasterStretchRangeRow');
+  if (row) row.style.display = (m === 'none') ? 'none' : '';
+  if (m === 'pct') { const a = $('rasterStretchMin'), b = $('rasterStretchMax'); if (a) a.value = 5; if (b) b.value = 250; }
+  else if (m === 'std') { const a = $('rasterStretchMin'), b = $('rasterStretchMax'); if (a) a.value = 0; if (b) b.value = 255; }
+  applyRasterRender();
+}
+function toggleRasterRampRev() {
+  const t = $('rasterRampRev'); if (t) t.classList.toggle('on');
+  applyRasterRender();
+}
+function refreshRasterLabel() {
+  if (!rasterGroup) return;
+  const c = [(RASTER_BBOX[0][0] + RASTER_BBOX[1][0]) / 2, (RASTER_BBOX[0][1] + RASTER_BBOX[1][1]) / 2];
+  const html = '<div class="map-label" style="text-align:center">🛰 影像渲染 · ' + rasterModeLabel() +
+    '<br>时相：' + RASTER_SCENES[rasterSceneIdx].t +
+    (rasterTimeVisible ? '' : '<br>（时相图层隐藏）') + '</div>';
+  if (!rasterLabel) {
+    rasterLabel = L.marker(c, { icon: L.divIcon({ className: '', html: html, iconSize: [0, 0], iconAnchor: [0, 0] }) });
+    rasterLabel.addTo(rasterGroup);
+  } else {
+    rasterLabel.setIcon(L.divIcon({ className: '', html: html, iconSize: [0, 0], iconAnchor: [0, 0] }));
+  }
+}
+function showRaster() {
+  if (!map) return;
+  removeRaster();
+  rasterGroup = L.featureGroup();
+  const op = (+($('rasterOp') ? $('rasterOp').value : 85)) / 100;
+  rasterLayer = L.rectangle(RASTER_BBOX, { color: '#0f947c', weight: 1, fillColor: rasterFillColor(), fillOpacity: op });
+  rasterLayer.addTo(rasterGroup);
+  refreshRasterLabel();
+  rasterGroup.addTo(map);
+}
+function removeRaster() {
+  if (rasterGroup && map) { map.removeLayer(rasterGroup); }
+  rasterGroup = null; rasterLayer = null; rasterLabel = null;
+}
+function hideVectorLayers() {
+  parcelLayers.forEach(function (l) { if (map.hasLayer(l)) map.removeLayer(l); });
+  boundaryLayers.forEach(function (l) { if (map.hasLayer(l)) map.removeLayer(l); });
+  if (labelGroup && map.hasLayer(labelGroup)) map.removeLayer(labelGroup);
+  markerLayers.forEach(function (m) { if (map.hasLayer(m)) map.removeLayer(m); });
+  clearSpecialLayers();
+  if (hiliteLayer && map.hasLayer(hiliteLayer)) map.removeLayer(hiliteLayer);
+}
+function applyRasterRender() {
+  if (!rasterLayer) return;
+  const base = (+($('rasterOp') ? $('rasterOp').value : 85)) / 100;
+  const maskOn = $('rasterMaskToggle') && $('rasterMaskToggle').classList.contains('on');
+  const op = base * (maskOn ? 0.9 : 1);
+  const v = $('rasterOpVal'); if (v) v.textContent = Math.round(op * 100) + '%';
+  rasterLayer.setStyle({ fillColor: rasterFillColor(), fillOpacity: op });
+  refreshRasterLabel();
+  updateLegendBox();
+  saveRasterServiceStyle(rasterActiveService); // 样式逐张服务独立保存
+}
+function applyRasterTime() {
+  const idx = +($('rasterScene') ? $('rasterScene').value : 0);
+  setRasterActive(idx, false); // 时间轴 = 服务序列选择器，二者同步（不抢面板）
+  showToast('🕒 已切换服务：服务 ' + (idx + 1) + ' · ' + (RASTER_SCENES[idx] ? RASTER_SCENES[idx].t : ''));
+}
+function onRasterModeChange() {
+  const m = rasterRenderMode || 'rgb';
+  const bandR = $('rasterBandRow'), classSec = $('rasterClassInline'), colorRow = $('rasterColorRow');
+  if (bandR) bandR.style.display = (m === 'rgb') ? '' : 'none';
+  if (classSec) classSec.style.display = (m === 'classify') ? '' : 'none';
+  if (colorRow) colorRow.style.display = (m === 'rgb') ? 'none' : '';
+  syncRasterStylePick();
+  applyRasterRender();
+}
+// 左列「样式模板」：点模板卡即选用（设置内部渲染方式，无展开子项）
+function pickRasterStyle(mode) {
+  if (mode === 'enhance') {
+    // ② 地形强度分析图：直接套用默认呈现（地形→晕渲；其余→强度拉伸）
+    rasterRenderMode = (currentRasterData && currentRasterData.flavor === '地形') ? 'hillshade' : 'gray';
+  } else if (mode === 'rgb' || mode === 'classify' || mode === 'gray' || mode === 'hillshade') {
+    rasterRenderMode = mode;
+  }
+  syncRasterStylePick();
+  onRasterModeChange();
+}
+// 同步左列模板卡选中高亮（与内部渲染方式一致）
+function syncRasterStylePick() {
+  const v = rasterRenderMode || 'rgb';
+  document.querySelectorAll('#rasterStylePick .rsp-tpl').forEach(function (o) {
+    const m = o.getAttribute('data-mode');
+    let on = false;
+    if (m === 'rgb') on = (v === 'rgb');
+    else if (m === 'enhance') on = (v === 'gray' || v === 'hillshade');
+    else if (m === 'classify') on = (v === 'classify');
+    o.classList.toggle('on', on);
+  });
+}
+
+/* ================= 时序栅格：批量绑定样式模板（把不同样式模板分别套用到服务序列各帧） ================= */
+// 模板默认样式（与左列「样式模板」三类一致）
+function rasterTemplateDefaults(key, flavor) {
+  const base = { bandR: 'R 红波段', bandG: 'G 绿波段', bandB: 'B 蓝波段', classBand: 'NIR 近红外', ramp: 'gr', classN: 5 };
+  if (key === 'rgb') return Object.assign({ renderMode: 'rgb' }, base);
+  if (key === 'enhance') return Object.assign({ renderMode: (flavor === '地形') ? 'hillshade' : 'gray' }, base);
+  if (key === 'classify') return Object.assign({ renderMode: 'classify' }, base);
+  return Object.assign({ renderMode: 'rgb' }, base);
+}
+// 模板名（取「样式管理」预置的业务化名称）
+function rasterTemplateName(key) {
+  const t = RASTER_STYLE_TEMPLATES.find(function (x) { return x.render === key; });
+  return t ? t.name : '未选';
+}
+// 帧缩略色（对应模板）
+function rasterStyleBadge(m) {
+  if (m === 'rgb') return 'linear-gradient(135deg,#2563eb,#16a34a,#dc2626)';
+  if (m === 'classify') return 'linear-gradient(90deg,#22c55e,#eab308,#ef4444)';
+  return 'linear-gradient(135deg,#f1f5f9,#475569)';
+}
+// 把模板默认套到第 i 帧
+function applyRasterTemplateToFrame(i, key) {
+  const st = rasterServiceStyles[i]; if (!st) return;
+  const d = rasterTemplateDefaults(key, currentRasterData && currentRasterData.flavor);
+  st.renderMode = d.renderMode; st.bandR = d.bandR; st.bandG = d.bandG; st.bandB = d.bandB;
+  st.classBand = d.classBand; st.ramp = d.ramp; st.classN = d.classN;
+}
+// 刷新底部序列每帧的样式缩略点（按当前绑定的模板着色）
+function refreshRasterStyleBadges() {
+  const track = $('rtlTrack'); if (!track) return;
+  track.querySelectorAll('.rtl-frame').forEach(function (n) {
+    const i = +n.dataset.i; const st = rasterServiceStyles[i]; if (!st) return;
+    const sw = n.querySelector('.rf-swatch'); if (sw) sw.style.background = rasterStyleBadge(st.renderMode);
+  });
+}
+function toggleRasterBatch() {
+  const p = $('rlBatch'); if (!p) return;
+  const open = p.classList.toggle('hidden') === false;
+  if (open) { buildBatchFrames(); refreshRasterStyleBadges(); }
+}
+function buildBatchFrames() {
+  const box = $('rbbFrames'); if (!box) return;
+  let html = '';
+  for (let i = 0; i < rasterServiceStyles.length; i++) {
+    const dt = rasterFrameDates[i] || ('第 ' + (i + 1) + ' 期');
+    html += '<label class="rbb-frame"><input type="checkbox" value="' + i + '" onchange="onBatchFrameChange(this)"><span>第 ' + (i + 1) + ' 期</span><small>' + dt + '</small></label>';
+  }
+  box.innerHTML = html;
+  updateBatchCount();
+}
+function onBatchFrameChange(box) {
+  const lab = box.closest('.rbb-frame'); if (lab) lab.classList.toggle('sel', box.checked);
+  updateBatchCount();
+}
+function updateBatchCount() {
+  const boxes = document.querySelectorAll('#rbbFrames input[type=checkbox]');
+  let n = 0; boxes.forEach(function (b) { if (b.checked) n++; });
+  const c = $('rbbCount'); if (c) c.textContent = '已选 ' + n + ' 帧';
+  const a = $('rbbApply'); if (a) a.disabled = !(batchTplKey && n > 0);
+}
+function selectBatchTpl(key) {
+  batchTplKey = key;
+  document.querySelectorAll('#rlBatch .rbb-tpl').forEach(function (o) { o.classList.toggle('on', o.getAttribute('data-tpl') === key); });
+  updateBatchCount();
+}
+function toggleBatchAll(checked) {
+  document.querySelectorAll('#rbbFrames input[type=checkbox]').forEach(function (b) { b.checked = checked; onBatchFrameChange(b); });
+  updateBatchCount();
+}
+function applyBatchTemplate() {
+  if (!batchTplKey) { showToast('请先在上方选一个样式模板'); return; }
+  const boxes = document.querySelectorAll('#rbbFrames input[type=checkbox]');
+  let n = 0;
+  boxes.forEach(function (b) { if (b.checked) { applyRasterTemplateToFrame(+b.value, batchTplKey); n++; } });
+  if (n === 0) { showToast('请先勾选要绑定的帧'); return; }
+  refreshRasterStyleBadges();
+  // 当前帧若被选中则重载其样式到画布，否则保持当前帧样式一致
+  setRasterActive(rasterActiveService, false);
+  showToast('已为 ' + n + ' 帧批量绑定「' + rasterTemplateName(batchTplKey) + '」模板（逐帧独立保存）');
+}
+function toggleRasterMask() {
+  const on = $('rasterMaskToggle').classList.toggle('on');
+  applyRasterRender();
+  showToast('掩膜透明（nodata 透明）：' + (on ? '开启' : '关闭'));
+}
+function toggleRasterTimeVis() {
+  rasterTimeVisible = $('rasterTimeToggle').classList.toggle('on');
+  if (rasterLabel) {
+    if (rasterTimeVisible) { if (rasterGroup) rasterLabel.addTo(rasterGroup); }
+    else { if (map.hasLayer(rasterLabel)) map.removeLayer(rasterLabel); }
+  }
+  refreshRasterLabel();
+}
+function setLayerMode(mode) {
+  isRasterMode = (mode === 'raster');
+  const vecBox = $('vecLayerBox'), vecAux = $('vecAuxBox'), rasBox = $('rasterLayerBox'), rasMeta = $('scRasterMeta');
+  if (vecBox) vecBox.classList.toggle('hidden', isRasterMode);
+  if (vecAux) vecAux.classList.toggle('hidden', isRasterMode);
+  // 🛰 影像图层（统一影像表达）：仅单张栅格显示；时序栅格左列由「三类基础样式选择」卡替代，无影像图层主体
+  if (rasBox) rasBox.classList.toggle('hidden', !(isRasterMode && !currentRasterTimeSeries));
+  if (rasMeta) rasMeta.classList.toggle('hidden', !isRasterMode);
+  // 左列「样式模板」卡（三张带缩略图）：模板由服务序列带出 → 仅时序栅格显示；单张栅格样式在右栏调整；矢量隐藏
+  const rasStylePick = $('rasterStylePick'); if (rasStylePick) rasStylePick.classList.toggle('hidden', !(isRasterMode && currentRasterTimeSeries));
+  const tl = $('rasterTimeline'); if (tl) tl.classList.toggle('hidden', !(isRasterMode && currentRasterTimeSeries));
+  const main = document.querySelector('.main'); if (main) main.classList.toggle('raster-on', isRasterMode);
+  ['sec-fill', 'sec-label', 'sec-symbol', 'sec-marker'].forEach(function (id) { const e = $(id); if (e) e.classList.toggle('hidden', isRasterMode); });
+  // 右栏「样式参数」：单张栅格 = 参数调整主入口；时序栅格 = 模板带出渲染方式后的参数微调
+  const stSec = $('sec-raster'); if (stSec) stSec.classList.toggle('hidden', !isRasterMode);
+  const rtSec = $('sec-rtime'); if (rtSec) rtSec.classList.toggle('hidden', !(isRasterMode && currentRasterTimeSeries));
+  ['lgFillRow', 'lgStrokeRow', 'lgSymRow'].forEach(function (id) { const e = $(id); if (e) e.style.display = isRasterMode ? 'none' : ''; });
+  const lr = $('lgRasterRow'); if (lr) lr.style.display = isRasterMode ? '' : 'none';
+  const pb = $('plbBadge'); if (pb) pb.textContent = isRasterMode ? '影像主体 · 重点' : '主渲染 · 重点';
+  const ab = $('albBadge'); if (ab) ab.textContent = isRasterMode ? '影像表达层' : '辅助 · 派生服务';
+  if (isRasterMode) { hideVectorLayers(); showRaster(); }
+  else { removeRaster(); if (isPointMode) showPoints(); else showParcels(); }
+  updateLegendBox();
+}
+
+
+/* ================= 栅格：服务序列（画布底部时间序列逐帧选「某一张地图服务」并分别设样式） ================= */
+// 时序栅格 = 单张发布的服务 + 绑定服务序列（多期地图服务）；逐帧样式独立，左侧为统一影像表达；
+// 选中其中某一张，右侧样式即作用于该张（样式逐张独立保存）。
+function buildRasterTimeline(d, frames) {
+  const track = $('rtlTrack'); if (!track) return;
+  const seq = SERVICE_SEQUENCES[d.sequenceId];
+  const dates = (seq && seq.dates) ? seq.dates : RASTER_SCENES.map(function (s) { return s.t; });
+  rasterFrameDates = [];
+  for (let i = 0; i < frames; i++) rasterFrameDates.push(dates[i] || ('第' + (i + 1) + '期'));
+  const cnt = $('rtlCount'); if (cnt) cnt.textContent = '（时序序列 ' + frames + ' 期）';
+  rasterServiceStyles = [];
+  let html = '';
+  for (let i = 0; i < frames; i++) {
+    const t = rasterFrameDates[i];
+    rasterServiceStyles.push({
+      renderMode: 'rgb',
+      bandR: 'R 红波段', bandG: 'G 绿波段', bandB: 'B 蓝波段',
+      mask: true, opacity: 85 - (i % 4) * 3,
+      classBand: 'NIR 近红外', ramp: 'gr', classN: 5, classMethod: 'equal',
+      stretchMode: 'none', stretchMin: 0, stretchMax: 255,
+      displayRamp: 'gray', rampRev: false,
+      brightness: 100, contrast: 100, gamma: 1,
+      timeVisible: true
+    });
+    html += '<div class="rtl-frame' + (i === 0 ? ' active' : '') + '" data-i="' + i + '" onclick="selectRasterService(' + i + ')">'
+      + '<span class="rf-dot"></span>'
+      + '<div class="rf-idx">第 ' + (i + 1) + ' 期</div>'
+      + '<div class="rf-date">' + t + '</div>'
+      + '<div class="rf-swatch"></div></div>';
+  }
+  track.innerHTML = html;
+  refreshRasterStyleBadges();
+}
+// 选中某一张地图服务：加载其样式到右侧面板、同步时间轴、重渲染、高亮底部序列
+function selectRasterService(i) { setRasterActive(i, true); }
+function setRasterActive(i, openPanel) {
+  rasterActiveService = i;
+  rasterSceneIdx = i;
+  loadRasterServiceStyle(i);
+  const rs = $('rasterScene'); if (rs) rs.value = i;
+  const dt = rasterFrameDates[i] || ('第' + (i + 1) + '期');
+  const rsl = $('rasterSceneLabel'); if (rsl) rsl.textContent = dt;
+  const ras = $('rasterActiveSvc'); if (ras) ras.textContent = '第 ' + (i + 1) + ' 期 · ' + dt;
+  const rta = $('rtlActive'); if (rta) rta.textContent = '第 ' + (i + 1) + ' 期 · ' + dt;
+  // 底部时间序列高亮（无论来源都同步）
+  const track = $('rtlTrack');
+  if (track) track.querySelectorAll('.rtl-frame').forEach(function (n) { n.classList.toggle('active', +n.dataset.i === i); });
+  if (openPanel) {
+    const el = document.querySelector('#treeRasterFlat .lt-sub');
+    if (el) selectNode(el, 'raster'); // 从序列点选→打开右侧样式面板；时间轴拖动则不抢面板
+  }
+  const label = '影像渲染 · 第 ' + (i + 1) + ' 期';
+  const sc = $('stCurrent'); if (sc) sc.textContent = '当前选中：' + label;
+  const pt = $('propTarget'); if (pt) pt.textContent = label;
+  const pn = $('propNodeName'); if (pn) pn.textContent = label;
+  if (map) showRaster();
+  onRasterModeChange();
+}
+/* ================= 栅格·属性信息卡 / 单张静态预览 / 时序播放 ================= */
+function fillRasterProps(d) {
+  const set = function (id, v) { const e = $(id); if (e) e.textContent = v; };
+  // 关键字段合入顶部服务卡（#scRasterMeta）；仅展示类型/坐标系/分辨率/波段/获取/来源
+  set('roType', (d.type || '栅格') + (d.timeSeries ? ' · 时序' : ' · 单张'));
+  set('roCrs', d.crs || '—');
+  set('roRes', d.resolution || '—');
+  set('roBands', d.bandList || ((d.bands || '—') + ' 波段'));
+  set('roDate', d.acquire || '—');
+  set('roSource', d.source || '—');
+  const meta = $('scRasterMeta'); if (meta) meta.classList.remove('hidden');
+}
+function showRasterTimeline() {
+  const tl = $('rasterTimeline'); if (tl) tl.classList.remove('hidden');
+  const btn = $('rtlPlay'); if (btn) btn.textContent = '▶';
+  if (rasterPlayTimer) { clearInterval(rasterPlayTimer); rasterPlayTimer = null; }
+}
+function showRasterStatic() {
+  const tl = $('rasterTimeline'); if (tl) tl.classList.add('hidden');
+  if (rasterPlayTimer) { clearInterval(rasterPlayTimer); rasterPlayTimer = null; }
+  const btn = $('rtlPlay'); if (btn) btn.textContent = '▶';
+}
+function setRasterStaticDefault(d) {
+  // 单张栅格默认呈现：地形→晕渲；雷达→强度拉伸（灰度）；其余→真彩合成
+  const def = d.flavor === '地形' ? 'hillshade' : (d.flavor === '雷达' ? 'gray' : 'rgb');
+  rasterRenderMode = def;
+  const ras = $('rasterActiveSvc'); if (ras) ras.textContent = (d.subject || '影像渲染') + ' · 单张';
+  if (map) showRaster();
+  onRasterModeChange();
+}
+function playRasterSequence() {
+  const frames = rasterFrameDates.length || rasterServiceStyles.length;
+  if (!frames) return;
+  if (rasterPlayTimer) { clearInterval(rasterPlayTimer); rasterPlayTimer = null; const b = $('rtlPlay'); if (b) b.textContent = '▶'; return; }
+  const btn = $('rtlPlay'); if (btn) btn.textContent = '⏸';
+  let i = rasterActiveService;
+  setRasterActive(i, false);
+  rasterPlayTimer = setInterval(function () {
+    i = (i + 1) % frames;
+    setRasterActive(i, false);
+    const ind = $('timeIndicator'); if (ind) { ind.classList.remove('hidden'); ind.textContent = '⏱ 当前时段：' + (rasterFrameDates[i] || ('第' + (i + 1) + '期')); }
+  }, 900);
+}
+function loadRasterServiceStyle(i) {
+  const st = rasterServiceStyles[i]; if (!st) return;
+  const setVal = function (id, v) { const e = $(id); if (e) e.value = v; };
+  rasterRenderMode = st.renderMode || 'rgb';
+  setVal('rasterBandR', st.bandR); setVal('rasterBandG', st.bandG); setVal('rasterBandB', st.bandB);
+  setVal('rasterClassBand', st.classBand); setVal('rasterRamp', st.ramp); setVal('rasterClass', st.classN);
+  setVal('rasterClassMethod', st.classMethod || 'equal');
+  setVal('rasterStretchMode', st.stretchMode || 'none');
+  setVal('rasterStretchMin', st.stretchMin != null ? st.stretchMin : 0);
+  setVal('rasterStretchMax', st.stretchMax != null ? st.stretchMax : 255);
+  setVal('rasterDisplayRamp', st.displayRamp || 'gray');
+  const rev = $('rasterRampRev'); if (rev) rev.classList.toggle('on', !!st.rampRev);
+  const sr = $('rasterStretchRangeRow');
+  if (sr) sr.style.display = (st.stretchMode && st.stretchMode !== 'none') ? '' : 'none';
+  const op = $('rasterOp'); if (op) op.value = st.opacity;
+  const opv = $('rasterOpVal'); if (opv) opv.textContent = st.opacity + '%';
+  const setRange = function (id, vid, v, fmt) {
+    const e = $(id); if (e && v != null) e.value = v;
+    const l = $(vid); if (l) l.textContent = (fmt ? fmt(v) : v);
+  };
+  setRange('rasterBrightness', 'rasterBrightnessVal', st.brightness != null ? st.brightness : 100);
+  setRange('rasterContrast', 'rasterContrastVal', st.contrast != null ? st.contrast : 100);
+  setRange('rasterGamma', 'rasterGammaVal', st.gamma != null ? Math.round(st.gamma * 100) : 100, function (x) { return (x / 100).toFixed(1); });
+  const m = $('rasterMaskToggle'); if (m) m.classList.toggle('on', !!st.mask);
+  const tt = $('rasterTimeToggle'); if (tt) tt.classList.toggle('on', !!st.timeVisible);
+  onRasterModeChange();
+}
+function saveRasterServiceStyle(i) {
+  const st = rasterServiceStyles[i]; if (!st) return;
+  const gv = function (id) { const e = $(id); return e ? e.value : ''; };
+  st.renderMode = rasterRenderMode || 'rgb';
+  st.bandR = gv('rasterBandR'); st.bandG = gv('rasterBandG'); st.bandB = gv('rasterBandB');
+  st.classBand = gv('rasterClassBand'); st.ramp = gv('rasterRamp'); st.classN = +gv('rasterClass');
+  st.classMethod = gv('rasterClassMethod') || 'equal';
+  st.stretchMode = gv('rasterStretchMode') || 'none';
+  st.stretchMin = +gv('rasterStretchMin') || 0;
+  st.stretchMax = +gv('rasterStretchMax') || 255;
+  st.displayRamp = gv('rasterDisplayRamp') || 'gray';
+  const rev = $('rasterRampRev'); st.rampRev = rev ? rev.classList.contains('on') : false;
+  st.opacity = +gv('rasterOp');
+  st.brightness = +($('rasterBrightness') ? $('rasterBrightness').value : 100);
+  st.contrast = +($('rasterContrast') ? $('rasterContrast').value : 100);
+  st.gamma = +($('rasterGamma') ? $('rasterGamma').value : 100) / 100;
+  const m = $('rasterMaskToggle'); st.mask = m ? m.classList.contains('on') : true;
+  const tt = $('rasterTimeToggle'); st.timeVisible = tt ? tt.classList.contains('on') : true;
+}
+// 画布底部时间序列：罗列当前时序栅格服务序列的每一期，点击切换编辑对象；▶ 按钮播放逐期动画（单张栅格不显示此条）。
+
+
+/* ================= 数据更新同步提示（真值 BR23）已移除：三种展示形态（栅格单张/栅格序列/矢量服务）均不提供「检测数据更新」 ================= */
 function copyUrl() { navigator.clipboard && navigator.clipboard.writeText($('shareUrl').value); showToast('链接已复制'); }
 function saveLayer() {
   const n = $('infoLayerName') ? $('infoLayerName').textContent : '';
@@ -1873,9 +2859,25 @@ function showToast(msg) {
   clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('show'); }, 2200);
 }
 
+/* ================= URL 预选服务（从要素图层列表页「设计」带 ?svc= 进入，直接加载对应栅格/时序服务，便于查看改动） ================= */
+function applyUrlPreset() {
+  try {
+    const p = new URLSearchParams(location.search);
+    const svc = p.get('svc') || p.get('layer');
+    if (!svc) return;
+    const idx = SERVICE_CATALOG.findIndex(function (d) { return d.name === svc; });
+    if (idx < 0) return;
+    svcMainIdx = idx;
+    confirmServiceSelection(); // 直接加载该服务（不打开切换模态，符合“不允许切换服务”）
+  } catch (e) {}
+}
+
 /* ================= init（与原地图编辑器一致：等 load 后 Leaflet/CSS 就绪再建图） ================= */
 function boot() {
+  renderRasterStylePick();    // 左列「样式模板」卡 —— 由 RASTER_STYLE_TEMPLATES（样式管理预置）渲染
+  renderBatchTpls();          // 批量绑定面板的模板卡
   initMap();
+  applyUrlPreset();           // 列表页带 ?svc= 进入时，按服务直接加载（栅格单张/时序序列）
   applyFill(); applyBoundary(); applyLabel();
 }
 window.addEventListener('load', boot);

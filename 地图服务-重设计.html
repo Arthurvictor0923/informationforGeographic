@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>河图·地理信息平台 — 服务资源（地图服务）</title>
+<link rel="stylesheet" href="tailwind.css">
+<link rel="stylesheet" href="common.css">
+<style>
+  /* ── 地图服务（服务资源）专属：分段控件 / 关联检索视图 ── */
+  .seg { display:inline-flex; background:var(--bg-page); border:1px solid var(--border); border-radius:8px; padding:2px; }
+  .seg button { height:30px; padding:0 12px; border-radius:6px; font-size:13px; color:var(--text-secondary); background:transparent; border:none; cursor:pointer; transition:all .2s; }
+  .seg button.on { background:#fff; color:var(--brand-dark); font-weight:600; box-shadow:var(--shadow-xs); }
+  .seg.brand-seg button.on { background:var(--brand); color:#fff; }
+
+  .filter-sec { padding:10px 14px; border-bottom:1px solid var(--border); }
+  .filter-sec:last-child { border-bottom:none; }
+  .filter-label { font-size:12px; color:var(--text-muted); font-weight:600; margin-bottom:8px; letter-spacing:.02em; }
+  .chk-row { display:flex; align-items:center; gap:8px; padding:5px 8px; border-radius:6px; cursor:pointer; transition:background .15s; font-size:13px; color:var(--text-secondary); }
+  .chk-row:hover { background:rgba(43,186,160,.05); }
+  .chk-row.active { background:rgba(43,186,160,.10); color:var(--brand-dark); font-weight:600; }
+  .date-input { flex:1 1 0; min-width:0; font-size:12px; color:var(--text-secondary); padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:#fff; outline:none; transition:border-color .15s; }
+  .date-input:focus { border-color:var(--brand); }
+
+  /* 关联信息条（在原始卡片标签行之下追加，不改动原样式） */
+  .link-bar { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-secondary); }
+  .link-bar .lk-name { color:var(--brand-dark); font-weight:600; cursor:pointer; }
+  .link-bar .lk-name:hover { text-decoration:underline; }
+  .lk-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+
+  /* （关联检索视图样式已随方案 D 重构移除，改由联动 + 关系链面板实现） */
+
+  .stat-chip { flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:2px; padding:12px 16px; border-radius:12px; background:#fff; border:1px solid var(--border); box-shadow:var(--shadow-xs); }
+  .stat-chip .n { font-size:22px; font-weight:700; line-height:1; }
+  .stat-chip .l { font-size:12px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* 详情弹窗 / 共享弹窗 */
+  .drawer-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:60; display:flex; justify-content:flex-end; }
+  .drawer { width:520px; max-width:92vw; height:100%; background:#fff; display:flex; flex-direction:column; box-shadow:var(--shadow-xl); animation:drawerIn .3s var(--transition); }
+  @keyframes drawerIn { from { transform:translateX(100%); } to { transform:translateX(0); } }
+  .dt-tab { display:inline-flex; align-items:center; gap:1.5; padding:8px 14px; font-size:13px; cursor:pointer; color:var(--text-secondary); border-bottom:2px solid transparent; transition:all .15s; }
+  .dt-tab.on { color:var(--brand-dark); font-weight:600; border-bottom-color:var(--brand); }
+  .dt-tab:hover:not(.on) { color:var(--text); }
+  .kv { display:flex; gap:12px; padding:10px 0; border-bottom:1px dashed var(--border); font-size:13px; }
+  .kv .k { color:var(--text-muted); width:84px; flex-shrink:0; }
+  .kv .v { color:var(--text); flex:1; }
+  .preview-box { flex:1; border-radius:10px; overflow:hidden; min-height:300px; background:linear-gradient(135deg,#c8dce8 0%,#d4e4f0 20%,#b8d4e8 40%,#c8dce0 60%,#d0e0ec 80%,#c0d8e8 100%); position:relative; }
+  .modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:70; display:flex; align-items:center; justify-content:center; }
+  .modal-box { width:480px; max-width:92vw; background:#fff; border-radius:16px; box-shadow:var(--shadow-xl); overflow:hidden; animation:scaleIn .25s var(--transition); }
+  /* 修复：带 hidden 的遮罩必须隐藏，否则上面的 display:flex 会覆盖 .hidden，导致弹窗一进来就自动弹出 */
+  .modal-mask.hidden, .drawer-mask.hidden { display:none !important; }
+
+  /* ── 方案 D：活动筛选 chip 条 ─────────────────────── */
+  .active-chip { display:inline-flex; align-items:center; gap:6px; padding:3px 8px 3px 10px; border-radius:999px; background:rgba(43,186,160,.10); color:var(--brand-dark); font-size:12px; font-weight:500; border:1px solid var(--brand-light); cursor:pointer; transition:all .15s; }
+  .active-chip:hover { background:rgba(43,186,160,.18); }
+  .active-chip .x { font-size:11px; opacity:.6; }
+  .active-chip:hover .x { opacity:1; }
+
+  /* ── 方案 D：统计卡可下钻 ─────────────────────────── */
+  .stat-chip.clickable { cursor:pointer; transition:all .15s; }
+  .stat-chip.clickable:hover { box-shadow:var(--shadow-sm); transform:translateY(-1px); }
+  .stat-chip.clickable.on { outline:2px solid var(--brand); outline-offset:-1px; background:rgba(43,186,160,.04); }
+
+  /* ── 方案 D：分页 ─────────────────────────────────── */
+  .pager { display:flex; align-items:center; justify-content:flex-end; gap:6px; margin-top:22px; flex-wrap:wrap; }
+  .pager .total { font-size:12px; color:var(--text-muted); margin-right:8px; white-space:nowrap; }
+  .pager button { min-width:32px; height:32px; padding:0 8px; border-radius:8px; border:1px solid var(--border); background:#fff; font-size:13px; color:var(--text-secondary); cursor:pointer; transition:all .15s; }
+  .pager button:hover:not(:disabled) { border-color:var(--brand); color:var(--brand-dark); }
+  .pager button.on { background:var(--brand); color:#fff; border-color:var(--brand); }
+  .pager button:disabled { opacity:.4; cursor:not-allowed; }
+
+  /* ── 卡片 / 列表 视图切换 ─────────────────────────── */
+  .ltag { display:inline-block; font-size:11px; line-height:1.4; padding:1px 7px; border-radius:6px; background:var(--bg-page); color:var(--text-secondary); border:1px solid var(--border); margin:1px 3px 1px 0; white-space:nowrap; }
+  .list-wrap { border:1px solid var(--border); border-radius:12px; overflow-x:auto; }
+  .list-head, .list-row { display:grid; grid-template-columns:56px minmax(150px,1.8fr) minmax(84px,0.9fr) minmax(130px,1.5fr) minmax(150px,1.6fr) minmax(96px,1fr) minmax(88px,0.9fr) 132px; gap:12px; align-items:center; padding:11px 16px; min-width:1000px; }
+  .list-head { font-size:12px; color:var(--text-muted); font-weight:600; background:var(--bg-page); border-bottom:1px solid var(--border); }
+  .list-row { border-bottom:1px solid var(--border); cursor:pointer; transition:background .15s; font-size:13px; color:var(--text-secondary); }
+  .list-row:last-child { border-bottom:none; }
+  .list-row:hover { background:rgba(43,186,160,.05); }
+  .list-row .col-act { display:flex; gap:6px; justify-content:flex-end; }
+  .list-thumb { width:56px; height:38px; border-radius:8px; overflow:hidden; background:#eef4f2; flex-shrink:0; }
+  .list-thumb svg { display:block; width:100%; height:100%; }
+  .lbtn { font-size:12px; line-height:1; padding:5px 10px; border-radius:7px; border:1px solid var(--border); background:#fff; color:var(--text-secondary); cursor:pointer; white-space:nowrap; transition:all .15s; }
+  .lbtn:hover { border-color:var(--brand); color:var(--brand-dark); }
+  .lbtn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
+  .lbtn.primary:hover { background:var(--brand-light); color:#fff; }
+  .st { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:2px 9px; border-radius:999px; }
+  .st::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
+  .st-ok { color:#0f947c; background:rgba(43,186,160,.12); }
+  .st-err { color:#cf1322; background:rgba(207,19,34,.10); }
+  .st-off { color:#8c8c8c; background:rgba(140,140,140,.12); }
+</style>
+</head>
+<body class="bg-page-bg text-gray-800 text-sm h-screen overflow-hidden flex flex-col">
+
+<div id="appShell" class="h-full flex flex-col">
+  <!-- HEADER -->
+  <header class="h-16 flex items-center justify-between flex-shrink-0 z-30 px-5">
+    <div class="flex items-center">
+      <div class="flex items-center gap-2 mr-6">
+        <div class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-base">河</div>
+        <span class="text-base font-semibold text-brand">河图·地理信息平台</span>
+      </div>
+      <nav id="topNav" class="flex items-center h-16 gap-0.5">
+        <a href="数据资产.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
+        </a>
+        <a href="地图服务-重设计.html" data-module="service" class="nav-btn active px-3.5 h-16 text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg> 地图服务
+          <span class="active-bar"></span>
+        </a>
+        <a href="要素图层.html" data-module="layer" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg> 要素图层
+        </a>
+        <a href="专题地图.html" data-module="map" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 专题地图
+        </a>
+        <a href="任务中心.html" data-module="task" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> 任务中心
+        </a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-[#f56a00] text-white flex items-center justify-center font-semibold text-sm">张</div>
+      <span class="text-gray-700 text-sm">张建国</span>
+      <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">业务人员</span>
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <div class="flex flex-1 overflow-hidden gap-3 p-3">
+    <!-- LEFT: 筛选组件 -->
+    <aside class="w-72 bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden flex flex-col flex-shrink-0">
+      <div class="p-3 border-b border-gray-100">
+        <div class="relative">
+          <svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input id="kwInput" type="text" placeholder="搜索服务名称 / 类型…" oninput="setKw(this.value)" class="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 focus:bg-white transition-all">
+        </div>
+      </div>
+      <div id="filterPanel" class="flex-1 overflow-y-auto scroll-thin">
+        <div class="filter-sec">
+          <div class="filter-label">服务来源</div>
+          <div id="sourceList">
+            <div class="chk-row active" onclick="setSource('全部',this)">全部来源</div>
+            <div class="chk-row" onclick="setSource('平台发布',this)">平台发布 · 源自数据资产</div>
+            <div class="chk-row" onclick="setSource('外部注册',this)">外部注册 · 第三方引入</div>
+          </div>
+          <div class="text-[11px] text-gray-400 mt-2 leading-relaxed">平台发布 = 源自本平台数据资产；外部注册 = 引入第三方已有服务。</div>
+        </div>
+        <div class="filter-sec">
+          <div class="filter-label">所属组织</div>
+          <div id="orgList">
+            <div class="chk-row active" onclick="setOrg('全部',this)">全部组织</div>
+            <div class="chk-row" onclick="setOrg('建三江分公司',this)">建三江分公司</div>
+            <div class="chk-row" onclick="setOrg('二龙山农场',this)">二龙山农场</div>
+            <div class="chk-row" onclick="setOrg('北大荒集团（总部）',this)">北大荒集团（总部）</div>
+            <div class="chk-row" onclick="setOrg('外部组织',this)">外部组织 · 第三方归属</div>
+          </div>
+          <div class="text-[11px] text-gray-400 mt-2 leading-relaxed">按服务归属的组织单位筛选（分公司／农场／总部／外部）。</div>
+        </div>
+        <div class="filter-sec">
+          <div class="filter-label">服务用途</div>
+          <div id="purposeList">
+            <div class="chk-row active" onclick="setPurpose('全部',this)">全部用途</div>
+            <div class="chk-row" onclick="setPurpose('业务',this)">业务服务 · 查询／分析</div>
+            <div class="chk-row" onclick="setPurpose('地图',this)">地图服务 · 底图／专题图层</div>
+            <div class="chk-row" onclick="setPurpose('综合',this)">综合 · 业务＋地图</div>
+          </div>
+        </div>
+        <div class="filter-sec">
+          <div class="filter-label">服务类型</div>
+          <div id="typeList">
+            <div class="chk-row active" onclick="setType('全部',this)">全部类型</div>
+            <div class="chk-row" onclick="setType('WFS',this)">WFS · 矢量要素</div>
+            <div class="chk-row" onclick="setType('WMS',this)">WMS · 地图影像</div>
+            <div class="chk-row" onclick="setType('MVT',this)">MVT · 矢量瓦片</div>
+            <div class="chk-row" onclick="setType('REAL_MVT',this)">REAL_MVT · 实时矢量瓦片</div>
+            <div class="chk-row" onclick="setType('在线底图',this)">在线底图 · WMTS</div>
+          </div>
+        </div>
+        <div class="filter-sec">
+          <div class="filter-label">坐标系</div>
+          <div id="crsList">
+            <div class="chk-row active" onclick="setCrs('全部',this)">全部坐标系</div>
+            <div class="chk-row" onclick="setCrs('中国大地坐标',this)">中国大地坐标 (CGCS2000)</div>
+            <div class="chk-row" onclick="setCrs('Web墨卡托',this)">Web 墨卡托</div>
+            <div class="chk-row" onclick="setCrs('WGS84',this)">WGS84</div>
+          </div>
+        </div>
+        <div class="filter-sec">
+          <div class="filter-label">更新时间</div>
+          <div class="flex items-center gap-1.5">
+            <input type="date" id="dateFrom" onchange="setDateRange()" class="date-input" title="起始日期">
+            <span class="text-xs text-gray-400 flex-shrink-0">至</span>
+            <input type="date" id="dateTo" onchange="setDateRange()" class="date-input" title="截止日期">
+          </div>
+          <p class="text-xs text-gray-400 mt-1.5">按服务更新时间筛选，可只填一侧做单边筛选。</p>
+        </div>
+      </div>
+      <div class="p-3 border-t border-gray-100">
+        <button onclick="resetFilters()" class="btn btn-md btn-text w-full">重置筛选条件</button>
+      </div>
+    </aside>
+
+    <!-- RIGHT: 数据展示 -->
+    <main class="flex-1 bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden flex flex-col min-w-0 relative">
+      <div class="px-5 pt-4 pb-3 border-b border-gray-100">
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg font-semibold text-gray-900">服务资源</h1>
+              <span class="text-xs text-gray-400">在线地图服务能力中枢</span>
+            </div>
+          </div>
+          <button onclick="openRegister()" class="btn btn-md btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em"><path d="M12 5v14M5 12h14"/></svg> 注册服务</button>
+        </div>
+        <div id="statBar" class="flex gap-3 mt-3"></div>
+      </div>
+
+      <div class="px-5 py-2.5 border-b border-gray-100 flex items-center justify-between flex-shrink-0 gap-3">
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <span class="text-xs text-gray-400 whitespace-nowrap">数据范围</span>
+          <div class="seg brand-seg" id="segMine">
+            <button data-v="all" class="on" onclick="setMine(false)">全部服务</button>
+            <button data-v="mine" onclick="setMine(true)">仅我发布的</button>
+          </div>
+        </div>
+        <div id="activeChips" class="flex items-center gap-2 flex-wrap flex-1 min-w-0"></div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+          <div class="flex items-center gap-2">
+            <select id="sortSel" onchange="setSort(this.value)" class="text-xs border border-gray-200 rounded-md px-2 py-1.5 bg-white text-gray-600">
+              <option value="默认">排序：默认</option>
+              <option value="更新">最近更新</option>
+              <option value="名称">名称</option>
+              <option value="状态">服务状态</option>
+            </select>
+            <select id="recentSel" onchange="setRecent(this.value)" class="text-xs border border-gray-200 rounded-md px-2 py-1.5 bg-white text-gray-600">
+              <option value="全部">更新时间：全部</option>
+              <option value="7">近 7 天更新</option>
+              <option value="30">近 30 天更新</option>
+            </select>
+          </div>
+          <div class="seg brand-seg" id="segView">
+            <button data-v="card" class="on" onclick="setView('card')">卡片</button>
+            <button data-v="list" onclick="setView('list')">列表</button>
+          </div>
+          <div id="resultCount" class="text-xs text-gray-400 whitespace-nowrap"></div>
+        </div>
+      </div>
+
+      <div id="mainContent" class="flex-1 overflow-y-auto scroll-thin p-5"></div>
+    </main>
+  </div>
+</div>
+
+<!-- 注册服务 简化弹窗 -->
+<div id="registerModal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background:rgba(0,0,0,.45);">
+  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden" style="width:640px;">
+    <div class="px-6 py-4 border-b border-line flex items-center justify-between">
+      <h2 class="text-base font-semibold text-gray-900">注册外部服务</h2>
+      <button onclick="closeRegister()" class="btn btn-icon btn-md btn-text">✕</button>
+    </div>
+    <div class="p-6 space-y-4" style="max-height:74vh; overflow-y:auto;">
+      <!-- 注册外部服务 -->
+      <div id="regExtBlock">
+        <div>
+          <div class="text-sm font-medium text-gray-700 mb-2">内外来源 <span class="text-xs text-red-500">*</span></div>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white cursor-pointer text-sm text-gray-700 hover:border-brand transition-colors"><input type="radio" name="regScope" value="内部系统" onchange="onScopeChange()" class="text-brand"> 内部系统</label>
+            <label class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white cursor-pointer text-sm text-gray-700 hover:border-brand transition-colors"><input type="radio" name="regScope" value="外部互联网" onchange="onScopeChange()" class="text-brand"> 外部互联网</label>
+          </div>
+          <p class="text-xs text-gray-400 mt-1.5">内部系统=集团／平台内部其他业务系统；外部互联网=公网第三方服务。</p>
+        </div>
+        <div id="regEngineWrap" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">服务引擎 <span class="text-xs text-red-500">*</span></label>
+          <select id="regEngine" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
+            <option value="">— 选择服务引擎 —</option>
+            <option value="ArcGIS">ArcGIS Server</option>
+            <option value="GeoServer">GeoServer</option>
+            <option value="iServer">SuperMap iServer</option>
+          </select>
+          <p class="text-xs text-gray-400 mt-1.5">内部系统服务需选择所属服务引擎，系统按引擎登记对应协议服务。</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">服务地址 <span class="text-xs text-red-500">*</span></label>
+          <input id="regUrl" type="text" placeholder="http://.../geoserver/ows?service=WMS" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
+          <p class="text-xs text-gray-400 mt-1.5">填写外部服务地址，系统自动探测类型并登记为外部注册服务。</p>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">名称 <span class="text-xs text-red-500">*</span></label>
+        <input id="regName" type="text" placeholder="例如：建三江_玉米长势_WMS" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand">
+      </div>
+      <div>
+        <div class="text-sm font-medium text-gray-700 mb-2">服务用途 <span class="text-xs text-red-500">*</span></div>
+        <div class="grid grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white cursor-pointer text-sm text-gray-700 hover:border-brand transition-colors"><input type="radio" name="regPurpose" value="业务" class="text-brand"> 业务</label>
+          <label class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white cursor-pointer text-sm text-gray-700 hover:border-brand transition-colors"><input type="radio" name="regPurpose" value="地图" class="text-brand"> 地图</label>
+          <label class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white cursor-pointer text-sm text-gray-700 hover:border-brand transition-colors"><input type="radio" name="regPurpose" value="综合" class="text-brand"> 综合</label>
+        </div>
+        <p class="text-xs text-gray-400 mt-1.5">业务=支撑业务分析；地图=作为底图/专题图层；综合=既用于业务也对外共享。</p>
+      </div>
+    </div>
+    <div class="px-6 py-4 border-t border-line flex items-center justify-between bg-gray-50">
+      <span class="text-xs text-gray-400">注册后可在「要素图层」中作为图层使用</span>
+      <div class="flex gap-3">
+        <button onclick="closeRegister()" class="btn btn-md btn-text">取消</button>
+        <button onclick="confirmRegister()" class="btn btn-md btn-primary">确认</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 详情弹窗 -->
+<div id="detailModal" class="modal-mask hidden" onclick="if(event.target===this)closeDetail()">
+  <div class="modal-box" style="max-height:88vh; display:flex; flex-direction:column;">
+    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-2 min-w-0">
+        <h2 id="dtTitle" class="text-base font-semibold text-gray-900 truncate"></h2>
+        <span id="dtSrcBadge"></span>
+      </div>
+      <button onclick="closeDetail()" class="btn btn-icon btn-md btn-text">✕</button>
+    </div>
+    <div id="dtTabs" class="px-3 border-b border-gray-100 flex items-center gap-1 flex-shrink-0"></div>
+    <div id="dtContent" class="flex-1 overflow-y-auto scroll-thin p-5"></div>
+    <div class="px-5 py-3 border-t border-gray-200 flex items-center justify-end gap-3 flex-shrink-0">
+      <button onclick="dtCopy()" class="btn btn-md btn-default"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> 复制地址</button>
+    </div>
+  </div>
+</div>
+
+<!-- 通知 -->
+<div id="toast" class="fixed top-20 right-6 z-[9999] hidden"></div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   以下封面绘制函数与 serviceTagsHTML 原样复制自 common.js，
+   以保证「服务资源」卡片样式与系统其余原型 100% 一致。
+   ════════════════════════════════════════════════════════════ */
+function coverCatKey(c) {
+  const k = (c.cat || c.purpose || '');
+  if (k.indexOf('耕地') >= 0) return '耕地';
+  if (k.indexOf('水利') >= 0) return '水利';
+  if (k.indexOf('生态') >= 0) return '生态';
+  if (k.indexOf('遥感') >= 0) return '遥感';
+  if (k.indexOf('驾驶舱') >= 0) return '驾驶舱';
+  if (k === '基础') return '基础';
+  if (k === '底图') return '底图';
+  if (k === '外部') return '外部';
+  return 'default';
+}
+const COVER_PAL = {
+  '耕地':   { bg: '#eef5ee', wash: '#e1efe2', feat: '#9fd0b2', deep: '#3a9d6e' },
+  '水利':   { bg: '#eaf3f6', wash: '#dcecf2', feat: '#a6d4e4', deep: '#3a8fb0' },
+  '生态':   { bg: '#eef4ec', wash: '#e2efe0', feat: '#b4dab8', deep: '#5aa86a' },
+  '遥感':   { bg: '#f6f1e9', wash: '#ece2d2', feat: '#e3c39c', deep: '#c08a4e' },
+  '驾驶舱': { bg: '#eef4f4', wash: '#e1efee', feat: '#a9ded4', deep: '#2bbaa0' },
+  '基础':   { bg: '#eef2f4', wash: '#e3eaee', feat: '#bcd2de', deep: '#5a8aa8' },
+  '底图':   { bg: '#eef1f3', wash: '#e6eaed', feat: '#cdd6db', deep: '#7a8a96' },
+  '外部':   { bg: '#f1eef3', wash: '#eae3ef', feat: '#cdbfdc', deep: '#8a7aa8' },
+  'default':{ bg: '#eef4f2', wash: '#e1eeeb', feat: '#a9ded4', deep: '#2bbaa0' }
+};
+function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0); }
+function mkRng(s) { let x = (hashStr(s) || 1) % 2147483647; if (x <= 0) x += 2147483646; return () => { x = (x * 16807) % 2147483647; return (x - 1) / 2147483646; }; }
+const COVER_FONT = "-apple-system,BlinkMacSystemFont,'Microsoft YaHei','PingFang SC',sans-serif";
+function coverGrid(pal, op) {
+  let g = '';
+  for (let i = 1; i < 6; i++) g += `<line x1="${i * 50}" y1="0" x2="${i * 50}" y2="176" stroke="${pal.wash}" stroke-width="1"/>`;
+  for (let j = 1; j < 4; j++) g += `<line x1="0" y1="${j * 44}" x2="300" y2="${j * 44}" stroke="${pal.wash}" stroke-width="1"/>`;
+  return `<g opacity="${op || 0.6}">${g}</g>`;
+}
+function coverCaption(deep, txt) {
+  return `<text x="12" y="168" font-family="${COVER_FONT}" font-size="10.5" font-weight="600" fill="${deep}" opacity="0.9">${txt}</text>`;
+}
+function coverBrand() { return '#2bbaa0'; }
+function coverDataSheet(rng, pal) {
+  const x0 = 30, y0 = 20, w = 240, h = 124, cols = 4, rows = 6;
+  const cw = w / cols, rh = h / rows;
+  let cells = `<rect x="${x0}" y="${y0}" width="${w}" height="${rh}" fill="${coverBrand()}" opacity="0.16"/>`;
+  for (let i = 1; i < cols; i++) cells += `<line x1="${x0 + i * cw}" y1="${y0}" x2="${x0 + i * cw}" y2="${y0 + h}" stroke="${pal.wash}" stroke-width="1"/>`;
+  for (let j = 1; j < rows; j++) cells += `<line x1="${x0}" y1="${y0 + j * rh}" x2="${x0 + w}" y2="${y0 + j * rh}" stroke="${pal.wash}" stroke-width="1"/>`;
+  for (let k = 0; k < 6; k++) { const ci = Math.floor(rng() * cols), rj = 1 + Math.floor(rng() * rows); cells += `<rect x="${x0 + ci * cw + 2}" y="${y0 + rj * rh + 2}" width="${cw - 4}" height="${rh - 4}" rx="2" fill="${pal.feat}" opacity="${(0.35 + rng() * 0.4).toFixed(2)}"/>`; }
+  const sx = x0 + w - 16, sy = y0 + h - 12; let sp = ''; let px = sx; const step = 4;
+  for (let i = 0; i < 6; i++) { const yy = sy - ((rng() * 10) | 0); sp += (i ? 'L' : 'M') + px + ' ' + yy + ' '; px += step; }
+  sp += `L${px} ${sy}`;
+  return `<rect x="${x0}" y="${y0}" width="${w}" height="${h}" rx="6" fill="#ffffff" stroke="${pal.wash}" stroke-width="1"/>${cells}<path d="${sp}" fill="none" stroke="${pal.deep}" stroke-width="1.5" opacity="0.8"/><circle cx="${sx}" cy="${sy}" r="1.6" fill="${coverBrand()}"/>`;
+}
+function coverRaster(rng, pal) {
+  const tones = ['#dfe7d8', '#cfe0c4', '#e9dcc4', '#d6c9b0', '#e3d3b6'];
+  let y = 20, bands = '', patches = ''; const total = 130;
+  for (let i = 0; i < 5; i++) { const bh = total / 5 * (0.7 + rng() * 0.6); bands += `<rect x="26" y="${y.toFixed(1)}" width="248" height="${bh.toFixed(1)}" fill="${tones[i % tones.length]}" opacity="0.92"/>`; y += bh; }
+  for (let i = 0; i < 16; i++) { const px = 30 + rng() * 240, py = 22 + rng() * 126; patches += `<rect x="${px.toFixed(1)}" y="${py.toFixed(1)}" width="${(6 + rng() * 16).toFixed(1)}" height="${(4 + rng() * 10).toFixed(1)}" rx="1" fill="${pal.feat}" opacity="${(0.15 + rng() * 0.25).toFixed(2)}"/>`; }
+  const sb = `<g transform="translate(30,160)"><rect x="0" y="0" width="40" height="4" fill="#ffffff" stroke="${pal.deep}" stroke-width="0.8"/><text x="0" y="-4" font-family="${COVER_FONT}" font-size="9" fill="${pal.deep}">1 km</text></g>`;
+  return `<rect x="26" y="20" width="248" height="130" rx="4" fill="${pal.bg}" stroke="${pal.wash}"/>${bands}${patches}${sb}`;
+}
+function coverVector(rng, pal, c) {
+  const geom = c.geom || 'polygon'; let shapes = '';
+  if (geom === 'point') {
+    for (let i = 0; i < 22; i++) { const px = 24 + rng() * 252, py = 22 + rng() * 132; shapes += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${(1.4 + rng() * 1.6).toFixed(1)}" fill="${coverBrand()}" opacity="${(0.5 + rng() * 0.4).toFixed(2)}"/>`; }
+    shapes += `<g transform="translate(150,82)"><path d="M0 0 C-7 -10 -7 -18 0 -22 C7 -18 7 -10 0 0 Z" fill="${pal.deep}"/><circle cx="0" cy="-15" r="3.4" fill="#ffffff"/></g>`;
+  } else if (geom === 'line') {
+    for (let i = 0; i < 4; i++) { const y = 34 + i * 28 + rng() * 6; let d = `M24 ${y.toFixed(1)}`; let x = 24; while (x < 276) { x += 20 + rng() * 30; d += ` L${x.toFixed(1)} ${(y + (rng() * 16 - 8)).toFixed(1)}`; } shapes += `<path d="${d}" fill="none" stroke="${i % 2 ? pal.deep : coverBrand()}" stroke-width="${i === 0 ? 2.4 : 1.6}" opacity="0.85"/>`; }
+  } else {
+    for (let i = 0; i < 4; i++) { const cx = 40 + rng() * 220, cy = 34 + rng() * 100, n = 4 + ((rng() * 3) | 0); let d = ''; for (let k = 0; k < n; k++) { const a = k / n * 6.283, r = 14 + rng() * 22; d += (k ? 'L' : 'M') + (cx + Math.cos(a) * r).toFixed(1) + ' ' + (cy + Math.sin(a) * r * 0.7).toFixed(1) + ' '; } d += 'Z'; shapes += `<path d="${d}" fill="${pal.feat}" fill-opacity="0.55" stroke="${pal.deep}" stroke-width="1.4"/>`; }
+  }
+  return coverGrid(pal, 0.5) + shapes;
+}
+function coverService(rng, pal, c) {
+  const role = (c.purpose === '底图' || c.purpose === '地图') ? 'base' : 'biz';
+  const tw = 82, th = 58, gx = 8, gy = 8, x0 = 24, y0 = 24;
+  let tiles = '';
+  for (let r = 0; r < 2; r++) for (let col = 0; col < 3; col++) {
+    const tx = x0 + col * (tw + gx), ty = y0 + r * (th + gy);
+    tiles += `<rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="5" fill="#ffffff" stroke="${pal.wash}"/>`;
+    let inner = '';
+    for (let i = 0; i < 3; i++) { const ly = ty + 10 + i * 15 + rng() * 4; inner += `<path d="M${tx + 6} ${ly.toFixed(1)} L${tx + tw - 6} ${(ly + (rng() * 8 - 4)).toFixed(1)}" stroke="${role === 'base' ? '#c2ccd2' : '#bcd9cf'}" stroke-width="1.4" fill="none" opacity="0.9"/>`; }
+    if (role === 'biz') inner += `<rect x="${(tx + 14).toFixed(1)}" y="${(ty + 14).toFixed(1)}" width="${(22 + rng() * 18).toFixed(1)}" height="${(14 + rng() * 12).toFixed(1)}" rx="3" fill="${pal.feat}" opacity="0.5"/>`;
+    tiles += inner;
+  }
+  const chip = `<g transform="translate(196,13)"><rect x="0" y="0" width="86" height="15" rx="7.5" fill="${coverBrand()}" opacity="0.14"/><circle cx="9" cy="7.5" r="3.2" fill="${coverBrand()}"/><text x="16" y="11.2" font-family="${COVER_FONT}" font-size="9.5" font-weight="600" fill="${coverBrand()}">在线 · EPSG:4490</text></g>`;
+  return tiles + chip;
+}
+function coverLayer(rng, pal, c) {
+  if (c.empty) return `<rect x="20" y="18" width="260" height="138" rx="8" fill="none" stroke="${pal.wash}" stroke-width="2" stroke-dasharray="8 6"/><text x="150" y="92" text-anchor="middle" font-family="${COVER_FONT}" font-size="13" fill="${pal.deep}" opacity="0.6">草稿图层 · 待配置</text>`;
+  let shapes = '';
+  for (let i = 0; i < 3; i++) { const cx = 50 + rng() * 200, cy = 40 + rng() * 90, n = 4 + ((rng() * 3) | 0); let d = ''; for (let k = 0; k < n; k++) { const a = k / n * 6.283, r = 16 + rng() * 20; d += (k ? 'L' : 'M') + (cx + Math.cos(a) * r).toFixed(1) + ' ' + (cy + Math.sin(a) * r * 0.7).toFixed(1) + ' '; } d += 'Z'; shapes += `<path d="${d}" fill="${pal.feat}" fill-opacity="0.5" stroke="${pal.deep}" stroke-width="1.4"/>`; }
+  shapes += `<path d="M210 55 l24 10 -8 26 -26 -6 z" fill="${coverBrand()}" fill-opacity="0.72" stroke="${coverBrand()}" stroke-width="1.6"/>`;
+  const lg = `<g transform="translate(196,116)"><rect x="0" y="0" width="88" height="46" rx="6" fill="#ffffff" stroke="${pal.wash}"/><rect x="8" y="10" width="12" height="8" rx="2" fill="${pal.feat}"/><text x="24" y="17" font-family="${COVER_FONT}" font-size="9" fill="${pal.deep}">主体数据</text><rect x="8" y="27" width="12" height="8" rx="2" fill="${coverBrand()}"/><text x="24" y="34" font-family="${COVER_FONT}" font-size="9" fill="${pal.deep}">表达层</text></g>`;
+  return coverGrid(pal, 0.5) + shapes + lg;
+}
+function coverMap(rng, pal) {
+  const mx = 70, my = 24, mw = 150, mh = 128; let map = '';
+  for (let i = 0; i < 4; i++) { const cx = mx + 30 + rng() * 90, cy = my + 24 + rng() * 80, n = 4 + ((rng() * 3) | 0); let d = ''; for (let k = 0; k < n; k++) { const a = k / n * 6.283, r = 12 + rng() * 18; d += (k ? 'L' : 'M') + (cx + Math.cos(a) * r).toFixed(1) + ' ' + (cy + Math.sin(a) * r * 0.7).toFixed(1) + ' '; } d += 'Z'; map += `<path d="${d}" fill="${pal.feat}" fill-opacity="0.5" stroke="${pal.deep}" stroke-width="1.2"/>`; }
+  map += `<circle cx="${mx + 60}" cy="${my + 50}" r="3.4" fill="${coverBrand()}"/><circle cx="${mx + 100}" cy="${my + 90}" r="3.4" fill="${coverBrand()}"/>`;
+  const mapRect = `<rect x="${mx}" y="${my}" width="${mw}" height="${mh}" rx="6" fill="#ffffff" stroke="${pal.wash}"/>${map}`;
+  const bx = 14, by = 26, bw = 40, bh = 80; let bars = '';
+  for (let i = 0; i < 4; i++) { const h = 18 + rng() * 54; bars += `<rect x="${bx + i * 10}" y="${by + bh - h}" width="7" height="${h.toFixed(1)}" rx="1.5" fill="${i === 2 ? coverBrand() : pal.feat}" opacity="0.85"/>`; }
+  const leftPanel = `<rect x="10" y="20" width="52" height="98" rx="6" fill="#ffffff" stroke="${pal.wash}"/><text x="16" y="32" font-family="${COVER_FONT}" font-size="8.5" fill="${pal.deep}">播种面积</text>${bars}`;
+  let line = 'M14 100'; let px = 14; for (let i = 0; i < 5; i++) { px += 8; line += ` L${px} ${(90 - rng() * 50).toFixed(1)}`; }
+  const rightPanel = `<rect x="226" y="20" width="60" height="98" rx="6" fill="#ffffff" stroke="${pal.wash}"/><text x="232" y="32" font-family="${COVER_FONT}" font-size="8.5" fill="${pal.deep}">长势指数</text><path d="${line}" fill="none" stroke="${coverBrand()}" stroke-width="1.6" opacity="0.9"/><circle cx="${px}" cy="90" r="2" fill="${coverBrand()}"/>`;
+  const don = `<g transform="translate(150,150)"><circle r="13" fill="none" stroke="${pal.wash}" stroke-width="6"/><circle r="13" fill="none" stroke="${coverBrand()}" stroke-width="6" stroke-dasharray="${(18 + rng() * 30).toFixed(0)} 100" transform="rotate(-90)"/></g>`;
+  return leftPanel + mapRect + rightPanel + don;
+}
+function cardCover(c, m) {
+  const pal = COVER_PAL[coverCatKey(c)] || COVER_PAL['default'];
+  const rng = mkRng(c.title + '|' + m);
+  let inner = '';
+  if (m === 'data') {
+    if (c.geom === 'raster') inner = coverRaster(rng, pal);
+    else if (c.geom === 'polygon' || c.geom === 'line' || c.geom === 'point') inner = coverVector(rng, pal, c);
+    else inner = coverDataSheet(rng, pal);
+  } else if (m === 'service') inner = coverService(rng, pal, c);
+  else if (m === 'layer') inner = coverLayer(rng, pal, c);
+  else inner = coverMap(rng, pal);
+  const bg = `<rect width="300" height="176" fill="${pal.bg}"/>`;
+  const cap = m === 'data' ? (c.fmt + ' · ' + (c.crs || '')) : m === 'service' ? (c.fmt + ' 服务') : m === 'layer' ? '要素图层' : '一张图 · 驾驶舱';
+  return `<svg viewBox="0 0 300 176" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">${bg}${inner}${coverCaption(pal.deep, cap)}</svg>`;
+}
+
+// 卡片标签行（原样复制自 common.js serviceTagsHTML）
+let tagSetSeq = 0;
+function serviceTagsHTML(c) {
+  const tags = [];
+  tags.push({
+    html: `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-medium ${(c.purpose === '底图' || c.purpose === '地图') ? 'bg-blue-50 text-blue-700 border border-blue-200' : (c.purpose === '综合' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-brand-light text-brand-dark border border-brand-light')}">${(c.purpose === '底图' || c.purpose === '地图') ? '地图服务' : (c.purpose === '综合' ? '综合服务' : '业务服务')}</span>`,
+    title: (c.purpose === '底图' || c.purpose === '地图') ? '地图服务：地图底图/专题图层' : (c.purpose === '综合' ? '综合服务：同时含业务与底图能力' : '业务服务：面向业务的查询/分析')
+  });
+  tags.push({
+    html: `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-brand-light text-brand-dark font-medium border border-brand-light">${c.type}</span>`,
+    title: '服务类型'
+  });
+  tags.push({
+    html: `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${c.source === '外部注册' ? 'bg-gray-100 text-gray-600 border border-gray-200' : 'bg-brand-light text-brand-dark border border-brand-light'}">${c.source || '平台发布'}</span>`,
+    title: '服务来源'
+  });
+  if (c.source === '外部注册') {
+    tags.push({
+      html: `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 border border-gray-200">外部注册</span>`,
+      title: '服务来源：外部注册'
+    });
+  }
+  if (c.cat) {
+    tags.push({
+      html: `<span class="tag-pill inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-gray-50 text-gray-500 font-medium border border-gray-100">${c.cat}</span>`,
+      title: '归属数据分类（服务继承自数据）'
+    });
+  }
+  /* 注：原「N 份 · 日期」紫色标签（title=服务按时间平铺）为已废弃的「期」模型残留，
+     按 08-28 决议：时序仅与「服务序列」绑定，服务详情以「关联服务序列」行表达，故移除。 */
+  const shown = tags.slice(0, 3);
+  const rest = tags.slice(3);
+  const seq = ++tagSetSeq;
+  window.__tagSetData = window.__tagSetData || {};
+  window.__tagSetData['ts-' + seq] = rest;
+  let html = '<span class="inline-flex items-center gap-1.5 overflow-hidden whitespace-nowrap align-middle">';
+  html += shown.map(t => t.html).join('');
+  if (rest.length) {
+    html += `<button type="button" onclick="event.stopPropagation();toggleTagSet(this,'ts-${seq}')" class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-500 border border-gray-200 flex-shrink-0 hover:bg-gray-200 transition-all" title="点击展开其余 ${rest.length} 个标签" style="cursor:pointer">+${rest.length} 标签集</button>`;
+  }
+  html += '</span>';
+  if (c.sub) {
+    html += `<span class="truncate">${c.sub}</span>`;
+  }
+  return html;
+}
+function toggleTagSet(btn, key) {
+  const existing = document.getElementById('tagSetPop');
+  if (existing) { existing.remove(); return; }
+  const restData = (window.__tagSetData && window.__tagSetData[key]) || [];
+  if (!restData.length) return;
+  const rect = btn.getBoundingClientRect();
+  const pop = document.createElement('div');
+  pop.id = 'tagSetPop';
+  pop.className = 'tag-set-pop';
+  pop.style.left = Math.max(8, rect.left) + 'px';
+  let top = rect.bottom + 6;
+  pop.style.top = top + 'px';
+  pop.innerHTML = `<div class="tag-set-title">其余 ${restData.length} 个标签</div>` + restData.map(t => t.html).join('');
+  pop.addEventListener('click', e => e.stopPropagation());
+  document.body.appendChild(pop);
+  const pr = pop.getBoundingClientRect();
+  if (pr.bottom > window.innerHeight - 8) { pop.style.top = Math.max(8, rect.top - pr.height - 6) + 'px'; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   服务资源（地图服务）逻辑
+   ════════════════════════════════════════════════════════════ */
+const SVC = [
+  { id:'s1', title:'大豆长势遥感（七级）', source:'平台发布', purpose:'业务', type:'WFS', fmt:'WFS', cat:'遥感', crs:'中国大地坐标', org:'建三江分公司',
+    mine:true, asset:'建三江_大豆长势指数_2026夏', sub:'WFS · 2026-08-05 · 夏莹发布', series:'seq1', seriesName:'建三江_大豆长势_月度序列', thumb:'from-green-300 to-green-400',
+    tags:['长势','遥感','动态'], updated:'2026-08-05', status:'正常',
+    layers:['耕作层质量评价图层'], maps:['耕地种植用途管理平台','建三江业务协同驾驶舱'] },
+  { id:'s2', title:'北大荒行政区划边界', source:'平台发布', purpose:'地图', type:'MVT', fmt:'MVT', cat:'基础', crs:'中国大地坐标', org:'北大荒集团（总部）',
+    mine:false, asset:null, assetLabel:'平台预置（行政区划库）', sub:'MVT · 平台预置 · 引用8个图层', thumb:'from-brand to-brand',
+    tags:['行政区划','基础'], updated:'2026-07-22', status:'正常',
+    layers:['北大荒资源一张图','八五六农场数字底图','鹤山农场数字指挥中心'], maps:['耕地种植用途管理平台','平台端-全量问题线索','智慧水利指挥平台'] },
+  { id:'s3', title:'中晚稻遥感影像_2025', source:'平台发布', purpose:'地图', type:'WMS', fmt:'WMS', cat:'遥感', crs:'Web墨卡托', org:'建三江分公司',
+    mine:false, asset:'中晚稻_2025_wgs84', sub:'WMS · 网络地图服务', thumb:'from-brand-light to-brand/20',
+    tags:['遥感','影像'], updated:'2026-03-15', status:'正常',
+    layers:['北大荒资源一张图'], maps:['耕地种植用途管理平台'] },
+  { id:'s4', title:'中晚稻长势WFS', source:'平台发布', purpose:'业务', type:'WFS', fmt:'WFS', cat:'遥感', crs:'中国大地坐标', org:'建三江分公司',
+    mine:true, asset:'中晚稻_2025_wgs84', sub:'WFS · 业务查询', thumb:'from-green-200 to-green-300',
+    tags:['长势','遥感','业务'], updated:'2026-08-05', status:'正常',
+    layers:['耕作层质量评价图层'], maps:['建三江业务协同驾驶舱'] },
+  { id:'s5', title:'天地图矢量底图', source:'外部注册', purpose:'地图', type:'在线底图', fmt:'WMTS', cat:'外部', crs:'Web墨卡托', org:'外部组织',
+    mine:false, extSrc:'天地图（国家地理信息公共服务平台）', scope:'外部互联网', sub:'在线底图（外部注册）· 互联网服务', thumb:'from-gray-300 to-gray-400',
+    tags:['地图','外部'], updated:'2026-08-20', status:'正常',
+    layers:[], maps:['平台端-全量问题线索','鹤山农场数字指挥中心'] },
+  { id:'s6', title:'耕地种植-全量问题线索', source:'外部注册', purpose:'业务', type:'MVT', fmt:'MVT', cat:'耕地', crs:'中国大地坐标', org:'外部组织',
+    mine:false, extSrc:'外部业务系统（10.11.20.5）', sub:'MVT · 外部注册 · 被2个专题引用', thumb:'from-cyan-300 to-cyan-400',
+    tags:['耕地','问题线索','外部'], updated:'2026-08-03', status:'异常',
+    layers:['耕地种植-全量问题线索'], maps:['耕地种植用途管理平台','平台端-全量问题线索'] },
+  { id:'s7', title:'二龙山农场草地边界', source:'平台发布', purpose:'业务', type:'WMS', fmt:'WMS', cat:'耕地', crs:'Web墨卡托', org:'二龙山农场',
+    mine:true, asset:'二龙山农场_草地资源', sub:'WMS · 网络地图服务', thumb:'from-teal-300 to-teal-400',
+    tags:['草地','林草'], updated:'2026-06-10', status:'正常',
+    layers:['鹤山农场_林草边界'], maps:[] },
+  { id:'s8', title:'实时地块权属（动态矢量瓦片）', source:'平台发布', purpose:'业务', type:'REAL_MVT', fmt:'REAL_MVT', cat:'耕地', crs:'中国大地坐标', org:'建三江分公司',
+    mine:true, asset:'耕地承包经营权地块', sub:'实时 MVT · 平台发布 · 高频更新', thumb:'from-orange-300 to-orange-400',
+    tags:['权属','实时','动态'], updated:'2026-08-21', status:'正常',
+    layers:['耕地种植-全量问题线索'], maps:['耕地种植用途管理平台'] },
+];
+
+const ASSET_LABEL = {
+  '建三江_大豆长势指数_2026夏':'遥感影像 · 时序数据集',
+  '中晚稻_2025_wgs84':'遥感影像 · 时序数据集',
+  '二龙山农场_草地资源':'数据库查询 · 已关联2服务',
+  '耕地承包经营权地块':'矢量面 · GeoJSON',
+};
+let state = { source:'全部', purpose:'全部', org:'全部', type:'全部', crs:'全部', mine:false, kw:'', hasRef:false, sort:'默认', recent:'全部', dateFrom:'', dateTo:'', view:'card', page:1, pageSize:6 };
+
+/* ── 筛选（左侧组件）─────────────────────────────────── */
+function match(c){
+  if(state.source!=='全部' && c.source!==state.source) return false;
+  if(state.org!=='全部' && c.org!==state.org) return false;
+  if(state.purpose!=='全部'){
+    if(state.purpose==='综合'){ if(c.purpose!=='综合') return false; }
+    else { if(c.purpose!==state.purpose && c.purpose!=='综合') return false; }
+  }
+  if(state.recent!=='全部'){
+    const days = parseInt(state.recent,10);
+    if(!c.updated) return false;
+    const d = (new Date('2026-08-26') - new Date(c.updated)) / 86400000;
+    if(!(d>=0 && d<=days)) return false;
+  }
+  /* 时间维度：按更新时间区间筛选（c.updated 为 YYYY-MM-DD，可直接字符串比较） */
+  if(state.dateFrom && (!c.updated || c.updated < state.dateFrom)) return false;
+  if(state.dateTo && (!c.updated || c.updated > state.dateTo)) return false;
+  if(state.type!=='全部' && c.type!==state.type) return false;
+  if(state.crs!=='全部' && c.crs!==state.crs) return false;
+  if(state.mine && !c.mine) return false;
+  if(state.hasRef && !((c.layers&&c.layers.length)||(c.maps&&c.maps.length))) return false;
+  if(state.kw){ const h=(c.title+' '+c.type+' '+(c.asset||'')).toLowerCase(); if(!h.includes(state.kw.toLowerCase())) return false; }
+  return true;
+}
+function filtered(){ return SVC.filter(match); }
+
+/* ── 统计 ─────────────────────────────────────────── */
+function renderStats(){
+  /* 统计卡片：仅作整体统计展示，不与筛选维度联动——始终基于全量 SVC，
+     跟随筛选变化会造成"筛完数字也变"的歧义；筛选结果数量见右下「共 N 个服务」。 */
+  const f = SVC;
+  const pub = f.filter(c=>c.source==='平台发布').length;
+  const ext = f.filter(c=>c.source==='外部注册').length;
+  const assets = new Set(f.filter(c=>c.asset).map(c=>c.asset));
+  const refd = f.filter(c=>(c.layers&&c.layers.length)||(c.maps&&c.maps.length)).length;
+  const chips = [
+    {n:f.length, l:'服务总数', c:'var(--brand)', click:null, on:false},
+    {n:pub, l:'平台发布（源自数据）', c:'var(--brand)', click:()=>setSource('平台发布'), on:state.source==='平台发布'},
+    {n:ext, l:'外部注册', c:'#8c8c8c', click:()=>setSource('外部注册'), on:state.source==='外部注册'},
+    {n:refd, l:'被下游引用', c:'#a855f7', click:()=>toggleStat('hasRef'), on:state.hasRef},
+  ];
+  document.getElementById('statBar').innerHTML = chips.map((ch,i)=>{
+    const cls = ch.click ? 'stat-chip clickable'+(ch.on?' on':'') : 'stat-chip';
+    const attr = ch.click ? `onclick="statClick(${i})"` : '';
+    return `<div class="${cls}" ${attr}><span class="n" style="color:${ch.c}">${ch.n}</span><span class="l">${ch.l}</span></div>`;
+  }).join('');
+  window.__statChips = chips;
+}
+
+/* ── 卡片组件（h-44 封面 + 精简标签行）── */
+/* 卡片标签行（精简版）：仅留 用途 + 类型 + 来源 三枚紧凑标签，
+   其余（数据资产 / 下游引用 / 数据分类 / 时序）移至详情页展示，避免卡片过载。 */
+function cardTagsHTML(c){
+  const purTag = c.purpose==='地图' ? '地图服务' : (c.purpose==='综合' ? '综合服务' : '业务服务');
+  const purCls = c.purpose==='地图' ? 'bg-blue-50 text-blue-700 border border-blue-200' : (c.purpose==='综合' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-brand-light text-brand-dark border border-brand-light');
+  const srcTag = c.source==='平台发布' ? '平台发布' : '外部注册';
+  return `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-medium ${purCls}">${purTag}</span>`
+       + `<span class="tag-pill inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-brand-light text-brand-dark border border-brand-light">${c.type}</span>`
+       + `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] text-gray-400">${srcTag}</span>`;
+}
+function renderServiceCard(c){
+  return `<div class="card-hover relative bg-panel rounded-lg overflow-hidden cursor-pointer group" onclick="openDetail('${c.id}')">
+    <div class="h-44 relative overflow-hidden card-thumb bg-[#eef4f2]">
+      ${cardCover(c,'service')}
+      <div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent"></div>
+      <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+        <button onclick="event.stopPropagation();copyUrl(${JSON.stringify(c.title)})" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow">复制地址</button>
+      </div>
+    </div>
+    <div class="p-3.5">
+      <h3 class="font-semibold text-gray-900 truncate text-sm mb-2" title="${c.title}">${c.title}</h3>
+      <div class="flex items-center gap-2 text-xs text-muted">${cardTagsHTML(c)}</div>
+    </div>
+    <div class="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+      <button onclick="toggleCardMenu(event,'${c.id}')" class="w-7 h-7 text-sm flex items-center justify-center bg-white/90 hover:bg-white rounded-lg font-medium shadow-sm border border-gray-200 hover:border-gray-300 hover:shadow transition-all" title="操作">⋯</button>
+      <div id="cardMenu-${c.id}" class="card-menu hidden absolute right-0 top-full mt-1 w-32 bg-white border border-line rounded-lg shadow-lg py-1 z-30">
+        <button onclick="event.stopPropagation();openDetail('${c.id}')" class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 whitespace-nowrap">查看详情</button>
+        <button onclick="event.stopPropagation();removeSvc('${c.id}')" class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-red-500 hover:bg-red-50 whitespace-nowrap">删除</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── 卡片视图已并入 renderMain（平铺含分页；列表视图见 renderList）── */
+
+function emptyState(){
+  return `<div class="flex flex-col items-center justify-center h-full text-center text-gray-400 py-20">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;opacity:.5"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <p class="mt-3 text-sm">没有符合当前筛选条件的服务</p>
+    <button onclick="resetFilters()" class="btn btn-sm btn-text mt-2">重置筛选</button>
+  </div>`;
+}
+
+function sortList(arr){
+  const a = arr.slice();
+  if(state.sort==='更新') a.sort((x,y)=> (y.updated||'').localeCompare(x.updated||''));
+  else if(state.sort==='名称') a.sort((x,y)=> (x.title||'').localeCompare(y.title||'','zh'));
+  else if(state.sort==='状态'){ const o={异常:0,正常:1,已停用:2}; a.sort((x,y)=> ((o[x.status]??9)-(o[y.status]??9))); }
+  return a;
+}
+/* ── 主渲染（卡片视图 + 分页）──────────────────────── */
+function renderMain(){
+  const list = sortList(filtered());
+  const total = list.length;
+  document.getElementById('resultCount').textContent = `共 ${total} 个服务` + (state.source!=='全部'?` · 来源：${state.source}`:'') + (state.recent!=='全部'?` · 近${state.recent}天`:'') + (state.sort!=='默认'?` · 排序：${state.sort}`:'') + (state.view==='list'?` · 列表视图`:'');
+  if(!total){ document.getElementById('mainContent').innerHTML = emptyState(); return; }
+  if(state.view==='list'){ document.getElementById('mainContent').innerHTML = renderList(list); return; }
+  const pages = Math.max(1, Math.ceil(total/state.pageSize));
+  if(state.page>pages) state.page=pages;
+  const start=(state.page-1)*state.pageSize;
+  const pageItems = list.slice(start, start+state.pageSize);
+  const grid = `<div class="grid gap-5" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));">${pageItems.map(renderServiceCard).join('')}</div>`;
+  document.getElementById('mainContent').innerHTML = grid + renderPager(total, pages);
+}
+/* 列表视图：紧凑行式表格，字段显式成列 + 行内操作 */
+function renderList(list){
+  const head = `<div class="list-head">
+    <span></span>
+    <span>服务名称</span>
+    <span>数据类型</span>
+    <span>标签</span>
+    <span>来源 / 数据资产</span>
+    <span>更新时间</span>
+    <span>服务状态</span>
+    <span>操作</span>
+  </div>`;
+  const rows = list.map(c=>{
+    const tags = (c.tags||[]).map(t=>`<span class="ltag">${t}</span>`).join('') || '<span class="text-gray-300">—</span>';
+    const src = c.source==='平台发布' ? (c.asset?`<span class="text-brand-dark font-medium">${c.asset}</span>`:`<span class="text-gray-500">${c.assetLabel||'平台预置'}</span>`) : `<span class="text-gray-500">外部 · ${c.extSrc||'—'}</span>`;
+    const stCls = c.status==='异常'?'st-err':(c.status==='已停用'?'st-off':'st-ok');
+    const st = c.status||'正常';
+    return `<div class="list-row" onclick="openDetail('${c.id}')">
+      <span class="col-thumb"><div class="list-thumb">${cardCover(c,'service')}</div></span>
+      <span class="col-name"><span class="font-medium text-gray-900">${c.title}</span></span>
+      <span class="col-type"><span class="ltag" style="background:rgba(43,186,160,.08);border-color:transparent;color:var(--brand-dark)">${c.type}</span></span>
+      <span class="col-tags">${tags}</span>
+      <span class="col-src">${src}</span>
+      <span class="col-upd">${c.updated||'—'}</span>
+      <span class="col-st"><span class="st ${stCls}">${st}</span></span>
+      <span class="col-act">
+        <button class="lbtn" onclick="event.stopPropagation();copyUrl('${c.title}')">复制地址</button>
+        <button class="lbtn primary" onclick="event.stopPropagation();openDetail('${c.id}')">详情</button>
+      </span>
+    </div>`;
+  }).join('');
+  return `<div class="list-wrap">${head}${rows}</div>`;
+}
+function renderPager(total, pages){
+  // 2026-08-31 统一分页：单页也显示页码（右下角右对齐）
+  let btns='';
+  btns += `<button ${state.page===1?'disabled':''} onclick="setPage(${state.page-1})">‹ 上一页</button>`;
+  for(let i=1;i<=pages;i++) btns += `<button class="${i===state.page?'on':''}" onclick="setPage(${i})">${i}</button>`;
+  btns += `<button ${state.page===pages?'disabled':''} onclick="setPage(${state.page+1})">下一页 ›</button>`;
+  return `<div class="pager"><span class="total">共 ${total} 项 · 第 ${state.page}/${pages} 页</span>${btns}</div>`;
+}
+function setPage(p){ state.page=p; renderMain(); }
+
+/* ── 交互 ─────────────────────────────────────────── */
+function setSource(v,el){ state.source=v; state.page=1; const idx={'全部':0,'平台发布':1,'外部注册':2}[v]||0; if(el) chkSet('sourceList',el); else chkSetById('sourceList',idx); renderAll(); }
+function setOrg(v,el){ state.org=v; state.page=1; chkSet('orgList',el); renderAll(); }
+function setPurpose(v,el){ state.purpose=v; state.page=1; chkSet('purposeList',el); renderAll(); }
+function setSort(v){ state.sort=v; state.page=1; renderMain(); }
+function setRecent(v){ state.recent=v; state.page=1; renderMain(); }
+function setType(v,el){ state.type=v; state.page=1; chkSet('typeList',el); renderAll(); }
+function setCrs(v,el){ state.crs=v; state.page=1; chkSet('crsList',el); renderAll(); }
+/* 数据范围（已移至列表上方 seg 控件，不再用左侧 chk-row） */
+function setMine(v){ state.mine=v; state.page=1; segSet('segMine', v?'mine':'all'); renderAll(); }
+/* 时间维度：更新时间区间 */
+function setDateRange(){
+  const df=document.getElementById('dateFrom'), dt=document.getElementById('dateTo');
+  state.dateFrom=df?df.value:'';
+  state.dateTo=dt?dt.value:'';
+  state.page=1; renderAll();
+}
+function setKw(v){ state.kw=v; state.page=1; renderMain(); }
+function setView(v){ state.view=v; segSet('segView',v); renderMain(); }
+
+/* 统计卡下钻 */
+function statClick(i){ const ch=window.__statChips&&window.__statChips[i]; if(ch&&ch.click) ch.click(); }
+function toggleStat(k){ state[k]=!state[k]; state.page=1; renderAll(); }
+
+/* 活动筛选 chip 条 */
+let __activeChips=[];
+function clearChip(i){ const fn=__activeChips[i]&&__activeChips[i].fn; if(fn){ fn(); state.page=1; renderAll(); } }
+function renderActiveChips(){
+  const c=[];
+  if(state.source!=='全部') c.push({t:`来源：${state.source}`, fn:()=>{ state.source='全部'; chkSetById('sourceList',0); }});
+  if(state.org!=='全部') c.push({t:`组织：${state.org}`, fn:()=>{ state.org='全部'; chkSetById('orgList',0); }});
+  if(state.purpose!=='全部') c.push({t:`用途：${state.purpose}`, fn:()=>{ state.purpose='全部'; chkSetById('purposeList',0); }});
+  if(state.type!=='全部') c.push({t:`类型：${state.type}`, fn:()=>{ state.type='全部'; chkSetById('typeList',0); }});
+  if(state.crs!=='全部') c.push({t:`坐标系：${state.crs}`, fn:()=>{ state.crs='全部'; chkSetById('crsList',0); }});
+  if(state.mine) c.push({t:'仅我发布的', fn:()=>{ state.mine=false; segSet('segMine','all'); }});
+  if(state.dateFrom||state.dateTo) c.push({t:`更新时间：${state.dateFrom||'不限'} ~ ${state.dateTo||'不限'}`, fn:()=>{ state.dateFrom=''; state.dateTo=''; const d1=document.getElementById('dateFrom'); if(d1) d1.value=''; const d2=document.getElementById('dateTo'); if(d2) d2.value=''; }});
+  if(state.hasRef) c.push({t:'含下游引用', fn:()=>{ state.hasRef=false; }});
+  __activeChips=c;
+  const el=document.getElementById('activeChips'); if(!el) return;
+  if(!c.length){ el.innerHTML=''; return; }
+  el.innerHTML=c.map((x,i)=>`<button class="active-chip" onclick="clearChip(${i})">${x.t}<span class="x">✕</span></button>`).join('');
+}
+function chkSetById(listId,idx){ const rows=document.querySelectorAll('#'+listId+' .chk-row'); if(rows[idx]) chkSet(listId,rows[idx]); }
+
+
+
+function segSet(id,v){ document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on', b.dataset.v===v)); }
+function chkSet(listId,el){ document.querySelectorAll('#'+listId+' .chk-row').forEach(r=>r.classList.remove('active')); el.classList.add('active'); }
+
+function resetFilters(){
+  state={ source:'全部', purpose:'全部', org:'全部', type:'全部', crs:'全部', mine:false, kw:'', hasRef:false, sort:'默认', recent:'全部', dateFrom:'', dateTo:'', view:state.view, page:1, pageSize:state.pageSize };
+  document.getElementById('kwInput').value='';
+  const ss=document.getElementById('sortSel'); if(ss) ss.value='默认';
+  const rs=document.getElementById('recentSel'); if(rs) rs.value='全部';
+  const df=document.getElementById('dateFrom'); if(df) df.value='';
+  const dt=document.getElementById('dateTo'); if(dt) dt.value='';
+  segSet('segMine','all');
+  ['sourceList','orgList','purposeList','typeList','crsList'].forEach(id=>{ const first=document.querySelector('#'+id+' .chk-row'); if(first) chkSet(id,first); });
+  renderAll();
+}
+function renderAll(){ renderStats(); renderMain(); renderActiveChips(); }
+
+/* ── 卡片操作 ─────────────────────────────────────── */
+function toggleCardMenu(e,id){ e.stopPropagation(); document.querySelectorAll('.card-menu').forEach(m=>{ if(m.id!=='cardMenu-'+id) m.classList.add('hidden'); }); const m=document.getElementById('cardMenu-'+id); if(m) m.classList.toggle('hidden'); }
+function removeSvc(id){ const i=SVC.findIndex(x=>x.id===id); if(i>=0){ SVC.splice(i,1); renderAll(); toast('已删除服务'); } }
+/* ── 详情抽屉 ─────────────────────────────────────── */
+let dtCard = null, dtTab = 0;
+const DT_LABS = [
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em"><circle cx="12" cy="12" r="6" fill="currentColor"/></svg> 服务信息',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> 服务预览'
+];
+function openDetail(id){
+  const c = SVC.find(x=>x.id===id); if(!c) return;
+  dtCard = c; dtTab = 0;
+  document.getElementById('dtTitle').textContent = c.title;
+  document.getElementById('dtSrcBadge').innerHTML = c.source==='平台发布'
+    ? `<span class="src-pill src-pub">平台发布</span>`
+    : `<span class="src-pill src-ext">外部注册</span>`;
+  renderDetailTabs();
+  document.getElementById('detailModal').classList.remove('hidden');
+}
+function closeDetail(){ document.getElementById('detailModal').classList.add('hidden'); dtCard=null; }
+function renderDetailTabs(){
+  document.getElementById('dtTabs').innerHTML = DT_LABS.map((l,i)=>`<div class="dt-tab ${i===dtTab?'on':''}" onclick="switchDetailTab(${i})">${l}</div>`).join('');
+  renderDetailContent();
+}
+function switchDetailTab(i){ dtTab=i; renderDetailTabs(); }
+function renderDetailContent(){
+  const c=dtCard; if(!c) return;
+  const el=document.getElementById('dtContent');
+  if(dtTab===0) el.innerHTML = dtInfo(c);
+  else el.innerHTML = dtPreview(c);
+}
+function dtInfo(c){
+  const ln=(c.layers||[]).length, mn=(c.maps||[]).length;
+  let refs='无下游引用';
+  if(ln||mn){ const parts=[]; if(ln)parts.push(`<span class="text-brand-dark font-semibold">${ln}</span> 个要素图层`); if(mn)parts.push(`<span class="text-purple-700 font-semibold">${mn}</span> 个专题图`); refs=parts.join(' · '); }
+  let s = `<div class="mb-1">${serviceTagsHTML(c)}</div>`;
+  s += `<div class="kv"><div class="k">服务用途</div><div class="v">${{ '业务':'业务服务（查询/分析）', '地图':'地图服务（底图/专题图层）', '综合':'综合服务（业务+底图）' }[c.purpose] || c.purpose}</div></div>`;
+  s += `<div class="kv"><div class="k">服务类型</div><div class="v">${c.type} · ${c.fmt||c.type}</div></div>`;
+  s += `<div class="kv"><div class="k">坐标系</div><div class="v">${c.crs||'—'}</div></div>`;
+  s += `<div class="kv"><div class="k">数据分类</div><div class="v">${c.cat||'—'}</div></div>`;
+  s += `<div class="kv"><div class="k">所属组织</div><div class="v">${c.org||'—'}</div></div>`;
+  s += `<div class="kv"><div class="k">数据来源</div><div class="v">${c.source==='平台发布' ? (c.asset?`<span class="text-brand-dark font-semibold">${c.asset}</span>`:(c.assetLabel||'平台预置')) : `<span>${c.extSrc||'外部注册'}</span>`}</div></div>`;
+  if(c.source==='外部注册'){
+    s += `<div class="kv"><div class="k">内外来源</div><div class="v">${c.scope||'—'}</div></div>`;
+    if(c.scope==='内部系统'){ s += `<div class="kv"><div class="k">服务引擎</div><div class="v">${c.engine||'—'}</div></div>`; }
+    else { s += `<div class="kv"><div class="k">服务引擎</div><div class="v">公网服务 · 协议自动探测</div></div>`; }
+  }
+  if(c.seriesName){ s += `<div class="kv"><div class="k">关联服务序列</div><div class="v"><span class="text-brand-dark font-semibold">${c.seriesName}</span></div></div>`; }
+  s += `<div class="kv"><div class="k">下游引用</div><div class="v">${refs}</div></div>`;
+  return s;
+}
+function dtPreview(c){
+  return `<div class="preview-box flex items-center justify-center"><div class="text-center"><div style="width:300px;height:176px">${cardCover(c,'service')}</div><div class="text-white font-semibold text-base bg-black/40 backdrop-blur-sm rounded-lg px-4 py-2 mt-3 inline-block">${c.title}</div></div></div>
+    <p class="text-xs text-gray-400 mt-3">服务预览为示意，实际将加载该服务瓦片并在底图上渲染。</p>`;
+}
+function dtCopy(){ if(dtCard) copyUrl(dtCard.title); }
+
+/* ── 注册弹窗 ─────────────────────────────────────── */
+/* 服务引擎 → 默认注册协议类型（引擎决定被注册服务暴露的协议；仅内部系统服务需选择） */
+const REG_ENGINE_TYPE = { 'ArcGIS':'WMS', 'GeoServer':'WMS', 'iServer':'WMS' };
+function onScopeChange(){
+  const wrap=document.getElementById('regEngineWrap');
+  if(!wrap) return;
+  const el=document.querySelector('input[name="regScope"]:checked');
+  wrap.classList.toggle('hidden', !(el && el.value==='内部系统'));
+}
+function resetRegForm(){
+  const nm=document.getElementById('regName'); if(nm) nm.value='';
+  const url=document.getElementById('regUrl'); if(url) url.value='';
+  document.querySelectorAll('input[name="regScope"]').forEach(r=>r.checked=false);
+  const eng=document.getElementById('regEngine'); if(eng) eng.value='';
+  document.querySelectorAll('input[name="regPurpose"]').forEach(r=>r.checked=false);
+  const ew=document.getElementById('regEngineWrap'); if(ew) ew.classList.add('hidden');
+}
+function openRegister(){ resetRegForm(); onScopeChange(); document.getElementById('registerModal').classList.remove('hidden'); }
+function closeRegister(){ document.getElementById('registerModal').classList.add('hidden'); }
+function confirmRegister(){
+  const name=document.getElementById('regName').value.trim();
+  if(!name){ toast('请填写服务名称'); return; }
+  const purEl=document.querySelector('input[name="regPurpose"]:checked');
+  if(!purEl){ toast('请选择服务用途（业务／地图／综合）'); return; }
+  const purpose=purEl.value;
+  const scopeEl=document.querySelector('input[name="regScope"]:checked');
+  if(!scopeEl){ toast('请选择内外来源（内部系统／外部互联网）'); return; }
+  const scope=scopeEl.value;
+  let engine='', engType='WMS';
+  if(scope==='内部系统'){
+    engine=document.getElementById('regEngine').value;
+    if(!engine){ toast('内部系统服务请选择服务引擎（ArcGIS／GeoServer／iServer）'); return; }
+    engType=REG_ENGINE_TYPE[engine]||'WMS';
+  }
+  const url=document.getElementById('regUrl').value.trim();
+  if(!url){ toast('请填写外部服务地址'); return; }
+  const nc={ id:'s'+(SVC.length+1), title:name, source:'外部注册', purpose:purpose, type:engType, fmt:engType, cat:'外部', crs:'Web墨卡托', org:'外部组织', mine:false, extSrc:url, scope:scope, engine:engine, sub:(scope==='内部系统'?engine+' · ':'')+'外部注册', thumb:'from-gray-300 to-gray-400', layers:[], maps:[] };
+  SVC.unshift(nc); finishRegister(name,'注册'); return;
+}
+function finishRegister(name,verb){ closeRegister(); resetRegForm(); if(state.source!=='全部'){ state.source='全部'; chkSetById('sourceList',0); } renderAll(); toast('✅ 已'+verb+'服务：'+name+'（示例数据已加入列表）'); }
+
+/* ── 工具 ─────────────────────────────────────────── */
+function copyUrl(t){
+  const url='http://maps.hetu.example.com/svc/'+encodeURIComponent(t);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=>toast('✅ 服务地址已复制到剪贴板')).catch(()=>toast('服务地址：'+url));
+  } else { toast('服务地址：'+url); }
+}
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.innerHTML=`<div class="notif-enter flex items-center gap-2 bg-white border border-gray-100 rounded-lg shadow-lg px-4 py-2.5 text-sm text-gray-700 max-w-sm">${msg}</div>`;
+  t.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.add('hidden'),2600);
+}
+document.addEventListener('click',()=>{ const p=document.getElementById('tagSetPop'); if(p) p.remove(); document.querySelectorAll('.card-menu').forEach(m=>m.classList.add('hidden')); });
+
+/* ── 初始化 ───────────────────────────────────────── */
+renderAll();
+
+/* ── 服务序列导航入口（管理员可见，2026-08-31 新增）─────────────
+   本页不引用 common.js（独立实现），故与 common.js ensureSeqNav() 同源口径：
+   角色存 localStorage.hetu_role（默认 admin），管理员时向 #topNav 追加「服务序列」tab。
+   角色在「服务序列管理.html」顶部切换，其他页面硬刷新后生效。 */
+(function injectSeqNav(){
+  let role = 'admin';
+  try { role = localStorage.getItem('hetu_role') || 'admin'; } catch (e) {}
+  if (role !== 'admin') return;
+  const nav = document.getElementById('topNav');
+  if (!nav || nav.querySelector('[data-module="seq"]')) return;
+  const a = document.createElement('a');
+  a.href = '服务序列管理.html';
+  a.setAttribute('data-module', 'seq');
+  a.className = 'nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5';
+  a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg> 服务序列';
+  nav.appendChild(a);
+})();
+</script>
+</body>
+</html>

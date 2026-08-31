@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>河图·地理信息平台 — 服务序列</title>
+<link rel="stylesheet" href="tailwind.css">
+<link rel="stylesheet" href="common.css">
+<style>
+/* ── 服务序列管理页专属样式（命名加 sq 前缀，避免与 common.css 冲突）── */
+.sq-tpl { border: 1.5px solid #e5e7eb; border-radius: 12px; padding: 10px; cursor: pointer; transition: all .15s ease; background: #fff; position: relative; }
+.sq-tpl:hover { border-color: #93d3c6; }
+.sq-tpl.sel { border-color: var(--brand); background: linear-gradient(180deg, rgba(43,186,160,.05), rgba(43,186,160,.01)); }
+.sq-tpl .sq-tpl-thumb { width: 100%; height: 44px; border-radius: 7px; overflow: hidden; display: block; }
+.sq-tpl .sq-check { position: absolute; top: 8px; right: 8px; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #d1d5db; background: #fff; display: flex; align-items: center; justify-content: center; }
+.sq-tpl.sel .sq-check { background: var(--brand); border-color: var(--brand); }
+.sq-tpl .sq-check svg { width: 11px; height: 11px; color: #fff; }
+.sq-def-btn { font-size: 11px; padding: 1px 8px; border-radius: 999px; border: 1px solid #d1d5db; color: #6b7280; background: #fff; }
+.sq-def-btn.on { border-color: var(--brand); color: var(--brand); background: rgba(43,186,160,.08); font-weight: 600; }
+.sq-tpl-chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; font-size: 11px; background: #f9fafb; color: #374151; border: 1px solid #e5e7eb; }
+.sq-tpl-chip.def { background: rgba(43,186,160,.1); color: #0f947c; border-color: rgba(43,186,160,.4); font-weight: 600; }
+.sq-sec-title { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.sq-sec-title::before { content: ""; width: 3px; height: 14px; border-radius: 2px; background: var(--brand); }
+/* 详情弹窗模板卡片：缩略图铺满更高（默认 .sq-tpl-thumb 为 44px） */
+.sq-detail-card .sq-tpl-thumb { width: 100%; height: 64px; border-radius: 0; }
+</style>
+</head>
+<body class="bg-page-bg text-gray-800 text-sm h-screen overflow-hidden flex flex-col">
+
+<!-- ============================================================ -->
+<!-- MAIN APP SHELL                                               -->
+<!-- ============================================================ -->
+<div id="appShell" class="h-full flex flex-col">
+
+  <!-- HEADER -->
+  <header class="h-16 flex items-center justify-between flex-shrink-0 z-30 px-5">
+    <div class="flex items-center">
+      <div class="flex items-center gap-2 mr-6">
+        <div class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-base">河</div>
+        <span class="text-base font-semibold text-brand">河图·地理信息平台</span>
+      </div>
+      <nav id="topNav" class="flex items-center h-16 gap-0.5">
+        <a href="数据资产.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
+        </a>
+        <a href="地图服务-重设计.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4.9 4.9a15 15 0 0 1 0 14.2"/><path d="M7.8 7.8a10 10 0 0 1 0 8.4"/><circle cx="12" cy="12" r="1.6"/><path d="M16.2 7.8a10 10 0 0 1 2.8 6.4"/><path d="M19.1 4.9a15 15 0 0 1 0 14.2"/></svg> 地图服务
+        </a>
+        <a href="要素图层.html" data-module="layer" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg> 要素图层
+        </a>
+        <a href="专题地图.html" data-module="map" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg> 专题地图
+        </a>
+        <a href="任务中心.html" data-module="task" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> 任务中心
+        </a>
+        <!-- 服务序列：仅管理员可见（登录账号为管理员时由 common.js ensureSeqNav() 在各页注入；本页自带高亮态） -->
+        <a href="服务序列管理.html" data-module="seq" class="nav-btn active px-3.5 h-16 text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg> 服务序列
+          <span class="active-bar"></span>
+        </a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-3">
+      <button id="sqRoleToggle" onclick="sqToggleRole()" class="btn btn-sm btn-text" title="演示用：切换当前登录身份（管理员 / 业务人员），验证服务序列入口的权限门控"></button>
+      <div class="w-8 h-8 rounded-full bg-[#f56a00] text-white flex items-center justify-center font-semibold text-sm">张</div>
+      <span class="text-gray-700 text-sm">张建国</span>
+      <span id="sqRoleBadge" class="text-[10px] px-1.5 py-0.5 rounded"></span>
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <div class="flex-1 overflow-hidden p-3">
+    <main id="sqMain" class="h-full bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden flex flex-col min-w-0"></main>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 新建 / 编辑服务序列弹窗                                       -->
+<!-- ============================================================ -->
+<div id="seqWizard" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
+  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 720px; max-height: 92vh; display: flex; flex-direction: column;">
+    <div class="px-6 py-4 border-b border-line flex items-center justify-between shrink-0">
+      <h2 class="text-base font-semibold text-gray-900" id="sqwTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg> 创建服务序列</h2>
+      <button onclick="closeWizard('seqWizard')" class="btn btn-icon btn-md btn-text">✕</button>
+    </div>
+    <div class="p-6 space-y-5 overflow-y-auto scroll-thin flex-1">
+      <!-- Row 1: 名称 + 编码 -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">序列名称 <span class="text-red-400">*</span></label>
+          <input type="text" id="sqwName" placeholder="例如：作物长势制图样式组" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">序列编码 <span class="text-[11px] text-gray-400 font-normal">（系统自动生成）</span></label>
+          <input type="text" id="sqwCode" placeholder="保存后自动生成" disabled class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-gray-50 text-gray-400">
+        </div>
+      </div>
+      <!-- Row 2: 描述 -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">描述</label>
+        <textarea id="sqwDesc" rows="2" placeholder="一句话说明该序列的业务用途" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 resize-none"></textarea>
+      </div>
+      <!-- 绑定制图样式模板 -->
+      <div>
+        <div class="sq-sec-title">绑定制图样式模板 <span class="text-red-400">*</span> <span class="text-[11px] text-gray-400 font-normal">（最多 3 个，其中一个为默认模板）</span></div>
+        <div class="relative mb-3">
+          <svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" id="sqwTplSearch" placeholder="搜索样式模板（名称 / 描述）" oninput="sqwTplKw=this.value;sqwRenderTpls()" class="w-full pl-9 pr-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
+        </div>
+        <div id="sqwTplList" class="grid grid-cols-3 gap-3"></div>
+        <div class="flex items-center justify-between mt-2">
+          <p class="text-[11px] text-gray-400">模板由系统「样式管理」预先配置，序列在此<b class="text-gray-600 mx-0.5">选用绑定</b>；图层绑定该序列后即继承模板组。⚠️ 当前为示例数据（样式管理功能建设中）。</p>
+          <span id="sqwTplCount" class="text-[11px] text-gray-500 shrink-0 ml-3"></span>
+        </div>
+      </div>
+    </div>
+    <div class="px-6 py-4 border-t border-line flex items-center justify-end gap-3 shrink-0">
+      <button onclick="closeWizard('seqWizard')" class="btn btn-md btn-text">取消</button>
+      <button id="sqwSubmit" onclick="sqwConfirm()" class="btn btn-md btn-primary">创建服务序列</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 序列详情弹窗                                                  -->
+<!-- ============================================================ -->
+<div id="seqDetail" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
+  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 720px; max-height: 90vh; display: flex; flex-direction: column;">
+    <div class="px-6 py-4 border-b border-line flex items-center justify-between shrink-0">
+      <h2 class="text-base font-semibold text-gray-900" id="sqdTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg> 服务序列详情</h2>
+      <button onclick="closeWizard('seqDetail')" class="btn btn-icon btn-md btn-text">✕</button>
+    </div>
+    <div id="sqdBody" class="p-6 space-y-5 overflow-y-auto scroll-thin flex-1"></div>
+    <div class="px-6 py-4 border-t border-line flex items-center justify-end shrink-0">
+      <button onclick="closeWizard('seqDetail')" class="btn btn-md btn-text">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 删除确认弹窗                                                  -->
+<!-- ============================================================ -->
+<div id="seqDelete" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,.45);">
+  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in" style="width: 420px; display: flex; flex-direction: column;">
+    <div class="px-6 py-4 border-b border-line flex items-center gap-2 shrink-0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0;color:#ef4444"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      <h2 class="text-base font-semibold text-gray-900">删除服务序列</h2>
+    </div>
+    <div class="p-6 text-sm text-gray-600" id="sqDelText">确定删除该服务序列？删除后已绑定该序列的图层将失去样式模板组。</div>
+    <div class="px-6 py-4 border-t border-line flex items-center justify-end gap-3 shrink-0">
+      <button onclick="closeWizard('seqDelete')" class="btn btn-md btn-text">取消</button>
+      <button onclick="sqDelConfirm()" class="btn btn-md btn-primary" style="background:#ef4444;border-color:#ef4444;">删除</button>
+    </div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════
+// 服务序列管理（独立模块 · 仅管理员可见可管理，所有用户可查看）
+// 2026-08-31 09:27 用户拍板收敛：服务序列 = 一组制图样式模板的命名容器
+// （≤3 个模板，其一为默认）。**不承载**期数/时间帧、播放排序、关联服务
+// —— 期数·排序·服务关联等时序语义由发布层与制图端各自表达，序列只管样式组。
+// ⚠️ 样式模板当前为示例数据（样式管理功能建设中）。
+// 序列数据：内置示例（演示常量）+ 管理员维护（localStorage 持久化）；无「预置」概念，
+// 所有序列平等可编辑；删除仅受「服务引用 / 要素图层选取」约束（2026-08-31 09:43 拍板）。
+// 命名统一加 sq 前缀，避免与 common.js 顶层声明重名（防白屏红线）。
+// ════════════════════════════════════════════════════════════
+
+// ── 示例数据：制图样式模板库（样式管理功能建成前的演示数据）──
+const SQ_TPL_SAMPLES = [
+  { key: 'standard',  name: '标准影像底图',   short: '真彩 / 假彩', desc: '日常浏览与底图服务 · 真彩 / 假彩波段合成',      render: 'rgb',      thumb: 'rgb' },
+  { key: 'analysis',  name: '地形强度分析图', short: '强度 / 地形', desc: '高程、雷达强度等单波段分析 · 强度拉伸 / 地形晕渲', render: 'enhance',  thumb: 'gray' },
+  { key: 'graded',    name: '长势分级专题图', short: '分级色带',    desc: '作物长势、土壤湿度等分级表达 · 分级色带 + 注记图例', render: 'classify', thumb: 'class' },
+  { key: 'falsecolor',name: '假彩植被增强图', short: '近红外假彩',  desc: '近红外假彩合成 · 植被信息增强表达',               render: 'rgb',      thumb: 'nir' },
+  { key: 'moisture',  name: '土壤湿度色阶图', short: '干湿色阶',    desc: '土壤湿度连续色阶 · 干（暖） → 湿（冷）',           render: 'classify', thumb: 'moist' }
+];
+function sqTpl(key) { return SQ_TPL_SAMPLES.find(function (t) { return t.key === key; }) || null; }
+
+// ── 内置示例序列（演示常量；与自建序列平等，可编辑/删除）──
+const SQ_BUILTIN = [
+  { id: 'seq-jjs', builtin: true, name: '建三江影像制图样式组',
+    tpls: ['graded','standard','analysis'], defaultTpl: 'graded',
+    desc: '作物长势分级为主 · 兼备真彩浏览与地形分析', owner: '遥感监测科', createdAt: '2026-05-01' },
+  { id: 'seq-radar', builtin: true, name: '土壤湿度制图样式组',
+    tpls: ['standard','moisture','analysis'], defaultTpl: 'standard',
+    desc: '标准影像为主 · 干湿色阶与强度分析辅助', owner: '王磊', createdAt: '2026-01-05' }
+];
+
+// ── 引用关系（原型阶段示例数据；真实系统由服务注册表 / 要素图层元数据按 id 回查）──
+// 删除门控：序列被「服务引用」或「要素图层选取」时不可删除（行内删除按钮置灰）。
+const SQ_REF_SAMPLES = [
+  { seqId: 'seq-jjs', kind: 'service', name: '建三江遥感影像（时序）' },
+  { seqId: 'seq-jjs', kind: 'service', name: '建三江长势监测服务（WMS）' },
+  { seqId: 'seq-jjs', kind: 'layer',   name: '建三江作物长势时序图层' }
+];
+function sqRefsOf(id) { return SQ_REF_SAMPLES.filter(function (r) { return r.seqId === id; }); }
+function sqRefLabel(r) { return (r.kind === 'service' ? '服务「' : '图层「') + r.name + '」'; }
+
+// 已删除的内置示例序列 id（localStorage 持久化；删除后不再显示，刷新不复活）
+const SQ_HIDDEN_KEY = 'hetu_seq_hidden';
+function sqHidden() {
+  try { return JSON.parse(localStorage.getItem(SQ_HIDDEN_KEY) || '[]'); } catch (e) { return []; }
+}
+function sqSaveHidden(list) { localStorage.setItem(SQ_HIDDEN_KEY, JSON.stringify(list)); }
+
+// ── 管理员维护序列（localStorage 持久化）──
+const SQ_STORE_KEY = 'hetu_seq_custom';
+function sqCustom() {
+  try { return JSON.parse(localStorage.getItem(SQ_STORE_KEY) || '[]'); } catch (e) { return []; }
+}
+function sqSaveCustom(list) { localStorage.setItem(SQ_STORE_KEY, JSON.stringify(list)); }
+function sqAll() {
+  const custom = sqCustom();
+  const hidden = sqHidden();
+  // 内置示例：删除即隐藏；被管理员编辑后以 custom 同 id 条目覆盖（无「预置」特权）
+  const builtin = SQ_BUILTIN
+    .filter(function (b) { return hidden.indexOf(b.id) < 0; })
+    .map(function (b) { return custom.find(function (c) { return c.id === b.id; }) || b; });
+  // 管理员自建（排除已覆盖内置的同 id 条目）
+  const own = custom.filter(function (c) { return !SQ_BUILTIN.some(function (b) { return b.id === c.id; }); });
+  return builtin.concat(own);
+}
+function sqFind(id) { return sqAll().find(function (s) { return s.id === id; }) || null; }
+
+// ── 页面状态 ──
+let sqKw = '';
+let sqPage = 1;
+const SQ_PAGE_SIZE = 8;
+let sqDelId = null;
+let sqwEditingId = null;   // null=新建，否则为编辑中的序列 id
+let sqwTplSel = [];        // 向导已选模板 key（有序）
+let sqwTplDefault = '';    // 默认模板 key
+let sqwTplKw = '';         // 向导模板搜索关键词
+
+// ── 身份门控（演示）：角色存 localStorage，common.js ensureSeqNav() 同源读取 ──
+function sqRole() { return (typeof getHetuRole === 'function') ? getHetuRole() : 'admin'; }
+function sqToggleRole() {
+  const next = sqRole() === 'admin' ? 'user' : 'admin';
+  if (typeof setHetuRole === 'function') setHetuRole(next);
+  sqRenderRoleUI();
+  sqRender();
+}
+function sqRenderRoleUI() {
+  const admin = sqRole() === 'admin';
+  const btn = document.getElementById('sqRoleToggle');
+  if (btn) btn.innerHTML = admin
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> 切换为业务人员'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 切换为管理员';
+  const badge = document.getElementById('sqRoleBadge');
+  if (badge) {
+    badge.textContent = admin ? '管理员' : '业务人员';
+    badge.className = 'text-[10px] px-1.5 py-0.5 rounded ' + (admin ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700');
+  }
+}
+
+// ── 模板缩略图（五类；渐变 id 加前缀防重复）──
+function sqThumb(type, prefix) {
+  const p = prefix || 'a';
+  if (type === 'rgb') return '<svg class="sq-tpl-thumb" viewBox="0 0 64 44" preserveAspectRatio="none"><defs><linearGradient id="' + p + 'gRgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset=".5" stop-color="#16a34a"/><stop offset="1" stop-color="#dc2626"/></linearGradient></defs><rect width="64" height="44" fill="url(#' + p + 'gRgb)"/><path d="M0 28 L16 20 L30 26 L64 12 L64 44 L0 44Z" fill="#0b3d2e" opacity=".35"/></svg>';
+  if (type === 'class') return '<svg class="sq-tpl-thumb" viewBox="0 0 64 44" preserveAspectRatio="none"><rect width="64" height="44" fill="#22c55e"/><rect x="22" width="20" height="44" fill="#eab308"/><rect x="42" width="22" height="44" fill="#ef4444"/></svg>';
+  if (type === 'nir') return '<svg class="sq-tpl-thumb" viewBox="0 0 64 44" preserveAspectRatio="none"><defs><linearGradient id="' + p + 'gNir" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a855f7"/><stop offset=".55" stop-color="#d946ef"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs><rect width="64" height="44" fill="url(#' + p + 'gNir)"/><path d="M0 32 L20 22 L34 28 L64 16 L64 44 L0 44Z" fill="#3b0764" opacity=".4"/></svg>';
+  if (type === 'moist') return '<svg class="sq-tpl-thumb" viewBox="0 0 64 44" preserveAspectRatio="none"><defs><linearGradient id="' + p + 'gMo" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f97316"/><stop offset=".5" stop-color="#eab308"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient></defs><rect width="64" height="44" fill="url(#' + p + 'gMo)"/><circle cx="18" cy="15" r="5" fill="#f97316" opacity=".5"/><circle cx="46" cy="28" r="7" fill="#0ea5e9" opacity=".5"/></svg>';
+  return '<svg class="sq-tpl-thumb" viewBox="0 0 64 44" preserveAspectRatio="none"><defs><linearGradient id="' + p + 'gGy" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f5f9"/><stop offset="1" stop-color="#475569"/></linearGradient></defs><rect width="64" height="44" fill="url(#' + p + 'gGy)"/><path d="M0 32 L18 18 L32 28 L48 14 L64 24 L64 44 L0 44Z" fill="#94a3b8" opacity=".55"/></svg>';
+}
+
+// ════════════════ 列表渲染 ════════════════
+function sqFiltered() {
+  const kw = sqKw.trim().toLowerCase();
+  return sqAll().filter(function (s) {
+    if (!kw) return true;
+    return (s.name + ' ' + (s.desc || '')).toLowerCase().indexOf(kw) >= 0;
+  });
+}
+
+function sqStatsHTML() {
+  const all = sqAll();
+  const inUse = all.filter(function (s) { return sqRefsOf(s.id).length > 0; });
+  const svcRefs = SQ_REF_SAMPLES.filter(function (r) { return r.kind === 'service'; }).length;
+  const layerRefs = SQ_REF_SAMPLES.filter(function (r) { return r.kind === 'layer'; }).length;
+  const card = function (label, num, sub, icon, iconBg) {
+    return '<div class="flex-1 min-w-0 flex items-center gap-3 bg-white border border-line rounded-xl px-4 py-3.5 shadow-sm">'
+      + '<div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ' + iconBg + '">'
+      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;color:#fff">' + icon + '</svg></div>'
+      + '<div class="flex flex-col gap-1 min-w-0 flex-1"><div class="text-xs text-gray-400">' + label + '</div>'
+      + '<div class="text-2xl font-semibold leading-none text-gray-800 tabular-nums">' + num + '</div>'
+      + (sub ? '<div class="text-[11px] text-gray-400 truncate">' + sub + '</div>' : '') + '</div></div>';
+  };
+  return '<div class="flex gap-4">'
+    + card('总数量', all.length, '全部服务序列', '<path d="M3 12h4l3-8 4 16 3-8h4"/>', 'stat-icon-brand')
+    + card('使用中', inUse.length, '被服务或图层引用的序列', '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/>', 'stat-icon-blue')
+    + card('关联服务引用', svcRefs, '服务引用合计（跨序列）', '<rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/>', 'stat-icon-cyan')
+    + card('关联要素图层', layerRefs, '图层选取合计（跨序列）', '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>', 'stat-icon-green')
+    + card('未关联', all.length - inUse.length, '未被引用 · 可安全删除', '<path d="m18.84 12.25 1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="m5.17 11.75-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><path d="M8 2v3"/><path d="M2 8h3"/><path d="M16 22v-3"/><path d="M22 16h-3"/>', 'stat-icon-purple')
+    + '</div>';
+}
+
+function sqTplChips(s) {
+  const tpls = s.tpls || [];
+  return tpls.map(function (k) {
+    const t = sqTpl(k);
+    const isDef = k === s.defaultTpl;
+    return '<span class="sq-tpl-chip' + (isDef ? ' def' : '') + '">' + (isDef ? '★ ' : '') + (t ? t.name : k) + '</span>';
+  }).join(' ') + (tpls.length ? ' <span class="text-[10px] text-gray-400">' + tpls.length + ' / 3</span>' : '<span class="text-[11px] text-gray-400">未绑定</span>');
+}
+
+function sqRowHTML(s) {
+  const refs = sqRefsOf(s.id);
+  // 删除门控：被服务引用 / 要素图层选取 → 置灰不可点（title 说明引用方）
+  const delBtn = refs.length
+    ? '<button disabled class="btn btn-sm btn-default opacity-40 cursor-not-allowed" title="已被 ' + refs.length + ' 处引用（' + refs.map(sqRefLabel).join('、') + '），解除引用后方可删除">删除</button>'
+    : '<button onclick="sqAskDelete(\'' + s.id + '\')" class="btn btn-sm btn-default" style="color:#ef4444;border-color:#fecaca;">删除</button>';
+  const actions = '<div class="flex items-center justify-end gap-2">'
+    + '<button onclick="sqOpenDetail(\'' + s.id + '\')" class="btn btn-sm btn-default">详情</button>'
+    + '<button onclick="sqOpenWizard(\'' + s.id + '\')" class="btn btn-sm btn-default">编辑</button>'
+    + delBtn
+    + '</div>';
+  return '<tr class="border-t border-gray-100 hover:bg-gray-50 transition-colors">'
+    + '<td class="px-4 py-3"><span class="text-sm font-medium text-gray-800">' + s.name + '</span>'
+    + (s.desc ? '<div class="text-[11px] text-gray-400 mt-0.5 truncate max-w-[260px]" title="' + s.desc + '">' + s.desc + '</div>' : '') + '</td>'
+    + '<td class="px-4 py-3"><span class="inline-block text-[11px] font-mono text-gray-500 bg-gray-50 border border-gray-100 rounded-md px-1.5 py-0.5">' + s.id + '</span></td>'
+    + '<td class="px-4 py-3"><div class="flex flex-wrap items-center gap-1.5 max-w-[320px]">' + sqTplChips(s) + '</div></td>'
+    + '<td class="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">' + (s.owner || '—') + '<div class="text-[11px] text-gray-400">' + (s.createdAt || '—') + '</div></td>'
+    + '<td class="px-4 py-3">' + actions + '</td>'
+    + '</tr>';
+}
+
+function sqSetPage(p) { sqPage = p; sqRenderList(); }
+
+function sqPagerHTML(total, totalPages, cur) {
+  // 统一分页规范（2026-08-31）：右下角 + 始终渲染 + 共 N 条 + 禁用态 opacity-40
+  const nums = [];
+  const push = function (p) { if (nums.indexOf(p) < 0) nums.push(p); };
+  push(1);
+  for (let p = cur - 2; p <= cur + 2; p++) if (p >= 1 && p <= totalPages) push(p);
+  push(totalPages);
+  nums.sort(function (a, b) { return a - b; });
+  let pages = '', prev = 0;
+  nums.forEach(function (p) {
+    if (p - prev > 1) pages += '<span class="px-1 text-gray-300 text-sm">…</span>';
+    pages += '<button onclick="sqSetPage(' + p + ')" class="px-2 text-sm ' + (p === cur ? 'text-brand font-semibold' : 'text-gray-500 hover:text-gray-800') + ' transition-colors">' + p + '</button>';
+    prev = p;
+  });
+  const dis = 'disabled:opacity-40 disabled:cursor-not-allowed';
+  return '<div class="flex items-center justify-end px-4 py-3 border-t border-gray-100 gap-4 flex-shrink-0">'
+    + '<span class="text-xs text-gray-400">共 ' + total + ' 条 · 第 ' + cur + ' / ' + totalPages + ' 页</span>'
+    + '<div class="flex items-center gap-1">'
+    + '<button onclick="sqSetPage(' + (cur - 1) + ')" ' + (cur === 1 ? 'disabled' : '') + ' class="px-2 text-sm text-gray-500 hover:text-gray-800 transition-colors ' + dis + '">上一页</button>'
+    + pages
+    + '<button onclick="sqSetPage(' + (cur + 1) + ')" ' + (cur === totalPages ? 'disabled' : '') + ' class="px-2 text-sm text-gray-500 hover:text-gray-800 transition-colors ' + dis + '">下一页</button>'
+    + '</div></div>';
+}
+
+function sqRenderList() {
+  const list = sqFiltered();
+  const total = list.length;
+  const totalPages = Math.max(1, Math.ceil(total / SQ_PAGE_SIZE));
+  sqPage = Math.min(Math.max(1, sqPage), totalPages);
+  const slice = list.slice((sqPage - 1) * SQ_PAGE_SIZE, sqPage * SQ_PAGE_SIZE);
+  const body = document.getElementById('sqListBody');
+  if (body) body.innerHTML = total
+    ? slice.map(sqRowHTML).join('')
+    : '<tr><td colspan="5" class="px-4 py-14 text-center text-gray-400"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:2.5em;height:2.5em;margin:0 auto;display:block"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><div class="mt-2">暂无服务序列</div></td></tr>';
+  const cnt = document.getElementById('sqCount');
+  if (cnt) cnt.textContent = '共 ' + total + ' 条';
+  const pg = document.getElementById('sqPager');
+  if (pg) pg.innerHTML = sqPagerHTML(total, totalPages, sqPage);
+}
+
+function sqSetKw(v) {
+  sqKw = v; sqPage = 1;
+  sqRenderList();
+  const el = document.getElementById('sqSearch');
+  if (el) { el.focus(); }
+}
+
+// ── 非管理员视图 ──
+function sqNoPermHTML() {
+  return '<div class="flex-1 flex items-center justify-center">'
+    + '<div class="text-center max-w-md">'
+    + '<div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-300"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:2.5em;height:2.5em"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>'
+    + '<div class="text-gray-800 font-semibold text-base mb-2">该模块仅管理员可见</div>'
+    + '<div class="text-gray-500 text-sm leading-relaxed">服务序列由管理员统一创建与维护；业务人员可在制图相关功能中使用序列。当前身份：业务人员。</div>'
+    + '<button onclick="sqToggleRole()" class="btn btn-md btn-primary mt-5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 切换为管理员身份（演示）</button>'
+    + '</div></div>';
+}
+
+function sqRender() {
+  const admin = sqRole() === 'admin';
+  const main = document.getElementById('sqMain');
+  if (!main) return;
+  if (!admin) { main.innerHTML = sqNoPermHTML(); return; }
+  main.innerHTML =
+    '<div class="flex-1 flex flex-col min-h-0">'
+    + '<div class="px-6 pt-6 pb-4 flex items-center justify-between flex-shrink-0">'
+    + '<div class="flex items-center gap-3">'
+    + '<h1 class="text-lg font-bold text-gray-900">服务序列</h1>'
+    + '<span class="text-xs text-muted bg-gray-100 px-2.5 py-1 rounded-full font-medium">制图样式模板 · 命名容器</span>'
+    + '<span class="text-xs text-gray-400" id="sqCount">共 ' + sqAll().length + ' 条</span>'
+    + '</div>'
+    + '<div class="flex items-center gap-3">'
+    + '<div class="relative">'
+    + '<svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>'
+    + '<input id="sqSearch" type="text" placeholder="搜索序列名称" value="' + sqKw + '" oninput="sqSetKw(this.value)" class="pl-9 pr-3 py-2 bg-white border border-line rounded-lg text-sm w-60 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">'
+    + '</div>'
+    + '<button onclick="sqOpenWizard()" class="btn btn-md btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M12 4v16m8-8H4"/></svg> 新建服务序列</button>'
+    + '</div></div>'
+    + '<div class="px-6 pb-3 flex-shrink-0">' + sqStatsHTML() + '</div>'
+    + '<div class="flex-1 min-h-0 flex flex-col px-6 pb-6">'
+    + '<div class="flex-1 min-h-0 flex flex-col bg-white border border-line rounded-xl overflow-hidden">'
+    + '<div class="flex-1 min-h-0 overflow-y-auto scroll-thin">'
+    + '<table class="w-full text-sm">'
+    + '<thead><tr class="text-gray-500 text-xs">'
+    + '<th class="text-left px-4 py-3 font-medium bg-gray-50">序列名称</th>'
+    + '<th class="text-left px-4 py-3 font-medium bg-gray-50">序列编码</th>'
+    + '<th class="text-left px-4 py-3 font-medium bg-gray-50">绑定样式模板</th>'
+    + '<th class="text-left px-4 py-3 font-medium bg-gray-50">创建人 / 时间</th>'
+    + '<th class="text-right px-4 py-3 font-medium bg-gray-50">操作</th>'
+    + '</tr></thead>'
+    + '<tbody id="sqListBody"></tbody>'
+    + '</table></div>'
+    + '<div id="sqPager" class="flex-shrink-0"></div>'
+    + '</div>'
+    + '<div class="mt-4 p-4 rounded-xl bg-brand-light/40 border border-brand/20 text-sm text-gray-600">'
+    + '<b class="text-brand">口径说明</b>：服务序列 = 一组制图样式模板的命名容器（≤3 个模板，其一为默认）。图层绑定序列后即继承其样式模板组。'
+    + '权限：管理员创建与维护，所有用户可查看使用。'
+    + '⚠️ 绑定的样式模板当前为<b>示例数据</b>，「样式管理」功能建成后由其统一配置。'
+    + '</div>'
+    + '</div></div>';
+  sqRenderList();
+}
+
+// ════════════════ 新建 / 编辑向导 ════════════════
+// 模板选择（最多 3；单选默认）
+function sqwToggleTpl(key) {
+  const idx = sqwTplSel.indexOf(key);
+  if (idx >= 0) {
+    sqwTplSel.splice(idx, 1);
+    if (sqwTplDefault === key) sqwTplDefault = sqwTplSel[0] || '';
+  } else {
+    if (sqwTplSel.length >= 3) {
+      showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>', '一个服务序列最多绑定 <strong>3 个</strong>样式模板，请先取消已有绑定');
+      return;
+    }
+    sqwTplSel.push(key);
+    if (!sqwTplDefault) sqwTplDefault = key;
+  }
+  sqwRenderTpls();
+}
+function sqwSetDefault(key) {
+  if (sqwTplSel.indexOf(key) < 0) return;
+  sqwTplDefault = key;
+  sqwRenderTpls();
+}
+// 模板候选（受搜索框过滤；已选模板恒显示，避免搜索时丢失选中态）
+function sqwTplFiltered() {
+  const kw = (sqwTplKw || '').trim().toLowerCase();
+  return SQ_TPL_SAMPLES.filter(function (t) {
+    return sqwTplSel.indexOf(t.key) >= 0
+      || !kw
+      || (t.name + ' ' + (t.short || '') + ' ' + (t.desc || '')).toLowerCase().indexOf(kw) >= 0;
+  });
+}
+function sqwRenderTpls() {
+  const box = document.getElementById('sqwTplList');
+  if (!box) return;
+  const shown = sqwTplFiltered();
+  box.innerHTML = shown.length
+    ? shown.map(function (t) {
+        const sel = sqwTplSel.indexOf(t.key) >= 0;
+        const isDef = sel && sqwTplDefault === t.key;
+        return '<div class="sq-tpl' + (sel ? ' sel' : '') + '" onclick="sqwToggleTpl(\'' + t.key + '\')">'
+          + '<span class="sq-check">' + (sel ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '') + '</span>'
+          + sqThumb(t.thumb, 'w' + t.key)
+          + '<div class="flex items-center justify-between mt-2 gap-1">'
+          + '<b class="text-[13px] text-gray-800 truncate">' + t.name + '</b>'
+          + (sel ? '<button type="button" class="sq-def-btn' + (isDef ? ' on' : '') + '" onclick="event.stopPropagation();sqwSetDefault(\'' + t.key + '\')" title="设为该序列的默认模板">' + (isDef ? '★ 默认' : '设为默认') + '</button>' : '')
+          + '</div>'
+          + '<small class="text-[11px] text-gray-400 block mt-0.5 leading-snug">' + t.desc + '</small>'
+          + '</div>';
+      }).join('')
+    : '<div class="col-span-3 py-10 text-center text-gray-400"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:2em;height:2em;margin:0 auto 6px;display:block"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>未找到匹配的样式模板<br><span class="text-[11px]">换个关键词试试</span></div>';
+  const cnt = document.getElementById('sqwTplCount');
+  if (cnt) cnt.textContent = '已选 ' + sqwTplSel.length + ' / 3' + (sqwTplDefault ? ' · 默认：' + (sqTpl(sqwTplDefault) || {}).name : '');
+}
+
+function sqOpenWizard(id) {
+  sqwEditingId = id || null;
+  const s = id ? sqFind(id) : null;
+  document.getElementById('sqwName').value = s ? s.name : '';
+  document.getElementById('sqwCode').value = s ? s.id : '';
+  document.getElementById('sqwDesc').value = s ? (s.desc || '') : '';
+  sqwTplSel = s ? (s.tpls || []).slice() : [];
+  sqwTplDefault = s ? (s.defaultTpl || sqwTplSel[0] || '') : (sqwTplSel[0] || '');
+  document.getElementById('sqwTitle').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg> ' + (s ? '编辑服务序列' : '创建服务序列');
+  document.getElementById('sqwSubmit').textContent = s ? '保存修改' : '创建服务序列';
+  sqwRenderTpls();
+  document.getElementById('seqWizard').classList.remove('hidden');
+}
+
+function sqwConfirm() {
+  const name = document.getElementById('sqwName').value.trim();
+  const checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+  // 校验
+  if (!name) { showNotification(checkIcon, '请填写序列名称'); return; }
+  if (sqAll().some(function (s) { return s.name === name && s.id !== sqwEditingId; })) { showNotification(checkIcon, '已存在同名序列「<strong>' + name + '</strong>」'); return; }
+  if (!sqwTplSel.length) { showNotification(checkIcon, '请至少绑定 1 个制图样式模板'); return; }
+  if (sqwTplSel.length > 3) { showNotification(checkIcon, '最多绑定 3 个样式模板'); return; }
+
+  const today = new Date();
+  const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+  const entry = {
+    id: sqwEditingId || ('seq-c' + Date.now().toString(36)),
+    builtin: false,
+    name: name,
+    desc: document.getElementById('sqwDesc').value.trim(),
+    tpls: sqwTplSel.slice(),
+    defaultTpl: sqwTplDefault,
+    owner: '张建国',
+    createdAt: sqwEditingId ? (sqFind(sqwEditingId) || {}).createdAt || todayStr : todayStr
+  };
+  const list = sqCustom();
+  if (sqwEditingId) {
+    const idx = list.findIndex(function (x) { return x.id === sqwEditingId; });
+    if (idx >= 0) list[idx] = entry; else list.push(entry);
+  } else {
+    list.push(entry);
+  }
+  sqSaveCustom(list);
+  closeWizard('seqWizard');
+  sqRender();
+  showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>', (sqwEditingId ? '已保存修改' : '已创建服务序列') + '「<strong>' + name + '</strong>」· 绑定 ' + sqwTplSel.length + ' 个样式模板（默认：' + ((sqTpl(sqwTplDefault) || {}).name || '—') + '）');
+  sqwEditingId = null;
+}
+
+// ════════════════ 详情 ════════════════
+function sqOpenDetail(id) {
+  const s = sqFind(id);
+  if (!s) return;
+  const tpls = (s.tpls || []).map(function (k) {
+    const t = sqTpl(k);
+    const isDef = k === s.defaultTpl;
+    return '<div class="sq-detail-card relative rounded-xl border overflow-hidden ' + (isDef ? 'border-brand/50 bg-brand-light/10' : 'border-gray-100 bg-white') + '">'
+      + (isDef ? '<span class="absolute top-2 right-2 z-10 text-[10px] px-2 py-0.5 rounded-full bg-brand text-white font-semibold shadow">★ 默认模板</span>' : '')
+      + '<div class="w-full h-16">' + sqThumb(t ? t.thumb : 'gray', 'd' + k) + '</div>'
+      + '<div class="p-3">'
+      + '<b class="text-[13px] text-gray-800 block truncate">' + (t ? t.name : k) + '</b>'
+      + '<div class="text-[11px] text-gray-400 mt-1 leading-snug">' + (t ? t.desc : '') + '</div>'
+      + '</div></div>';
+  }).join('');
+  document.getElementById('sqdTitle').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg> ' + s.name;
+  document.getElementById('sqdBody').innerHTML =
+    '<div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">'
+    + '<div><span class="text-xs text-gray-400 block mb-0.5">序列编码</span>' + s.id + '</div>'
+    + '<div><span class="text-xs text-gray-400 block mb-0.5">创建人 / 时间</span>' + (s.owner || '—') + ' · ' + (s.createdAt || '—') + '</div>'
+    + '<div class="col-span-2"><span class="text-xs text-gray-400 block mb-0.5">描述</span>' + (s.desc || '<span class="text-gray-400">—</span>') + '</div>'
+    + '</div>'
+    + '<div><div class="sq-sec-title">绑定制图样式模板（' + (s.tpls || []).length + ' / 3）</div>'
+    + '<div class="grid grid-cols-3 gap-3">' + (tpls || '<div class="col-span-3 text-xs text-gray-400 text-center py-6">未绑定模板</div>') + '</div>'
+    + '<p class="text-[11px] text-gray-400 mt-2">模板由系统「样式管理」预先配置，此处仅选用绑定；图层绑定该序列后继承默认模板渲染（当前为示例数据）。</p></div>';
+  document.getElementById('seqDetail').classList.remove('hidden');
+}
+
+// ════════════════ 删除（门控：被服务引用 / 要素图层选取 → 不可删）══
+function sqAskDelete(id) {
+  const s = sqFind(id);
+  if (!s) return;
+  const refs = sqRefsOf(id);
+  if (refs.length) {
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>', '该序列正被 ' + refs.length + ' 处引用（' + refs.map(sqRefLabel).join('、') + '），不可删除；请先在对应服务 / 要素图层中解除引用');
+    return;
+  }
+  sqDelId = id;
+  document.getElementById('sqDelText').innerHTML = '确定删除服务序列「<strong>' + s.name + '</strong>」？删除后，已绑定该序列的图层将失去样式模板组，且不可恢复。';
+  document.getElementById('seqDelete').classList.remove('hidden');
+}
+function sqDelConfirm() {
+  if (!sqDelId) return;
+  // 兜底：即使绕过置灰按钮，引用中的序列也不允许删除
+  const refs = sqRefsOf(sqDelId);
+  if (refs.length) {
+    closeWizard('seqDelete');
+    sqDelId = null;
+    sqRender();
+    showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>', '该序列正被 ' + refs.length + ' 处引用，不可删除');
+    return;
+  }
+  const s = sqFind(sqDelId);
+  sqSaveCustom(sqCustom().filter(function (x) { return x.id !== sqDelId; }));
+  if (SQ_BUILTIN.some(function (b) { return b.id === sqDelId; })) {
+    sqSaveHidden(sqHidden().concat(sqDelId)); // 内置示例：删除后持久化隐藏，刷新不复活
+  }
+  closeWizard('seqDelete');
+  sqDelId = null;
+  sqRender();
+  if (s) showNotification('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>', '已删除服务序列「<strong>' + s.name + '</strong>」');
+}
+
+// ── 初始化 ──
+sqRenderRoleUI();
+sqRender();
+</script>
+</body>
+</html>
