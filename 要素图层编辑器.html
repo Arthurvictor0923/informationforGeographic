@@ -1144,7 +1144,7 @@ function initMap() {
   parcelLayers = PARCELS.map(function (ring) {
     return L.polygon(ring, { fillColor: STYLE.fillColor, fillOpacity: STYLE.fillOpacity, color: 'transparent', weight: 0 });
   });
-  parcelLayers.forEach(function (p) { p.on('click', function () { selectOnMap(p); }); p.addTo(map); });
+  parcelLayers.forEach(function (p) { p.on('click', function () { selectOnMap(p); }); if (!isRasterMode) p.addTo(map); });
 
   // 辅助表达层：标注
   labelList = [
@@ -1155,11 +1155,13 @@ function initMap() {
     { pos: [47.185,132.528], name: '南区-12' },
     { pos: [47.140,132.538], name: '西区-06' },
   ];
-  labelGroup = L.featureGroup().addTo(map);
+  labelGroup = L.featureGroup();
+  if (!isRasterMode) labelGroup.addTo(map);
   // 表达层：边界（面→描边，地块边界线）
   boundaryLayers = PARCELS.map(function (ring) {
-    return L.polygon(ring, { fill: false, color: STYLE.boundaryColor, weight: STYLE.boundaryWeight }).addTo(map);
+    return L.polygon(ring, { fill: false, color: STYLE.boundaryColor, weight: STYLE.boundaryWeight });
   });
+  if (!isRasterMode) boundaryLayers.forEach(function (l) { l.addTo(map); });
 
   if (window.ResizeObserver) {
     new ResizeObserver(function () { map.invalidateSize(); }).observe(document.getElementById('mapCanvas'));
@@ -1173,6 +1175,9 @@ function initMap() {
   buildHilite();
   buildMarkers();
   updateLegendBox();
+  // 栅格预选（?svc= 栅格服务）时 applyUrlPreset 先于 initMap 执行，showRaster 因 map 未就绪被跳过；
+  // 此处补渲染：栅格态画布只显示栅格，矢量（地块/边界/标注/标记/高亮）已按 isRasterMode 守卫不加入地图。
+  if (isRasterMode) showRaster();
 }
 
 function selectOnMap(layer) {
@@ -1754,7 +1759,7 @@ function buildHilite() {
     const ring = p.getLatLngs()[0];
     L.polygon(ring, { color: c, weight: 1, dashArray: '4 3', fillColor: c, fillOpacity: op, className: 'hilite', interactive: false }).addTo(hiliteLayer);
   });
-  if (hiliteOn) map.addLayer(hiliteLayer);
+  if (hiliteOn && !isRasterMode) map.addLayer(hiliteLayer);
 }
 function applyHilite() { $('hiliteColorText').value = $('hiliteColor').value; buildHilite(); }
 function applyHiliteText() { const c = $('hiliteColorText').value; $('hiliteColor').value = c; buildHilite(); }
@@ -1843,7 +1848,7 @@ function buildMarkers() {
     const c = p.getBounds().getCenter();
     const icon = L.divIcon({ className: '', html: '<div style="display:flex;align-items:center;justify-content:center;width:22px;height:22px">' + iconSVG(currentSymbol, '18px') + '</div>', iconSize: [22,22], iconAnchor: [11,11] });
     const mk = L.marker(c, { icon: icon });
-    if (markerOn) mk.addTo(map);
+    if (markerOn && !isRasterMode) mk.addTo(map);
     markerLayers.push(mk);
   });
 }
@@ -2112,12 +2117,12 @@ const RASTER_STYLE_TEMPLATES = [
 function rasterTplThumbSvg(type, cls, idp) {
   const c = cls || 'rsp-thumb', p = idp || '';
   if (type === 'rgb') {
-    return '<svg class="' + c + '" viewBox="0 0 64 40" preserveAspectRatio="none"><defs><linearGradient id="' + p + 'tgRgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset=".5" stop-color="#16a34a"/><stop offset="1" stop-color="#dc2626"/></linearGradient></defs><rect width="64" height="40" fill="url(#' + p + 'tgRgb)"/><path d="M0 26 L16 18 L30 24 L64 10 L64 40 L0 40Z" fill="#0b3d2e" opacity=".35"/><text x="5" y="33" font-size="9" font-weight="700" fill="#fff">影像</text></svg>';
+    return '<svg class="' + c + '" viewBox="0 0 64 40" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="' + p + 'tgRgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset=".5" stop-color="#16a34a"/><stop offset="1" stop-color="#dc2626"/></linearGradient></defs><rect width="64" height="40" fill="url(#' + p + 'tgRgb)"/><path d="M0 26 L16 18 L30 24 L64 10 L64 40 L0 40Z" fill="#0b3d2e" opacity=".35"/><text x="5" y="33" font-size="9" font-weight="700" fill="#fff">影像</text></svg>';
   }
   if (type === 'class') {
-    return '<svg class="' + c + '" viewBox="0 0 64 40" preserveAspectRatio="none"><rect width="64" height="40" fill="#22c55e"/><rect x="22" width="20" height="40" fill="#eab308"/><rect x="42" width="22" height="40" fill="#ef4444"/><text x="5" y="33" font-size="9" font-weight="700" fill="#064e3b">分级</text></svg>';
+    return '<svg class="' + c + '" viewBox="0 0 64 40" preserveAspectRatio="xMidYMid slice"><rect width="64" height="40" fill="#22c55e"/><rect x="22" width="20" height="40" fill="#eab308"/><rect x="42" width="22" height="40" fill="#ef4444"/><text x="5" y="33" font-size="9" font-weight="700" fill="#064e3b">分级</text></svg>';
   }
-  return '<svg class="' + c + '" viewBox="0 0 64 40" preserveAspectRatio="none"><defs><linearGradient id="' + p + 'tgGray" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f5f9"/><stop offset="1" stop-color="#475569"/></linearGradient></defs><rect width="64" height="40" fill="url(#' + p + 'tgGray)"/><path d="M0 30 L18 16 L32 26 L48 12 L64 22 L64 40 L0 40Z" fill="#94a3b8" opacity=".55"/><text x="5" y="33" font-size="9" font-weight="700" fill="#1e293b">地形</text></svg>';
+  return '<svg class="' + c + '" viewBox="0 0 64 40" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="' + p + 'tgGray" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f5f9"/><stop offset="1" stop-color="#475569"/></linearGradient></defs><rect width="64" height="40" fill="url(#' + p + 'tgGray)"/><path d="M0 30 L18 16 L32 26 L48 12 L64 22 L64 40 L0 40Z" fill="#94a3b8" opacity=".55"/><text x="5" y="33" font-size="9" font-weight="700" fill="#1e293b">地形</text></svg>';
 }
 // 按模板库渲染左列「样式模板」卡
 function renderRasterStylePick() {
@@ -2609,10 +2614,18 @@ function refreshRasterStyleBadges() {
     const sw = n.querySelector('.rf-swatch'); if (sw) sw.style.background = rasterStyleBadge(st.renderMode);
   });
 }
+let rasterBatchLegendShown = false; // 批量绑定面板展开时临时隐藏画布图例框（图例 z-index 高于时间序列条，会压住面板）
 function toggleRasterBatch() {
   const p = $('rlBatch'); if (!p) return;
   const open = p.classList.toggle('hidden') === false;
-  if (open) { buildBatchFrames(); refreshRasterStyleBadges(); }
+  const lg = $('mapLegendBox');
+  if (open) {
+    buildBatchFrames(); refreshRasterStyleBadges();
+    if (lg && !lg.classList.contains('hidden')) { rasterBatchLegendShown = true; lg.classList.add('hidden'); }
+    else rasterBatchLegendShown = false;
+  } else {
+    if (lg && rasterBatchLegendShown) lg.classList.remove('hidden');
+  }
 }
 function buildBatchFrames() {
   const box = $('rbbFrames'); if (!box) return;
@@ -2677,8 +2690,10 @@ function setLayerMode(mode) {
   if (rasMeta) rasMeta.classList.toggle('hidden', !isRasterMode);
   // 左列「样式模板」卡（三张带缩略图）：模板由服务序列带出 → 仅时序栅格显示；单张栅格样式在右栏调整；矢量隐藏
   const rasStylePick = $('rasterStylePick'); if (rasStylePick) rasStylePick.classList.toggle('hidden', !(isRasterMode && currentRasterTimeSeries));
-  const tl = $('rasterTimeline'); if (tl) tl.classList.toggle('hidden', !(isRasterMode && currentRasterTimeSeries));
-  const main = document.querySelector('.main'); if (main) main.classList.toggle('raster-on', isRasterMode);
+  const seqOn = isRasterMode && currentRasterTimeSeries; // 时序组件是否实际显示
+  const tl = $('rasterTimeline'); if (tl) tl.classList.toggle('hidden', !seqOn);
+  // 图例让位类仅在实际显示时序组件时启用（单张栅格/矢量无底部组件 → 图例贴画布右下角 bottom:18px）
+  const main = document.querySelector('.main'); if (main) main.classList.toggle('raster-on', seqOn);
   ['sec-fill', 'sec-label', 'sec-symbol', 'sec-marker'].forEach(function (id) { const e = $(id); if (e) e.classList.toggle('hidden', isRasterMode); });
   // 右栏「样式参数」：单张栅格 = 参数调整主入口；时序栅格 = 模板带出渲染方式后的参数微调
   const stSec = $('sec-raster'); if (stSec) stSec.classList.toggle('hidden', !isRasterMode);
