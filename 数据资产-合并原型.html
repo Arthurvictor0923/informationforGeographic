@@ -829,6 +829,7 @@ body.hetu-portal {
 .publish-selected-service span{display:block;margin-top:3px;font-size:12px;color:#79867d}
 .publish-dialog-footer{flex-shrink:0;padding:16px 24px;background:#fff}
 .publish-dialog-footer .btn{min-width:88px}
+#publishOptionsArea:not(:empty){margin-top:24px}
 #publishOptionsArea>div>div.flex{flex-wrap:wrap}
 @media(max-width:760px){#publishModal .publish-dialog{width:calc(100vw - 24px);height:92vh;max-height:92vh}.publish-dialog-body{padding:20px}.publish-type-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.publish-service-art{width:120px;min-height:132px}.publish-service-description{gap:18px}.publish-steps{gap:15px;padding:16px}.publish-step-connector{width:35px}}
 @media(max-width:480px){.publish-type-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.publish-steps{gap:10px}.publish-step{font-size:12px;gap:6px}.publish-step-connector{width:18px}.publish-service-art{display:none}.publish-card-title{font-size:16px}}
@@ -1395,6 +1396,8 @@ body .sp-panel h1{color:#173830}
         <h3 id="publishServiceTypeLabel" class="publish-section-title">选择服务类型</h3>
         <div id="publishTypeSection">
           <div id="publishTypeCardsInline" class="publish-type-grid" role="group" aria-labelledby="publishServiceTypeLabel"></div>
+          <!-- 所选服务类型的专属选项随类型切换，在第一步配置。 -->
+          <div id="publishOptionsArea"></div>
           <div class="publish-service-description" aria-live="polite" aria-atomic="true">
             <div class="publish-service-art" aria-hidden="true"><svg viewbox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 17 17-9 17 9-17 9-17-9Z"></path><path d="m7 25 17 9 17-9M7 33l17 9 17-9"></path><path d="M24 8v18" opacity=".35"></path></svg><span id="publishDescriptionArtType"></span></div>
             <div class="publish-service-description-copy"><h4 id="publishDescriptionType"></h4><div id="publishDescriptionName"></div><p id="publishDescriptionSummary"></p><p id="publishDescriptionText"></p></div>
@@ -1439,7 +1442,7 @@ body .sp-panel h1{color:#173830}
 <div id="publishTimeBlock" class="border border-line rounded-lg overflow-hidden"><div class="flex items-center justify-between px-4 py-3 bg-gray-50"><span class="text-sm font-medium">时间维度</span><button type="button" id="pubTimeToggle" onclick="togglePublishTimeEnabled()" role="switch" aria-label="时间维度" aria-checked="false" class="relative inline-flex items-center flex-shrink-0 rounded-full" style="width:44px;height:24px;background:#d1d5db"><span id="pubTimeKnob" class="bg-white rounded-full transition-transform" style="width:20px;height:20px;margin-left:2px"></span></button></div><div id="pubTimeConfig" class="hidden p-4 space-y-3"><div><label class="block text-sm font-medium mb-2">绑定服务序列 <span class="text-red-500">*</span></label><select id="pubTimeSeq" class="w-full border border-line rounded-lg px-3 py-2 text-sm"><option value="">请选择服务序列</option></select></div><div><label class="block text-sm font-medium mb-2">绑定时间戳 <span class="text-red-500">*</span></label><input id="pubTimeStamp" type="date" class="w-full border border-line rounded-lg px-3 py-2 text-sm"></div></div></div>
 <div class="border border-line rounded-lg overflow-hidden">
         <button type="button" id="publishAdvancedToggle" aria-expanded="false" aria-controls="publishAdvancedPanel" onclick="togglePublishAdvanced()" class="w-full px-4 py-2.5 bg-gray-50 hover:bg-gray-100 flex items-center justify-between text-sm font-medium text-gray-700 transition-colors">
-          <span class="flex items-center gap-2"><svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> 高级设置（协议参数） <span class="text-[10px] text-gray-400 font-normal">一般用户无需修改</span></span>
+          <span class="flex items-center gap-2"><svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> 高级设置（数据子集） <span class="text-[10px] text-gray-400 font-normal">一般用户无需修改</span></span>
           <span id="publishAdvancedArrow" class="text-gray-400 transition-transform">▾</span>
         </button>
         <div id="publishAdvancedPanel" class="hidden p-4">
@@ -1459,8 +1462,6 @@ body .sp-panel h1{color:#173830}
               <input type="text" id="pubSubsetBbox" value="" placeholder="可选：west,south,east,north（经纬度，留空=全图）" class="w-full px-2.5 py-1.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20">
             </div>
           </div>
-          <!-- Service-specific options (WMTS/MVT/REAL_MVT) -->
-          <div id="publishOptionsArea"></div>
         </div>
       </div>
         </div>
