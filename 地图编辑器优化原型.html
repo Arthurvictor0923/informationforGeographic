@@ -1279,7 +1279,12 @@ input { font-family: inherit; }
 
 /* ── 图层 tab：按渲染表达类型分类排序（类别顺序固定）── */
 .oc-scroll { display:flex; flex-direction:column; }
-.oc-cat { border:1px solid var(--gray-200); border-radius:var(--r-md); margin:0 var(--sp-lg) var(--sp-sm); overflow:hidden; background:var(--white); }
+/* 🔴 修复（2026-10-12）：.oc-cat 必须 flex-shrink:0。
+   父级 .oc-scroll 是 flex column 且由外层 flex:1 + min-height:0 限高（可滚动区），
+   .oc-cat 默认 flex-shrink:1 会在内容总高超出时被【等比压扁】，再被自身 overflow:hidden
+   把压掉的部分直接裁掉——表现为「填充 4 条只显示 2 条、栅格 3 条只显示 2 条」且
+   连滚动条都不出现（压缩后 scrollHeight 恰好等于容器高）。保持自然高度交给滚动条。 */
+.oc-cat { flex-shrink:0; border:1px solid var(--gray-200); border-radius:var(--r-md); margin:0 var(--sp-lg) var(--sp-sm); overflow:hidden; background:var(--white); }
 .oc-hd { display:flex; align-items:center; gap:6px; padding:7px 10px; background:var(--gray-25); font-size:var(--text-base); }
 .oc-hd .oc-ic { font-size:14px; flex-shrink:0; }
 .oc-hd .oc-name { font-weight:600; color:var(--gray-800); flex:1; }
@@ -1289,6 +1294,7 @@ input { font-family: inherit; }
 .oc-item {
   display:flex; align-items:center; gap:6px; padding:6px 10px; border-top:1px solid var(--gray-100);
   font-size:var(--text-sm); cursor:default; transition:all var(--t-fast) var(--ease-in-out);
+  flex-shrink:0; /* 同上：列表项被限高时必须保自然高度，不得压缩 */
 }
 .oc-item:hover { background:var(--brand-bg); }
 .oc-item.selected { background:var(--brand-bg-solid); border-left:3px solid var(--brand); }
