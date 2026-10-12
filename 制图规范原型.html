@@ -229,8 +229,11 @@
   .geo-panel{overflow-y:auto;padding-right:4px;}
   .gram-title{font-size:12px;font-weight:600;color:var(--text);background:#f5f7f6;border-radius:6px;padding:6px 8px;margin-bottom:8px;}
 </style>
+<link rel="stylesheet" href="portal-theme.css">
+<script defer src="portal-theme.js"></script>
+<script src="hetu-workflow.js"></script>
 </head>
-<body>
+<body class="hetu-portal hetu-catalog">
 <div class="app-shell">
 
   <!-- ============ TopNav（与项目壳一致：图标+文案、制图规范高亮） ============ -->
@@ -241,7 +244,7 @@
         <span class="text-base font-semibold text-brand">河图·地理信息平台</span>
       </div>
       <nav id="topNav" class="flex items-center h-16 gap-0.5">
-        <a href="数据资产.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+        <a href="数据资产-合并原型.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
         </a>
         <a href="地图服务-重设计.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
@@ -844,7 +847,7 @@
       list.forEach(s=>{
         const lock = s.src==='preset' ? '<span class="lock" title="系统预置不可删除">🔒</span>' : '';
         cards += '<div class="spec-card" onclick="openEdit(\''+s.id+'\')">'
-          + '<div class="card-menu"><button title="编辑" onclick="event.stopPropagation();openEdit(\''+s.id+'\')">✎</button><button title="另存为新包" onclick="event.stopPropagation();saveAsCopy()">⎘</button><button title="删除" onclick="event.stopPropagation();openDel(\''+s.id+'\')">🗑</button></div>'
+          + '<div class="card-menu"><button title="编辑" onclick="event.stopPropagation();openEdit(\''+s.id+'\')">✎</button><button title="另存为新包" onclick="event.stopPropagation();saveAsCopy(\''+s.id+'\')">⎘</button><button title="删除" onclick="event.stopPropagation();openDel(\''+s.id+'\')">🗑</button></div>'
           + '<div class="spec-vis">'+pvs(s)+'</div>'
           + '<div class="spec-body">'
           + '<div class="spec-name">'+s.name+lock+'</div>'
@@ -868,7 +871,7 @@
           + '<td><span class="pill gray"><span class="dot"></span>'+(s.src==='preset'?'🔒 系统预置':'自定义')+'</span></td>'
           + '<td>'+s.usage+'</td>'
           + '<td style="color:var(--text-3)">'+geomCovered(s)+'</td>'
-          + '<td><span class="lnk" onclick="openEdit(\''+s.id+'\')">编辑</span><span class="lnk" onclick="saveAsCopy()">另存为新包</span>'+(s.src==='preset'?'<span class="lnk disabled">删除</span>':'<span class="lnk danger" onclick="openDel(\''+s.id+'\')">删除</span>')+'</td>'
+          + '<td><span class="lnk" onclick="openEdit(\''+s.id+'\')">编辑</span><span class="lnk" onclick="saveAsCopy(\''+s.id+'\')">另存为新包</span>'+(s.src==='preset'?'<span class="lnk disabled">删除</span>':'<span class="lnk danger" onclick="openDel(\''+s.id+'\')">删除</span>')+'</td>'
           + '</tr>';
       });
       $('tableView').innerHTML = '<table><thead><tr><th>样式包名称</th><th>业务</th><th>来源</th><th>套用次数</th><th>已覆盖几何类型</th><th>操作</th></tr></thead><tbody>'+rows+'</tbody></table>';
@@ -1167,5 +1170,6 @@
   renderTree();
   renderData();
 </script>
+<script src="prototype-spec-links.js"></script>
 </body>
 </html>

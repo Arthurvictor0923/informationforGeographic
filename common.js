@@ -4,7 +4,7 @@
    ============================================================ */
 
 // ── 跨页联动：模块 → 文件名映射 ────────────────────────
-const MODULE_FILES = { data: '数据资产', service: '地图服务-重设计', layer: '要素图层', map: '专题地图', symbol: '符号库', spec: '制图规范原型', task: '任务中心' };
+const MODULE_FILES = { data: '数据资产-合并原型', service: '地图服务-重设计', layer: '要素图层', map: '专题地图', symbol: '符号库', spec: '制图规范原型', task: '任务中心' };
 function goModule(m) {
   if (MODULE_FILES[m]) location.href = MODULE_FILES[m] + '.html';
 }
@@ -22,6 +22,8 @@ function openEditorPrototype() {
 function openLayerEditor(title, svc) {
   var url = '要素图层编辑器.html';
   var q = [];
+  var saved = window.HTWorkflow && HTWorkflow.layers().find(x=>x.name===title);
+  if(saved) q.push('layerId='+encodeURIComponent(saved.id));
   if (svc) { try { q.push('svc=' + encodeURIComponent(svc)); } catch (e) {} }
   if (title) { try { q.push('layer=' + encodeURIComponent(title)); } catch (e) {} }
   if (q.length) url += '?' + q.join('&');
@@ -289,7 +291,7 @@ function renderPagination(total, page) {
 function gotoPage(p) {
   const cfg = moduleConfigs[activeModule];
   if (!cfg) return;
-  const totalPages = getPageCount(cfg.total);
+  const totalPages = getPageCount(cfg.cards.filter(matchCard).length);
   p = Math.min(Math.max(1, p), totalPages);
   uiFilter.page = p;
   document.getElementById('mainContent').innerHTML = renderMain(activeModule);
@@ -477,7 +479,7 @@ const moduleConfigs = {
     ]
   },
   layer: {
-    title: '要素图层', subtitle: '单一数据制图表达', total: 731, btnLabel: '创建要素图层', btnAction: "document.getElementById('layerWizard').classList.remove('hidden')",
+    title: '要素图层', subtitle: '地图服务制图表达', total: 731, btnLabel: '创建要素图层', btnAction: "document.getElementById('layerWizard').classList.remove('hidden')",
     cards: [
       {title:'耕地种植-全量问题线索',sub:'被3个专题引用 · 2026-07-22',tag:'耕地',cat:'耕地',type:'要素图层',svcCount:1,mine:true,thumb:'from-green-300 to-green-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>'},
       {title:'北大荒资源一张图',sub:'平台预置 · 被12个专题引用',tag:'基础',cat:'基础',type:'要素图层',svcCount:3,mine:false,thumb:'from-brand to-brand',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg>'},
@@ -918,7 +920,7 @@ function renderMain(m) {
       <div class="flex items-center gap-3">
         <h1 class="text-lg font-bold text-gray-900">${cfg.title}</h1>
         <span class="text-xs text-muted bg-gray-100 px-2.5 py-1 rounded-full font-medium">${cfg.subtitle}</span>
-        <span class="text-xs text-gray-400">共 ${cfg.total} 条</span>
+        <span class="text-xs text-gray-400">共 ${cards.length} 条</span>
         ${m === 'data' ? `<div class="flex items-center gap-2">
           <span class="stat-pill"><span class="stat-pill-label">已发布服务</span><b class="stat-pill-num">${cards.filter(c => c.svcCount).length}</b></span>
           <span class="stat-pill stat-pill-accent"><span class="stat-pill-label">可发布</span><b class="stat-pill-num">${cards.filter(c => !c.svcCount).length}</b></span>
@@ -967,7 +969,7 @@ function renderMain(m) {
     <div class="flex-1 overflow-y-auto scroll-thin px-6 pb-6">
       ${renderContentArea(m, cards)}    </div>
     <div class="px-6 py-3 border-t border-gray-200 flex items-center justify-end gap-4 flex-shrink-0">
-      ${renderPagination(cfg.total, uiFilter.page)}
+      ${renderPagination(cards.length, uiFilter.page)}
     </div>
     ${batchBarHTML()}
   </div>`;
@@ -1323,7 +1325,7 @@ function updateDetailActions(card, m, tabIdx) {
   } else {
     actionsHTML = `<div></div><div class="flex items-center gap-2">
       <button onclick="closeWizard('detailModal');openMapViewer('${card.title}')" class="btn btn-md btn-default flex-shrink-0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> 预览</button>
-      <button onclick="closeWizard('detailModal');openEditorPrototype()" class="btn btn-md btn-primary flex-shrink-0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg> 设计</button>
+      <button onclick="closeWizard('detailModal');openEditorPrototype(dtCard.title)" class="btn btn-md btn-primary flex-shrink-0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg> 设计</button>
       <button onclick="closeWizard('detailModal');notifyDeleted('${card.title}')" class="btn btn-md btn-danger flex-shrink-0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> 删除</button>
     </div>`;
   }
@@ -2062,7 +2064,7 @@ function dataCardHTML(c, idx, m) {
               <div class="absolute inset-x-0 bottom-0 bg-black/50 backdrop-blur-sm px-3 py-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
                 <button onclick="event.stopPropagation();openShareModal('${c.title}','map')" class="flex-1 px-2 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow inline-flex items-center justify-center gap-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg>共享</button>
                 <button onclick="event.stopPropagation();openMapDesign('edit','${c.title}')" class="flex-1 px-3 py-1.5 bg-white/95 hover:bg-white text-gray-800 rounded-lg text-xs font-medium shadow-sm transition-all hover:shadow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg> 编辑</button>
-                <button onclick="event.stopPropagation();openEditorPrototype()" class="flex-1 px-3 py-1 bg-brand hover:bg-brand-hover text-white rounded text-xs font-medium shadow-sm transition-all hover:shadow-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="13.5" cy="6.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".6" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".6" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".6" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/></svg> 设计</button>
+                <button onclick="event.stopPropagation();openEditorPrototype('${c.title}')" class="flex-1 px-3 py-1 bg-brand hover:bg-brand-hover text-white rounded text-xs font-medium shadow-sm transition-all hover:shadow-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><circle cx="13.5" cy="6.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".6" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".6" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".6" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/></svg> 设计</button>
               </div>
               ` : ''}
             </div>
@@ -2355,7 +2357,7 @@ function nowTime() {
 }
 function addTask(t) {
   const list = getTasks();
-  list.unshift({ id: 'T' + Date.now(), status: 'queued', progress: 0, reason: null, log: '', createdAt: nowTime(), steps: makeTaskSteps(t.type || 'data'), ...t });
+  list.unshift({ id: 'T' + Date.now(), status: 'queued', progress: 0, reason: null, log: '', createdAt: nowTime(), createdTs: Date.now(), steps: makeTaskSteps(t.type || 'data'), ...t });
   saveTasks(list);
   updateTaskBadge();
   return list[0];
@@ -2375,6 +2377,8 @@ function runningCount() { return getTasks().filter(t => t.status === 'queued' ||
 // 任务结束（成功/失败）→ 目标数据卡片状态随之变化（与 M1 闭环，跨页持久化）
 // 08-17 决策：数据业务态仅两态（待发布/已发布）；任务失败不回写数据卡，错误只在任务中心展示
 function applyTaskResult(task, failed) {
+  if (!failed && window.HTWorkflow) HTWorkflow.complete(task);
+  if (task.operation === 'update') return;
   if (!task.target) return;
   const card = moduleConfigs.data.cards.find(c => c.title === task.target);
   if (!card) return;
@@ -2462,6 +2466,7 @@ function seedSteps(type, status) {
   });
 }
 function ensureSeedTasks() {
+  if (getTasks().some(t=>String(t.id).startsWith('T_seed'))) return;
   const SEEDS = [
     { id: 'T_seed1',  type: 'data',    title: '入库：嫩江农场_玉米长势_2026Q3',   target: '嫩江农场_玉米长势_2026Q3',   status: 'success', progress: 100, reason: null, createdAt: '15:30', operator: '张建国' },
     { id: 'T_seed2',  type: 'service', title: '发布：水稻估产遥感（八级）',       target: '水稻估产遥感（八级）',       status: 'running', progress: 45,  reason: null, createdAt: '15:12', operator: '聂聪' },
@@ -2821,6 +2826,22 @@ function publishFromDetail(card) {
   document.body.insertAdjacentHTML('beforeend', html);
 })();
 
+// 本地保存的图层在列表与编辑器之间保持一致。
+function htSyncSavedLayers() {
+  if (!window.HTWorkflow) return;
+  const saved=HTWorkflow.layers();
+  moduleConfigs.layer.cards=moduleConfigs.layer.cards.filter(c=>!c.htSaved&&!saved.some(l=>l.name===c.title||l.originalName===c.title));
+  saved.forEach(l=>moduleConfigs.layer.cards.unshift({id:l.id,htSaved:true,title:l.name,type:'要素图层',raster:l.timeSeries?'sequence':(l.services[0]?.dataModel==='栅格'?'single':undefined),svcCount:l.services.length,empty:!l.services.length,svc:l.services[0]?.catalogName||l.services[0]?.name,fmt:'图层',sub:l.services.length+' 个服务',org:l.org,mine:true,tags:l.tags||[],crs:l.services[0]?.crs||'待配置',updated:l.updated,status:'未共享',thumb:'from-brand-light to-brand/20',editorService:l.services[0]?.name}));
+}
+htSyncSavedLayers();
+if (window.HTWorkflow) {
+  const htPublished = HTWorkflow.services();
+  moduleConfigs.data.cards.forEach(c => {
+    c.svcCount = (c.svcCount || 0) + htPublished.filter(s => s.asset === c.title).length;
+  });
+  moduleConfigs.service.cards.unshift(...htPublished.map(s => ({...s,thumb:'from-brand-light to-brand/20',sub:s.type+' · 平台发布',timeSeries:s.timeEnabled?[s.timestamp]:null})));
+}
+window.addEventListener('storage',e=>{if(e.key==='hetu_layers_v2'){htSyncSavedLayers();if(activeModule==='layer')switchModule('layer');}});
 // ── 初始化 ───────────────────────────────────────────────
 ensureSeedTasks();
 injectTaskBell();

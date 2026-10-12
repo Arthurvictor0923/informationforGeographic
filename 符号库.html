@@ -6,8 +6,11 @@
 <title>河图·地理信息平台 — 符号库</title>
 <link rel="stylesheet" href="tailwind.css">
 <link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="portal-theme.css">
+<script defer src="portal-theme.js"></script>
+<script src="hetu-workflow.js"></script>
 </head>
-<body class="bg-page-bg text-gray-800 text-sm h-screen overflow-hidden flex flex-col">
+<body class="bg-page-bg text-gray-800 text-sm h-screen overflow-hidden flex flex-col hetu-portal hetu-catalog">
 
 <!-- ============================================================ -->
 <!-- MAIN APP SHELL                                               -->
@@ -22,7 +25,7 @@
         <span class="text-base font-semibold text-brand">河图·地理信息平台</span>
       </div>
       <nav id="topNav" class="flex items-center h-16 gap-0.5">
-        <a href="数据资产.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
+        <a href="数据资产-合并原型.html" data-module="data" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg> 数据资产
         </a>
         <a href="地图服务-重设计.html" data-module="service" class="nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5">
@@ -70,5 +73,7 @@
   // 符号库为独立资源层（管理员域），与数据资产 / 地图服务 / 要素图层 并列。
   switchModule('symbol');
 </script>
+<script src="prototype-list-links.js"></script>
+<script src="prototype-symbol-links.js"></script>
 </body>
 </html>

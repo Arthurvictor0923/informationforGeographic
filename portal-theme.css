@@ -1,0 +1,247 @@
+/* 河图 · 门户风格基础样式 / 2026-10-10
+   样式依据：用户提供的协同创新平台门户 HTML 实际界面。
+   此文件放在原样式之后；仅负责外观、尺寸与自适应，不改变业务状态及事件。 */
+:root {
+  --brand:#005653; --brand-hover:#004542; --brand-active:#003b39; --brand-dark:#004542;
+  --brand-primary:#005653; --brand-light:#edf6f2; --brand-soft:#edf6f2;
+  --brand-50:#f4f8f5; --brand-100:#edf6f2; --brand-500:#005653; --brand-600:#005653;
+  --brand-bg:#edf6f2; --brand-bg-solid:#edf6f2; --brand-bg-hover:#e2efea;
+  --brand-border:#b8d4cb; --brand-outline:rgba(0,86,83,.12);
+  --page-bg:#f4f8f5; --bg-page:#f4f8f5; --bg-panel:#fff; --panel-bg:#fff; --surface:#fff;
+  --bg-hover:#f3f8f5; --white:#fff;
+  --text:#10213a; --text-secondary:#526078; --text-muted:#6b778c;
+  --text-2:#526078; --text-3:#6b778c; --text-4:#94a1af; --text-ph:#94a1af; --text-placeholder:#94a1af;
+  --gray-25:#fafcfb; --gray-50:#f5f8f7; --gray-100:#eaf0ee; --gray-200:#dce5e9;
+  --gray-300:#c4d0d5; --gray-400:#94a1af; --gray-500:#6b778c; --gray-600:#526078;
+  --gray-700:#36485e; --gray-800:#24374d; --gray-900:#10213a;
+  --border:#dce5e9; --border-light:#eaf0ee; --border-sec:#dce5e9; --split:#eaf0ee;
+  --c-primary:#005653; --c-primary-hover:#004542; --c-primary-active:#003b39;
+  --c-primary-bg:#edf6f2; --c-primary-deep:#004542; --c-primary-lightest:#edf6f2; --c-primary-lighter:#e2efea;
+  --radius-sm:4px; --radius:4px; --radius-lg:8px; --radius-xl:8px;
+  --r-xs:3px; --r-sm:4px; --r-md:4px; --r-lg:8px; --r-xl:8px;
+  --shadow-xs:0 1px 3px rgba(16,33,58,.04);
+  --shadow-sm:0 2px 8px rgba(16,33,58,.05);
+  --shadow:0 2px 8px rgba(16,33,58,.06);
+  --shadow-md:0 6px 18px rgba(16,33,58,.08);
+  --shadow-lg:0 12px 32px rgba(16,33,58,.12);
+  --shadow-xl:0 20px 60px rgba(16,33,58,.16);
+  --shadow-card:0 2px 8px rgba(16,33,58,.04); --shadow-modal:0 20px 60px rgba(16,33,58,.16);
+  --font-ui:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC",sans-serif;
+  --font-stack:var(--font-ui); --font-sans:var(--font-ui); --font:var(--font-ui);
+  --text-xs:12px; --text-sm:12px; --text-base:14px; --text-md:14px;
+  --topbar-h:64px; --header-height:64px; --control-height:36px;
+  --tab-w:60px; --func-w:60px; --panel-w:300px; --drawer-w:336px;
+}
+
+/* 真实字号与视口；恢复 fixed 弹窗以窗口为定位基准。 */
+html { background:var(--page-bg); }
+body.hetu-portal {
+  transform:none; width:100%; min-height:100vh; min-height:100dvh;
+  font-family:var(--font-ui); font-size:14px; line-height:22px;
+  color:var(--text); background:var(--page-bg); -webkit-font-smoothing:antialiased;
+}
+.hetu-portal button,.hetu-portal input,.hetu-portal select,.hetu-portal textarea { font-family:var(--font-ui); }
+.hetu-portal button:active { transform:none; }
+.hetu-portal .hidden,.hetu-portal [hidden] { display:none !important; }
+.hetu-portal a { text-decoration:none; }
+.hetu-portal :focus-visible { outline:2px solid rgba(0,86,83,.35); outline-offset:2px; }
+.hetu-portal :is(input,select,textarea):focus { outline:none; border-color:var(--brand) !important; box-shadow:0 0 0 2px var(--brand-outline) !important; }
+.hetu-portal input:is([type="checkbox"],[type="radio"],[type="range"]) { accent-color:var(--brand); }
+.hetu-portal [role="switch"][aria-checked="true"] { background:var(--brand) !important; }
+.hetu-portal ::-webkit-scrollbar-thumb { background:#c4d0d5; }
+
+/* 兼容原 Tailwind、独立编辑器及样式管理页的组件命名。 */
+.hetu-portal :is(.text-gray-900,.text-gray-800,.text-gray-700) { color:var(--text); }
+.hetu-portal :is(.text-gray-600,.text-gray-500) { color:var(--text-secondary); }
+.hetu-portal :is(.text-gray-400,.text-muted) { color:var(--text-muted); }
+.hetu-portal :is(.bg-gray-50,.bg-gray-100) { background-color:var(--gray-50); }
+.hetu-portal :is(.border-line,.border-gray-100,.border-gray-200) { border-color:var(--border); }
+.hetu-portal :is(.text-brand,.text-brand-dark,.text-brand-hover) { color:var(--brand); }
+.hetu-portal .bg-brand { background-color:var(--brand); }
+.hetu-portal .bg-brand-light { background-color:var(--brand-soft); }
+.hetu-portal :is(.rounded-xl,.rounded-2xl) { border-radius:8px; }
+.hetu-portal :is(.shadow-sm,.shadow-md) { box-shadow:var(--shadow); }
+.hetu-portal .btn {
+  height:36px; padding:0 16px; border-radius:4px; font-size:14px; line-height:20px;
+  font-weight:500; box-shadow:none; transition:background .15s,border-color .15s,color .15s;
+}
+.hetu-portal :is(.btn-primary,.btn.primary,.btn-brand) { background:var(--brand); border-color:var(--brand); color:#fff; }
+.hetu-portal :is(.btn-primary,.btn.primary,.btn-brand):hover { background:var(--brand-hover); border-color:var(--brand-hover); color:#fff; }
+.hetu-portal .btn-default { border-color:var(--border); color:var(--text); }
+.hetu-portal :is(.btn-sm,.btn.btn-sm) { height:32px; padding:0 12px; font-size:13px; }
+.hetu-portal :is(.btn-xs,.btn.btn-xs) { height:28px; padding:0 8px; font-size:12px; }
+.hetu-portal .btn-lg { height:40px; }
+.hetu-portal :is(.btn-icon,.icon-btn,.modal-close) { border-radius:4px; }
+.hetu-portal .btn-icon { padding:0; }
+.hetu-portal .btn-icon.btn-sm { width:32px; }
+.hetu-portal .btn-icon.btn-md { width:36px; }
+.hetu-portal .btn-icon.btn-lg { width:40px; }
+.hetu-portal .btn:disabled { cursor:not-allowed; }
+.hetu-portal :is(.filter-select,.date-input,.input,select,input[type="text"],input[type="search"],input[type="url"],input[type="number"],input[type="date"]) {
+  min-height:36px; border-radius:4px; border-color:var(--border); font-size:14px;
+}
+.hetu-portal textarea { border-radius:4px; border-color:var(--border); font-size:14px; }
+.hetu-portal .date-input { font-size:12px; padding-left:5px; padding-right:3px; }
+.hetu-portal :is(.tag-pill,.ltag,.pill,.st-pill,.active-chip,.sq-tpl-chip,.sq-def-btn) { border-radius:4px; }
+.hetu-portal .tag-pill { font-size:12px; line-height:18px; }
+.hetu-portal :is(.page-current,.pager button.on,.pg.active) { background:var(--brand); color:#fff; }
+.hetu-portal .pager button { border-radius:4px; }
+.hetu-portal :is(.data-table,.list-row) { font-size:14px; }
+.hetu-portal :is(.data-table thead th,.list-head) { background:#f5f8f7; font-size:13px; color:var(--text-secondary); }
+.hetu-portal .data-table tbody td { border-color:var(--border-light); }
+.hetu-portal :is(.filter-swtich-active,.filter-select:hover,.filter-select:focus) { color:var(--brand); border-color:var(--brand); }
+.hetu-portal :is(.lw-svc-checked,.lw-svc-checked:hover) { background:var(--brand-soft); box-shadow:inset 0 0 0 1px var(--brand); }
+.hetu-portal .step-dot.active { background:var(--brand); box-shadow:0 0 0 4px var(--brand-outline); }
+.hetu-portal .card-selected { border-color:var(--brand); box-shadow:0 0 0 2px var(--brand-outline); }
+
+/* 门户式白色导航：深蓝品牌名、深绿选中项、细下划线。 */
+.hetu-catalog :is(#appShell,.app-shell) { height:100vh; height:100dvh; min-height:0; }
+.hetu-catalog :is(#appShell,.app-shell)>header {
+  height:64px; min-height:64px; padding:0 clamp(24px,3.65vw,56px);
+  background:#fff; border-bottom:1px solid var(--border); box-shadow:none; gap:20px;
+}
+.hetu-catalog header>div:first-child { flex:1; min-width:0; }
+.hetu-catalog header>div:first-child>div:first-child { flex-shrink:0; margin-right:24px; gap:10px; }
+.hetu-catalog header>div:first-child>div:first-child>span { font-size:20px; font-weight:600; color:var(--text); white-space:nowrap; }
+.hetu-catalog header>div:first-child>div:first-child>div { border-radius:6px; background:var(--brand); width:34px; height:34px; }
+.hetu-catalog header>div:last-child { flex-shrink:0; gap:10px; }
+.hetu-catalog header [class*="bg-[#f56a00]"] { background:var(--brand); width:30px; height:30px; }
+.hetu-catalog #topNav { height:64px; min-width:0; gap:0; overflow-x:auto; scrollbar-width:none; }
+.hetu-catalog #topNav::-webkit-scrollbar { display:none; }
+.hetu-catalog #topNav .nav-btn {
+  height:64px; padding:0 16px; border-radius:0; color:var(--text-secondary); font-weight:400;
+  font-size:14px; white-space:nowrap; flex-shrink:0; background:transparent;
+}
+.hetu-catalog #topNav .nav-btn>svg { display:none; }
+.hetu-catalog #topNav .nav-btn:hover { color:var(--brand); }
+.hetu-catalog #topNav .nav-btn.active { background:transparent; color:var(--brand) !important; font-weight:600; }
+.hetu-catalog #topNav .active-bar { bottom:0; left:16px; right:16px; height:3px; background:var(--brand); }
+
+/* 列表骨架：浅青底、白面板、272px 侧栏、16px 间距。 */
+.hetu-catalog #appShell>div.flex-1 { padding:16px clamp(24px,3.65vw,56px) 24px; gap:16px; min-height:0; }
+.hetu-catalog .workspace { padding:16px clamp(24px,3.65vw,56px) 24px; gap:16px; }
+.hetu-catalog #appShell>div>aside { width:272px; }
+.hetu-catalog :is(#appShell aside,#appShell main,.panel) { border:1px solid var(--border); border-radius:8px; box-shadow:none; }
+.hetu-catalog :is(#appShell aside,#appShell main) { min-height:0; }
+.hetu-catalog #sidebarContent { padding:12px; }
+.hetu-catalog #sidebarContent [data-tree-filter] { min-height:34px; border-radius:4px; }
+.hetu-catalog #sidebarContent .font-semibold.text-brand { background:var(--brand-soft); }
+.hetu-catalog #sidebarContent .rounded-md:hover { background:var(--brand-soft); }
+.hetu-catalog .filter-label { font-size:14px; color:var(--text); display:flex; align-items:center; gap:8px; }
+.hetu-catalog .filter-label::before { content:""; width:3px; height:14px; flex-shrink:0; border-radius:2px; background:var(--brand); }
+.hetu-catalog .filter-sec { padding:14px 16px; border-color:var(--border-light); }
+.hetu-catalog .chk-row { font-size:14px; min-height:32px; border-radius:4px; }
+.hetu-catalog .chk-row.active { background:var(--brand-soft); color:var(--brand); }
+.hetu-catalog .chk-row:hover { background:var(--brand-soft); }
+.hetu-catalog #mainContent>div>div:first-child { flex-wrap:wrap; gap:16px; padding:20px; }
+.hetu-catalog #mainContent>div>div:first-child>div { flex-wrap:wrap; gap:10px; min-width:0; }
+.hetu-catalog #mainContent>div>div:first-child>div:last-child { margin-left:auto; }
+.hetu-catalog #mainContent #mainSearch { width:200px; }
+.hetu-catalog #mainContent>div>div:first-child button { min-height:36px; border-radius:4px; }
+.hetu-catalog #mainContent>div>.overflow-y-auto { padding:0 20px 20px; }
+.hetu-catalog #mainContent>div>#filterPanel { padding-left:20px; padding-right:20px; }
+.hetu-catalog #mainContent>div>div:first-child h1 { font-size:18px; line-height:26px; font-weight:600; }
+.hetu-catalog :is(.card-hover,.sq-tpl,.stat-chip,.list-wrap) { border-radius:8px; border-color:var(--border); }
+.hetu-catalog .card-hover { box-shadow:none; transition:border-color .15s,box-shadow .15s; }
+.hetu-catalog .card-hover:hover { transform:none; border-color:#a4bfb5; box-shadow:0 4px 14px rgba(16,33,58,.07); }
+.hetu-catalog .card-todo { border-color:#ead4a7; box-shadow:inset 3px 0 0 #d7a33b; }
+.hetu-catalog .card-todo:hover { border-color:#d7a33b; box-shadow:inset 3px 0 0 #d7a33b,0 4px 14px rgba(16,33,58,.06); }
+.hetu-catalog .card-hover h3 { font-size:15px; line-height:24px; font-weight:600; color:var(--text); }
+.hetu-catalog :is(.view-seg,.seg) { border-radius:4px; }
+.hetu-catalog .view-seg { height:36px; padding:0; gap:0; overflow:hidden; }
+.hetu-catalog .view-seg button { height:34px; border-radius:0; font-size:14px; padding:0 12px; box-shadow:none; }
+.hetu-catalog .view-seg button+button { border-left:1px solid var(--border); }
+.hetu-catalog .stat-chip .n { color:var(--text) !important; font-weight:600; }
+.hetu-catalog :is(.stat-icon-blue,.stat-icon-cyan,.stat-icon-purple,.stat-icon-brand) { background:var(--brand-soft); color:var(--brand) !important; border-radius:6px; }
+.hetu-catalog .stat-icon-green { background:#edf7ef; color:#2b7951 !important; border-radius:6px; }
+.hetu-catalog .stat-icon-red { background:#fff1f0; color:#b42318 !important; border-radius:6px; }
+.hetu-catalog .stat-icon-orange { background:#fff7e6; color:#a66b16 !important; border-radius:6px; }
+.hetu-catalog .stat-chip .l { font-size:13px; }
+.hetu-catalog .stat-chip.clickable.on { background:var(--brand-soft); outline:1px solid var(--brand); }
+.hetu-catalog .sq-tpl.sel { background:var(--brand-soft); border-color:var(--brand); }
+.hetu-catalog .sq-tpl-chip.def { background:var(--brand-soft); color:var(--brand); border-color:var(--brand-border); }
+.hetu-catalog .sq-def-btn.on { background:var(--brand-soft); color:var(--brand); }
+
+/* 同一套弹窗和抽屉；遮罩的开关仍由原有业务代码控制。 */
+.hetu-portal :is(.modal,.modal-box,.drawer,.right-drawer) { color:var(--text); }
+.hetu-portal :is(.modal,.modal-box) { border-radius:8px; box-shadow:var(--shadow-xl); max-width:calc(100vw - 48px); max-height:calc(100dvh - 48px); }
+.hetu-portal :is(.modal-hd,.modal-head) { font-size:18px; font-weight:600; border-color:var(--border); padding:20px 24px; }
+.hetu-portal :is(.modal-bd,.modal-body) { font-size:14px; }
+.hetu-portal :is(.modal-ft,.modal-foot) { border-color:var(--border); padding:16px 24px; background:#fff; }
+.hetu-catalog .fixed.inset-0>div.bg-white { max-width:calc(100vw - 48px); border-radius:8px; box-shadow:var(--shadow-xl); }
+.hetu-catalog .fixed.inset-0 h2 { font-size:18px; color:var(--text); font-weight:600; }
+.hetu-portal .fixed.inset-0.z-50.flex.items-center.justify-center { backdrop-filter:none; }
+.hetu-catalog .drawer .dt-tab { font-size:14px; }
+
+/* 编辑器保留地图画布、服务结构、工具位置，只统一外观与阅读尺寸。 */
+.hetu-editor .app { height:100vh; height:100dvh; }
+.hetu-editor .topbar { height:64px; min-height:64px; padding:0 24px; background:#fff; border-bottom:1px solid var(--border); box-shadow:none; gap:12px; }
+.hetu-editor .topbar .title { font-size:18px; font-weight:600; color:var(--text); }
+.hetu-editor .topbar .title .sub { font-size:12px; color:var(--text-muted); }
+.hetu-editor .type-tag { border-radius:4px !important; font-size:12px !important; background:var(--brand-soft) !important; color:var(--brand) !important; }
+.hetu-editor .left-tabs,.hetu-editor .right-funcbar { background:#fff; border-color:var(--border); padding-top:12px; }
+.hetu-editor .left-tab { width:48px; height:54px; margin-bottom:5px; border-radius:4px; color:var(--text-secondary); }
+.hetu-editor :is(.left-tab .lt-label,.func-btn .fb-label) { font-size:12px; line-height:18px; }
+.hetu-editor .left-tab.active,.hetu-editor .func-btn.active { color:var(--brand); background:var(--brand-soft); box-shadow:none; }
+.hetu-editor :is(.left-panel,.right-drawer) { border-color:var(--border); box-shadow:none; }
+.hetu-editor .pnl-header { font-size:14px; padding:16px; background:#fff; border-color:var(--border); }
+.hetu-editor .pnl-section { padding:12px 16px; }
+.hetu-editor :is(.subject-card,.info-card,.layer-info-card,.service-card) { border-radius:8px; border-color:var(--border); background:#fff; }
+.hetu-editor .subject-card { padding:12px; }
+.hetu-editor .subject-card .sc-name { font-size:14px; line-height:22px; }
+.hetu-editor .subject-card :is(.sc-label,.sc-note,.sc-from,.meta-line) { font-size:12px; line-height:20px; }
+.hetu-editor .subject-card .sc-from { background:var(--brand-soft); border-color:var(--brand-border); color:var(--brand); }
+.hetu-editor :is(.pnl-hint,.hint,.help,.field-hint,.field-label,.sec-title,.meta-line,.form-label) { font-size:12px; }
+.hetu-editor .info-banner { border-radius:4px; font-size:12px; line-height:20px; }
+.hetu-editor .statusbar { height:30px; padding:0 16px; font-size:12px; border-color:var(--border); color:var(--text-secondary); }
+.hetu-editor .func-btn { min-height:52px; font-size:12px; border-radius:4px; }
+.hetu-editor .right-funcbar { width:60px; flex-shrink:0; }
+.hetu-editor .func-btn { width:48px; }
+.hetu-editor .func-btn>span:last-child { font-size:12px; line-height:18px; }
+.hetu-editor .modal-close { width:32px; height:32px; }
+.hetu-editor :is(.map-toolbar,.toolbar-group) { border-color:var(--border); border-radius:8px; box-shadow:var(--shadow); }
+.hetu-editor .map-toolbar button { border-radius:4px; }
+.hetu-editor .raster-style-pick,.hetu-editor .rsp-tpl { border-radius:8px; }
+.ht-icon { display:inline-block; width:1.15em; height:1.15em; vertical-align:-.16em; flex-shrink:0; }
+.ht-symbol { display:inline-flex; vertical-align:-.16em; align-items:center; justify-content:center; color:inherit; font-size:inherit; line-height:1; }
+.ht-symbol .ht-glyph { display:none; }
+.hetu-editor .lt-icon .ht-icon,.hetu-editor .fb-icon .ht-icon { width:20px; height:20px; }
+.hetu-editor .pnl-header>span:first-child { white-space:nowrap; flex-shrink:0; }
+.hetu-editor .pnl-header .pnl-hint { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-left:10px; }
+.hetu-editor .info-banner { background:var(--brand-soft) !important; color:var(--text-secondary) !important; border-color:var(--brand-border) !important; }
+
+@media(max-width:1400px) {
+  .hetu-catalog :is(#appShell,.app-shell)>header { padding-inline:24px; gap:12px; }
+  .hetu-catalog header>div:first-child>div:first-child { margin-right:12px; }
+  .hetu-catalog header>div:first-child>div:first-child>span { font-size:18px; }
+  .hetu-catalog #topNav .nav-btn { padding-inline:12px; }
+  .hetu-catalog #appShell>div.flex-1,.hetu-catalog .workspace { padding-inline:24px; }
+  .hetu-catalog #appShell>div>aside { width:248px; }
+  .hetu-catalog #mainContent>div>div:first-child>div:last-child { flex:1 1 100%; margin-left:0; }
+}
+@media(max-width:1100px) {
+  .hetu-catalog :is(#appShell,.app-shell)>header { height:auto; min-height:64px; flex-wrap:wrap; padding-bottom:8px; }
+  .hetu-catalog header>div:first-child { flex:1 1 100%; }
+  .hetu-catalog header>div:last-child { margin-left:auto; }
+  .hetu-catalog #appShell>div>aside { width:224px; }
+  .hetu-editor { --panel-w:272px; --drawer-w:300px; }
+  .hetu-editor .topbar { padding-inline:16px; }
+  .hetu-editor .topbar .title .sub { display:none; }
+}
+@media(max-width:760px) {
+  .hetu-catalog #appShell>div.flex-1 { padding:12px; gap:12px; overflow:auto; }
+  .hetu-catalog #appShell>div>aside { width:200px; }
+  .hetu-catalog #appShell>div>main { min-width:360px; }
+  .hetu-catalog header>div:first-child { flex-wrap:wrap; }
+  .hetu-catalog #topNav { width:100%; height:48px; }
+  .hetu-catalog #topNav .nav-btn { height:48px; }
+  .hetu-catalog header>div:first-child>div:first-child { height:52px; }
+  .hetu-portal :is(.modal,.modal-box,.fixed.inset-0>div.bg-white) { max-width:calc(100vw - 24px); }
+  .hetu-editor .topbar .title { font-size:15px; }
+  .hetu-editor .topbar .btn { padding-inline:8px; }
+}
+/* Keep creation dialogs reachable after expanding resource selectors. */
+#createMapModal>div,#layerWizard>div{display:flex;flex-direction:column;max-height:calc(100dvh - 48px);max-width:calc(100vw - 32px)}
+#createMapModal>div>div:first-child,#createMapModal>div>div:last-child,#layerWizard>div>div:first-child,#layerWizard>div>div:last-child{flex-shrink:0}
+#createMapModal>div>div:nth-child(2),#layerWizard>div>div:nth-child(2){overflow-y:auto;min-height:0}
+#cmLayerList{max-height:208px;overflow-y:auto}
