@@ -1,0 +1,81 @@
+/* Publishing and resource intake: shared visual language. */
+[hidden]{display:none!important}
+.ux-help{font-size:12px;line-height:1.65;color:#7a8780;margin:6px 0 0}
+.ux-error{font-size:12px;color:#b42318;margin-top:6px;min-height:0}
+.ux-error:empty{display:none}
+.ux-control{width:100%;border:1px solid #dce5df;border-radius:7px;padding:9px 11px;background:#fff;font:inherit;color:#263a2f;min-width:0}
+.ux-control:focus{outline:2px solid #b6d8ca;outline-offset:1px;border-color:#006f64}
+.ux-control[aria-invalid=true]{border-color:#c74a42}
+.ux-field{margin-bottom:17px;min-width:0}.ux-field>label,.ux-label{display:block;font-size:13px;font-weight:500;color:#334b3d;margin-bottom:7px}
+.ux-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}.ux-required{color:#b42318;margin-left:3px}
+.ux-details{border:1px solid #dfe7e1;border-radius:8px;margin-top:16px;background:#fff}
+.ux-details>summary{cursor:pointer;padding:13px 16px;font-size:13px;font-weight:500;color:#344c3f;background:#f8faf9;border-radius:8px}
+.ux-details[open]>summary{border-bottom:1px solid #e6ece8;border-radius:8px 8px 0 0}
+.ux-details-body{padding:17px}.ux-details-body>:last-child{margin-bottom:0}
+.ux-checks{display:flex;flex-wrap:wrap;gap:10px 20px}.ux-checks label{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px}
+.ux-checks input{accent-color:#006f64}.ux-muted{color:#7b8981;font-size:12px;font-weight:400}
+.ux-link{border:0;background:none;color:#006f64;cursor:pointer;padding:3px 0;font-size:12px}.ux-link:hover{text-decoration:underline}
+.ux-readonly{font-family:ui-monospace,monospace;font-size:12px;background:#f6f8f7;overflow-wrap:anywhere;padding:10px;border-radius:6px;color:#65776c}
+.ux-field-list{max-height:158px;overflow:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px 0 0}
+.ux-field-list label{display:flex;gap:7px;align-items:center;overflow:hidden;font-size:12px;cursor:pointer}.ux-field-list span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ux-field-list input{accent-color:#006f64}.ux-field-toolbar{display:flex;align-items:center;gap:14px}.ux-field-toolbar input[type=search]{flex:1;width:auto;padding:7px 9px;font-size:12px}.ux-field-toolbar label{font-size:12px;display:flex;gap:6px;align-items:center;white-space:nowrap}
+.ux-parameter{display:grid;grid-template-columns:minmax(180px,1fr) 110px 145px;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #edf1ee;font-size:12px}
+.ux-parameter:last-child{border-bottom:0}.ux-parameter input[type=number]{padding:6px 8px}.ux-parameter input:disabled{background:#f7f9f8;color:#8b9790}
+.ux-subhead{font-size:12px;font-weight:600;color:#61756a;margin:17px 0 3px}.ux-subhead:first-child{margin-top:0}
+#publishModal .publish-dialog{height:auto;max-height:92vh;width:min(1080px,calc(100vw - 40px))}
+#publishModal .publish-dialog-header{padding:16px 24px}
+#publishModal .publish-steps{padding:13px 24px;margin:0}
+#publishModal .publish-dialog-body{padding:20px 28px;flex:0 1 auto;min-height:280px;max-height:calc(92vh - 180px)}
+#publishModal .publish-section-title{margin-bottom:14px}
+#publishModal .publish-flow-content{max-width:none}
+#publishModal .publish-type-grid{gap:12px;margin:0 0 18px}
+#publishModal .publish-card{min-height:126px;padding:14px 13px;justify-content:flex-start;gap:5px}
+#publishModal .publish-card-title{font-size:14px;font-weight:600;line-height:1.5;white-space:normal;padding-right:12px}
+#publishModal .publish-card-name{font-size:12px;color:#748278}
+#publishModal .ux-card-use{font-size:12px;line-height:1.65;color:#607369;margin-top:5px;font-weight:400}
+#publishModal .publish-service-description{display:none}
+#publishModal .publish-selected-service{padding:12px 15px;margin-bottom:18px;min-height:0}
+#publishModal .publish-selected-icon{width:38px;height:38px}
+#publishModal .publish-selected-service strong{font-size:14px}
+#publishModal .publish-selected-service span{font-size:12px}
+#publishModal .publish-dialog-footer{justify-content:flex-end;padding:15px 34px}
+#publishOptionsArea .ux-config{border-top:1px solid #e6ece8;padding-top:21px}
+#publishOptionsArea input[type=checkbox]{accent-color:#006f64}
+#publishTitleField input{font-size:14px}
+.ux-source-summary{display:flex;align-items:center;gap:10px;font-size:12px;color:#607369;background:#f5f8f6;border-radius:6px;padding:8px 11px;margin-bottom:14px}
+.ux-source-summary span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#uploadWizard>div{width:min(820px,calc(100vw - 36px))!important;height:min(760px,90vh);max-height:90vh!important}
+#uxMethodCards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:18px 24px 0;flex-shrink:0}
+#uxMethodCards button{padding:12px!important;border-radius:8px!important;border-width:1px!important;text-align:left;min-height:62px}
+#uxMethodCards button svg{width:20px!important;height:20px!important;margin:0!important}
+#uxMethodCards button>div:first-child{margin-bottom:5px!important}
+#uxMethodCards button{display:grid;grid-template-columns:28px minmax(0,1fr);column-gap:7px;align-content:center;min-height:89px}
+#uxMethodCards button>div:first-child{width:24px;height:24px;grid-row:1/3;align-self:center}
+#uxMethodCards button>div:nth-child(2),#uxMethodCards button>div:nth-child(3){grid-column:2}
+#uxMethodCards button[aria-pressed=true]{border-color:#006f64!important;background:#edf6f2!important}
+#uxMethodCards button p{display:none}#uxMethodCards button .text-lg{font-size:13px}
+.ux-upload-steps{display:flex;justify-content:center;gap:36px;padding:16px;border-bottom:1px solid #e3e9e5;font-size:13px;color:#86958c}
+.ux-upload-steps .step-dot{display:inline-block;width:22px;height:22px;border-radius:50%;text-align:center;line-height:22px;margin-right:7px;background:#eef2ef;color:#77877d}
+.ux-upload-steps .step-dot.active,.ux-upload-steps .step-dot.done{background:#006f64;color:#fff}
+.ux-tool-nav{width:210px;flex-shrink:0;align-self:stretch;background:white;border:1px solid #e0e8e2;border-radius:10px;padding:18px 12px}
+.ux-tool-nav h2{font-size:13px;color:#738579;padding:2px 12px 17px;font-weight:500}
+.ux-tool-nav a{display:flex;gap:9px;align-items:center;padding:12px;border-radius:6px;background:#e8f4ed;color:#006f64;font-size:14px;font-weight:600}
+#spatialPanel.ux-tools-layout{display:flex!important;flex-direction:row;gap:16px;padding:16px;min-height:0;flex:1}
+#spatialPanel.ux-tools-layout[hidden]{display:none!important}
+#spatialPanel.ux-tools-layout .sp-panel{flex:1;min-width:0;margin:0;min-height:0}
+#spatialPanel.ux-tools-layout .sp-bottom-note{display:none}
+.asset-tabs{display:none!important}
+#topNav .ux-nav-active{color:#006f64!important;background:transparent}
+#topNav .ux-nav-active:after{content:'';position:absolute;height:3px;background:#006f64;bottom:0;left:16px;right:16px}
+#topNav .ux-nav-active .active-bar{display:none}
+.ux-reg-providers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ux-reg-provider{padding:11px 6px;border:1px solid #dce5df;background:#f8faf9;border-radius:6px;cursor:pointer;font-size:12px;line-height:1.5;color:#63776b}
+.ux-reg-provider[aria-pressed=true]{border-color:#006f64;background:#e8f4ed;color:#006f64;font-weight:600}
+#registerModal>div{width:min(740px,calc(100vw - 32px))!important;max-height:92vh;display:flex;flex-direction:column}
+#registerModal .ux-reg-body{padding:23px 28px;overflow:auto;flex:1;min-height:0}
+#registerModal .ux-reg-foot{padding:15px 28px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #e0e8e2;background:#fafcfb}
+.ux-detail-actions{display:flex;gap:9px;margin:12px 0 18px;flex-wrap:wrap}
+.ux-kv{display:grid;grid-template-columns:100px minmax(0,1fr);gap:13px;padding:12px 0;border-bottom:1px solid #eff2ef;line-height:1.6;font-size:13px}
+.ux-kv>span:first-child{color:#7a8a80}.ux-kv>span:last-child{overflow-wrap:anywhere}
+.ux-code-url{overflow-wrap:anywhere;word-break:break-all;line-height:1.7;font-size:12px}
+@media(max-width:800px){#publishModal .publish-type-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#publishModal .publish-card{min-height:120px}#publishModal .publish-dialog-body{padding:20px}.ux-row{grid-template-columns:1fr}.ux-tool-nav{width:160px}.ux-field-list{grid-template-columns:repeat(2,minmax(0,1fr))}.ux-parameter{grid-template-columns:1fr 85px 110px}.ux-reg-providers{grid-template-columns:repeat(2,minmax(0,1fr))}}

@@ -2654,7 +2654,7 @@ function viewTaskLog(t) {
   document.getElementById('logTitle').textContent = task.title;
   const body = document.getElementById('logBody');
   if (body) {
-    body.innerHTML = renderTaskSteps(task)
+    body.innerHTML = (task.ingestOptions ? '<div class="mb-3 text-xs text-gray-500">像素直方图：'+(task.ingestOptions.parseHistogram ? '入库时解析' : '本次不解析')+'</div>' : '') + renderTaskSteps(task)
       + '<div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-3">'
       + '<span class="text-[11px] text-gray-400">任务级重试 = 从首个失败步骤续跑；也可在失败步骤上单独「重试此步」</span>'
       + '<button onclick="retryTask(\'' + task.id + '\')" class="px-3 py-1.5 bg-brand hover:bg-brand-hover text-white rounded-lg text-xs font-medium transition-colors flex-shrink-0">任务级重试</button>'

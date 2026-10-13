@@ -1,0 +1,23 @@
+/* October scope: existing metadata aggregation and one optional raster input flag. */
+(() => {
+'use strict';const $=id=>document.getElementById(id),W=HTWorkflow,E=W.esc;
+const number=value=>value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value))&&Number(value)>=0?Number(value):null;
+function bytes(c){const direct=number(c.sizeBytes);if(direct!==null)return direct;const files=(c.datasetFiles||[]).filter(f=>f.latest!==false);if(!files.length||files.some(f=>number(f.size)===null))return null;return files.reduce((sum,f)=>sum+Number(f.size),0);}
+function formatBytes(n){if(n===null)return '—';if(n<1024)return n+' B';if(n<1048576)return (n/1024).toFixed(1)+' KB';if(n<1073741824)return (n/1048576).toFixed(1)+' MB';return (n/1073741824).toFixed(2)+' GB';}
+function metrics(){const cards=moduleConfigs.data.cards,features=cards.filter(c=>getDataGeomType(c.title)!=='raster'),sizes=cards.map(bytes),counts=features.map(c=>number(c.featureCount));return {count:cards.length,size:sizes.every(n=>n!==null)?sizes.reduce((a,b)=>a+b,0):null,features:counts.every(n=>n!==null)?counts.reduce((a,b)=>a+b,0):null,missingSize:sizes.filter(n=>n===null).length,missingFeatures:counts.filter(n=>n===null).length};}
+function statistics(){const m=metrics();return '<div class="light-statbar" id="dataStatBar"><div><strong data-stat="count">'+m.count+'</strong><span>数据总数</span></div><div title="'+(m.missingSize?m.missingSize+' 项数据尚未提供大小信息':'')+'"><strong data-stat="size">'+formatBytes(m.size)+'</strong><span>数据总大小</span></div><div title="'+(m.missingFeatures?m.missingFeatures+' 项矢量数据尚未提供要素数量':'')+'"><strong data-stat="features">'+(m.features===null?'—':m.features.toLocaleString('zh-CN'))+'</strong><span>矢量要素总数</span></div></div>';}
+const nativeRender=renderMain;window.renderMain=function(m){const html=nativeRender(m);return m==='data'?html.replace('<div id="filterPanel"',statistics()+'<div id="filterPanel"'):html;};
+let intake=null;
+const histogram=document.createElement('div');histogram.id='lightHistogram';histogram.hidden=true;histogram.className='light-histogram';histogram.innerHTML='<label><input type="checkbox" id="lightParseHistogram" checked>解析像素直方图</label><p class="ux-help">取消勾选可缩短栅格入库处理时间。</p>';$('createSectionFile').append(histogram);
+function rasterFiles(){return [...($('fbInput').files||[])].filter(f=>/\.tiff?$/i.test(f.name));}
+function syncHistogram(){histogram.hidden=currentCreateMethod!=='file'||!rasterFiles().length;}
+const nativePick=onFilePick;window.onFilePick=function(input,listId){nativePick(input,listId);const list=$(listId||'fbFileList');if(list)list.querySelectorAll('button').forEach((button,index)=>button.onclick=()=>{const transfer=new DataTransfer();[...(input.files||[])].forEach((file,i)=>{if(i!==index)transfer.items.add(file);});input.files=transfer.files;window.onFilePick(input,listId);});syncHistogram();};
+const nativeMethod=switchCreateMethod;window.switchCreateMethod=function(method){nativeMethod(method);syncHistogram();};
+const nativeReset=resetUploadDrawer;window.resetUploadDrawer=function(){nativeReset();$('lightParseHistogram').checked=true;histogram.hidden=true;};
+const nativeTask=addTask;window.addTask=function(task){if(intake&&task.type==='data')task={...task,ingestOptions:{parseHistogram:intake.parseHistogram},rasterFiles:[...intake.files]};return nativeTask(task);};
+const nativeSubmit=submitUpload;window.submitUpload=function(){const before=new Set(moduleConfigs.data.cards.map(c=>c.id)),name=$('ndName').value.trim(),manual=currentCreateMethod==='draw'&&!$('drawSectionEmpty').classList.contains('hidden');const fields=manual?[...$('drawFieldTable').querySelectorAll('tr')].map(tr=>({name:tr.querySelector('input').value.trim(),type:tr.querySelector('select').value,primaryKey:false})):null,geom=manual?({'点':'point','线':'line','面':'polygon'})[$('drawGeomType').value]:null;intake=currentCreateMethod==='file'&&rasterFiles().length?{parseHistogram:$('lightParseHistogram').checked,files:rasterFiles().map(f=>f.name)}:null;const options=intake?{parseHistogram:intake.parseHistogram}:null;try{nativeSubmit();const card=moduleConfigs.data.cards.find(c=>c.title===name&&!before.has(c.id));if(card){if(options)card.ingestOptions=options;if(fields){card.fieldDefinitions=fields;card.geom=geom;}W.write('hetu_data_cards_v3',moduleConfigs.data.cards.filter(c=>!c.spId));applyFilter();}}finally{intake=null;}};
+// The single existing example has explicit metadata in its own original description.
+const sample=moduleConfigs.data.cards.find(c=>c.title==='行政村居民点');if(sample&&sample.featureCount===undefined)sample.featureCount=1284;
+window.HTLightData={metrics,bytes,formatBytes};
+applyFilter();
+})();
