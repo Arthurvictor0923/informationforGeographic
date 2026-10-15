@@ -1169,6 +1169,57 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
 
 </style>
 <style>#uxServiceIdRow{margin-bottom:20px}#uxServiceName{font-family:inherit;color:#84938b;min-height:40px;display:flex;align-items:center}</style>
+<style data-source="mvt-tile-type-and-asset-metadata">
+.mvt-tile-row>.tile-type-label{padding-top:7px;text-align:right;font-size:13px;line-height:1.7;color:#536159}
+.tile-type-layout{display:grid;grid-template-columns:minmax(190px,.8fr) minmax(0,1.7fr);gap:24px;align-items:start}
+.tile-type-selection{min-width:0}.tile-type-selection .ux-control{width:100%;box-sizing:border-box}
+.tile-type-detail{font-size:12px;line-height:1.85;color:#75857b;margin:13px 0 16px}
+.tile-type-key{border-left:2px solid #239d85;padding-left:10px;font-size:12px;line-height:1.75;color:#218c74;margin:0}
+.tile-type-preview{margin:0;min-width:0;box-sizing:border-box}
+.tile-type-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;line-height:20px;margin-bottom:12px}.tile-type-preview-heading strong{font-size:13px;font-weight:500;color:#4e6457}.tile-type-preview-heading>span{font-size:11px;color:#8b9a91}
+.tile-type-pair{display:grid;grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);gap:4px;align-items:center}
+.tile-type-pane{min-width:0}.tile-type-pane-title{font-size:12px;color:#53675b;text-align:center;margin-bottom:7px;line-height:20px}
+.tile-type-plot{width:100%;height:180px;background:#f5f8f6;border-radius:4px;overflow:hidden}.tile-type-plot svg{width:100%;height:180px;display:block}.tile-type-plot text{font-family:inherit;font-size:12px;fill:#34483c}
+.tile-type-arrow{font-size:22px;color:#83998b;text-align:center;line-height:1}
+.tile-type-caption{font-size:12px;line-height:1.65;text-align:center;color:#75857b;margin-top:8px;min-height:40px}
+.tile-type-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;font-size:12px;line-height:20px;color:#75857b;margin-top:5px;min-height:20px}.tile-type-legend>span{display:inline-flex;align-items:center;gap:5px}
+.tile-type-legend i{display:inline-block;box-sizing:border-box;flex-shrink:0}.tile-legend-circle{width:8px;height:8px;border-radius:50%;background:#198c70}.tile-legend-diamond{width:8px;height:8px;transform:rotate(45deg);background:#be873a}.tile-legend-area-a,.tile-legend-area-b{width:12px;height:9px;border:1.5px solid #198c70;background:#e7f4ec}.tile-legend-area-b{border-color:#be873a;background:transparent}
+#publishModal .publish-service-description.is-mvt-compact{display:block;padding:10px 0;margin-bottom:20px;min-height:0}
+#publishModal .publish-service-description.is-mvt-compact .publish-service-art,#publishModal .publish-service-description.is-mvt-compact h4{display:none}
+#publishModal .publish-service-description.is-mvt-compact #publishDescriptionSummary{font-size:12px;line-height:1.8;color:#839087}
+@media(max-width:900px){.tile-type-layout{grid-template-columns:1fr;gap:20px}.tile-type-detail{margin-bottom:10px}.tile-type-selection{max-width:none}}
+@media(max-width:520px){.tile-type-pair{grid-template-columns:1fr;gap:10px}.tile-type-arrow{transform:rotate(90deg);height:20px}.tile-type-caption{min-height:0}}
+
+.asset-card-metadata{display:flex;flex-direction:column;gap:7px;padding-top:12px;margin-top:11px;border-top:1px solid #f0f3f1;font-size:12px}
+.asset-card-metadata>div{display:flex;align-items:baseline;gap:12px;line-height:1.5;min-height:18px}
+.asset-card-metadata span{color:#8a968f;flex:0 0 52px}.asset-card-metadata b{color:#5b6c62;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.asset-table-wrap{overflow:auto;max-height:calc(100vh - 325px)}.asset-data-table{min-width:1215px;table-layout:fixed;border-collapse:separate;border-spacing:0}.asset-data-table th{white-space:nowrap;position:sticky;top:0;z-index:2}.asset-data-table td:nth-child(2){max-width:250px}.asset-data-table td:nth-child(7){white-space:nowrap}.asset-data-table th:last-child,.asset-data-table td:last-child{position:sticky;right:0;background:#fff;box-shadow:-5px 0 8px #244f3210}.asset-data-table th:last-child{z-index:3;background:#f5f8f7}.asset-data-table td:last-child{z-index:1}.asset-meta-cell{font-size:12px;color:#66776c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.asset-metadata-form{padding-bottom:24px;margin-bottom:24px;border-bottom:1px solid #edf1ee;max-width:680px}.asset-metadata-form h4{font-size:14px;font-weight:600;margin-bottom:18px;color:#394b40}.asset-metadata-form label{display:block;font-size:12px;margin:16px 0 8px;color:#53685b}.asset-metadata-form .ux-control{width:100%;font-size:13px}.asset-metadata-form p{font-size:12px;line-height:1.7;color:#8b968f;margin:6px 0 0}.asset-metadata-actions{margin-top:18px}
+
+
+</style>
+<style data-source="asset-time-picker.css">
+.asset-time-control{display:flex;align-items:stretch;gap:8px;min-width:0;font-size:13px}
+.asset-time-precision{width:96px;flex:0 0 96px;border:1px solid #dedede;border-radius:4px;padding:0 9px;height:36px;background:#fff;color:#505756;font:inherit;cursor:pointer}
+.asset-time-value{position:relative;flex:1;min-width:0}
+.asset-time-date,.asset-time-year{height:36px;width:100%;box-sizing:border-box;border:1px solid #dedede;border-radius:4px;background:#fff;color:#505756;font:inherit;padding:7px 32px 7px 10px;min-width:0}
+.asset-time-year{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;text-align:left}
+.asset-time-year svg{width:17px;height:17px;color:#929b97;flex-shrink:0}.asset-time-year.is-empty{color:#a4aba7}
+.asset-time-control [hidden],.asset-year-popup[hidden]{display:none!important}
+.asset-time-clear{position:absolute;right:5px;top:7px;border:0;background:transparent;width:22px;height:22px;padding:0;color:#98a29c;font:18px/22px Arial,sans-serif;cursor:pointer;border-radius:3px}
+.asset-time-clear:hover{background:#f0f5f2;color:#53685b}
+.asset-time-precision:focus-visible,.asset-time-date:focus-visible,.asset-time-year:focus-visible,.asset-time-clear:focus-visible{outline:2px solid #d9eee5;outline-offset:1px;border-color:#28a88f}
+.asset-year-popup{position:fixed;z-index:130;background:#fff;border:1px solid #dce7e1;border-radius:6px;box-shadow:0 8px 30px #15392a26;padding:8px;color:#394b40;font:13px/1.5 "Microsoft YaHei",sans-serif}
+.asset-year-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #edf1ee;padding:0 0 7px;margin-bottom:7px}.asset-year-head strong{font-size:13px;font-weight:500}
+.asset-year-head button{border:0;background:transparent;width:28px;height:28px;border-radius:4px;color:#6c7c72;font-size:20px;cursor:pointer}
+.asset-year-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.asset-year-grid button{height:36px;border:1px solid transparent;border-radius:4px;background:#fff;color:#4b6154;font:inherit;cursor:pointer}.asset-year-grid button.is-outside{color:#adb6b0}.asset-year-grid button.is-current{font-weight:600;color:#138d77}
+.asset-year-grid button:hover,.asset-year-head button:hover{background:#f0f8f4}.asset-year-grid button[aria-pressed=true]{background:#e7f7ef;color:#15896f;border-color:#b3dac8}.asset-year-grid button:focus-visible,.asset-year-head button:focus-visible{outline:2px solid #8bcaa3;outline-offset:-2px}
+.asset-year-popup button:disabled{cursor:default;color:#c5cdc8;background:#fff}
+.asset-time-legacy{font-size:12px;color:#8b968f;margin-top:6px}
+@media(max-width:600px){#ndMetadataRow{grid-template-columns:1fr}.asset-time-precision{width:88px;flex-basis:88px}}
+
+</style>
 </head>
 <body class="bg-page-bg text-gray-800 text-sm h-screen overflow-hidden flex flex-col hetu-portal hetu-catalog">
 
@@ -1500,6 +1551,17 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
               </select>
             </div>
           </div>
+          <div id="ndMetadataRow" class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="ndDataTimePrecision" class="block text-sm font-medium text-gray-700 mb-1.5">数据时间 <span class="text-xs text-gray-400 font-normal">（选填）</span></label>
+              <div id="ndDataTimeControl"></div>
+              <p class="text-xs text-gray-400 mt-1.5">数据对应的采集时间或业务时期。</p>
+            </div>
+            <div>
+              <label for="ndDataOrigin" class="block text-sm font-medium text-gray-700 mb-1.5">数据来源 <span class="text-xs text-gray-400 font-normal">（选填）</span></label>
+              <input type="text" id="ndDataOrigin" placeholder="填写数据提供单位、系统或采集来源" class="w-full px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white">
+            </div>
+          </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1.5">标签 <span class="text-xs text-gray-400 font-normal">（可多选）</span></label>
             <div id="ndTags" class="flex flex-wrap gap-2"></div>
@@ -1574,15 +1636,6 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
         </select>
         <input id="pubCrsOther" type="text" placeholder="若选『其他』，在此输入坐标系名称或 EPSG 编码（如 EPSG:32650）" class="hidden w-full mt-2 px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white">
         <p class="text-xs text-gray-400 mt-1.5">此处设置服务对外使用的坐标系，不修改数据源坐标系。</p>
-      </div>
-<div>
-        <div class="text-sm font-medium text-gray-700 mb-2">服务用途 <span class="text-xs text-red-500">*</span> <span class="text-xs text-muted font-normal">— 该服务用于哪类场景（必选）</span></div>
-        <div class="grid grid-cols-3 gap-2" id="pubPurposeSeg">
-          <label class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white cursor-pointer text-sm text-gray-700 hover:border-brand transition-colors"><input type="radio" name="pubPurpose" value="地图" class="text-brand"> 底图服务</label>
-          <label class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white cursor-pointer text-sm text-gray-700 hover:border-brand transition-colors"><input type="radio" name="pubPurpose" value="业务" class="text-brand" checked> 业务服务</label>
-          <label class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-line bg-white cursor-pointer text-sm text-gray-700 hover:border-brand transition-colors"><input type="radio" name="pubPurpose" value="综合" class="text-brand"> 综合服务</label>
-        </div>
-        <p class="text-xs text-gray-400 mt-1.5">业务=支撑业务分析；地图=作为底图/专题图层；综合=既用于业务也对外共享。</p>
       </div>
 <div id="publishTimeBlock" class="border border-line rounded-lg overflow-hidden"><div class="flex items-center justify-between px-4 py-3 bg-gray-50"><span class="text-sm font-medium">时间维度</span><button type="button" id="pubTimeToggle" onclick="togglePublishTimeEnabled()" role="switch" aria-label="时间维度" aria-checked="false" class="relative inline-flex items-center flex-shrink-0 rounded-full" style="width:44px;height:24px;background:#d1d5db"><span id="pubTimeKnob" class="bg-white rounded-full transition-transform" style="width:20px;height:20px;margin-left:2px"></span></button></div><div id="pubTimeConfig" class="hidden p-4 space-y-3"><div><label class="block text-sm font-medium mb-2">绑定服务序列 <span class="text-red-500">*</span></label><select id="pubTimeSeq" class="w-full border border-line rounded-lg px-3 py-2 text-sm"><option value="">请选择服务序列</option></select></div><div><label class="block text-sm font-medium mb-2">绑定时间戳 <span class="text-red-500">*</span></label><input id="pubTimeStamp" type="date" class="w-full border border-line rounded-lg px-3 py-2 text-sm"></div></div></div>
 <div class="border border-line rounded-lg overflow-hidden">
@@ -1746,6 +1799,81 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
   </div>
 </div>
 
+<script data-source="asset-time-picker.js">
+(function(){
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const calendar='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="15" rx="2"/><path d="M7.5 3v5M16.5 3v5M4 11h16"/></svg>';
+ let popup,activeId='',decade=0;
+ function parts(card={}){
+  const raw=String(card.dataTime||'').trim(),year=/^\d{4}年?$/.test(raw)&&Number(raw.slice(0,4))>0;
+  const date=/^\d{4}-\d{2}-\d{2}$/.test(raw);
+  return {value:year?raw.slice(0,4):raw,precision:year?'year':date?'date':card.dataTimePrecision==='year'?'year':'date',legacy:!!raw&&!year&&!date};
+ }
+ function render(id,card={}){
+  const p=parts(card),year=p.precision==='year',showYear=year&&!p.legacy&&p.value;
+  return `<div class="asset-time-control" data-time-id="${E(id)}" role="group" aria-label="数据时间">
+   <input type="hidden" id="${E(id)}" value="${E(p.value)}" data-precision="${p.precision}">
+   <select id="${E(id)}Precision" class="asset-time-precision" aria-label="数据时间精度" onchange="HTAssetTime.changePrecision('${id}',this.value)"><option value="date" ${!year?'selected':''}>按日期</option><option value="year" ${year?'selected':''}>按年</option></select>
+   <div class="asset-time-value">
+    <input id="${E(id)}Date" class="asset-time-date" type="date" lang="zh-CN" min="0001-01-01" max="9999-12-31" aria-label="数据日期" value="${!year&&!p.legacy?E(p.value):''}" ${year?'hidden':''} oninput="HTAssetTime.setDate('${id}',this.value)">
+    <button type="button" id="${E(id)}Year" class="asset-time-year ${showYear?'':'is-empty'}" aria-label="选择数据年份" aria-haspopup="dialog" aria-expanded="false" ${!year?'hidden':''} onclick="HTAssetTime.openYear('${id}')"><span>${showYear?E(p.value)+'年':'请选择年份'}</span>${calendar}</button>
+    <button type="button" id="${E(id)}Clear" class="asset-time-clear" aria-label="清空数据时间" title="清空" ${!p.value?'hidden':''} onclick="HTAssetTime.clear('${id}')">×</button>
+   </div>
+  </div>${p.legacy?`<p id="${E(id)}Legacy" class="asset-time-legacy">当前值：${E(p.value)}</p>`:''}`;
+ }
+ function read(id){const input=$(id),date=$(id+'Date');if(input.dataset.precision==='date'&&!date.validity.valid){date.reportValidity();return null;}return {dataTime:input.value.trim(),dataTimePrecision:input.dataset.precision};}
+ function update(id,value){
+  const input=$(id);input.value=value;$(id+'Legacy')?.remove();
+  const year=input.dataset.precision==='year';$(id+'Date').hidden=year;$(id+'Year').hidden=!year;
+  $(id+'Date').value=year?'':value;$(id+'Year').querySelector('span').textContent=year&&value?value+'年':'请选择年份';
+  $(id+'Year').classList.toggle('is-empty',!value);$(id+'Clear').hidden=!value;
+ }
+ function changePrecision(id,precision){close();$(id).dataset.precision=precision;update(id,'');}
+ function setDate(id,value){if(!$(id+'Date').validity.valid)return;$(id).dataset.precision='date';$(id).value=value;$(id+'Legacy')?.remove();$(id+'Clear').hidden=!value;}
+ function clear(id){close();update(id,'');($(id).dataset.precision==='year'?$(id+'Year'):$(id+'Date')).focus();}
+ function reset(id){if(!$(id))return;close();$(id).dataset.precision='date';$(id+'Precision').value='date';update(id,'');}
+ function close(restore=false){if(!activeId)return;const trigger=$(activeId+'Year');if(trigger){trigger.setAttribute('aria-expanded','false');if(restore)trigger.focus();}activeId='';if(popup)popup.hidden=true;}
+ function position(){
+  if(!activeId)return;const r=$(activeId+'Year').getBoundingClientRect(),width=Math.min(288,window.innerWidth-32);
+  popup.style.width=width+'px';const h=popup.offsetHeight;
+  popup.style.left=Math.max(16,Math.min(r.left,window.innerWidth-width-16))+'px';
+  popup.style.top=(r.bottom+6+h<=window.innerHeight-16?r.bottom+6:Math.max(16,r.top-h-6))+'px';
+ }
+ function draw(focusYear){
+  const value=$(activeId).value,now=new Date().getFullYear();
+  popup.innerHTML=`<div class="asset-year-head"><button type="button" data-decade="-1" aria-label="上十年" ${decade<=0?'disabled':''}>‹</button><strong>${String(Math.max(1,decade)).padStart(4,'0')} – ${Math.min(9999,decade+9)}</strong><button type="button" data-decade="1" aria-label="下十年" ${decade>=9990?'disabled':''}>›</button></div><div class="asset-year-grid" role="group" aria-label="年份">${Array.from({length:12},(_,i)=>decade-1+i).map(y=>`<button type="button" data-year="${y}" ${y<1||y>9999?'disabled':''} class="${y<decade||y>decade+9?'is-outside ':''}${y===now?'is-current':''}" aria-pressed="${value===String(y).padStart(4,'0')}" ${y===focusYear?'tabindex="0"':'tabindex="-1"'}>${y<1||y>9999?'—':String(y).padStart(4,'0')}</button>`).join('')}</div>`;
+  position();if(focusYear)popup.querySelector('[data-year="'+focusYear+'"]')?.focus();
+ }
+ function openYear(id){
+  if(activeId===id){close(true);return;}close();activeId=id;
+  const chosen=Number($(id).value),year=chosen>=1&&chosen<=9999?chosen:new Date().getFullYear();decade=Math.floor(year/10)*10;
+  if(!popup){popup=document.createElement('div');popup.className='asset-year-popup';popup.id='assetYearPopup';popup.setAttribute('role','dialog');popup.setAttribute('aria-label','选择年份');document.body.append(popup);
+   popup.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b||b.disabled)return;
+    if(b.dataset.decade){decade+=Number(b.dataset.decade)*10;draw(Math.max(1,decade));return;}
+    if(b.dataset.year){update(activeId,String(b.dataset.year).padStart(4,'0'));close(true);}
+   });
+   popup.addEventListener('keydown',e=>{
+    const b=e.target.closest('[data-year]');if(!b)return;
+    const n=Number(b.dataset.year),offset={ArrowLeft:-1,ArrowRight:1,ArrowUp:-3,ArrowDown:3,PageUp:-10,PageDown:10}[e.key];
+    if(offset===undefined&&e.key!=='Home'&&e.key!=='End')return;e.preventDefault();
+    const next=Math.max(1,Math.min(9999,e.key==='Home'?decade:e.key==='End'?decade+9:n+offset));
+    if(next<decade||next>decade+9)decade=Math.floor(next/10)*10;draw(next);
+   });
+  }
+  popup.hidden=false;$(id+'Year').setAttribute('aria-expanded','true');$(id+'Year').setAttribute('aria-controls','assetYearPopup');draw(year);
+ }
+ document.addEventListener('pointerdown',e=>{if(activeId&&!popup.contains(e.target)&&!$(activeId+'Year')?.contains(e.target))close();});
+ document.addEventListener('focusin',e=>{if(activeId&&!popup.contains(e.target)&&!$(activeId+'Year')?.contains(e.target))close();});
+ window.addEventListener('keydown',e=>{if(activeId&&e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();close(true);}},true);
+ window.addEventListener('resize',()=>close());document.addEventListener('scroll',e=>{if(activeId&&!popup.contains(e.target))close();},true);
+ window.HTAssetTime={render,read,changePrecision,setDate,clear,reset,openYear};
+ const host=$('ndDataTimeControl');if(host)host.innerHTML=render('ndDataTime');
+})();
+
+</script>
 <script data-bundled-from="common.js">
 /* ============================================================
    河图·易用性优化原型 — 拆分版 · 共享逻辑 common.js
@@ -2179,12 +2307,17 @@ try {
 } catch (e) { /* localStorage 损坏时忽略，不影响页面渲染 */ }
 
 // 全局卡片存储（支持删除持久化）
+
+function assetDataTime(c){const value=String(c.dataTime||'');return /^\d{4}年?$/.test(value)?value.slice(0,4)+'年':value;}
+function assetDataOrigin(c){if(Object.hasOwn(c,'dataOrigin'))return c.dataOrigin||'';return c.dataSource||(c.spId?'数据空间化':'');}
+function assetMetadataHTML(c){const E=HTWorkflow.esc;return '<div class="asset-card-metadata"><div><span>数据时间</span><b title="'+E(assetDataTime(c)||'—')+'">'+E(assetDataTime(c)||'—')+'</b></div><div><span>数据来源</span><b title="'+E(assetDataOrigin(c)||'—')+'">'+E(assetDataOrigin(c)||'—')+'</b></div></div>';}
+
 const moduleConfigs = {
   data: {
     title: '数据资产', subtitle: '管理原始数据', total: 1026, btnLabel: '上传数据', btnAction: "document.getElementById('uploadWizard').classList.remove('hidden')",
     cards: [
       {title:'行政村居民点',svcCount:0,sub:'Excel 表格 · 1,284 条 · 2026-08-17 入库',tag:'表格数据',cat:'基础',type:'表格数据',fmt:'CSV/EXCEL',mine:true,dataAssetType:'static',crs:'WGS84',geom:'point',thumb:'from-green-100 to-green-200',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'},
-      {title:'建三江_大豆长势指数_2026夏',svcCount:1,sub:'遥感影像 · GeoTIFF · 27.3 MB · 2026-07-31 拍摄',tag:'影像图片',cat:'遥感',type:'影像图片',fmt:'GeoTIFF',mine:true,dataAssetType:'static',crs:'中国大地坐标',geom:'raster',datasetFiles:[{f:'建三江_大豆长势指数_2026夏.tif',d:'2026-07-31',ver:'当前数据',rel:'覆盖',latest:true}],thumb:'from-brand-light to-brand/20',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg>'},
+      {title:'建三江_大豆长势指数_2026夏',dataTime:'2026-07-31',svcCount:1,sub:'遥感影像 · GeoTIFF · 27.3 MB · 2026-07-31 拍摄',tag:'影像图片',cat:'遥感',type:'影像图片',fmt:'GeoTIFF',mine:true,dataAssetType:'static',crs:'中国大地坐标',geom:'raster',datasetFiles:[{f:'建三江_大豆长势指数_2026夏.tif',d:'2026-07-31',ver:'当前数据',rel:'覆盖',latest:true}],thumb:'from-brand-light to-brand/20',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg>'},
       {title:'中晚稻_2025_wgs84',svcCount:3,sub:'影像图片 · GeoTIFF',tag:'影像图片',cat:'遥感',type:'影像图片',fmt:'GeoTIFF',mine:false,crs:'WGS84',geom:'raster',datasetFiles:[{f:'中晚稻_2025.gpkg',d:'2026-08-05',ver:'中晚稻_2025（栅格数据包）',isPackage:true,latest:true,children:[{f:'中晚稻_2025_0701.tif',d:'2026-07-01',ver:'2026-07-01'},{f:'中晚稻_2025_0715.tif',d:'2026-07-15',ver:'2026-07-15'},{f:'中晚稻_2025_0805.tif',d:'2026-08-05',ver:'2026-08-05',latest:true}]}],thumb:'from-brand-light to-brand/20',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg>'},
       {title:'二龙山农场_草地资源',svcCount:2,sub:'数据库查询 · DbSQL',tag:'数据库查询',cat:'耕地',type:'数据库查询',fmt:'DbSQL',mine:true,dataAssetType:'static',crs:'中国大地坐标',thumb:'from-orange-100 to-orange-200',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>'},
       {title:'宗地权属调查_2026Q3',svcCount:0,sub:'数据库表 · DbTable',tag:'数据库表',cat:'耕地',type:'数据库表',fmt:'DbTable',mine:true,dataAssetType:'static',crs:'中国大地坐标',thumb:'from-cyan-100 to-cyan-200',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>'},
@@ -2193,7 +2326,7 @@ const moduleConfigs = {
       {title:'灌区骨干渠系中心线',svcCount:1,sub:'矢量线 · SHP',tag:'矢量数据',cat:'水利',type:'矢量数据',fmt:'SHP',mine:false,dataAssetType:'static',crs:'中国大地坐标',geom:'line',thumb:'from-cyan-300 to-cyan-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M4 18 L9 12 L13 15 L20 6"/></svg>'},
       {title:'作物种植地块_2026时序',svcCount:2,sub:'矢量面 · 多份数据',tag:'矢量数据',cat:'耕地',type:'矢量数据',fmt:'GeoJSON',mine:true,crs:'中国大地坐标',geom:'polygon',datasetFiles:[{f:'crop_plot_202604.shp',d:'2026-04-30',ver:'2026-04-30'},{f:'crop_plot_202607.shp',d:'2026-07-31',ver:'2026-07-31'},{f:'crop_plot_202608.shp',d:'2026-08-15',ver:'2026-08-15',latest:true}],thumb:'from-brand-light to-brand/20',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>'},
       {title:'黑龙江耕地质量监测样点',svcCount:0,sub:'Excel 表格 · 312 个采样点 · 2026-08-02 入库',tag:'表格数据',cat:'基础',type:'表格数据',fmt:'CSV/EXCEL',mine:true,dataAssetType:'static',crs:'WGS84',geom:'point',thumb:'from-green-100 to-green-200',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'},
-      {title:'黑龙江林草资源分布',svcCount:1,sub:'矢量面 · 国土三调',tag:'矢量数据',cat:'生态',type:'矢量数据',fmt:'GeoJSON',mine:false,dataAssetType:'static',crs:'中国大地坐标',geom:'polygon',thumb:'from-green-300 to-green-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>'},
+      {title:'黑龙江林草资源分布',dataOrigin:'国土三调',svcCount:1,sub:'矢量面 · 国土三调',tag:'矢量数据',cat:'生态',type:'矢量数据',fmt:'GeoJSON',mine:false,dataAssetType:'static',crs:'中国大地坐标',geom:'polygon',thumb:'from-green-300 to-green-400',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>'},
     ]
   },
   service: {
@@ -3002,6 +3135,16 @@ function renderDetailPreview(card, m) {
 function renderDetailSettings(card, m) {
   if (m === 'data') {
     return `<div class="w-3/5 p-5 border-r border-line overflow-y-auto overflow-x-hidden h-full min-h-0 space-y-5">
+
+      <form class="asset-metadata-form" id="assetMetadataForm" onsubmit="event.preventDefault();HTProdData.saveMetadata()">
+        <h4>基本信息</h4>
+        <label for="assetDataTimeInputPrecision">数据时间 <span class="text-gray-400">（选填）</span></label>
+        ${HTAssetTime.render('assetDataTimeInput',card)}
+        <p>数据对应的采集时间或业务时期。</p>
+        <label for="assetDataOriginInput">数据来源 <span class="text-gray-400">（选填）</span></label>
+        <input class="ux-control" id="assetDataOriginInput" value="${HTWorkflow.esc(assetDataOrigin(card))}" placeholder="填写数据提供单位、系统或采集来源">
+        <div class="asset-metadata-actions"><button type="submit" class="btn btn-md btn-primary">保存</button></div>
+      </form>
       <div>
         <h4 class="text-sm font-semibold text-gray-800 mb-3">设置空间范围</h4>
         <p class="text-xs text-gray-500 mb-3">在地图上拖拽矩形框设定数据的空间范围（Bounding Box），用于索引和快速定位。</p>
@@ -3776,6 +3919,7 @@ function dataCardHTML(c, idx, m) {
                 : ''}
               </div>
               ${m !== 'service' ? `<div class="mt-2 text-xs text-gray-400 truncate">${c.sub}</div>` : ''}
+              ${m === 'data' ? assetMetadataHTML(c) : ''}
             </div>
             ${m === 'data' ? `
             <div class="px-3.5 pt-3 flex items-center gap-2">
@@ -3877,6 +4021,8 @@ function dataListHTML(cards, pageIdxs) {
           </div>
         </div>
       </td>
+      <td class="asset-meta-cell" title="${HTWorkflow.esc(assetDataTime(c)||'—')}">${HTWorkflow.esc(assetDataTime(c)||'—')}</td>
+      <td class="asset-meta-cell" title="${HTWorkflow.esc(assetDataOrigin(c)||'—')}">${HTWorkflow.esc(assetDataOrigin(c)||'—')}</td>
       <td><span class="text-xs text-gray-600">${c.fmt || c.type}</span></td>
       <td class="text-xs">
         ${(c.datasetFiles && c.datasetFiles.some(f => f.isPackage || (f.children && f.children.length))) ? `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-600 font-medium border border-purple-200">数据包</span>` : `<span class="tag-pill inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-50 text-sky-600 font-medium border border-sky-200">单点数据</span>`}
@@ -3892,10 +4038,10 @@ function dataListHTML(cards, pageIdxs) {
       </td>
     </tr>`;
   }).join('');
-  return `<div class="bg-white border border-line rounded-xl overflow-hidden">
-    <table class="data-table"><thead><tr>
+  return `<div class="asset-table-wrap bg-white border border-line rounded-xl">
+    <table class="data-table asset-data-table"><colgroup><col style="width:40px"><col style="width:250px"><col style="width:150px"><col style="width:170px"><col style="width:95px"><col style="width:210px"><col style="width:80px"><col style="width:220px"></colgroup><thead><tr>
       <th class="w-10"></th>
-      <th>数据信息</th><th>格式</th><th>类型 / 合集</th><th>创建人</th><th class="text-right">操作</th>
+      <th>数据信息</th><th>数据时间</th><th>数据来源</th><th>格式</th><th>类型 / 合集</th><th>创建人</th><th class="text-right">操作</th>
     </tr></thead><tbody>${rows}</tbody></table>
   </div>`;
 }
@@ -4374,7 +4520,6 @@ function openPublishFor(title) {
   publishRasterSel = '';
   document.getElementById('publishTitle').value = title;
   ['pubSubsetFilter','pubSubsetFields','pubSubsetBbox'].forEach(id => document.getElementById(id).value = '');
-  document.querySelector('input[name="pubPurpose"][value="业务"]').checked = true;
   document.getElementById('publishAdvancedPanel').classList.add('hidden');
   document.getElementById('publishAdvancedArrow').style.transform = '';
   document.getElementById('publishAdvancedToggle').setAttribute('aria-expanded', 'false');
@@ -4683,10 +4828,11 @@ function submitUpload() {
 // 提交成功后重置抽屉表单
 function resetUploadDrawer() {
   selectedTags.clear();
-  ['ndName','ndCrs','ndCrsOther','ndOrg','ndCatalog','ndDesc'].forEach(id => {
+  ['ndName','ndDataTime','ndDataOrigin','ndCrs','ndCrsOther','ndOrg','ndCatalog','ndDesc'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  HTAssetTime.reset('ndDataTime');
   const dsSel = document.getElementById('ndDataset');
   if (dsSel) dsSel.value = '';
   const fb = document.getElementById('fbInput');
@@ -4708,7 +4854,7 @@ const PUBLISH_SERVICE_TYPES = [
   { key:'WMS',  label:'WMS', summary:'动态图片，慢但灵活', chName:'网络地图服务', desc:'WMS 是一种通过 HTTP 请求向客户端返回地理空间数据可视化地图的服务。它将地理数据（如矢量或栅格数据）渲染为 PNG、JPEG 等图片格式，支持叠加多层地图数据。' },
   { key:'WMTS', label:'WMTS', summary:'预切图片，快但固定', chName:'网络地图瓦片服务', desc:'WMTS 是一种高效的地图服务模式，基于预生成的地图切片（Tile）提供服务。它将地图按不同比例尺（层级）和网格划分成固定尺寸的小块（如 256×256 像素），提前渲染并存储在服务器。', options:{ '切片格式':['PNG','JPEG'], '瓦片层级范围':['自动（按数据范围）','1–12 级','1–18 级'] } },
   { key:'WFS',  label:'WFS', summary:'传输原始数据，可编辑', chName:'网络要素服务', desc:'WFS 是一种面向地理空间要素数据的网络服务，专注于矢量数据的传输与交互。它支持通过 HTTP 请求获取、插入、更新或删除地理要素（如点、线、面），返回的是原始数据而非图片，常见格式包括 GML、JSON、GeoJSON 等。' },
-  { key:'MVT',  label:'MVT 矢量瓦片', summary:'预切片矢量，流畅可变', chName:'矢量瓦片（预切片）', desc:'MVT（Mapbox Vector Tile）是预切片矢量瓦片：与 WMTS 同源，同样按层级提前烘焙瓦片，只是内容为矢量几何而非栅格图片，由客户端渲染、样式可变，是矢量数据的默认推荐。Real-time MVT 是其实时生成版本，两者仅差“是否预切片”。', options:{ '执行策略':['默认','高性能','低延迟'], '输出字段':['名称','面积','作物类型','产量','行政区划'], '瓦片层级范围':['自动（按数据范围）','1–12 级','1–18 级'], '切片参数':['默认','自定义'] } },
+  { key:'MVT',  label:'MVT 矢量瓦片', summary:'预切片矢量，流畅可变', chName:'矢量瓦片（预切片）', desc:'MVT（Mapbox Vector Tile）是预切片矢量瓦片：与 WMTS 同源，同样按层级提前烘焙瓦片，只是内容为矢量几何而非栅格图片，由客户端渲染、样式可变，是矢量数据的默认推荐。Real-time MVT 是其实时生成版本，两者仅差“是否预切片”。', options:{ '切片类型':['常规切片','简单聚类','属性分组聚类','要素蜂窝图','数据蜂窝图'], '输出字段':['名称','面积','作物类型','产量','行政区划'], '瓦片层级范围':['自动（按数据范围）','1–12 级','1–18 级'], '切片参数':['默认','自定义'] } },
   { key:'REAL_MVT', label:'实时 MVT', summary:'实时生成的矢量瓦片', chName:'实时矢量瓦片', desc:'实时 MVT（Real-time MVT）是 MVT 的实时生成版本：不预烘焙，按请求即时生成矢量瓦片，支持亚秒级~分钟级更新可见，适合小规模、高频更新的矢量数据；大体积实时切片成本高，应改用预切片 MVT。', options:{ '输出字段':['名称','面积','作物类型','产量','行政区划'] } },
 ];
 
@@ -5240,24 +5386,22 @@ function confirmPublish() {
   if (publishStep !== 2) { publishNextStep(); return; }
   const card = getPublishCard();
   const title = (document.getElementById('publishTitle').value || '').trim();
-  const purpose = document.querySelector('input[name="pubPurpose"]:checked')?.value;
   const geometries = selectedPublishGeometries();
   const sequence = document.getElementById('pubTimeSeq').value;
   const stamp = document.getElementById('pubTimeStamp').value;
   if (!title) { showNotification(ICO_ALERT,'请填写服务标题'); return; }
-  if (!purpose) { showNotification(ICO_ALERT,'请选择服务用途'); return; }
   if (!pubCrsValue()) { showNotification(ICO_ALERT,'请填写服务输出坐标系'); return; }
   if (publishDataForm === 'vector' && publishGeometryTypes(card).length > 0 && !geometries.length) { showNotification(ICO_ALERT,'请至少选择一项发布内容'); return; }
   if (publishDataForm === 'raster' && !gatherRasterSheets(card).some(item => item.key === publishRasterSel)) { showNotification(ICO_ALERT,'请选择一张栅格'); return; }
   if (pubTimeEnabled && (!sequence || !stamp)) { showNotification(ICO_ALERT,'请绑定服务序列及时间戳'); return; }
   const service = {id:HTWorkflow.id('svc-'),title,asset:card?.title || publishTarget,assetRef:card?.title || publishTarget,
-    type:publishSelectedType,fmt:publishSelectedType,purpose,source:'平台发布',org:card?.org || '北大荒集团',
+    type:publishSelectedType,fmt:publishSelectedType,source:'平台发布',org:card?.org || '北大荒集团',
     crs:pubCrsValue(),dataModel:publishDataForm==='raster'?'栅格':'矢量',geometries,geometryScope:publishDataForm==='vector'?(geometries.length?'selected':'all'):undefined,
     geom:publishDataForm==='raster'?'raster':(geometries.length===1?geometries[0]:undefined),raster:publishDataForm==='raster'?publishRasterSel:null,
     timeEnabled:publishDataForm==='raster' && pubTimeEnabled,sequence:pubTimeEnabled?sequence:'',timestamp:pubTimeEnabled?stamp:'',
     subset:{filter:document.getElementById('pubSubsetFilter').value,fields:document.getElementById('pubSubsetFields').value,bbox:document.getElementById('pubSubsetBbox').value},
     protocolOptions:Object.fromEntries([...document.querySelectorAll('#publishOptionsArea input:checked')].map(e=>[e.name||e.value,e.value])),
-    updated:new Date().toISOString().slice(0,10),status:'正常',mine:true,layers:[],maps:[],tags:[purpose]};
+    updated:new Date().toISOString().slice(0,10),status:'正常',mine:true,layers:[],maps:[],tags:[]};
   addTask({type:'service',operation:'publish',title:'发布服务：'+title+' · '+publishSelectedType,target:service.asset,serviceRecord:service});
   closeWizard('publishModal');
   showNotification(ICO_OK,'已提交发布任务。<button class="text-brand underline" onclick="goModule(\'task\')">查看任务进度 →</button>');
@@ -6181,8 +6325,63 @@ const names={WMS:'Web地图服务',WMTS:'栅格瓦片服务',WFS:'Web要素服�
 const uses={WMS:'将数据绘制成地图图片，用于地图叠加展示。',WMTS:'按图片瓦片加载，适合固定样式的地图浏览。',WFS:'获取空间要素及属性，用于数据查询和系统对接。',MVT:'按矢量瓦片加载，可在应用中设置颜色、标注和样式。',REAL_MVT:'按请求生成矢量瓦片，适合需要及时反映数据变化的地图。'};
 const schemes=['Web Mercator','CGCS2000','WGS84'];
 const numbers=[['minZoom','最小切片层级',5,0],['maxZoom','最大切片层级',15,0],['dropRate','点抽稀比例',1,0],['baseZoom','基准缩放级别',15,0],['clusterDistance','聚合距离（像素）',40,1],['maxBytes','瓦片大小上限（字节）',null,1]];
-const presets={system:{label:'系统默认',help:'沿用服务引擎的默认参数。',params:{}},zoom:{label:'常用层级',help:'最小 5 级，最大 15 级。',params:{minZoom:5,maxZoom:15}},point:{label:'点聚合',help:'5–15 级，聚类距离 40 像素。',params:{minZoom:5,maxZoom:15,clusterDistance:40,clusterPoints:true}}};
-const strategies=['单机常规切片','单机属性唯一值分组切片','单机均匀分组切片','单机聚类','单机属性唯一值分片聚类','蜂窝图'];
+const presets={system:{label:'系统默认',help:'沿用服务引擎的默认参数。',params:{}},zoom:{label:'常用层级',help:'最小 5 级，最大 15 级。',params:{minZoom:5,maxZoom:15}},point:{label:'常用聚类',help:'5–15 级，聚合距离 40 像素。',params:{minZoom:5,maxZoom:15,clusterDistance:40}}};
+// The type catalogue owns display copy and its illustration configuration.
+// Illustrations are explanatory examples, independent of the publishing algorithms.
+const tileTypes=[
+ {value:'BASE_TILE',label:'常规切片',short:'保留原始要素结构',detail:'基础矢量切片，保留要素结构。',illustration:{kind:'base',sourceCaption:'3 个独立要素',resultCaption:'仍保留各自的形状与位置'}},
+ {value:'BASE_CLUSTER',label:'简单聚类',short:'依据距离进行聚类',detail:'按一定距离将相近的要素聚类成一个点要素。',illustration:{kind:'cluster',grouped:false,sourceCaption:'两处相邻要素，各 4 个',resultCaption:'每处聚合为一个点'}},
+ {value:'FIELD_GROUP_CLUSTER',label:'属性分组聚类',short:'即使相邻，不同组也不合并',detail:'先按指定属性的唯一值分组，再在各组内按距离聚类。组间不参与聚类，结果保留组信息，可用于聚类图层的过滤。',illustration:{kind:'cluster',grouped:true,sourceCaption:'与简单聚类相同的 8 个要素',resultCaption:'A、B 两组分别按距离聚类'}},
+ {value:'FEATURE_HEXBIN',label:'要素蜂窝图',short:'以每个要素的范围为单位',detail:'以每个要素各自的覆盖范围生成蜂窝图。',illustration:{kind:'hex',scope:'feature',sourceCaption:'两个要素，各有覆盖范围',resultCaption:'A、B 的范围分别生成蜂窝'}},
+ {value:'DATA_HEXBIN',label:'数据蜂窝图',short:'以全部要素的整体范围为单位',detail:'以所有要素的整体覆盖范围生成蜂窝图。',illustration:{kind:'hex',scope:'data',sourceCaption:'与要素蜂窝图相同的数据',resultCaption:'依据整体覆盖范围生成蜂窝'}}
+];
+const isCluster=p=>['BASE_CLUSTER','FIELD_GROUP_CLUSTER'].includes(p.tileType);
+function tileDiagram(type,result,w){
+ const spec=type.illustration,h=180,green='#198c70',amber='#be873a';
+ const text=(x,y,value,extra='')=>'<text x="'+x+'" y="'+y+'" text-anchor="middle" dominant-baseline="central" '+extra+'>'+E(value)+'</text>';
+ const path=points=>points.map((p,i)=>(i?'L':'M')+(p[0]*w).toFixed(2)+' '+(p[1]*h).toFixed(2)).join(' ')+'Z';
+ const polygons=[[[.12,.2],[.35,.12],[.43,.37],[.28,.49],[.13,.4]],[[.6,.16],[.84,.25],[.8,.47],[.58,.4]],[[.31,.65],[.58,.55],[.73,.76],[.52,.91],[.29,.83]]];
+ const regions=[[[.11,.15],[.43,.08],[.48,.34],[.34,.48],[.12,.4]],[[.61,.55],[.85,.42],[.9,.77],[.68,.91],[.53,.76]]];
+ const dots=[[.18,.25,0],[.34,.23,1],[.2,.43,1],[.37,.43,0],[.63,.55,0],[.8,.5,1],[.64,.76,1],[.83,.73,0]];
+ const symbol=(x,y,r,group,count)=>{const color=group?amber:green;return (group?'<path d="M'+x+' '+(y-r)+'L'+(x+r)+' '+y+'L'+x+' '+(y+r)+'L'+(x-r)+' '+y+'Z" fill="'+color+'"/>':'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+color+'"/>')+(count?text(x,y,count,'style="fill:#fff;font-size:14px;font-weight:500"'):'');};
+ function honey(clip,offset=0){let cells='';const r=7,dy=Math.sqrt(3)*r;for(let i=-1;i<w/(r*1.5)+1;i++)for(let j=-1;j<h/dy+1;j++){const x=i*r*1.5+offset,y=j*dy+(i%2?dy/2:0)+offset;cells+='<polygon points="'+Array.from({length:6},(_,k)=>{const a=k*Math.PI/3;return (x+r*Math.cos(a)).toFixed(2)+','+(y+r*Math.sin(a)).toFixed(2);}).join(' ')+'"/>';}return '<g clip-path="url(#'+clip+')" fill="#e7f4ec" stroke="'+green+'" stroke-width=".9">'+cells+'</g>';}
+ const areaLabels=()=>text(w*.28,h*.27,'A')+text(w*.73,h*.68,'B');
+ const shapeSet=(transparent=false)=>regions.map((p,i)=>'<path d="'+path(p)+'" fill="'+(i?amber:green)+'" fill-opacity="'+(transparent?'.04':'.17')+'" stroke="'+(i?amber:green)+'" stroke-width="1.6"/>').join('');
+ let marks='';
+ if(spec.kind==='base'){
+  if(result)marks+='<path d="M8 8H'+(w-8)+'V172H8Z M'+w/2+' 8V172 M8 90H'+(w-8)+'" fill="none" stroke="#dfe9e2" stroke-width="1.2"/>';
+  marks+=polygons.map((p,i)=>'<path d="'+path(p)+'" fill="'+green+'" fill-opacity=".18" stroke="'+green+'" stroke-width="1.5"/>'+text(w*[.27,.71,.49][i],h*[.3,.32,.75][i],i+1)).join('');
+ }else if(spec.kind==='cluster'){
+  if(!result)marks=dots.map(([x,y,g])=>symbol(x*w,y*h,g?7:6,g)).join('');
+  else if(!spec.grouped)marks=[[.27,.34],[.73,.64]].map(([x,y])=>'<circle cx="'+w*x+'" cy="'+h*y+'" r="21" fill="#34483c"/>'+text(w*x,h*y,'4','style="fill:#fff;font-size:14px;font-weight:500"')).join('');
+  else [[.2,.25,0],[.39,.43,1],[.62,.53,0],[.82,.74,1]].forEach(([x,y,g])=>{marks+=symbol(x*w,y*h,g?22:18,g,'2')+text(x*w,y*h-30,g?'B':'A');});
+ }else if(spec.kind==='hex'){
+  if(!result)marks=shapeSet()+areaLabels();
+  else if(spec.scope==='feature'){
+   regions.forEach((p,i)=>{const id='mvt-publish-each-'+i,d=path(p);marks+='<defs><clipPath id="'+id+'"><path d="'+d+'"/></clipPath></defs>'+honey(id,i*3)+'<path d="'+d+'" fill="none" stroke="'+(i?amber:green)+'" stroke-width="1.8"/>';});marks+=areaLabels();
+  }else{
+   const id='mvt-publish-overall',extent='M'+w*.075+' '+h*.06+'H'+w*.925+'V'+h*.94+'H'+w*.075+'Z';
+   marks='<defs><clipPath id="'+id+'"><path d="'+extent+'"/></clipPath></defs>'+honey(id)+'<path d="'+extent+'" fill="none" stroke="'+green+'" stroke-width="1.4"/>'+shapeSet(true)+areaLabels();
+  }
+ }
+ return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+E(type.label+'：'+(result?spec.resultCaption:spec.sourceCaption))+'"><title>'+E(type.label+'，'+(result?'切片结果':'原始数据'))+'</title>'+marks+'</svg>';
+}
+function drawTilePlot(plot){
+ const type=tileTypes.find(v=>v.value===$('uxTileType')?.value)||tileTypes[0],width=Math.round(plot.getBoundingClientRect().width);
+ if(width>0)plot.innerHTML=tileDiagram(type,plot.dataset.tilePlot==='result',width);
+}
+const tilePreviewObserver=new ResizeObserver(entries=>entries.forEach(({target})=>{if(target.isConnected)drawTilePlot(target);}));
+function observeTilePreview(){document.querySelectorAll('#uxTilePreview [data-tile-plot]').forEach(plot=>{drawTilePlot(plot);tilePreviewObserver.observe(plot);});}
+function tileLegend(spec){
+ if(spec.kind==='cluster')return '<span><i class="tile-legend-circle" aria-hidden="true"></i>属性值 A</span><span><i class="tile-legend-diamond" aria-hidden="true"></i>属性值 B</span><span>数字为示例要素数</span>';
+ if(spec.kind==='hex')return '<span><i class="tile-legend-area-a" aria-hidden="true"></i>要素 A</span><span><i class="tile-legend-area-b" aria-hidden="true"></i>要素 B</span><span>展示生成范围的区别</span>';
+ return '';
+}
+function tilePicker(p){
+ const selected=tileTypes.find(v=>v.value===p.tileType)||tileTypes[0],spec=selected.illustration;
+ return '<div class="prod-form-row mvt-tile-row"><label for="uxTileType" class="tile-type-label">切片类型 <span class="ux-required">*</span></label><div class="prod-field-control tile-type-layout"><div class="tile-type-selection"><select id="uxTileType" name="mvtTileType" class="ux-control" aria-describedby="uxTileHelp" required>'+tileTypes.map(v=>'<option value="'+E(v.value)+'" '+(v.value===selected.value?'selected':'')+'>'+E(v.label)+'</option>').join('')+'</select><p id="uxTileHelp" class="tile-type-detail" aria-live="polite">'+E(selected.detail)+'</p><p class="tile-type-key">'+E(selected.short)+'</p></div><figure id="uxTilePreview" class="tile-type-preview" data-tile-preview="'+E(selected.value)+'" aria-labelledby="uxTileName"><figcaption class="tile-type-preview-heading"><strong id="uxTileName">'+E(selected.label)+'</strong><span>示意图</span></figcaption><div class="tile-type-pair"><div class="tile-type-pane"><div class="tile-type-pane-title">原始数据</div><div class="tile-type-plot" data-tile-plot="source"></div><div class="tile-type-caption">'+E(spec.sourceCaption)+'</div></div><div class="tile-type-arrow" aria-hidden="true">→</div><div class="tile-type-pane"><div class="tile-type-pane-title">切片结果</div><div class="tile-type-plot" data-tile-plot="result"></div><div class="tile-type-caption">'+E(spec.resultCaption)+'</div></div></div><div class="tile-type-legend">'+tileLegend(spec)+'</div></figure></div></div>';
+}
+
 // Explicit metadata for an existing demo record; never inferred from a field name.
 const example=moduleConfigs.data.cards.find(c=>c.title==='行政村居民点');
 if(example&&!example.fieldDefinitions)example.fieldDefinitions=[{name:'fid',alias:'要素编号',primaryKey:true},{name:'id',alias:''},{name:'probability',alias:'概率'}];
@@ -6198,48 +6397,56 @@ function fields(){return schema().map(f=>f.name);}
 function fieldLabel(name){const f=schema().find(f=>f.name===name);return f?.alias||name;}
 function isPoint(){return getDataGeomType(publishTarget||'')==='point';}
 function isPolygon(){return getDataGeomType(publishTarget||'')==='polygon';}
-function config(){return publishProtocolDrafts[publishSelectedType]||{strategy:strategies[0],groupMode:'none',groupField:'',fields:publishSelectedType==='MVT'?schema().filter(f=>f.primaryKey).map(f=>f.name):[],schemes:[getPublishCard()?.tileScheme||'Web Mercator'],formats:['PNG'],preset:'system',parameters:{},boundary:false,labels:false};}
+function config(){const p=publishProtocolDrafts[publishSelectedType]||{tileType:'BASE_TILE',groupMode:'none',groupField:'',fields:publishSelectedType==='MVT'?schema().filter(f=>f.primaryKey).map(f=>f.name):[],schemes:[getPublishCard()?.tileScheme||'Web Mercator'],formats:['PNG'],preset:'system',parameters:{},boundary:false,labels:false};if(!tileTypes.some(v=>v.value===p.tileType))p.tileType='BASE_TILE';p.groupMode=p.tileType==='FIELD_GROUP_CLUSTER'?'attribute':'none';delete p.strategy;return p;}
 function error(id,message){const input=$(id);if(input){const d=input.closest('details');if(d)d.open=true;if(input.closest('#uxParameterDialog')){$('uxParameterDialog').hidden=false;}if(input.closest('#publishAdvancedPanel')){$('publishAdvancedPanel').classList.remove('hidden');$('publishAdvancedToggle').setAttribute('aria-expanded','true');}input.setAttribute('aria-invalid','true');input.focus();input.scrollIntoView({block:'nearest'});}const err=$(id+'Error')||$('publishFormError');if(err)err.textContent=message;return false;}
 function clearErrors(){document.querySelectorAll('#publishModal [aria-invalid],#uploadWizard [aria-invalid]').forEach(n=>n.removeAttribute('aria-invalid'));document.querySelectorAll('#publishModal .ux-error,#uploadWizard .ux-error').forEach(n=>n.textContent='');}
 function capture(){
  const area=$('publishOptionsArea'),old=config(),p={...old,parameters:{...old.parameters}};
- if($('uxStrategy'))p.strategy=$('uxStrategy').value;
- p.groupMode=/属性唯一值/.test(p.strategy)?'attribute':/均匀分组/.test(p.strategy)?'uniform':'none';
+ p.groupMode=p.tileType==='FIELD_GROUP_CLUSTER'?'attribute':'none';
  if($('uxGroupField'))p.groupField=p.groupMode==='attribute'?$('uxGroupField').value:'';
  if($('uxFieldList'))p.fields=[...area.querySelectorAll('[data-pub-field]:checked')].map(n=>n.value);
  if($('uxScheme'))p.schemes=[$('uxScheme').value];else if(area.querySelector('[data-scheme]'))p.schemes=[...area.querySelectorAll('[data-scheme]:checked')].map(n=>n.value);
  if(area.querySelector('[data-format]'))p.formats=[...area.querySelectorAll('[data-format]:checked')].map(n=>n.value);
  numbers.forEach(([k])=>{const n=$('uxParam_'+k);if(n&&!n.closest('[data-param-hidden="true"]')){if(n.value==='')delete p.parameters[k];else p.parameters[k]=Number(n.value);}else if(k==='clusterDistance')delete p.parameters[k];});
  ['dropDensest','mergePolygons'].forEach(k=>{const n=$('uxParam_'+k);if(n&&!n.disabled&&n.checked)p.parameters[k]=true;else delete p.parameters[k];});
- const cluster=$('uxParam_clusterPoints');if(cluster?.checked)p.parameters.clusterPoints=true;else delete p.parameters.clusterPoints;
+ delete p.parameters.clusterPoints;
+ if(!isCluster(p))delete p.parameters.clusterDistance;
+ if(p.groupMode==='attribute'&&p.groupField&&!p.fields.includes(p.groupField))p.fields.push(p.groupField);
  p.boundary=!!$('uxBoundary')?.checked;p.labels=!!$('uxLabels')?.checked;delete p.executionMode;p.fieldDefinitions=schema().filter(f=>p.fields.includes(f.name));
  publishProtocolDrafts[publishSelectedType]=p;return p;
 }
 function checks(items,selected,attr){return '<div class="ux-checks">'+items.map(v=>'<label><input type="checkbox" '+attr+' value="'+E(v)+'" '+(selected.includes(v)?'checked':'')+'>'+E(v)+'</label>').join('')+'</div>';}
-function fieldPicker(p){const pk=schema().filter(f=>f.primaryKey);return '<div class="prod-form-row"><label>输出字段 <span class="ux-required">*</span></label><div class="prod-field-control"><details class="prod-field-picker" id="uxFieldPicker"><summary><span id="uxFieldSummary"></span><span class="prod-chevron">⌄</span></summary><div class="prod-field-pop"><div class="ux-field-toolbar"><input id="uxFieldSearch" class="ux-control" type="search" placeholder="搜索字段别名或原名" aria-label="搜索输出字段"><label><input id="uxAllFields" type="checkbox">全选</label><button type="button" class="ux-link" id="uxOnlyPrimary">仅选主键</button></div><div id="uxFieldList" class="ux-field-list">'+schema().map(f=>'<label data-field-row><input type="checkbox" data-pub-field value="'+E(f.name)+'" '+(p.fields.includes(f.name)?'checked':'')+'><span>'+E(f.alias)+(f.alias!==f.name?'<small>'+E(f.name)+'</small>':'')+'</span>'+(f.primaryKey?'<i class="prod-key">主键</i>':'')+'</label>').join('')+'</div></div></details><p class="ux-help">'+(!schema().length?'暂未取得字段元信息。':pk.length&&publishSelectedType==='MVT'?'默认选择主键；分类、标注或属性查看用到的字段可一并勾选。':pk.length?'请选择需要发布的属性字段。':'元信息未提供主键，请选择需要发布的属性字段。')+'<span id="uxFieldCount"></span></p><div id="uxFieldListError" class="ux-error" role="alert"></div></div></div>';}
-function parameterRows(p){return numbers.map(([k,label,value,min])=>{const hide=false;return '<div class="prod-param" '+(hide?'hidden data-param-hidden="true"':'')+'><label for="uxParam_'+k+'">'+label+'</label><input class="ux-control" id="uxParam_'+k+'" type="number" min="'+min+'" step="'+(k==='dropRate'?'any':'1')+'" placeholder="使用系统默认" value="'+(p.parameters[k]??'')+'"><div class="ux-error" id="uxParam_'+k+'Error" role="alert"></div></div>';}).join('');}
-function parameterDialog(p){return '<div id="uxParameterDialog" class="prod-param-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="uxParamTitle"><div class="prod-param-dialog"><header><h3 id="uxParamTitle">切片参数</h3><button type="button" class="btn btn-icon btn-text" id="uxCloseParams" aria-label="关闭切片参数">×</button></header><div class="prod-param-body"><h4>常用参数组合</h4><div class="prod-presets">'+Object.entries(presets).filter(([k])=>k!=='point'||isPoint()).map(([k,v])=>'<button type="button" data-preset="'+k+'" aria-pressed="'+(p.preset===k)+'"><strong>'+v.label+'</strong><span>'+v.help+'</span></button>').join('')+'</div><div class="prod-param-heading"><h4>参数设置 <span class="ux-muted" id="uxPresetState">'+(presets[p.preset]?.label||'自定义')+'</span></h4><button type="button" class="ux-link" id="uxResetParams">恢复默认</button></div><div class="prod-param-grid">'+parameterRows(p)+'</div><div class="prod-param-checks"><label '+(!isPoint()?'hidden':'')+'><input id="uxParam_clusterPoints" type="checkbox" '+(p.parameters.clusterPoints?'checked':'')+'>对点进行聚类</label><label><input id="uxParam_dropDensest" type="checkbox" '+(p.parameters.dropDensest?'checked':'')+'>按需减少密集区域要素</label><label '+(!isPolygon()?'hidden':'')+'><input id="uxParam_mergePolygons" type="checkbox" '+(p.parameters.mergePolygons?'checked':'')+' '+(!isPolygon()?'disabled':'')+'>合并密集区域的面要素</label></div><p class="ux-help">抽稀、合并或聚合会改变瓦片中的要素展示。</p></div><footer><button type="button" class="btn btn-default" id="uxCancelParams">取消</button><button type="button" class="btn btn-primary" id="uxApplyParams">应用</button></footer></div></div>';}
+function fieldPicker(p){const pk=schema().filter(f=>f.primaryKey);return '<div class="prod-form-row"><label>输出字段 <span class="ux-required">*</span></label><div class="prod-field-control"><details class="prod-field-picker" id="uxFieldPicker"><summary><span id="uxFieldSummary"></span><span class="prod-chevron">⌄</span></summary><div class="prod-field-pop"><div class="ux-field-toolbar"><input id="uxFieldSearch" class="ux-control" type="search" placeholder="搜索字段别名或原名" aria-label="搜索输出字段"><label><input id="uxAllFields" type="checkbox">全选</label><button type="button" class="ux-link" id="uxOnlyPrimary">仅选主键</button></div><div id="uxFieldList" class="ux-field-list">'+schema().map(f=>{const grouped=p.groupMode==='attribute'&&f.name===p.groupField;return '<label data-field-row><input type="checkbox" data-pub-field value="'+E(f.name)+'" '+(p.fields.includes(f.name)||grouped?'checked':'')+' '+(grouped?'disabled':'')+'><span>'+E(f.alias)+(f.alias!==f.name?'<small>'+E(f.name)+'</small>':'')+'</span>'+(grouped?'<i class="prod-key">分组字段</i>':f.primaryKey?'<i class="prod-key">主键</i>':'')+'</label>';}).join('')+'</div></div></details><p class="ux-help">'+(!schema().length?'暂未取得字段元信息。':pk.length&&publishSelectedType==='MVT'?'默认选择主键；可按需添加其他属性字段。':pk.length?'请选择需要发布的属性字段。':'元信息未提供主键，请选择需要发布的属性字段。')+'<span id="uxFieldCount"></span></p><div id="uxFieldListError" class="ux-error" role="alert"></div></div></div>';}
+function parameterRows(p){return numbers.map(([k,label,value,min])=>{const hide=k==='clusterDistance'&&!isCluster(p);return '<div class="prod-param" '+(hide?'hidden data-param-hidden="true"':'')+'><label for="uxParam_'+k+'">'+label+'</label><input class="ux-control" id="uxParam_'+k+'" type="number" min="'+min+'" step="'+(k==='dropRate'?'any':'1')+'" placeholder="使用系统默认" value="'+(p.parameters[k]??'')+'"><div class="ux-error" id="uxParam_'+k+'Error" role="alert"></div></div>';}).join('');}
+function parameterDialog(p){return '<div id="uxParameterDialog" class="prod-param-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="uxParamTitle"><div class="prod-param-dialog"><header><h3 id="uxParamTitle">切片参数</h3><button type="button" class="btn btn-icon btn-text" id="uxCloseParams" aria-label="关闭切片参数">×</button></header><div class="prod-param-body"><h4>常用参数组合</h4><div class="prod-presets">'+Object.entries(presets).filter(([k])=>k!=='point'||isCluster(p)).map(([k,v])=>'<button type="button" data-preset="'+k+'" aria-pressed="'+(p.preset===k)+'"><strong>'+v.label+'</strong><span>'+v.help+'</span></button>').join('')+'</div><div class="prod-param-heading"><h4>参数设置 <span class="ux-muted" id="uxPresetState">'+(presets[p.preset]?.label||'自定义')+'</span></h4><button type="button" class="ux-link" id="uxResetParams">恢复默认</button></div><div class="prod-param-grid">'+parameterRows(p)+'</div><div class="prod-param-checks"><label><input id="uxParam_dropDensest" type="checkbox" '+(p.parameters.dropDensest?'checked':'')+'>按需减少密集区域要素</label><label '+(!isPolygon()?'hidden':'')+'><input id="uxParam_mergePolygons" type="checkbox" '+(p.parameters.mergePolygons?'checked':'')+' '+(!isPolygon()?'disabled':'')+'>合并密集区域的面要素</label></div><p class="ux-help">抽稀或合并会改变瓦片中的要素展示。</p></div><footer><button type="button" class="btn btn-default" id="uxCancelParams">取消</button><button type="button" class="btn btn-primary" id="uxApplyParams">应用</button></footer></div></div>';}
 window.updatePublishOptions=function(){
  const area=$('publishOptionsArea'),t=publishSelectedType,p=config();
+ tilePreviewObserver.disconnect();
  if(!['WMTS','MVT','REAL_MVT'].includes(t)){area.innerHTML='';return;}
  let out='<div class="prod-config">';
- if(t==='MVT')out+='<div class="prod-form-row"><label for="uxStrategy">执行策略 <span class="ux-required">*</span></label><div class="prod-field-control"><select id="uxStrategy" class="ux-control">'+strategies.map(v=>'<option '+(v===p.strategy?'selected':'')+' '+((/聚类|蜂窝/.test(v)&&!isPoint())?'disabled':'')+'>'+v+'</option>').join('')+'</select></div></div><div class="prod-form-row" id="uxGrouping" '+(p.groupMode!=='attribute'?'hidden':'')+'><label for="uxGroupField">分组字段 <span class="ux-required">*</span></label><div class="prod-field-control"><select id="uxGroupField" class="ux-control"><option value="">选择分组字段</option>'+schema().map(f=>'<option value="'+E(f.name)+'" '+(p.groupField===f.name?'selected':'')+'>'+E(f.alias)+(f.alias!==f.name?'（'+E(f.name)+'）':'')+'</option>').join('')+'</select><div id="uxGroupFieldError" class="ux-error" role="alert"></div></div></div>';
+ if(t==='MVT')out+=tilePicker(p)+'<div class="prod-form-row" id="uxGrouping" '+(p.groupMode!=='attribute'?'hidden':'')+'><label for="uxGroupField">分组字段 <span class="ux-required">*</span></label><div class="prod-field-control"><select id="uxGroupField" class="ux-control"><option value="">选择用于分组的属性字段</option>'+schema().map(f=>'<option value="'+E(f.name)+'" '+(p.groupField===f.name?'selected':'')+'>'+E(f.alias)+(f.alias!==f.name?'（'+E(f.name)+'）':'')+'</option>').join('')+'</select><p class="ux-help">相同属性值的要素在同组内聚类；分组字段保留在输出字段中。</p><div id="uxGroupFieldError" class="ux-error" role="alert"></div></div></div>';
  if(t!=='WMTS')out+=fieldPicker(p);
  if(t==='WMTS')out+='<div class="prod-form-row"><label>图片格式 <span class="ux-required">*</span></label><div class="prod-field-control">'+checks(['PNG','JPEG'],p.formats,'data-format')+'<div id="uxFormatError" class="ux-error" role="alert"></div></div></div>';
  out+='<div class="prod-form-row"><label for="uxScheme">切片网格 <span class="ux-required">*</span></label><div class="prod-field-control">'+(t==='WMTS'?checks(schemes,p.schemes,'data-scheme'):'<select id="uxScheme" class="ux-control">'+options(schemes,p.schemes[0])+'</select>')+'<div id="uxSchemeError" class="ux-error" role="alert"></div></div></div>';
  if(t==='MVT')out+='<div class="prod-form-row"><label>切片参数</label><div class="prod-field-control"><button type="button" class="prod-select-trigger" id="uxOpenParams"><span id="uxParamSummary">'+(presets[p.preset]?.label||'自定义')+'</span><span>调整 ›</span></button></div></div><div class="prod-form-row prod-extra"><span aria-hidden="true"></span><div class="prod-field-control ux-checks"><label><input id="uxBoundary" type="checkbox" '+(p.boundary?'checked':'')+'>创建边界切片</label><label><input id="uxLabels" type="checkbox" '+(p.labels?'checked':'')+'>创建标注切片</label></div></div>'+parameterDialog(p);
  area.innerHTML=out+'</div>';
-
- if($('uxFieldPicker')){const positionPicker=()=>{const picker=$('uxFieldPicker');const rect=picker.getBoundingClientRect(),body=$('publishWizardBody').getBoundingClientRect(),below=body.bottom-rect.bottom-12,above=rect.top-body.top-12,up=below<300&&above>below;picker.classList.toggle('opens-up',up);picker.querySelector('.ux-field-list').style.maxHeight=Math.max(96,Math.min(228,(up?above:below)-76))+'px';};$('uxFieldPicker').ontoggle=()=>{if($('uxFieldPicker').open)positionPicker();};$('uxFieldPicker').querySelector('summary').onclick=positionPicker;}
+ if($('uxTileType'))$('uxTileType').onchange=e=>{
+  e.stopPropagation();
+  const d=capture();d.tileType=e.target.value;d.groupMode=d.tileType==='FIELD_GROUP_CLUSTER'?'attribute':'none';if(d.groupMode!=='attribute')d.groupField='';
+  if(!isCluster(d)){delete d.parameters.clusterDistance;if(d.preset==='point')d.preset='custom';}
+  delete d.parameters.clusterPoints;publishProtocolDrafts[t]=d;updatePublishOptions();$('uxTileType').focus({preventScroll:true});
+ };
+ observeTilePreview();
+ 
+ if($('uxFieldPicker')){const positionPicker=()=>{const picker=$('uxFieldPicker');const rect=picker.getBoundingClientRect(),body=$('publishWizardBody').getBoundingClientRect(),below=body.bottom-rect.bottom-12,above=rect.top-body.top-12,up=below<300&&above>below;picker.classList.toggle('opens-up',up);picker.querySelector('.ux-field-list').style.maxHeight=Math.max(96,Math.min(228,(up?above:below)-76))+'px';};$('uxFieldPicker').ontoggle=()=>{if($('uxFieldPicker').open){positionPicker();}};$('uxFieldPicker').querySelector('summary').onclick=positionPicker;}
  area.onchange=e=>{
-  if(e.target.id==='uxStrategy'){const d=capture();if(d.groupMode!=='attribute')d.groupField='';publishProtocolDrafts[t]=d;updatePublishOptions();return;}
   if(e.target.id==='uxGroupMode')$('uxGroupWrap').hidden=e.target.value!=='attribute';
-  if(e.target.id==='uxAllFields')area.querySelectorAll('[data-pub-field]').forEach(n=>n.checked=e.target.checked);
-  if(e.target.id==='uxGroupField'&&e.target.value){const n=[...area.querySelectorAll('[data-pub-field]')].find(n=>n.value===e.target.value);if(n)n.checked=true;}
+  if(e.target.id==='uxAllFields')area.querySelectorAll('[data-pub-field]').forEach(n=>{if(!n.disabled)n.checked=e.target.checked;});
+  if(e.target.id==='uxGroupField'&&e.target.value){const n=[...area.querySelectorAll('[data-pub-field]')].find(n=>n.value===e.target.value);if(n)n.checked=true;capture();updatePublishOptions();$('uxGroupField').focus();return;}
   capture();syncFieldCount();
  };
  area.oninput=e=>{if(e.target.id==='uxFieldSearch'){const q=e.target.value.toLowerCase();area.querySelectorAll('[data-field-row]').forEach(n=>n.hidden=!n.textContent.toLowerCase().includes(q));}else{const d=capture();if(e.target.closest('#uxParameterDialog')){d.preset='custom';area.querySelectorAll('[data-preset]').forEach(b=>b.setAttribute('aria-pressed','false'));$('uxPresetState').textContent='自定义';$('uxParamSummary').textContent='自定义';}}};
- if($('uxOnlyPrimary'))$('uxOnlyPrimary').onclick=()=>{const pk=schema().filter(f=>f.primaryKey).map(f=>f.name);area.querySelectorAll('[data-pub-field]').forEach(n=>n.checked=pk.includes(n.value));capture();syncFieldCount();};
+ if($('uxOnlyPrimary'))$('uxOnlyPrimary').onclick=()=>{const pk=schema().filter(f=>f.primaryKey).map(f=>f.name);area.querySelectorAll('[data-pub-field]').forEach(n=>n.checked=n.disabled||pk.includes(n.value));capture();syncFieldCount();};
  if($('uxOpenParams')){
   $('uxOpenParams').onclick=()=>{paramSnapshot=JSON.parse(JSON.stringify(capture()));$('uxFieldPicker').open=false;$('uxParameterDialog').hidden=false;$('uxCloseParams').focus();};
   const cancel=()=>{if(paramSnapshot){publishProtocolDrafts[t]=paramSnapshot;paramSnapshot=null;updatePublishOptions();}$('uxParameterDialog').hidden=true;$('uxOpenParams').focus();};
@@ -6255,6 +6462,7 @@ window.renderPublishCards=function(){
  const raster=getDataGeomType(publishTarget||'')==='raster';
  $('publishTypeCardsInline').innerHTML=Object.keys(names).map(t=>{const disabled=raster&&!['WMS','WMTS'].includes(t);return '<button type="button" data-service-type="'+t+'" aria-pressed="'+(publishSelectedType===t)+'" '+(disabled?'disabled ':'')+'class="publish-card" onclick="selectPublishType(\''+t+'\')" title="'+(disabled?'当前栅格数据不支持此类型':names[t])+'"><span class="publish-card-title">'+names[t]+'</span><span class="publish-card-name">'+t+'</span><span class="publish-card-check" aria-hidden="true">✓</span></button>';}).join('');
  renderPublishServiceSummary();$('publishSelectedServiceType').textContent=names[publishSelectedType];$('publishSelectedServiceName').textContent=publishSelectedType;
+ $('publishDescriptionSummary').closest('.publish-service-description').classList.toggle('is-mvt-compact',publishSelectedType==='MVT');
  $('publishDescriptionType').textContent=names[publishSelectedType]+' · '+publishSelectedType;$('publishDescriptionName').textContent='';$('publishDescriptionSummary').textContent=uses[publishSelectedType];$('publishDescriptionText').textContent='';
  const art=document.querySelector('.publish-service-art');if(window.HTProduction)art.innerHTML=HTProduction.serviceArt(publishSelectedType)+'<span id="publishDescriptionArtType" hidden></span>';
  const row=$('pubSubsetFields')?.parentElement;if(row)row.hidden=['MVT','REAL_MVT'].includes(publishSelectedType);
@@ -6264,7 +6472,7 @@ function validateParams(p){for(const [k,label,,min] of numbers){if(!Object.hasOw
 function validProtocol(){const t=publishSelectedType,p=capture();clearErrors();if(['MVT','REAL_MVT'].includes(t)&&!p.fields.length){$('uxFieldPicker').open=true;return error('uxFieldList','请选择需要发布的属性字段');}if(['WMTS','MVT','REAL_MVT'].includes(t)&&!p.schemes.length)return error('uxScheme','请至少选择一种切片网格');if(t==='WMTS'&&!p.formats.length){$('uxFormatError').textContent='请至少选择一种图片格式';return false;}if(t==='MVT'){if(p.groupMode==='attribute'&&!p.groupField)return error('uxGroupField','请选择用于分组的属性字段');if(!validateParams(p))return false;}return true;}
 window.publishNextStep=function(){if(validProtocol())setPublishStep(2);};
 window.updatePublishRecommendation=function(){const c=getPublishCard(),raster=getDataGeomType(publishTarget||'')==='raster';const hint=c?.recommendedServiceType||c?.serviceTypeHint;publishSelectedType=hint&&names[hint]&&(!raster||['WMS','WMTS'].includes(hint))?hint:raster?(c?.preTiled?'WMTS':'WMS'):(c?.updateMode==='realtime'?'REAL_MVT':'MVT');publishManualOverride=false;lastRec={key:publishSelectedType,label:names[publishSelectedType],reason:''};renderPublishCards();updatePublishOptions();};
-window.HTPublishUX={schema,fieldLabel,presets};
+window.HTPublishUX={schema,fieldLabel,presets,tileTypes};
 document.addEventListener('click',e=>{const f=$('uxFieldPicker');if(f&&!f.contains(e.target))f.open=false;});
 window.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('uxParameterDialog')&&!$('uxParameterDialog').hidden){e.preventDefault();e.stopImmediatePropagation();$('uxCancelParams').click();}else if($('uxFieldPicker')?.open){e.preventDefault();e.stopImmediatePropagation();$('uxFieldPicker').open=false;$('uxFieldPicker').querySelector('summary').focus();}},true);
 // Keep the existing raster picker, optional time binding and second-step subset controls.
@@ -6272,15 +6480,11 @@ $('publishTitleField').querySelector('label').innerHTML='服务名称 <span clas
 $('publishTitle').placeholder='请输入便于识别的服务名称';
 $('publishTitleField').insertAdjacentHTML('beforeend','<div id="publishTitleError" class="ux-error" role="alert"></div>');
 $('publishTitleField').insertAdjacentHTML('afterend','<div class="ux-row"><div class="ux-field"><label for="uxPubOrg">组织机构 <span class="ux-required">*</span></label><select id="uxPubOrg" class="ux-control"></select></div><div class="ux-field"><label for="uxPubCatalog">所属目录 <span class="ux-required">*</span></label><select id="uxPubCatalog" class="ux-control"></select></div></div>');
-const extra=document.createElement('div');extra.id='uxPubMore';extra.className='light-publish-meta';extra.innerHTML='<div><div class="ux-field"><label for="uxPubDesc">描述</label><textarea id="uxPubDesc" rows="2" class="ux-control" placeholder="补充服务的内容或用途"></textarea></div><div class="ux-field"><label for="uxPubTags">标签</label><input id="uxPubTags" class="ux-control" placeholder="输入标签，多个标签用逗号分隔"></div><div class="ux-field"><label>封面</label><div style="display:flex;align-items:center;gap:12px"><span id="uxCoverPreview"></span><button type="button" class="btn btn-sm btn-default" onclick="document.getElementById(\'uxCoverFile\').click()">修改封面</button><button type="button" id="uxCoverReset" class="ux-link">恢复默认</button><input hidden id="uxCoverFile" type="file" accept="image/*"></div></div><div id="uxPurposeHost"></div><div class="ux-field"><label>服务标识</label><div id="uxServiceName" class="ux-readonly"></div></div></div>';
+const extra=document.createElement('div');extra.id='uxPubMore';extra.className='light-publish-meta';extra.innerHTML='<div><div class="ux-field"><label for="uxPubDesc">描述</label><textarea id="uxPubDesc" rows="2" class="ux-control" placeholder="补充服务的内容或用途"></textarea></div><div class="ux-field"><label for="uxPubTags">标签</label><input id="uxPubTags" class="ux-control" placeholder="输入标签，多个标签用逗号分隔"></div><div class="ux-field"><label>封面</label><div style="display:flex;align-items:center;gap:12px"><span id="uxCoverPreview"></span><button type="button" class="btn btn-sm btn-default" onclick="document.getElementById(\'uxCoverFile\').click()">修改封面</button><button type="button" id="uxCoverReset" class="ux-link">恢复默认</button><input hidden id="uxCoverFile" type="file" accept="image/*"></div></div><div class="ux-field"><label>服务标识</label><div id="uxServiceName" class="ux-readonly"></div></div></div>';
 $('publishTimeBlock').before(extra);
 const serviceIdRow=$('uxServiceName').closest('.ux-field');
 serviceIdRow.id='uxServiceIdRow';$('publishTitleField').before(serviceIdRow);
 $('uxServiceName').textContent='由系统自动生成，无需填写';
-$('uxPurposeHost').hidden=false;$('publishTitleField').after($('uxPurposeHost'));
-const purpose=$('pubPurposeSeg').parentElement;$('uxPurposeHost').append(purpose);
-purpose.querySelector('div').innerHTML='服务用途 <span class="ux-required">*</span>';
-purpose.querySelector('p')?.remove();
 $('publishStepIndicator1').lastElementChild.textContent='选择类型与配置';$('publishStepIndicator2').lastElementChild.textContent='确认服务信息';
 $('publishSubmitButton').textContent='发布服务';
 $('publishAdvancedToggle').querySelector('span').innerHTML='数据子集 <span class="ux-muted">默认全部数据</span>';
@@ -6318,9 +6522,9 @@ window.confirmPublish=function(){
  if(pubTimeEnabled&&(!$('pubTimeSeq').value||!$('pubTimeStamp').value))return error(!$('pubTimeSeq').value?'pubTimeSeq':'pubTimeStamp','请选择服务序列并填写时间戳');
  const bbox='';
  if(!$('uxPubOrg').value||!$('uxPubCatalog').value)return error(!$('uxPubOrg').value?'uxPubOrg':'uxPubCatalog','请选择组织机构和所属目录');
- const p=capture(),purpose=document.querySelector('[name="pubPurpose"]:checked')?.value||'业务',isTile=['MVT','REAL_MVT'].includes(publishSelectedType);
+ const p=capture(),isTile=['MVT','REAL_MVT'].includes(publishSelectedType);
  const service={id:publishId||HTWorkflow.id('svc-'),serviceName,title,asset:c?.title||publishTarget,assetRef:c?.title||publishTarget,assetId:c?.spId,
-  type:publishSelectedType,fmt:publishSelectedType,purpose,source:'平台发布',org:$('uxPubOrg').value,cat:$('uxPubCatalog').value,description:$('uxPubDesc').value.trim(),cover,
+  type:publishSelectedType,fmt:publishSelectedType,source:'平台发布',org:$('uxPubOrg').value,cat:$('uxPubCatalog').value,description:$('uxPubDesc').value.trim(),cover,
   crs:pubCrsValue()||c?.crs||'',dataModel:publishDataForm==='raster'?'栅格':'矢量',geometries,geometryScope:publishDataForm==='vector'?(geometries.length?'selected':'all'):undefined,geom:publishDataForm==='raster'?'raster':geometries.length===1?geometries[0]:undefined,
   raster:publishDataForm==='raster'?publishRasterSel:null,timeEnabled:publishDataForm==='raster'&&pubTimeEnabled,sequence:pubTimeEnabled?$('pubTimeSeq').value:'',timestamp:pubTimeEnabled?$('pubTimeStamp').value:'',
   subset:{filter:'',fields:isTile?p.fields.join(','):'',bbox},protocolOptions:publishSelectedType==='WMTS'?{formats:p.formats,schemes:p.schemes}:publishSelectedType==='REAL_MVT'?{fields:p.fields,fieldDefinitions:p.fieldDefinitions,schemes:p.schemes}:publishSelectedType==='MVT'?p:{},
@@ -6353,8 +6557,10 @@ window.submitUpload=function(){
  if(moduleConfigs.data.cards.some(c=>c.title===name)){showNotification('','已存在同名数据，请调整名称');$('ndName').focus();return;}
  const crs=nonSpatialTable()?'':wizCrsValue();if(!nonSpatialTable()&&!crs){showNotification('','请选择原始数据的坐标系');$('ndCrs').focus();return;}
  if(!$('ndOrg').value||!$('ndCatalog').value){showNotification('','请选择组织机构和所属目录');return;}
+ const timeMetadata=HTAssetTime.read('ndDataTime');if(!timeMetadata)return;
  const files=[...(pickedInput()?.files||[])],ext=files[0]?.name.split('.').pop().toLowerCase(),raster=['tif','tiff','png','jpg','jpeg'].includes(ext),date=new Date().toISOString().slice(0,10),db=currentCreateMethod==='db';
  const card={id:HTWorkflow.id('data-'),title:name,sub:files.length?files.length+' 份数据':db?'数据库表':'绘制数据',tag:[...selectedTags][0]||'',tags:[...selectedTags],cat:$('ndCatalog').value,org:$('ndOrg').value,description:$('ndDesc').value.trim(),dataset:$('ndDataset').value,dataSource:db?$('dbSource').value:'',
+  ...timeMetadata,dataOrigin:$('ndDataOrigin').value.trim(),
   created:date,updated:date,type:db?'数据库表':raster?'影像图片':nonSpatialTable()?'表格数据':'矢量数据',fmt:db?'DbTable':ext==='tif'||ext==='tiff'?'GeoTIFF':ext==='geojson'||ext==='json'?'GeoJSON':(ext||'数据').toUpperCase(),crs,mine:true,svcCount:0,pendingRange:true,dataAssetType:'static',
   datasetFiles:db?[...document.querySelectorAll('.db-table-cb:checked')].map(cb=>({f:cb.value,d:date,latest:true})):files.map(f=>({f:f.name,d:date,ver:'当前数据',rel:'上传',latest:true,size:f.size})),thumb:'from-green-100 to-green-200',icon:ICO_BAR};
  moduleConfigs.data.cards.unshift(card);HTWorkflow.write('hetu_data_cards_v3',moduleConfigs.data.cards.filter(c=>!c.spId));addTask({type:'data',title:'入库：'+name,target:name});
@@ -6365,6 +6571,7 @@ $('dbSearch').oninput=()=>document.querySelectorAll('.db-table-cb').forEach(cb=>
 moduleConfigs.data.btnLabel='添加数据';
 goStep(1);
 applyFilter();
+
 })();
 
 </script>
@@ -6380,7 +6587,7 @@ const selected=document.querySelector('.publish-selected-service'),coverIcon=sel
 coverIcon.replaceChildren($('uxCoverPreview'));controls.id='uxCoverHost';selected.lastElementChild.append(controls);coverRow.remove();controls.querySelector('button').textContent='上传封面';$('uxCoverReset').textContent='默认封面';
 // A selected output is sufficient when the source contains a single raster.
 const nativeRaster=renderPublishRasterPick;window.renderPublishRasterPick=function(){nativeRaster();const sheets=gatherRasterSheets(getPublishCard());if(sheets.length===1){$('pubRasterTrigger').disabled=true;$('pubRasterTrigger').setAttribute('title','当前数据只有一张栅格，已自动选中');}else{$('pubRasterTrigger').disabled=false;$('pubRasterTrigger').removeAttribute('title');}};
-function persist(c){if(c.spId&&!HTSpatial.updateAssetMeta(c.spId,{cat:c.cat,org:c.org,tags:c.tags}))return false;HTWorkflow.write('hetu_data_cards_v3',moduleConfigs.data.cards.filter(c=>!c.spId));applyFilter();return true;}
+function persist(c){if(c.spId&&!HTSpatial.updateAssetMeta(c.spId,{cat:c.cat,org:c.org,tags:c.tags,dataTime:c.dataTime,dataTimePrecision:c.dataTimePrecision,dataOrigin:c.dataOrigin}))return false;HTWorkflow.write('hetu_data_cards_v3',moduleConfigs.data.cards.filter(c=>!c.spId));applyFilter();return true;}
 function save(key,value){if(!dtCard)return;const previous=dtCard[key];dtCard[key]=value;if(!persist(dtCard)){dtCard[key]=previous;switchDetailTab(0);showNotification('','保存失败，请检查浏览器存储空间');return;}showNotification('','已保存');}
 function side(c){return '<aside class="prod-detail-side"><section><h3>数据源名称</h3><p>'+E(c.dataSource||c.sourceName||(c.datasetFiles||[]).map(f=>f.f).join('、')||'—')+'</p></section><section><h3>所属目录</h3><select class="ux-control" onchange="HTProdData.save(\'cat\',this.value)">'+opts([c.cat,'全部数据','基础地理信息数据','耕地','遥感'],c.cat)+'</select></section><section><h3>组织机构</h3><select class="ux-control" onchange="HTProdData.save(\'org\',this.value)">'+opts([c.org,'北大荒农垦集团有限公司(86)','XXX农场'],c.org)+'</select></section><section><h3>标签</h3><div>'+((c.tags?.length?c.tags:c.tag?[c.tag]:[]).map(t=>'<span class="prod-tag">'+E(t)+'</span>').join('')||'<span class="ux-muted">暂无标签</span>')+'</div><details class="prod-tag-entry-wrap"><summary class="ux-link">＋ 添加标签</summary><div class="prod-tag-entry"><input id="prodDataTag" class="ux-control" placeholder="输入标签"><button class="btn btn-default" onclick="HTProdData.addTag()">添加</button></div></details></section><section><h3>创建信息</h3><p>创建人　'+E(c.creator|| (c.mine?'张建国':'—'))+'</p></section></aside>';}
 function opts(a,v){return [...new Set(a.filter(Boolean))].map(x=>'<option '+(x===v?'selected':'')+'>'+E(x)+'</option>').join('');}
@@ -6389,7 +6596,7 @@ function dataInfo(c){
  const refs=HTWorkflow.services().filter(s=>s.asset===c.title||s.assetRef===c.title||c.spId&&s.assetId===c.spId),count=c.featureCount??c.rowCount??c.count,id=c.id||c.spId,geom=c.geom||getDataGeomType(c.title),v=P.value;
  const copy=id?'<button class="ux-link light-meta-actions" onclick="HTProduction.copy(HTProdData.currentId())">复制</button>':'';
  const size=window.HTLightData?HTLightData.formatBytes(HTLightData.bytes(c)):'—';
- let intro=P.row('数据名称',E(c.title))+'<div class="prod-info-grid">'+P.row('数据ID',v(id)+copy)+P.row('数据格式',v(c.fmt||c.type))+P.row('要素数量',v(count))+P.row('数据大小',size)+'</div>'+P.row('数据描述',E(c.description||'暂无描述'))+P.row('预览地址',v(c.previewUrl)+' <button class="ux-link" onclick="switchDetailTab(1)">打开预览 ↗</button>');
+ let intro=P.row('数据名称',E(c.title))+'<div class="prod-info-grid">'+P.row('数据ID',v(id)+copy)+P.row('数据格式',v(c.fmt||c.type))+P.row('要素数量',v(count))+P.row('数据大小',size)+P.row('数据时间',v(assetDataTime(c)))+P.row('数据来源',v(assetDataOrigin(c)))+'</div>'+P.row('数据描述',E(c.description||'暂无描述'))+P.row('预览地址',v(c.previewUrl)+' <button class="ux-link" onclick="switchDetailTab(1)">打开预览 ↗</button>');
  let h=P.header(c,'data',intro);
  let spatial=P.row('要素类型',v(({point:'点',line:'线',polygon:'面',raster:'栅格'})[geom]))+P.row('坐标系',v(c.crs))+P.row('坐标单位',v(c.coordinateUnit||c.unit))+P.row('数据四至',v(c.bbox))+P.row('视图范围',v(c.viewExtent));
  if(geom==='raster')spatial+=P.row('波段数',v(c.bandCount))+P.row('行数',v(c.rows))+P.row('列数',v(c.columns));
@@ -6403,7 +6610,14 @@ function dataInfo(c){
 const nativeContent=renderDetailContent;
 window.renderDetailContent=function(c,m,tab){if(m!=='data')return nativeContent(c,m,tab);if(tab===0)return '<main class="prod-detail-main">'+dataInfo(c)+'</main>'+side(c);const box=document.createElement('div');box.innerHTML=nativeContent(c,m,tab);const main=box.firstElementChild;if(main){main.classList.remove('w-3/5','border-r');main.classList.add('prod-detail-main');}if(box.children.length===2&&box.lastElementChild.querySelector('.prod-detail-side'))box.lastElementChild.replaceWith(box.lastElementChild.querySelector('.prod-detail-side'));return box.innerHTML;};
 const nativeRight=renderDetailRight;window.renderDetailRight=function(c,m){return m==='data'?side(c):nativeRight(c,m);};
-window.HTProdData={save,addTag,currentId:()=>dtCard?.id||dtCard?.spId||''};
+
+function saveMetadata(){
+ if(!dtCard)return;const timeMetadata=HTAssetTime.read('assetDataTimeInput');if(!timeMetadata)return;const previous={...dtCard},dataOrigin=$('assetDataOriginInput').value.trim();
+ Object.assign(dtCard,{...timeMetadata,dataOrigin});
+ if(!persist(dtCard)){Object.keys(dtCard).forEach(k=>{if(!(k in previous))delete dtCard[k];});Object.assign(dtCard,previous);showNotification('','保存失败，请重试');return;}
+ showNotification('','数据时间与数据来源已保存');switchDetailTab(2);
+}
+window.HTProdData={save,saveMetadata,addTag,currentId:()=>dtCard?.id||dtCard?.spId||''};
 })();
 
 </script>
