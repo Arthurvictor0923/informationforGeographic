@@ -1171,10 +1171,13 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
 <style>#uxServiceIdRow{margin-bottom:20px}#uxServiceName{font-family:inherit;color:#84938b;min-height:40px;display:flex;align-items:center}</style>
 <style data-source="mvt-tile-type-and-asset-metadata">
 .mvt-tile-row>.tile-type-label{padding-top:7px;text-align:right;font-size:13px;line-height:1.7;color:#536159}
-.tile-type-layout{display:grid;grid-template-columns:minmax(190px,.8fr) minmax(0,1.7fr);gap:24px;align-items:start}
-.tile-type-selection{min-width:0}.tile-type-selection .ux-control{width:100%;box-sizing:border-box}
-.tile-type-detail{font-size:12px;line-height:1.85;color:#75857b;margin:13px 0 16px}
-.tile-type-key{border-left:2px solid #239d85;padding-left:10px;font-size:12px;line-height:1.75;color:#218c74;margin:0}
+.tile-type-segments{display:grid;grid-template-columns:repeat(5,minmax(98px,1fr));gap:3px;padding:4px;background:#eef3ef;border-radius:5px;margin:0 0 22px;overflow-x:auto;scrollbar-width:thin}
+.tile-type-segments button{min-width:0;min-height:36px;padding:7px 5px;border:1px solid transparent;background:transparent;border-radius:3px;font:inherit;font-size:13px;line-height:20px;color:#687e6e;white-space:nowrap;cursor:pointer}
+.tile-type-segments button[aria-pressed=true]{color:#198c70;background:#fff;border-color:#dfe9e2;font-weight:500}
+.tile-type-segments button:hover{color:#198c70}.tile-type-segments button:focus-visible{outline:2px solid #8bcaa3;outline-offset:-2px}
+.tile-type-layout{display:grid;grid-template-columns:160px minmax(0,1fr);gap:24px;align-items:start}
+.tile-type-selection{min-width:0;padding-top:1px}.tile-type-selection h4{font-size:14px;line-height:1.6;font-weight:500;color:#4e6457;margin:0 0 9px}
+.tile-type-detail{font-size:12px;line-height:1.85;color:#75857b;margin:0}
 .tile-type-preview{margin:0;min-width:0;box-sizing:border-box}
 .tile-type-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;line-height:20px;margin-bottom:12px}.tile-type-preview-heading strong{font-size:13px;font-weight:500;color:#4e6457}.tile-type-preview-heading>span{font-size:11px;color:#8b9a91}
 .tile-type-pair{display:grid;grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);gap:4px;align-items:center}
@@ -1187,7 +1190,7 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
 #publishModal .publish-service-description.is-mvt-compact{display:block;padding:10px 0;margin-bottom:20px;min-height:0}
 #publishModal .publish-service-description.is-mvt-compact .publish-service-art,#publishModal .publish-service-description.is-mvt-compact h4{display:none}
 #publishModal .publish-service-description.is-mvt-compact #publishDescriptionSummary{font-size:12px;line-height:1.8;color:#839087}
-@media(max-width:900px){.tile-type-layout{grid-template-columns:1fr;gap:20px}.tile-type-detail{margin-bottom:10px}.tile-type-selection{max-width:none}}
+@media(max-width:900px){.tile-type-layout{grid-template-columns:1fr;gap:18px}.tile-type-segments{margin-bottom:18px}.tile-type-selection{max-width:none}}
 @media(max-width:520px){.tile-type-pair{grid-template-columns:1fr;gap:10px}.tile-type-arrow{transform:rotate(90deg);height:20px}.tile-type-caption{min-height:0}}
 
 .asset-card-metadata{display:flex;flex-direction:column;gap:7px;padding-top:12px;margin-top:11px;border-top:1px solid #f0f3f1;font-size:12px}
@@ -1199,25 +1202,28 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
 
 </style>
 <style data-source="asset-time-picker.css">
-.asset-time-control{display:flex;align-items:stretch;gap:8px;min-width:0;font-size:13px}
-.asset-time-precision{width:96px;flex:0 0 96px;border:1px solid #dedede;border-radius:4px;padding:0 9px;height:36px;background:#fff;color:#505756;font:inherit;cursor:pointer}
-.asset-time-value{position:relative;flex:1;min-width:0}
-.asset-time-date,.asset-time-year{height:36px;width:100%;box-sizing:border-box;border:1px solid #dedede;border-radius:4px;background:#fff;color:#505756;font:inherit;padding:7px 32px 7px 10px;min-width:0}
-.asset-time-year{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;text-align:left}
-.asset-time-year svg{width:17px;height:17px;color:#929b97;flex-shrink:0}.asset-time-year.is-empty{color:#a4aba7}
-.asset-time-control [hidden],.asset-year-popup[hidden]{display:none!important}
-.asset-time-clear{position:absolute;right:5px;top:7px;border:0;background:transparent;width:22px;height:22px;padding:0;color:#98a29c;font:18px/22px Arial,sans-serif;cursor:pointer;border-radius:3px}
+.asset-time-control{display:flex;align-items:center;min-width:0;height:36px;box-sizing:border-box;border:1px solid #dedede;border-radius:4px;background:#fff;font-size:13px}
+.asset-time-part{display:flex;align-items:center;justify-content:space-between;gap:4px;flex:1;min-width:0;height:100%;border:0;border-right:1px solid #ededed;background:transparent;color:#505756;font:inherit;padding:0 10px;cursor:pointer;border-radius:0;text-align:left}
+.asset-time-part:first-of-type{flex:1.15;border-radius:3px 0 0 3px}.asset-time-part[data-time-part=day]{border-right:0}.asset-time-part>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.asset-time-part>svg{width:12px;height:12px;flex-shrink:0;color:#939f97}
+.asset-time-part.is-empty{color:#8f9b93}.asset-time-part:disabled{color:#a5aea8;background:#fafbfa;cursor:default}.asset-time-part:disabled>svg{color:#b5bdb7}
+.asset-time-part[aria-expanded=true],.asset-time-part:not(:disabled):hover{background:#f4f9f6}
+.asset-time-control [hidden],.asset-time-popup[hidden]{display:none!important}
+.asset-time-clear{flex:0 0 25px;border:0;background:transparent;height:25px;padding:0;color:#98a29c;font:18px/25px Arial,sans-serif;cursor:pointer;border-radius:3px;margin:0 3px}
 .asset-time-clear:hover{background:#f0f5f2;color:#53685b}
-.asset-time-precision:focus-visible,.asset-time-date:focus-visible,.asset-time-year:focus-visible,.asset-time-clear:focus-visible{outline:2px solid #d9eee5;outline-offset:1px;border-color:#28a88f}
-.asset-year-popup{position:fixed;z-index:130;background:#fff;border:1px solid #dce7e1;border-radius:6px;box-shadow:0 8px 30px #15392a26;padding:8px;color:#394b40;font:13px/1.5 "Microsoft YaHei",sans-serif}
-.asset-year-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #edf1ee;padding:0 0 7px;margin-bottom:7px}.asset-year-head strong{font-size:13px;font-weight:500}
-.asset-year-head button{border:0;background:transparent;width:28px;height:28px;border-radius:4px;color:#6c7c72;font-size:20px;cursor:pointer}
-.asset-year-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-.asset-year-grid button{height:36px;border:1px solid transparent;border-radius:4px;background:#fff;color:#4b6154;font:inherit;cursor:pointer}.asset-year-grid button.is-outside{color:#adb6b0}.asset-year-grid button.is-current{font-weight:600;color:#138d77}
-.asset-year-grid button:hover,.asset-year-head button:hover{background:#f0f8f4}.asset-year-grid button[aria-pressed=true]{background:#e7f7ef;color:#15896f;border-color:#b3dac8}.asset-year-grid button:focus-visible,.asset-year-head button:focus-visible{outline:2px solid #8bcaa3;outline-offset:-2px}
-.asset-year-popup button:disabled{cursor:default;color:#c5cdc8;background:#fff}
+.asset-time-part:focus-visible,.asset-time-clear:focus-visible{outline:2px solid #a7d5bd;outline-offset:-2px}
+.asset-time-popup{position:fixed;z-index:130;box-sizing:border-box;background:#fff;border:1px solid #dce7e1;border-radius:6px;box-shadow:0 8px 30px #15392a26;padding:10px;color:#394b40;font:13px/1.5 "Microsoft YaHei",sans-serif}
+.asset-time-head{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:8px;min-height:30px}.asset-time-head.is-static{justify-content:center}
+.asset-time-heading{font-weight:500}.asset-time-head button{border:0;background:transparent;width:28px;height:30px;padding:0;border-radius:4px;color:#53685b;font:inherit;font-size:20px;line-height:30px;cursor:pointer}
+.asset-time-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.asset-time-grid button{height:38px;border:1px solid transparent;border-radius:4px;background:#fff;color:#4b6154;font:inherit;cursor:pointer;padding:0 2px;min-width:0}
+.asset-time-grid button.is-outside{color:#adb6b0}.asset-time-grid button.is-current{font-weight:600;color:#138d77}
+.asset-time-grid button:hover,.asset-time-head button:hover{background:#f0f8f4}.asset-time-grid button[aria-pressed=true]{background:#e7f7ef;color:#15896f;border-color:#b3dac8}
+.asset-time-popup button:focus-visible{outline:2px solid #8bcaa3;outline-offset:-2px}.asset-time-popup button:disabled{cursor:default;color:#c5cdc8;background:#fff}
+.asset-time-days{grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}.asset-time-days button,.asset-time-days>span{height:30px}
+.asset-time-weekdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));margin-bottom:4px;color:#94a097;text-align:center;font-size:12px;line-height:26px}
+.asset-time-footer{border-top:1px solid #edf1ee;padding-top:7px;margin-top:8px;display:flex;justify-content:flex-end}.asset-time-footer button{border:0;border-radius:3px;background:transparent;color:#168b72;font:inherit;padding:5px 8px;cursor:pointer}.asset-time-footer button:hover{background:#f0f8f4}
 .asset-time-legacy{font-size:12px;color:#8b968f;margin-top:6px}
-@media(max-width:600px){#ndMetadataRow{grid-template-columns:1fr}.asset-time-precision{width:88px;flex-basis:88px}}
+@media(max-width:600px){#ndMetadataRow{grid-template-columns:1fr}.asset-time-part{padding:0 7px}}
 
 </style>
 </head>
@@ -1553,7 +1559,7 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
           </div>
           <div id="ndMetadataRow" class="grid grid-cols-2 gap-3">
             <div>
-              <label for="ndDataTimePrecision" class="block text-sm font-medium text-gray-700 mb-1.5">数据时间 <span class="text-xs text-gray-400 font-normal">（选填）</span></label>
+              <label for="ndDataTimeYear" class="block text-sm font-medium text-gray-700 mb-1.5">数据时间 <span class="text-xs text-gray-400 font-normal">（选填）</span></label>
               <div id="ndDataTimeControl"></div>
               <p class="text-xs text-gray-400 mt-1.5">数据对应的采集时间或业务时期。</p>
             </div>
@@ -1802,75 +1808,83 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
 <script data-source="asset-time-picker.js">
 (function(){
  'use strict';
- const $=id=>document.getElementById(id);
- const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const calendar='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="15" rx="2"/><path d="M7.5 3v5M16.5 3v5M4 11h16"/></svg>';
- let popup,activeId='',decade=0;
+ const $=id=>document.getElementById(id),E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const pad=(v,n=2)=>String(v).padStart(n,'0'),names={year:'年',month:'月',day:'日'},suffix={year:'Year',month:'Month',day:'Day'};
+ const arrow='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>';
+ let popup,activeId='',activePart='',cursor=0,decade=0;
+ function dateAt(y,m,d=1){const value=new Date(0);value.setHours(12,0,0,0);value.setFullYear(y,m-1,d);return value;}
+ function daysInMonth(y,m){return dateAt(y,m+1,0).getDate();}
  function parts(card={}){
-  const raw=String(card.dataTime||'').trim(),year=/^\d{4}年?$/.test(raw)&&Number(raw.slice(0,4))>0;
-  const date=/^\d{4}-\d{2}-\d{2}$/.test(raw);
-  return {value:year?raw.slice(0,4):raw,precision:year?'year':date?'date':card.dataTimePrecision==='year'?'year':'date',legacy:!!raw&&!year&&!date};
+  const raw=String(card.dataTime||'').trim(),match=/^(\d{4})(?:年|(?:-(\d{2})(?:-(\d{2}))?)?)$/.exec(raw);
+  const y=Number(match?.[1]||0),m=Number(match?.[2]||0),d=Number(match?.[3]||0);
+  const valid=!!match&&y>=1&&y<=9999&&(!match[2]||m>=1&&m<=12)&&(!match[3]||d>=1&&d<=daysInMonth(y,m));
+  return {value:valid?pad(y,4)+(m?'-'+pad(m):'')+(d?'-'+pad(d):''):raw,precision:valid?(d?'date':m?'month':'year'):['year','month','date'].includes(card.dataTimePrecision)?card.dataTimePrecision:'date',year:valid?y:0,month:valid?m:0,day:valid?d:0,legacy:!!raw&&!valid};
  }
+ function read(id){const input=$(id);return input?{dataTime:input.value.trim(),dataTimePrecision:input.dataset.precision}:null;}
+ function label(p,part){return p[part]?(part==='year'?pad(p.year,4):p[part])+names[part]:part==='year'?'选择年':names[part]+'（可不选）';}
+ function disabled(p,part){return part==='month'?!p.year:part==='day'?!p.month:false;}
  function render(id,card={}){
-  const p=parts(card),year=p.precision==='year',showYear=year&&!p.legacy&&p.value;
-  return `<div class="asset-time-control" data-time-id="${E(id)}" role="group" aria-label="数据时间">
-   <input type="hidden" id="${E(id)}" value="${E(p.value)}" data-precision="${p.precision}">
-   <select id="${E(id)}Precision" class="asset-time-precision" aria-label="数据时间精度" onchange="HTAssetTime.changePrecision('${id}',this.value)"><option value="date" ${!year?'selected':''}>按日期</option><option value="year" ${year?'selected':''}>按年</option></select>
-   <div class="asset-time-value">
-    <input id="${E(id)}Date" class="asset-time-date" type="date" lang="zh-CN" min="0001-01-01" max="9999-12-31" aria-label="数据日期" value="${!year&&!p.legacy?E(p.value):''}" ${year?'hidden':''} oninput="HTAssetTime.setDate('${id}',this.value)">
-    <button type="button" id="${E(id)}Year" class="asset-time-year ${showYear?'':'is-empty'}" aria-label="选择数据年份" aria-haspopup="dialog" aria-expanded="false" ${!year?'hidden':''} onclick="HTAssetTime.openYear('${id}')"><span>${showYear?E(p.value)+'年':'请选择年份'}</span>${calendar}</button>
-    <button type="button" id="${E(id)}Clear" class="asset-time-clear" aria-label="清空数据时间" title="清空" ${!p.value?'hidden':''} onclick="HTAssetTime.clear('${id}')">×</button>
-   </div>
-  </div>${p.legacy?`<p id="${E(id)}Legacy" class="asset-time-legacy">当前值：${E(p.value)}</p>`:''}`;
+  const p=parts(card);
+  return '<div class="asset-time-control" data-time-id="'+E(id)+'" role="group" aria-label="数据时间"><input type="hidden" id="'+E(id)+'" value="'+E(p.value)+'" data-precision="'+p.precision+'">'+['year','month','day'].map(part=>'<button type="button" id="'+E(id)+suffix[part]+'" class="asset-time-part '+(!p[part]?'is-empty':'')+'" data-time-part="'+part+'" aria-label="选择'+names[part]+(part==='year'?'':'（可不选）')+'" aria-haspopup="dialog" aria-expanded="false" '+(disabled(p,part)?'disabled ':'')+'onclick="HTAssetTime.open(\''+id+'\',\''+part+'\')"><span>'+label(p,part)+'</span>'+arrow+'</button>').join('')+'<button type="button" id="'+E(id)+'Clear" class="asset-time-clear" aria-label="清空数据时间" title="清空数据时间" '+(!p.value?'hidden ':'')+'onclick="HTAssetTime.clear(\''+id+'\')">×</button></div>'+(p.legacy?'<p id="'+E(id)+'Legacy" class="asset-time-legacy">当前值：'+E(p.value)+'</p>':'');
  }
- function read(id){const input=$(id),date=$(id+'Date');if(input.dataset.precision==='date'&&!date.validity.valid){date.reportValidity();return null;}return {dataTime:input.value.trim(),dataTimePrecision:input.dataset.precision};}
  function update(id,value){
-  const input=$(id);input.value=value;$(id+'Legacy')?.remove();
-  const year=input.dataset.precision==='year';$(id+'Date').hidden=year;$(id+'Year').hidden=!year;
-  $(id+'Date').value=year?'':value;$(id+'Year').querySelector('span').textContent=year&&value?value+'年':'请选择年份';
-  $(id+'Year').classList.toggle('is-empty',!value);$(id+'Clear').hidden=!value;
+  const p=parts({dataTime:value}),input=$(id);input.value=p.value;input.dataset.precision=p.precision;$(id+'Legacy')?.remove();
+  ['year','month','day'].forEach(part=>{const b=$(id+suffix[part]);b.querySelector('span').textContent=label(p,part);b.classList.toggle('is-empty',!p[part]);b.disabled=disabled(p,part);b.setAttribute('aria-label','选择'+names[part]+(p[part]?'，当前'+label(p,part):part==='year'?'':'（可不选）'));});
+  $(id+'Clear').hidden=!p.value;
  }
- function changePrecision(id,precision){close();$(id).dataset.precision=precision;update(id,'');}
- function setDate(id,value){if(!$(id+'Date').validity.valid)return;$(id).dataset.precision='date';$(id).value=value;$(id+'Legacy')?.remove();$(id+'Clear').hidden=!value;}
- function clear(id){close();update(id,'');($(id).dataset.precision==='year'?$(id+'Year'):$(id+'Date')).focus();}
- function reset(id){if(!$(id))return;close();$(id).dataset.precision='date';$(id+'Precision').value='date';update(id,'');}
- function close(restore=false){if(!activeId)return;const trigger=$(activeId+'Year');if(trigger){trigger.setAttribute('aria-expanded','false');if(restore)trigger.focus();}activeId='';if(popup)popup.hidden=true;}
+ function trigger(){return $(activeId+suffix[activePart]);}
+ function close(restore=false){if(!activeId)return;const b=trigger();activeId='';activePart='';if(popup)popup.hidden=true;if(b){b.setAttribute('aria-expanded','false');if(restore&&!b.disabled)b.focus({preventScroll:true});}}
+ function clear(id){close();update(id,'');$(id+'Year').focus({preventScroll:true});}
+ function reset(id){if(!$(id))return;close();update(id,'');}
+ function commit(value){
+  const p=parts(read(activeId));p[activePart]=Number(value);
+  if(!p.year){p.month=0;p.day=0;}else if(!p.month||p.day>daysInMonth(p.year,p.month))p.day=0;
+  const raw=p.year?pad(p.year,4)+(p.month?'-'+pad(p.month):'')+(p.day?'-'+pad(p.day):''):'';
+  update(activeId,raw);close(true);
+ }
  function position(){
-  if(!activeId)return;const r=$(activeId+'Year').getBoundingClientRect(),width=Math.min(288,window.innerWidth-32);
-  popup.style.width=width+'px';const h=popup.offsetHeight;
-  popup.style.left=Math.max(16,Math.min(r.left,window.innerWidth-width-16))+'px';
-  popup.style.top=(r.bottom+6+h<=window.innerHeight-16?r.bottom+6:Math.max(16,r.top-h-6))+'px';
+  const b=trigger();if(!b?.isConnected){close();return;}const r=b.getBoundingClientRect(),width=Math.min(activePart==='day'?288:272,window.innerWidth-32);
+  popup.style.width=width+'px';const h=popup.offsetHeight;popup.style.left=Math.max(16,Math.min(r.left,window.innerWidth-width-16))+'px';popup.style.top=(r.bottom+6+h<=window.innerHeight-16?r.bottom+6:Math.max(16,r.top-h-6))+'px';
  }
- function draw(focusYear){
-  const value=$(activeId).value,now=new Date().getFullYear();
-  popup.innerHTML=`<div class="asset-year-head"><button type="button" data-decade="-1" aria-label="上十年" ${decade<=0?'disabled':''}>‹</button><strong>${String(Math.max(1,decade)).padStart(4,'0')} – ${Math.min(9999,decade+9)}</strong><button type="button" data-decade="1" aria-label="下十年" ${decade>=9990?'disabled':''}>›</button></div><div class="asset-year-grid" role="group" aria-label="年份">${Array.from({length:12},(_,i)=>decade-1+i).map(y=>`<button type="button" data-year="${y}" ${y<1||y>9999?'disabled':''} class="${y<decade||y>decade+9?'is-outside ':''}${y===now?'is-current':''}" aria-pressed="${value===String(y).padStart(4,'0')}" ${y===focusYear?'tabindex="0"':'tabindex="-1"'}>${y<1||y>9999?'—':String(y).padStart(4,'0')}</button>`).join('')}</div>`;
-  position();if(focusYear)popup.querySelector('[data-year="'+focusYear+'"]')?.focus();
- }
- function openYear(id){
-  if(activeId===id){close(true);return;}close();activeId=id;
-  const chosen=Number($(id).value),year=chosen>=1&&chosen<=9999?chosen:new Date().getFullYear();decade=Math.floor(year/10)*10;
-  if(!popup){popup=document.createElement('div');popup.className='asset-year-popup';popup.id='assetYearPopup';popup.setAttribute('role','dialog');popup.setAttribute('aria-label','选择年份');document.body.append(popup);
-   popup.addEventListener('click',e=>{
-    const b=e.target.closest('button');if(!b||b.disabled)return;
-    if(b.dataset.decade){decade+=Number(b.dataset.decade)*10;draw(Math.max(1,decade));return;}
-    if(b.dataset.year){update(activeId,String(b.dataset.year).padStart(4,'0'));close(true);}
-   });
-   popup.addEventListener('keydown',e=>{
-    const b=e.target.closest('[data-year]');if(!b)return;
-    const n=Number(b.dataset.year),offset={ArrowLeft:-1,ArrowRight:1,ArrowUp:-3,ArrowDown:3,PageUp:-10,PageDown:10}[e.key];
-    if(offset===undefined&&e.key!=='Home'&&e.key!=='End')return;e.preventDefault();
-    const next=Math.max(1,Math.min(9999,e.key==='Home'?decade:e.key==='End'?decade+9:n+offset));
-    if(next<decade||next>decade+9)decade=Math.floor(next/10)*10;draw(next);
-   });
+ function choice(n,label,p,now,outside=false,invalid=false){return '<button type="button" data-time-value="'+n+'" '+(invalid?'disabled ':'')+'tabindex="-1" aria-pressed="'+(p[activePart]===n)+'" class="'+(outside?'is-outside ':'')+(now?'is-current':'')+'">'+label+'</button>';}
+ function draw(focus=true){
+  if(!$(activeId)){close();return;}const p=parts(read(activeId)),now=new Date();let header,grid='';
+  if(activePart==='year'){
+   header='<div class="asset-time-head"><button type="button" data-decade="-1" aria-label="上十年" '+(decade<=0?'disabled':'')+'>‹</button><span class="asset-time-heading">'+pad(Math.max(1,decade),4)+' – '+pad(Math.min(9999,decade+9),4)+'</span><button type="button" data-decade="1" aria-label="下十年" '+(decade>=9990?'disabled':'')+'>›</button></div>';
+   grid=Array.from({length:12},(_,i)=>decade-1+i).map(y=>choice(y,y<1||y>9999?'—':pad(y,4),p,y===now.getFullYear(),y<decade||y>decade+9,y<1||y>9999)).join('');
+  }else if(activePart==='month'){
+   header='<div class="asset-time-head is-static"><span class="asset-time-heading">'+pad(p.year,4)+'年</span></div>';
+   grid=Array.from({length:12},(_,i)=>choice(i+1,(i+1)+'月',p,p.year===now.getFullYear()&&i===now.getMonth())).join('');
+  }else{
+   header='<div class="asset-time-head is-static"><span class="asset-time-heading">'+pad(p.year,4)+'年'+p.month+'月</span></div><div class="asset-time-weekdays" aria-hidden="true">'+['一','二','三','四','五','六','日'].map(v=>'<span>'+v+'</span>').join('')+'</div>';
+   const start=(dateAt(p.year,p.month).getDay()+6)%7,total=daysInMonth(p.year,p.month);
+   grid=Array.from({length:Math.ceil((start+total)/7)*7},(_,i)=>{const d=i-start+1;return d<1||d>total?'<span aria-hidden="true"></span>':choice(d,d,p,p.year===now.getFullYear()&&p.month===now.getMonth()+1&&d===now.getDate());}).join('');
   }
-  popup.hidden=false;$(id+'Year').setAttribute('aria-expanded','true');$(id+'Year').setAttribute('aria-controls','assetYearPopup');draw(year);
+  popup.innerHTML=header+'<div class="asset-time-grid '+(activePart==='day'?'asset-time-days':'')+'" role="group" aria-label="选择'+names[activePart]+'">'+grid+'</div>'+(activePart!=='year'?'<div class="asset-time-footer"><button type="button" data-time-value="0">不选'+(activePart==='month'?'月份':'日期')+'</button></div>':'');
+  const b=popup.querySelector('[data-time-value="'+cursor+'"]');if(b)b.tabIndex=0;
+  if(activePart==='day')popup.querySelectorAll('.asset-time-grid button').forEach(b=>b.setAttribute('aria-label',pad(p.year,4)+'年'+p.month+'月'+b.dataset.timeValue+'日'));
+  position();if(focus&&b&&!b.disabled)b.focus({preventScroll:true});
  }
- document.addEventListener('pointerdown',e=>{if(activeId&&!popup.contains(e.target)&&!$(activeId+'Year')?.contains(e.target))close();});
- document.addEventListener('focusin',e=>{if(activeId&&!popup.contains(e.target)&&!$(activeId+'Year')?.contains(e.target))close();});
+ function onKey(e){
+  const b=e.target.closest('.asset-time-grid button');if(!b||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(e.key))return;e.preventDefault();
+  const p=parts(read(activeId)),n=Number(b.dataset.timeValue),cols=activePart==='day'?7:3,max=activePart==='year'?9999:activePart==='month'?12:daysInMonth(p.year,p.month),offset={ArrowLeft:-1,ArrowRight:1,ArrowUp:-cols,ArrowDown:cols,PageUp:-10,PageDown:10}[e.key];
+  if((e.key==='PageUp'||e.key==='PageDown')&&activePart!=='year')return;
+  const index=activePart==='year'?n-(decade-1):activePart==='month'?n-1:n-1+(dateAt(p.year,p.month).getDay()+6)%7;
+  cursor=Math.max(1,Math.min(max,e.key==='Home'?n-index%cols:e.key==='End'?n+cols-1-index%cols:n+offset));if(activePart==='year')decade=Math.floor(cursor/10)*10;draw();
+ }
+ function open(id,part='year'){
+  const p=parts(read(id));if(disabled(p,part))return;if(activeId===id&&activePart===part){close(true);return;}close();activeId=id;activePart=part;
+  const now=new Date();cursor=p[part]||(part==='year'?now.getFullYear():part==='month'?now.getMonth()+1:Math.min(now.getDate(),daysInMonth(p.year,p.month)));decade=Math.floor(cursor/10)*10;
+  if(!popup){popup=document.createElement('div');popup.className='asset-time-popup';popup.id='assetTimePopup';popup.setAttribute('role','dialog');document.body.append(popup);
+   popup.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;if(b.dataset.decade){decade=Math.max(0,Math.min(9990,decade+Number(b.dataset.decade)*10));cursor=Math.max(1,Math.min(9999,decade+cursor%10));draw();}else if(b.hasAttribute('data-time-value'))commit(b.dataset.timeValue);});popup.addEventListener('keydown',onKey);
+  }
+  popup.dataset.part=part;popup.setAttribute('aria-label','选择'+names[part]);popup.hidden=false;trigger().setAttribute('aria-expanded','true');trigger().setAttribute('aria-controls','assetTimePopup');draw();
+ }
+ document.addEventListener('pointerdown',e=>{if(activeId&&!popup.contains(e.target)&&!trigger()?.contains(e.target))close();});
+ document.addEventListener('focusin',e=>{if(activeId&&!popup.contains(e.target)&&!trigger()?.contains(e.target))close();});
  window.addEventListener('keydown',e=>{if(activeId&&e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();close(true);}},true);
  window.addEventListener('resize',()=>close());document.addEventListener('scroll',e=>{if(activeId&&!popup.contains(e.target))close();},true);
- window.HTAssetTime={render,read,changePrecision,setDate,clear,reset,openYear};
- const host=$('ndDataTimeControl');if(host)host.innerHTML=render('ndDataTime');
+ window.HTAssetTime={render,read,clear,reset,open};const host=$('ndDataTimeControl');if(host)host.innerHTML=render('ndDataTime');
 })();
 
 </script>
@@ -2308,7 +2322,7 @@ try {
 
 // 全局卡片存储（支持删除持久化）
 
-function assetDataTime(c){const value=String(c.dataTime||'');return /^\d{4}年?$/.test(value)?value.slice(0,4)+'年':value;}
+function assetDataTime(c){const value=String(c.dataTime||'');return /^\d{4}年?$/.test(value)?value.slice(0,4)+'年':/^\d{4}-\d{2}$/.test(value)?value.slice(0,4)+'年'+Number(value.slice(5))+'月':value;}
 function assetDataOrigin(c){if(Object.hasOwn(c,'dataOrigin'))return c.dataOrigin||'';return c.dataSource||(c.spId?'数据空间化':'');}
 function assetMetadataHTML(c){const E=HTWorkflow.esc;return '<div class="asset-card-metadata"><div><span>数据时间</span><b title="'+E(assetDataTime(c)||'—')+'">'+E(assetDataTime(c)||'—')+'</b></div><div><span>数据来源</span><b title="'+E(assetDataOrigin(c)||'—')+'">'+E(assetDataOrigin(c)||'—')+'</b></div></div>';}
 
@@ -3138,7 +3152,7 @@ function renderDetailSettings(card, m) {
 
       <form class="asset-metadata-form" id="assetMetadataForm" onsubmit="event.preventDefault();HTProdData.saveMetadata()">
         <h4>基本信息</h4>
-        <label for="assetDataTimeInputPrecision">数据时间 <span class="text-gray-400">（选填）</span></label>
+        <label for="assetDataTimeInputYear">数据时间 <span class="text-gray-400">（选填）</span></label>
         ${HTAssetTime.render('assetDataTimeInput',card)}
         <p>数据对应的采集时间或业务时期。</p>
         <label for="assetDataOriginInput">数据来源 <span class="text-gray-400">（选填）</span></label>
@@ -6329,11 +6343,11 @@ const presets={system:{label:'系统默认',help:'沿用服务引擎的默认参
 // The type catalogue owns display copy and its illustration configuration.
 // Illustrations are explanatory examples, independent of the publishing algorithms.
 const tileTypes=[
- {value:'BASE_TILE',label:'常规切片',short:'保留原始要素结构',detail:'基础矢量切片，保留要素结构。',illustration:{kind:'base',sourceCaption:'3 个独立要素',resultCaption:'仍保留各自的形状与位置'}},
- {value:'BASE_CLUSTER',label:'简单聚类',short:'依据距离进行聚类',detail:'按一定距离将相近的要素聚类成一个点要素。',illustration:{kind:'cluster',grouped:false,sourceCaption:'两处相邻要素，各 4 个',resultCaption:'每处聚合为一个点'}},
- {value:'FIELD_GROUP_CLUSTER',label:'属性分组聚类',short:'即使相邻，不同组也不合并',detail:'先按指定属性的唯一值分组，再在各组内按距离聚类。组间不参与聚类，结果保留组信息，可用于聚类图层的过滤。',illustration:{kind:'cluster',grouped:true,sourceCaption:'与简单聚类相同的 8 个要素',resultCaption:'A、B 两组分别按距离聚类'}},
- {value:'FEATURE_HEXBIN',label:'要素蜂窝图',short:'以每个要素的范围为单位',detail:'以每个要素各自的覆盖范围生成蜂窝图。',illustration:{kind:'hex',scope:'feature',sourceCaption:'两个要素，各有覆盖范围',resultCaption:'A、B 的范围分别生成蜂窝'}},
- {value:'DATA_HEXBIN',label:'数据蜂窝图',short:'以全部要素的整体范围为单位',detail:'以所有要素的整体覆盖范围生成蜂窝图。',illustration:{kind:'hex',scope:'data',sourceCaption:'与要素蜂窝图相同的数据',resultCaption:'依据整体覆盖范围生成蜂窝'}}
+ {value:'BASE_TILE',label:'常规切片',detail:'基础矢量切片，保留原始要素结构。',illustration:{kind:'base',sourceCaption:'3 个独立要素',resultCaption:'仍保留各自的形状与位置'}},
+ {value:'BASE_CLUSTER',label:'简单聚类',detail:'按一定距离将相近的要素聚类成一个点要素。',illustration:{kind:'cluster',grouped:false,sourceCaption:'两处相邻要素，各 4 个',resultCaption:'每处聚合为一个点'}},
+ {value:'FIELD_GROUP_CLUSTER',label:'属性分组聚类',detail:'先按指定属性的唯一值分组，再在各组内按距离聚类。组间不参与聚类，结果保留组信息，可用于聚类图层的过滤。',illustration:{kind:'cluster',grouped:true,sourceCaption:'与简单聚类相同的 8 个要素',resultCaption:'A、B 两组分别按距离聚类'}},
+ {value:'FEATURE_HEXBIN',label:'要素蜂窝图',detail:'以每个要素各自的覆盖范围生成蜂窝图。',illustration:{kind:'hex',scope:'feature',sourceCaption:'两个要素，各有覆盖范围',resultCaption:'A、B 的范围分别生成蜂窝'}},
+ {value:'DATA_HEXBIN',label:'数据蜂窝图',detail:'以所有要素的整体覆盖范围生成蜂窝图。',illustration:{kind:'hex',scope:'data',sourceCaption:'与要素蜂窝图相同的数据',resultCaption:'依据整体覆盖范围生成蜂窝'}}
 ];
 const isCluster=p=>['BASE_CLUSTER','FIELD_GROUP_CLUSTER'].includes(p.tileType);
 function tileDiagram(type,result,w){
@@ -6367,7 +6381,7 @@ function tileDiagram(type,result,w){
  return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+E(type.label+'：'+(result?spec.resultCaption:spec.sourceCaption))+'"><title>'+E(type.label+'，'+(result?'切片结果':'原始数据'))+'</title>'+marks+'</svg>';
 }
 function drawTilePlot(plot){
- const type=tileTypes.find(v=>v.value===$('uxTileType')?.value)||tileTypes[0],width=Math.round(plot.getBoundingClientRect().width);
+ const type=tileTypes.find(v=>v.value===$('uxTilePreview')?.dataset.tilePreview)||tileTypes[0],width=Math.round(plot.getBoundingClientRect().width);
  if(width>0)plot.innerHTML=tileDiagram(type,plot.dataset.tilePlot==='result',width);
 }
 const tilePreviewObserver=new ResizeObserver(entries=>entries.forEach(({target})=>{if(target.isConnected)drawTilePlot(target);}));
@@ -6379,7 +6393,7 @@ function tileLegend(spec){
 }
 function tilePicker(p){
  const selected=tileTypes.find(v=>v.value===p.tileType)||tileTypes[0],spec=selected.illustration;
- return '<div class="prod-form-row mvt-tile-row"><label for="uxTileType" class="tile-type-label">切片类型 <span class="ux-required">*</span></label><div class="prod-field-control tile-type-layout"><div class="tile-type-selection"><select id="uxTileType" name="mvtTileType" class="ux-control" aria-describedby="uxTileHelp" required>'+tileTypes.map(v=>'<option value="'+E(v.value)+'" '+(v.value===selected.value?'selected':'')+'>'+E(v.label)+'</option>').join('')+'</select><p id="uxTileHelp" class="tile-type-detail" aria-live="polite">'+E(selected.detail)+'</p><p class="tile-type-key">'+E(selected.short)+'</p></div><figure id="uxTilePreview" class="tile-type-preview" data-tile-preview="'+E(selected.value)+'" aria-labelledby="uxTileName"><figcaption class="tile-type-preview-heading"><strong id="uxTileName">'+E(selected.label)+'</strong><span>示意图</span></figcaption><div class="tile-type-pair"><div class="tile-type-pane"><div class="tile-type-pane-title">原始数据</div><div class="tile-type-plot" data-tile-plot="source"></div><div class="tile-type-caption">'+E(spec.sourceCaption)+'</div></div><div class="tile-type-arrow" aria-hidden="true">→</div><div class="tile-type-pane"><div class="tile-type-pane-title">切片结果</div><div class="tile-type-plot" data-tile-plot="result"></div><div class="tile-type-caption">'+E(spec.resultCaption)+'</div></div></div><div class="tile-type-legend">'+tileLegend(spec)+'</div></figure></div></div>';
+ return '<div class="prod-form-row mvt-tile-row"><span id="uxTileLabel" class="tile-type-label">切片类型 <span class="ux-required">*</span></span><div class="prod-field-control"><div id="uxTileTypes" class="tile-type-segments" role="group" aria-labelledby="uxTileLabel">'+tileTypes.map(v=>'<button type="button" data-tile-type="'+E(v.value)+'" aria-pressed="'+(v.value===selected.value)+'" tabindex="'+(v.value===selected.value?'0':'-1')+'" aria-describedby="'+(v.value===selected.value?'uxTileHelp':'')+'">'+E(v.label)+'</button>').join('')+'</div><div class="tile-type-layout"><div class="tile-type-selection" aria-live="polite"><h4 id="uxTileName">'+E(selected.label)+'</h4><p id="uxTileHelp" class="tile-type-detail">'+E(selected.detail)+'</p></div><figure id="uxTilePreview" class="tile-type-preview" data-tile-preview="'+E(selected.value)+'" aria-label="'+E(selected.label)+'处理前后对比示意"><figcaption class="tile-type-preview-heading"><strong>处理前后对比</strong><span>示意图</span></figcaption><div class="tile-type-pair"><div class="tile-type-pane"><div class="tile-type-pane-title">原始数据</div><div class="tile-type-plot" data-tile-plot="source"></div><div class="tile-type-caption">'+E(spec.sourceCaption)+'</div></div><div class="tile-type-arrow" aria-hidden="true">→</div><div class="tile-type-pane"><div class="tile-type-pane-title">切片结果</div><div class="tile-type-plot" data-tile-plot="result"></div><div class="tile-type-caption">'+E(spec.resultCaption)+'</div></div></div><div class="tile-type-legend">'+tileLegend(spec)+'</div></figure></div></div></div>';
 }
 
 // Explicit metadata for an existing demo record; never inferred from a field name.
@@ -6430,12 +6444,16 @@ window.updatePublishOptions=function(){
  out+='<div class="prod-form-row"><label for="uxScheme">切片网格 <span class="ux-required">*</span></label><div class="prod-field-control">'+(t==='WMTS'?checks(schemes,p.schemes,'data-scheme'):'<select id="uxScheme" class="ux-control">'+options(schemes,p.schemes[0])+'</select>')+'<div id="uxSchemeError" class="ux-error" role="alert"></div></div></div>';
  if(t==='MVT')out+='<div class="prod-form-row"><label>切片参数</label><div class="prod-field-control"><button type="button" class="prod-select-trigger" id="uxOpenParams"><span id="uxParamSummary">'+(presets[p.preset]?.label||'自定义')+'</span><span>调整 ›</span></button></div></div><div class="prod-form-row prod-extra"><span aria-hidden="true"></span><div class="prod-field-control ux-checks"><label><input id="uxBoundary" type="checkbox" '+(p.boundary?'checked':'')+'>创建边界切片</label><label><input id="uxLabels" type="checkbox" '+(p.labels?'checked':'')+'>创建标注切片</label></div></div>'+parameterDialog(p);
  area.innerHTML=out+'</div>';
- if($('uxTileType'))$('uxTileType').onchange=e=>{
-  e.stopPropagation();
-  const d=capture();d.tileType=e.target.value;d.groupMode=d.tileType==='FIELD_GROUP_CLUSTER'?'attribute':'none';if(d.groupMode!=='attribute')d.groupField='';
+ const chooseTileType=value=>{
+  const d=capture();d.tileType=value;d.groupMode=d.tileType==='FIELD_GROUP_CLUSTER'?'attribute':'none';if(d.groupMode!=='attribute')d.groupField='';
   if(!isCluster(d)){delete d.parameters.clusterDistance;if(d.preset==='point')d.preset='custom';}
-  delete d.parameters.clusterPoints;publishProtocolDrafts[t]=d;updatePublishOptions();$('uxTileType').focus({preventScroll:true});
+  delete d.parameters.clusterPoints;publishProtocolDrafts[t]=d;updatePublishOptions();
+  const chosen=area.querySelector('[data-tile-type="'+value+'"]');chosen?.focus({preventScroll:true});chosen?.scrollIntoView({block:'nearest',inline:'nearest'});
  };
+ area.querySelectorAll('[data-tile-type]').forEach(b=>{
+  b.onclick=()=>chooseTileType(b.dataset.tileType);
+  b.onkeydown=e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const index=tileTypes.findIndex(v=>v.value===b.dataset.tileType),next=e.key==='Home'?0:e.key==='End'?tileTypes.length-1:(index+(e.key==='ArrowRight'?1:tileTypes.length-1))%tileTypes.length;chooseTileType(tileTypes[next].value);};
+ });
  observeTilePreview();
  
  if($('uxFieldPicker')){const positionPicker=()=>{const picker=$('uxFieldPicker');const rect=picker.getBoundingClientRect(),body=$('publishWizardBody').getBoundingClientRect(),below=body.bottom-rect.bottom-12,above=rect.top-body.top-12,up=below<300&&above>below;picker.classList.toggle('opens-up',up);picker.querySelector('.ux-field-list').style.maxHeight=Math.max(96,Math.min(228,(up?above:below)-76))+'px';};$('uxFieldPicker').ontoggle=()=>{if($('uxFieldPicker').open){positionPicker();}};$('uxFieldPicker').querySelector('summary').onclick=positionPicker;}
