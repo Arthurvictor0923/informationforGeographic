@@ -1,7 +1,67 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<script src="hetu-workflow.js"></script>
+<script data-bundled-from="hetu-workflow.js">
+
+// 浏览器限制本地存储时，在当前页面保留演示状态。
+window.HTPrototypeStorage = (() => {
+  const memory = new Map();
+  let storage;
+  try { storage = window.localStorage; } catch (_) {}
+  return {
+    getItem(key) {
+      key = String(key);
+      if (storage) { try { return storage.getItem(key); } catch (_) { storage = null; } }
+      return memory.has(key) ? memory.get(key) : null;
+    },
+    setItem(key, value) {
+      key = String(key); value = String(value); memory.set(key, value);
+      if (storage) { try { storage.setItem(key, value); } catch (_) { storage = null; } }
+    },
+    removeItem(key) {
+      key = String(key); memory.delete(key);
+      if (storage) { try { storage.removeItem(key); } catch (_) { storage = null; } }
+    }
+  };
+})();
+
+/* 本地原型数据：发布记录、要素图层、服务更新任务。仅模拟跨页交互。 */
+(function () {
+  'use strict';
+  const read = (key, fallback) => { try { return JSON.parse(HTPrototypeStorage.getItem(key)) || fallback; } catch (_) { return fallback; } };
+  const write = (key, data) => HTPrototypeStorage.setItem(key, JSON.stringify(data));
+  const id = prefix => prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const services = () => read('hetu_published_services_v2', []);
+  const layers = () => read('hetu_layers_v2', []);
+  const upsert = (key, record) => { const list = read(key, []); const i = list.findIndex(x => x.id === record.id); if (i < 0) list.unshift(record); else list[i] = record; write(key, list); return record; };
+  function complete(task) {
+    if (task.operation === 'publish' && task.serviceRecord) upsert('hetu_published_services_v2', {...task.serviceRecord, status:'正常'});
+    if (task.operation === 'update') {
+      const dates = read('hetu_service_updates_v2', {});
+      dates[task.serviceId] = new Date().toISOString().slice(0, 10);
+      write('hetu_service_updates_v2', dates);
+    }
+  }
+  function queueUpdate(service) {
+    const list = read('hetu_tasks_v1', []);
+    if (list.some(t => t.operation === 'update' && t.serviceId === service.id && ['queued','running'].includes(t.status))) return false;
+    const steps = ['数据解析','坐标转换','切片生成','建索引','更新服务'].map(name => ({name,status:'pending',progress:0,startAt:null,endAt:null,log:''}));
+    list.unshift({id:id('T'),type:'service',operation:'update',serviceId:service.id,title:'按需更新：'+service.title,target:service.asset || service.assetRef || service.title,status:'queued',progress:0,reason:null,log:'',createdTs:Date.now(),createdAt:new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false}),steps});
+    write('hetu_tasks_v1', list);
+    return true;
+  }
+  window.HTWorkflow = {read,write,id,esc,services,layers,complete,queueUpdate,saveLayer:record=>upsert('hetu_layers_v2',record)};
+})();
+
+/* Cross-page records for the existing prototype workflows. */
+Object.assign(HTWorkflow, {
+  maps:()=>HTWorkflow.read('hetu_maps_v3',[]),
+  saveMap(record){const all=this.maps(),i=all.findIndex(x=>x.id===record.id);if(i<0)all.unshift(record);else all[i]=record;this.write('hetu_maps_v3',all);return record;},
+  removeRecord(key,id){this.write(key,this.read(key,[]).filter(x=>x.id!==id));}
+});
+
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>地图编辑器优化原型 V3 — 河图地理信息平台</title>
@@ -2207,6 +2267,49 @@ body.hetu-portal {
 .fap-service-source{display:block;font-size:10px;color:var(--gray-400);line-height:16px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .ov-leaf .fap-service-title{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ov-leaf .ov-sname{min-width:0}
+
+/* Map-setting edits are scoped to this tab; the footer is always visible. */
+#pnl-settings{display:flex;flex-direction:column;overflow:hidden;min-height:0}
+#pnl-settings.hidden{display:none}
+.tm-settings-scroll{flex:1;overflow:auto;min-height:0}
+.tm-settings-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 16px;background:#fff;border-top:1px solid var(--gray-200);flex-shrink:0}
+.tm-settings-footer .btn{flex:1;padding-inline:10px}
+.tm-settings-footer .btn:disabled{opacity:.45;cursor:default}
+#pnl-settings .sec{margin-bottom:4px}
+#pnl-settings .sec-row{padding-inline:16px;gap:8px}
+#pnl-settings .sec-value{min-width:0}
+.tm-range{width:100%;min-width:50px;accent-color:var(--brand)}
+#pnl-settings .tm-number,#tmSettingsView .tm-number{width:70px;min-width:0;flex-shrink:0;padding:6px}
+.tm-center{flex-wrap:wrap;font-size:11px;gap:6px!important}
+.tm-center .btn{margin-left:auto}
+#tmBackground{width:30px;height:30px;border:1px solid #ddd;border-radius:5px;padding:2px;background:#fff}
+.tm-view-heading{display:flex;align-items:center;gap:8px;padding:16px;border-bottom:1px solid var(--gray-100);font-size:13px;flex:none}
+.tm-view-heading strong{flex:1;white-space:nowrap}
+.tm-view-heading .btn{padding:0 8px}
+.tm-view-heading .modal-close{font-size:18px;width:24px;height:28px;flex:none}
+.tm-view-heading .btn:last-child{margin-left:auto}
+.tm-view-fields{padding:20px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;min-height:0;flex:1}
+.tm-view-fields label{display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--gray-600);min-width:0}
+.tm-view-fields .input{width:100%;min-width:0}
+.tm-control-row{display:flex;align-items:center;gap:7px;min-width:0}
+.tm-angle-row{display:flex;align-items:center;gap:14px}
+.tm-angle-row label{flex:1}
+.tm-angle-row small{font-size:11px;color:var(--gray-400)}
+.tm-angle-icon{width:50px;height:50px;border:1px solid var(--gray-200);border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:25px;color:var(--brand);background:var(--gray-50)}
+.tm-north{position:absolute;top:0px;left:20px;font-size:9px;color:var(--gray-500)}
+#tmHeadingArrow,#tmPitchArrow{display:block;transform-origin:center}
+.tm-pitch-icon{border-radius:9px}
+.tm-pitch-icon i{position:absolute;bottom:5px;width:30px;border-bottom:2px solid var(--gray-400)}
+.tm-angle-note{font-size:11px;line-height:1.6;color:var(--gray-400);margin:0}
+#tmSettingsStatus{font-size:11px;color:var(--brand)}
+.left-tab.tm-pending::after{content:'';position:absolute;right:9px;top:8px;width:6px;height:6px;background:#d89421;border-radius:50%}
+#pnl-overview .pnl-toolbar{flex-wrap:wrap;gap:6px}
+#addModal .fap-pagination select{display:inline-block}
+
+.tm-view-drawer{position:absolute;left:calc(var(--tab-w) + var(--panel-w));top:0;bottom:0;width:360px;max-width:calc(100% - var(--tab-w) - var(--panel-w) - 46px);z-index:990;display:flex;flex-direction:column;background:#fff;border-right:1px solid var(--border);box-shadow:6px 0 18px rgba(21,53,45,.1);animation:tm-view-enter .18s ease-out}
+.tm-view-drawer[hidden]{display:none}
+@keyframes tm-view-enter{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
+@media(prefers-reduced-motion:reduce){.tm-view-drawer{animation:none}}
 </style>
 </head>
 <body class="hetu-portal hetu-editor">
@@ -2223,7 +2326,7 @@ body.hetu-portal {
       <span class="type-tag">专题地图</span>
     </span>
     <button class="btn ghost" onclick="openShareModal()">🔗 分享</button>
-    <button class="btn primary">保存</button>
+    <button class="btn primary" id="tmSaveButton" onclick="TMSettings.requestSave()">保存</button>
   </div>
 
   <!-- ── MAIN ── -->
@@ -2276,7 +2379,7 @@ body.hetu-portal {
         <div class="pnl-body" id="pnl-overview">
           <div class="pnl-header"><span>🗂 当前制图概览</span><span class="pnl-hint">结构 · 增删 · 选中服务管样式</span></div>
           <div class="pnl-toolbar">
-            <button class="btn btn-sm primary" onclick="openAddModal()">＋ 添加图层</button>
+            <button class="btn btn-sm primary" onclick="openAddModal()">＋ 添加要素图层</button>
           </div>
           <div class="info-banner">本制图由以下<b>图层</b>组成；展开任一图层可查看其挂载的<b>服务</b>（子节点全部为服务）。<b>点击任一服务即选中它</b>，右侧功能栏随即解锁以进行<b>样式管理</b>；图层的增删也在此处。渲染顺序的调整在「图层」tab。</div>
           <div class="ov-summary" id="ovSummary"></div>
@@ -2346,60 +2449,42 @@ body.hetu-portal {
           <div class="info-banner">💡 已配置的图例会在<b>画布右下角图例框</b>实时渲染，所见即所得。</div>
         </div>
 
-        <!-- SETTINGS -->
+        <!-- SETTINGS: one transaction for the whole tab, including view details. -->
         <div class="pnl-body hidden" id="pnl-settings">
-          <div class="pnl-header"><span>⚙ 地图设置</span><span class="pnl-hint">视野 · 缩放 · 背景 · 权限</span></div>
-          <div class="sec">
-            <div class="sec-title">📍 视野参数</div>
-            <div class="sec-row">
-              <span class="sec-label">中心点</span>
-              <div class="sec-value">
-                <span class="text-mono" style="font-size:12px">126.35°, 45.68°</span>
-                <button class="btn btn-xs" style="margin-left:auto" onclick="openViewParam()">设置</button>
+          <div class="pnl-header"><span>⚙ 地图设置</span><span id="tmSettingsStatus" class="pnl-hint" aria-live="polite"></span></div>
+          <div class="tm-settings-scroll">
+            <div id="tmSettingsMain">
+              <div class="sec">
+                <div class="sec-title">视野参数</div>
+                <div class="sec-row"><span class="sec-label">中心点</span><div class="sec-value tm-center"><span class="text-mono" id="tmCenterSummary"></span><button class="btn btn-xs" id="tmOpenView" type="button" aria-controls="tmSettingsView" aria-expanded="false" onclick="openViewParam()">设置</button></div></div>
+              </div>
+              <div class="sec">
+                <div class="sec-title">缩放等级</div>
+                <div class="sec-row"><span class="sec-label">级别</span><div class="sec-value"><input type="range" class="tm-range" id="tmZoomRange" data-tm-field="zoom" min="0" max="20" step="0.1" value="9" aria-label="缩放等级"><input class="input tm-number" type="number" id="tmZoom" data-tm-field="zoom" min="0" max="20" step="0.1" value="9" required aria-label="缩放等级数值"></div></div>
+              </div>
+              <div class="sec">
+                <div class="sec-title">背景设置</div>
+                <div class="sec-row"><span class="sec-label">背景色</span><div class="sec-value"><input type="color" id="tmBackground" data-tm-field="background" value="#f5f7fa" aria-label="背景色"><span class="text-mono" id="tmBackgroundText">#F5F7FA</span></div></div>
+                <div class="sec-row"><span class="sec-label">可见范围</span><div class="sec-value"><input class="input tm-number" type="number" id="tmRangeMin" data-tm-field="rangeMin" min="0" max="20" step="1" value="0" required aria-label="背景最小可见级别"><span>至</span><input class="input tm-number" type="number" id="tmRangeMax" data-tm-field="rangeMax" min="0" max="20" step="1" value="20" required aria-label="背景最大可见级别"></div></div>
               </div>
             </div>
           </div>
-          <div class="sec">
-            <div class="sec-title">🔍 缩放等级</div>
-            <div class="sec-row">
-              <span class="sec-label">级别</span>
-              <div class="sec-value">
-                <div class="slider"><div class="slider-fill" style="width:50%"></div></div>
-                <span class="text-mono" style="font-size:12px;width:32px;text-align:right">10.0</span>
-              </div>
-            </div>
-          </div>
-          <div class="sec">
-            <div class="sec-title">🎨 背景设置</div>
-            <div class="sec-row">
-              <span class="sec-label">背景色</span>
-              <div class="sec-value">
-                <span class="swatch" style="background:#f5f7fa"></span>
-                <span class="text-mono" style="font-size:12px">#F5F7FA</span>
-              </div>
-            </div>
-            <div class="sec-row">
-              <span class="sec-label">背景可见</span>
-              <div class="sec-value">
-                <div class="slider"><div class="slider-fill" style="width:100%"></div></div>
-                <span class="text-mono" style="font-size:12px;width:32px;text-align:right">20</span>
-              </div>
-            </div>
-          </div>
-          <div class="sec">
-            <div class="sec-title">🔐 组件权限</div>
-            <div style="padding:var(--sp-sm) var(--sp-lg) var(--sp-lg)">
-              <div style="border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:var(--sp-md);cursor:pointer;transition:all var(--t-fast) var(--ease-in-out)" onclick="openPermission()">
-                <div style="font-size:var(--text-base);font-weight:500;display:flex;justify-content:space-between;align-items:center;color:var(--gray-800)">
-                  图层树权限配置 <span style="color:var(--gray-400)">→</span>
-                </div>
-                <div style="font-size:var(--text-sm);color:var(--gray-400);margin-top:4px;line-height:var(--lh-relaxed)">基于角色管理图层树的可见性，控制不同用户能看到的图层内容</div>
-              </div>
-            </div>
-          </div>
+          <div class="tm-settings-footer"><button class="btn" id="tmCancelSettings" onclick="TMSettings.cancel()">取消修改</button><button class="btn primary" id="tmConfirmSettings" onclick="TMSettings.confirm()">确认修改</button></div>
         </div>
       </div>
     </div>
+
+    <aside id="tmSettingsView" class="tm-view-drawer" role="region" aria-labelledby="tmViewTitle" hidden>
+      <div class="tm-view-heading"><strong id="tmViewTitle">视野参数设置</strong><button class="btn btn-sm" type="button" onclick="TMSettings.capture()">从当前地图获取</button><button class="modal-close" type="button" onclick="TMSettings.closeView()" aria-label="关闭视野参数">×</button></div>
+              <div class="tm-view-fields">
+                <label>中心经度<input class="input text-mono" type="number" id="tmLongitude" data-tm-field="longitude" min="-180" max="180" step="0.000001" required></label>
+                <label>中心纬度<input class="input text-mono" type="number" id="tmLatitude" data-tm-field="latitude" min="-90" max="90" step="0.000001" required></label>
+                <label>层级<div class="tm-control-row"><input type="range" class="tm-range" id="tmViewZoomRange" data-tm-field="zoom" min="0" max="20" step="0.1" aria-label="视野层级"><input class="input tm-number" type="number" id="tmViewZoom" data-tm-field="zoom" min="0" max="20" step="0.1" required aria-label="视野层级数值"></div></label>
+                <div class="tm-angle-row"><span class="tm-angle-icon" aria-label="航向方向示意"><span class="tm-north">N</span><span id="tmHeadingArrow">↑</span></span><label>航向角<div class="tm-control-row"><input class="input" type="number" id="tmHeading" data-tm-field="heading" min="-180" max="360" step="0.1" required aria-label="航向角"><span>°</span><button class="btn btn-xs" onclick="TMSettings.resetAngle('heading')">复位</button></div></label></div>
+                <div class="tm-angle-row"><span class="tm-angle-icon tm-pitch-icon" aria-label="俯仰方向示意"><span id="tmPitchArrow">↓</span><i></i></span><label>俯仰角<div class="tm-control-row"><input class="input" type="number" id="tmPitch" data-tm-field="pitch" min="0" max="90" step="0.1" required aria-label="俯仰角"><span>°</span><button class="btn btn-xs" onclick="TMSettings.resetAngle('pitch')">复位</button></div><small>0°为垂直向下</small></label></div>
+                <p class="tm-angle-note" id="tmAngleNote">当前画布不预览角度变化，参数可保留。</p>
+              </div>
+    </aside>
 
     <!-- ========== CENTER MAP ========== -->
     <div class="map-area" id="mapArea">
@@ -2860,7 +2945,7 @@ body.hetu-portal {
       <div class="fap-layer-grid" id="modal-feature-items"></div>
       <div class="fap-pagination"><span id="fapPageInfo"></span><select class="input" id="fapPageSize" aria-label="每页条数" onchange="FAP.filter()"><option value="6">6 条/页</option><option value="12">12 条/页</option></select><button id="fapPagePrev" aria-label="上一页" onclick="FAP.page(-1)">‹</button><span id="fapPageNumbers"></span><button id="fapPageNext" aria-label="下一页" onclick="FAP.page(1)">›</button></div>
     </section>
-    <div class="modal-ft"><span class="fap-foot-count" aria-live="polite">已选 <b id="modalCount">0</b> 个要素图层 · <b id="fapServiceCount">0</b> 个服务</span><button class="btn" onclick="closeAddModal()">取消</button><button class="btn primary" id="fapConfirm" onclick="doAddLayers()" disabled>确定</button></div>
+    <div class="modal-ft"><span class="fap-foot-count" aria-live="polite">已选 <b id="modalCount">0</b> 个要素图层 · <b id="fapServiceCount">0</b> 个服务</span><button class="btn" onclick="closeAddModal()">取消</button><button class="btn primary" id="fapConfirm" onclick="doAddLayers()" disabled>添加（0）</button></div>
   </div>
 </div>
 
@@ -3387,49 +3472,10 @@ body.hetu-portal {
 <!-- ====================================================================
      VIEW PARAM MODAL (J-13) — 视野参数设置
      ==================================================================== -->
-<div class="modal-mask hidden" id="viewParamModal">
-  <div class="modal modal-sm" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span>视野参数设置</span><button class="modal-close" onclick="closeModal('viewParamModal')">✕</button></div>
-    <div class="modal-bd">
-      <div class="form-item"><span class="fi-label req">经度</span><div class="fi-control"><input class="input text-mono" value="126.350000"></div></div>
-      <div class="form-item"><span class="fi-label req">纬度</span><div class="fi-control"><input class="input text-mono" value="45.680000"></div></div>
-      <div class="form-item"><span class="fi-label req">层级</span><div class="fi-control"><input class="input text-mono" value="10"></div></div>
-      <div class="form-item"><span class="fi-label">航向角</span><div class="fi-control"><input class="input text-mono" value="0.0"></div></div>
-      <div class="form-item"><span class="fi-label">俯仰角</span><div class="fi-control"><input class="input text-mono" value="-45.0"></div></div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeModal('viewParamModal')">取消</button>
-      <button class="btn primary" onclick="closeModal('viewParamModal');showToast('✅ 视野参数已更新')">确定</button>
-    </div>
-  </div>
+<div class="modal-mask hidden" id="tmPendingModal" role="dialog" aria-modal="true" aria-labelledby="tmPendingTitle">
+  <div class="modal modal-sm" onclick="event.stopPropagation()"><div class="modal-hd"><span id="tmPendingTitle">地图设置有未确认的修改</span><button class="modal-close" onclick="TMSettings.returnToSettings()">×</button></div><div class="modal-bd">是否确认本轮地图设置并保存专题地图？</div><div class="modal-ft"><button class="btn" onclick="TMSettings.returnToSettings()">返回地图设置</button><button class="btn primary" onclick="TMSettings.confirmAndSave()">确认修改并保存</button></div></div>
 </div>
 
-<!-- ====================================================================
-     PERMISSION MODAL (J-37) — 新增权限配置
-     ==================================================================== -->
-<div class="modal-mask hidden" id="permissionModal">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd"><span>新增权限配置</span><button class="modal-close" onclick="closeModal('permissionModal')">✕</button></div>
-    <div class="modal-bd">
-      <div class="form-item"><span class="fi-label req">选择系统</span><div class="fi-control"><select class="select"><option>河图地理信息平台</option><option>农业一张图系统</option></select></div></div>
-      <div class="form-item"><span class="fi-label req">选择角色</span><div class="fi-control"><select class="select"><option>平台管理员</option><option>机构管理员</option><option>普通用户</option><option>访客</option></select></div></div>
-      <div class="form-item" style="align-items:flex-start">
-        <span class="fi-label req">勾选图层</span>
-        <div class="fi-control" style="border:1px solid var(--gray-200);border-radius:var(--r-md);padding:8px;max-height:180px;overflow-y:auto">
-          <div style="display:flex;align-items:center;gap:8px;padding:4px 6px"><span class="cbx checked" onclick="this.classList.toggle('checked')"></span><span>🗺</span><span style="font-size:13px">基础矢量</span></div>
-          <div style="display:flex;align-items:center;gap:8px;padding:4px 6px"><span class="cbx checked" onclick="this.classList.toggle('checked')"></span><span>🗺</span><span style="font-size:13px">耕地地块</span></div>
-          <div style="display:flex;align-items:center;gap:8px;padding:4px 6px"><span class="cbx" onclick="this.classList.toggle('checked')"></span><span>🌾</span><span style="font-size:13px">作物长势</span></div>
-          <div style="display:flex;align-items:center;gap:8px;padding:4px 6px"><span class="cbx" onclick="this.classList.toggle('checked')"></span><span>🟫</span><span style="font-size:13px">土壤类型</span></div>
-          <div style="display:flex;align-items:center;gap:8px;padding:4px 6px"><span class="cbx" onclick="this.classList.toggle('checked')"></span><span>〰</span><span style="font-size:13px">灌排渠系</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn" onclick="closeModal('permissionModal')">取消</button>
-      <button class="btn primary" onclick="confirmPermission()">确定</button>
-    </div>
-  </div>
-</div>
 
 <!-- ====================================================================
      COORDINATE LOCATE MODAL (工具栏 坐标定位)
@@ -3575,6 +3621,7 @@ function onSortDragEnd() {
 
 // ── Left Tab ──
 function switchLeftTab(tab) {
+  if(tab!=='settings'||(S.activeLeftTab===tab&&S.panelOpen))window.TMSettings?.closeView(false);
   // Toggle off if clicking active tab
   if (S.activeLeftTab === tab && S.panelOpen) {
     collapsePanel();
@@ -3600,6 +3647,7 @@ function switchLeftTab(tab) {
 function togglePanel() { S.panelOpen ? collapsePanel() : expandPanel(); }
 
 function collapsePanel() {
+  window.TMSettings?.closeView(false);
   S.panelOpen = false;
   document.getElementById('leftPanel').classList.add('shut');
   document.getElementById('collapseBtn').classList.add('flip');
@@ -4020,7 +4068,7 @@ let activePopupLatLng = null;   // 当前属性浮窗锚定的地理坐标
 function makeTDTLayer(type) {
   return L.tileLayer(
     'https://t{s}.tianditu.gov.cn/DataServer?T=' + type + '&x={x}&y={y}&l={z}&tk=' + TIANDITU_KEY,
-    { subdomains: '01234567', maxZoom: 18 }
+    { subdomains: '01234567', maxNativeZoom: 18, maxZoom: 20 }
   );
 }
 
@@ -4045,8 +4093,9 @@ function initMap() {
   map = L.map('mapCanvas', {
     center: MAP_INIT.center,
     zoom: MAP_INIT.zoom,
-    minZoom: 3,
-    maxZoom: 18,
+    minZoom: 0,
+    maxZoom: 20,
+    zoomSnap: 0.1,
     zoomControl: false,
     attributionControl: false,
     preferCanvas: true,
@@ -4241,7 +4290,7 @@ function updateLayerDetail(name) {
 // ====================================================================
 
 // ── Generic modal open/close ──
-const MODAL_IDS = ['addModal','shareModal','legendEditorModal','nodeTypeModal','nodeNameModal','bindFilterModal','layerLegendSelectModal','iconLibModal','iconEditModal','addProjectModal','spriteModal','organizationModal','styleTemplateModal','fieldSelectModal','styleOptionsModal','dynamicFilterModal','viewParamModal','permissionModal','coordModal'];
+const MODAL_IDS = ['addModal','shareModal','legendEditorModal','nodeTypeModal','nodeNameModal','bindFilterModal','layerLegendSelectModal','iconLibModal','iconEditModal','addProjectModal','spriteModal','organizationModal','styleTemplateModal','fieldSelectModal','styleOptionsModal','dynamicFilterModal','tmPendingModal','coordModal'];
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -5086,11 +5135,9 @@ function toggleMultiRender() {
 }
 
 // ====================================================================
-//   设置 / 权限 / 坐标 (J-13, J-35~J-38)
+//   设置 / 坐标 (J-13, J-35~J-38)
 // ====================================================================
-function openViewParam() { openModal('viewParamModal'); }
-function openPermission() { openModal('permissionModal'); }
-function confirmPermission() { closeModal('permissionModal'); showToast('✅ 权限配置已保存'); }
+function openViewParam() { TMSettings.openView(); }
 function openCoordLocate() { openModal('coordModal'); }
 function doLocate() {
   const lng = parseFloat(document.getElementById('locLng').value);
@@ -5159,6 +5206,7 @@ document.addEventListener('keydown', e => {
     for (const id of MODAL_IDS) {
       if (!document.getElementById(id).classList.contains('hidden')) { closeModal(id); return; }
     }
+    if (!document.getElementById('tmSettingsView').hidden) { TMSettings.closeView(); return; }
     if (S.drawerOpen) { closeDrawer(); return; }
   }
 });
@@ -6065,6 +6113,7 @@ const FAP = (() => {
     document.getElementById('modalCount').textContent=chosen.length;
     document.getElementById('fapServiceCount').textContent=chosen.reduce((sum,layer)=>sum+layer.services.length,0);
     document.getElementById('fapConfirm').disabled=!chosen.length;
+    document.getElementById('fapConfirm').textContent='添加（'+chosen.length+'）';
   }
   function open(){returnFocus=document.activeElement;pending.clear();pageNo=1;document.getElementById('fapSearch').value='';render();document.getElementById('addModal').classList.remove('hidden');document.getElementById('fapSearch').focus();}
   function close(){document.getElementById('addModal').classList.add('hidden');pending.clear();if(returnFocus?.isConnected)returnFocus.focus();}
@@ -6262,6 +6311,138 @@ timelineApplyCurrent=function(){fapApplyTime();FAP.syncTimePreview();};
 })();
 
 </script>
-<script src="prototype-map-links.js"></script>
+<script>
+/* A single local transaction covers all map settings; other editor state is untouched. */
+window.TMSettings = (() => {
+  const clone=value=>JSON.parse(JSON.stringify(value));
+  const initial={longitude:MAP_INIT.center[1],latitude:MAP_INIT.center[0],zoom:MAP_INIT.zoom,heading:0,pitch:0,background:'#f5f7fa',rangeMin:0,rangeMax:20};
+  let confirmed=clone(initial),draft=clone(initial),saveAction=null;
+  const hasPending=()=>JSON.stringify(draft)!==JSON.stringify(confirmed)||[...document.querySelectorAll('#pnl-settings input[data-tm-field],#tmSettingsView input[data-tm-field]')].some(el=>el.type==='number'&&(!el.value||!el.checkValidity()));
+  function sync(force=false){
+    document.querySelectorAll('[data-tm-field]').forEach(el=>{const key=el.dataset.tmField;if(force||el!==document.activeElement)el.value=draft[key];});
+    document.getElementById('tmCenterSummary').textContent=draft.longitude.toFixed(5)+'°, '+draft.latitude.toFixed(5)+'°';
+    document.getElementById('tmBackgroundText').textContent=draft.background.toUpperCase();
+    document.getElementById('tmHeadingArrow').style.transform='rotate('+draft.heading+'deg)';
+    document.getElementById('tmPitchArrow').style.transform='rotate('+(-draft.pitch)+'deg)';
+    document.getElementById('tmSettingsStatus').textContent=hasPending()?'未确认修改':'';
+    document.querySelector('[data-ltab="settings"]').classList.toggle('tm-pending',hasPending());
+    document.getElementById('tmConfirmSettings').disabled=!hasPending();
+    document.getElementById('tmCancelSettings').disabled=!hasPending();
+    document.getElementById('tmAngleNote').classList.toggle('hidden',!!(map?.setBearing&&map?.setPitch));
+  }
+  function previewBackground(){
+    const canvas=document.getElementById('mapCanvas'),z=map?map.getZoom():draft.zoom;
+    canvas.style.background=z>=draft.rangeMin&&z<=draft.rangeMax?draft.background:'transparent';
+  }
+  function preview(move=true){
+    if(map&&move){map.setView([draft.latitude,draft.longitude],draft.zoom,{animate:false});if(map.setBearing)map.setBearing(draft.heading);if(map.setPitch)map.setPitch(draft.pitch);}
+    previewBackground();
+  }
+  function validate(){
+    const min=document.getElementById('tmRangeMin'),max=document.getElementById('tmRangeMax');
+    min.setCustomValidity('');max.setCustomValidity('');
+    if(Number(min.value)>Number(max.value))max.setCustomValidity('最大可见级别不能小于最小可见级别');
+    const invalid=[...document.querySelectorAll('#pnl-settings input[data-tm-field],#tmSettingsView input[data-tm-field]')].find(el=>!el.checkValidity());
+    if(invalid){
+      ensureTab();if(invalid.closest('#tmSettingsView'))openView();
+      invalid.reportValidity();invalid.focus();return false;
+    }
+    return true;
+  }
+  function update(el){
+    const key=el.dataset.tmField;el.setCustomValidity('');
+    if(el.type==='number'&&(!el.value||!el.checkValidity())){sync();return;}
+    draft[key]=key==='background'?el.value:Number(el.value);
+    sync();
+    if(draft.rangeMin<=draft.rangeMax)preview(['longitude','latitude','zoom','heading','pitch'].includes(key));
+  }
+  function confirm(silent=false){if(!validate())return false;confirmed=clone(draft);sync();if(!silent)showToast('地图设置已确认，点击顶部保存可保存专题地图');return true;}
+  function cancel(){draft=clone(confirmed);document.querySelectorAll('#pnl-settings input,#tmSettingsView input').forEach(el=>el.setCustomValidity(''));sync(true);preview();showToast('已恢复至最近一次确认的地图设置');}
+  function ensureTab(){if(S.activeLeftTab!=='settings'||!S.panelOpen)switchLeftTab('settings');}
+  function openView(){ensureTab();document.getElementById('tmSettingsView').hidden=false;document.getElementById('tmOpenView').setAttribute('aria-expanded','true');document.getElementById('tmLongitude').focus();}
+  function closeView(returnFocus=true){document.getElementById('tmSettingsView').hidden=true;document.getElementById('tmOpenView').setAttribute('aria-expanded','false');if(returnFocus&&S.activeLeftTab==='settings'&&S.panelOpen)document.getElementById('tmOpenView').focus();}
+  function capture(){
+    if(!map){showToast('地图尚未加载，暂时无法获取视野');return;}
+    const c=map.getCenter();draft.longitude=+c.lng.toFixed(6);draft.latitude=+c.lat.toFixed(6);draft.zoom=+map.getZoom().toFixed(2);
+    if(typeof map.getBearing==='function')draft.heading=map.getBearing();
+    if(typeof map.getPitch==='function')draft.pitch=map.getPitch();
+    sync(true);showToast((map.getBearing&&map.getPitch)?'已获取当前地图视野，请确认地图设置':'已获取中心与层级；当前画布不支持的角度保持原值');
+  }
+  function performSave(){const action=saveAction||window.saveThematicResource;saveAction=null;if(typeof action==='function')action();else showToast('保存入口尚未连接，请稍后重试');}
+  function requestSave(callback){if(typeof callback==='function')saveAction=callback;if(hasPending()){openModal('tmPendingModal');return false;}performSave();return true;}
+  function returnToSettings(){closeModal('tmPendingModal');saveAction=null;ensureTab();}
+  function confirmAndSave(){if(!confirm(true)){closeModal('tmPendingModal');ensureTab();return;}closeModal('tmPendingModal');performSave();}
+  function load(config){if(!config)return;const restored=clone(config);delete restored.permission;confirmed={...clone(initial),...restored};draft=clone(confirmed);sync(true);preview();}
+  document.querySelectorAll('[data-tm-field]').forEach(el=>el.addEventListener('input',()=>update(el)));
+  window.addEventListener('load',()=>{sync();preview();if(map)map.on('zoomend',previewBackground);});
+  sync();
+  return {getConfirmed:()=>clone(confirmed),getDraft:()=>clone(draft),hasPending,confirm,cancel,openView,closeView,capture,requestSave,returnToSettings,confirmAndSave,load,previewBackground,
+    resetAngle(key){draft[key]=0;sync(true);preview();}};
+})();
+const tmApplyBasemap=applyBasemap;
+applyBasemap=function(name){tmApplyBasemap(name);TMSettings.previewBackground();};
+
+
+</script>
+<script data-bundled-from="prototype-map-links.js">
+/* Keep the latest map editor connected to feature-layer records and map lists. */
+(() => {
+'use strict';const W=HTWorkflow,clone=v=>JSON.parse(JSON.stringify(v)),params=new URLSearchParams(location.search);
+let record=W.maps().find(m=>m.id===params.get('mapId'))||null;
+function converted(l){return {id:l.id,name:l.name,owner:l.org||'—',icon:'🗺',type:'要素图层',services:(l.services||[]).map((s,i)=>{
+ const v=s.style?.values||{},r=s.dataModel==='栅格',g=r?'栅格':s.geometry||'面';
+ return {id:s.key||l.id+'-'+i,name:s.name,proto:s.protocol||'WMS',model:s.dataModel||'矢量',geometry:g,dataId:s.data?.persistId||s.asset,dataName:s.asset,crs:s.crs,time:s.timestamp,visible:s.visible!==false,style:{render:r?'raster':g==='点'?'single-point':g==='线'?'single-line':'single-fill',color:v.fillColor||v.color||'#2bbaa0',strokeColor:v.boundaryColor||'#4d7367',strokeWidth:v.boundaryW||1.5,opacity:v.opacity??v.fillOp??85,params:{},sourceStyle:clone(s.style||{})}};
+ }),...(l.timeSeries?{sequence:{id:l.services[0]?.sequence||l.id,name:l.name,members:l.services.map((s,i)=>({serviceId:s.key||l.id+'-'+i,time:s.timestamp})),templateKeys:['rgb','enhance','classify']}}:{})};}
+function syncCatalog(){FAP.register(W.layers().map(converted));}
+function resolveRef(ref){
+ const saved=W.layers().find(l=>l.id===ref.id||l.name===ref.name);if(saved)return converted(saved);
+ const all=FAP.snapshot().catalog;
+ let found=all.find(l=>l.name===ref.name);
+ if(!found&&ref.card?.raster==='sequence')found=all.find(l=>l.sequence);
+ if(!found)found=all.find(l=>l.name===(/水|灌|渠/.test(ref.name)?'灌排渠系':/资源|底图/.test(ref.name)?'基础矢量':'耕地地块'));
+ if(!found)return null;return {...clone(found),id:'list-'+ref.name,name:ref.name};
+}
+function setTitle(){if(record){const el=document.querySelector('.topbar .title');el.replaceChildren(document.createTextNode(record.name+' '));const tag=document.createElement('span');tag.className='type-tag';tag.textContent='专题地图';el.append(tag);document.title=record.name+' · 专题地图编辑器';}}
+function controls(){const values={};document.querySelectorAll('input[id],select[id],textarea[id]').forEach(el=>{if(!el.closest('#addModal,#shareModal,#pnl-settings,#tmSettingsView,#tmPendingModal'))values[el.id]=el.type==='checkbox'?el.checked:el.value;});return values;}
+window.htSaveMap=function(quiet=false){
+ if(window.TMSettings?.hasPending()){showToast('请先确认或取消地图设置的修改');return false;}
+ if(!record)record={id:W.id('map-'),name:document.querySelector('.topbar .title').childNodes[0].textContent.trim()||'专题地图',code:'',desc:''};
+ const confirmed=window.TMSettings?.getConfirmed();
+ const timeline={};for(const k of ['mode','enabled','idx','speed','autoRange','rangeStart','rangeEnd','barOn'])timeline[k]=timelineState[k];
+ for(const k of ['vector','raster']){const {refEl,...rest}=timelineState[k];timeline[k]=clone(rest);}
+ Object.assign(record,{composition:clone(mapComposition),renderOrder:clone(renderOrder.items),controls:controls(),timeline,mapSettings:confirmed||record.mapSettings,view:confirmed?{center:[confirmed.latitude,confirmed.longitude],zoom:confirmed.zoom}:(map?{center:[map.getCenter().lat,map.getCenter().lng],zoom:map.getZoom()}:null),legendHTML:document.getElementById('mapLegendBox').innerHTML,updated:new Date().toISOString().slice(0,10)});
+ try{W.saveMap(record);}catch(_){showToast('保存失败，请检查浏览器本地存储空间');return false;}history.replaceState(null,'','?mapId='+encodeURIComponent(record.id));if(!quiet)showToast('专题地图已保存');return true;
+};
+window.saveThematicResource=()=>htSaveMap();
+const originalOverview=renderOverview;
+window.renderOverview=function(){originalOverview();document.querySelectorAll('#overviewTree .ov-group-hd').forEach((hd,i)=>{
+ const layer=mapComposition.layers[i];if(!layer)return;
+ const controls=document.createElement('span');controls.style.cssText='display:flex;gap:6px;margin-left:4px';
+ const vis=document.createElement('button');vis.className='icon-btn sm';vis.title=layer.visible===false?'显示图层':'隐藏图层';vis.textContent=layer.visible===false?'○':'◉';vis.onclick=e=>{e.stopPropagation();FAP.visibility(layer.id,layer.visible===false);renderOverview();};
+ const del=document.createElement('button');del.className='icon-btn sm';del.title='移除图层';del.textContent='×';del.onclick=e=>{e.stopPropagation();showPopconfirm(del,'移除当前要素图层？',()=>FAP.removeLayer(layer.id));};controls.append(vis,del);hd.append(controls);
+ });};
+const oldMove=moveOrderItem;window.moveOrderItem=function(...args){oldMove(...args);FAP.applyOrder();};
+const oldOpen=openAddModal;window.openAddModal=function(){syncCatalog();oldOpen();};
+window.copyShare=async function(type){if(!htSaveMap(true))return;const url=location.href;const text=type==='embed'?'<iframe src="'+url+'" width="100%" height="640"></iframe>':url;const input=document.getElementById('reviewLinkInput');input.value=url;try{await navigator.clipboard.writeText(text);showToast(type==='embed'?'嵌入代码已复制':'当前原型链接已复制');}catch(_){input.focus();input.select();showToast(document.execCommand('copy')?'当前原型链接已复制':'请复制已选中的链接');}};
+const oldShare=openShareModal;window.openShareModal=function(){if(!htSaveMap(true))return;oldShare();document.getElementById('reviewLinkInput').value=location.href;};
+window.addEventListener('storage',e=>{if(e.key==='hetu_layers_v2')syncCatalog();});
+window.addEventListener('load',()=>{
+ syncCatalog();
+ if(record?.composition)FAP.restore(record.composition.layers,record.renderOrder);
+ else if(record&&!record.legacy){const layers=(record.layerRefs||[]).map(resolveRef).filter(Boolean).map((l,i)=>({...l,featureLayerId:l.id,id:'map-import-'+(i+1)}));FAP.restore(layers);timelineState.vector.frames=[];timelineState.raster.frames=[];timelineState.idx=-1;timelineState.enabled=false;timelineStop();clearTimelineOverlay();}
+ else{const sources=FAP.snapshot().catalog;FAP.restore(mapComposition.layers.map(l=>({...clone(l),services:clone(sources.find(s=>s.id===l.featureLayerId)?.services||l.services)})));}
+ setTitle();if(record?.controls)Object.entries(record.controls).forEach(([id,v])=>{const el=document.getElementById(id);if(el&&!el.closest('#pnl-settings,#tmSettingsView,#tmPendingModal')){if(el.type==='checkbox')el.checked=v;else el.value=v;}});
+ if(record?.timeline)Object.assign(timelineState,record.timeline,{overlayGroups:[],playing:false,intervalId:null});
+ if(record?.view)map?.setView(record.view.center,record.view.zoom);
+ if(window.TMSettings){const initial=record?.mapSettings||(record?.view?{...TMSettings.getConfirmed(),latitude:record.view.center[0],longitude:record.view.center[1],zoom:record.view.zoom}:null);if(initial)TMSettings.load(initial);}
+ if(record?.legendHTML)document.getElementById('mapLegendBox').innerHTML=record.legendHTML;
+ mapComposition.layers.forEach(l=>{if(l.visible===false)FAP.visibility(l.id,false);});renderOverview();renderTimelinePanel();renderTimelineBar();if(timelineState.enabled)timelineApplyCurrent();FAP.applyOrder();
+ document.querySelector('.topbar .btn.primary').onclick=()=>window.TMSettings?TMSettings.requestSave(()=>htSaveMap()):htSaveMap();
+ const back=document.createElement('button');back.className='btn';back.textContent='返回列表';back.onclick=()=>location.href='专题地图.html';document.querySelector('.topbar').prepend(back);
+});
+})();
+if(window.L)L.Icon.Default.mergeOptions({iconUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAApCAYAAADAk4LOAAAFgUlEQVR4Aa1XA5BjWRTN2oW17d3YaZtr2962HUzbDNpjszW24mRt28p47v7zq/bXZtrp/lWnXr337j3nPCe85NcypgSFdugCpW5YoDAMRaIMqRi6aKq5E3YqDQO3qAwjVWrD8Ncq/RBpykd8oZUb/kaJutow8r1aP9II0WmLKLIsJyv1w/kqw9Ch2MYdB++12Onxee/QMwvf4/Dk/Lfp/i4nxTXtOoQ4pW5Aj7wpici1A9erdAN2OH64x8OSP9j3Ft3b7aWkTg/Fm91siTra0f9on5sQr9INejH6CUUUpavjFNq1B+Oadhxmnfa8RfEmN8VNAsQhPqF55xHkMzz3jSmChWU6f7/XZKNH+9+hBLOHYozuKQPxyMPUKkrX/K0uWnfFaJGS1QPRtZsOPtr3NsW0uyh6NNCOkU3Yz+bXbT3I8G3xE5EXLXtCXbbqwCO9zPQYPRTZ5vIDXD7U+w7rFDEoUUf7ibHIR4y6bLVPXrz8JVZEql13trxwue/uDivd3fkWRbS6/IA2bID4uk0UpF1N8qLlbBlXs4Ee7HLTfV1j54APvODnSfOWBqtKVvjgLKzF5YdEk5ewRkGlK0i33Eofffc7HT56jD7/6U+qH3Cx7SBLNntH5YIPvODnyfIXZYRVDPqgHtLs5ABHD3YzLuespb7t79FY34DjMwrVrcTuwlT55YMPvOBnRrJ4VXTdNnYug5ucHLBjEpt30701A3Ts+HEa73u6dT3FNWwflY86eMHPk+Yu+i6pzUpRrW7SNDg5JHR4KapmM5Wv2E8Tfcb1HoqqHMHU+uWDD7zg54mz5/2BSnizi9T1Dg4QQXLToGNCkb6tb1NU+QAlGr1++eADrzhn/u8Q2YZhQVlZ5+CAOtqfbhmaUCS1ezNFVm2imDbPmPng5wmz+gwh+oHDce0eUtQ6OGDIyR0uUhUsoO3vfDmmgOezH0mZN59x7MBi++WDL1g/eEiU3avlidO671bkLfwbw5XV2P8Pzo0ydy4t2/0eu33xYSOMOD8hTf4CrBtGMSoXfPLchX+J0ruSePw3LZeK0juPJbYzrhkH0io7B3k164hiGvawhOKMLkrQLyVpZg8rHFW7E2uHOL888IBPlNZ1FPzstSJM694fWr6RwpvcJK60+0HCILTBzZLFNdtAzJaohze60T8qBzyh5ZuOg5e7uwQppofEmf2++DYvmySqGBuKaicF1blQjhuHdvCIMvp8whTTfZzI7RldpwtSzL+F1+wkdZ2TBOW2gIF88PBTzD/gpeREAMEbxnJcaJHNHrpzji0gQCS6hdkEeYt9DF/2qPcEC8RM28Hwmr3sdNyht00byAut2k3gufWNtgtOEOFGUwcXWNDbdNbpgBGxEvKkOQsxivJx33iow0Vw5S6SVTrpVq11ysA2Rp7gTfPfktc6zhtXBBC+adRLshf6sG2RfHPZ5EAc4sVZ83yCN00Fk/4kggu40ZTvIEm5g24qtU4KjBrx/BTTH8ifVASAG7gKrnWxJDcU7x8X6Ecczhm3o6YicvsLXWfh3Ch1W0k8x0nXF+0fFxgt4phz8QvypiwCCFKMqXCnqXExjq10beH+UUA7+nG6mdG/Pu0f3LgFcGrl2s0kNNjpmoJ9o4B29CMO8dMT4Q5ox8uitF6fqsrJOr8qnwNbRzv6hSnG5wP+64C7h9lp30hKNtKdWjtdkbuPA19nJ7Tz3zR/ibgARbhb4AlhavcBebmTHcFl2fvYEnW0ox9xMxKBS8btJ+KiEbq9zA4RthQXDhPa0T9TEe69gWupwc6uBUphquXgf+/FrIjweHQS4/pduMe5ERUMHUd9xv8ZR98CxkS4F2n3EUrUZ10EYNw7BWm9x1GiPssi3GgiGRDKWRYZfXlON+dfNbM+GgIwYdwAAAAASUVORK5CYII=',iconRetinaUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAABSCAMAAAAhFXfZAAAC91BMVEVMaXEzeak2f7I4g7g3g7cua5gzeKg8hJo3grY4g7c3grU0gLI2frE0daAubJc2gbQwd6QzeKk2gLMtd5sxdKIua5g1frA2f7IydaM0e6w2fq41fK01eqo3grgubJgta5cxdKI1f7AydaQydaMxc6EubJgvbJkwcZ4ubZkwcJwubZgubJcydqUydKIxapgubJctbJcubZcubJcvbJYubJcvbZkubJctbJctbZcubJg2f7AubJcrbZcubJcubJcua5g3grY0fq8ubJcubJdEkdEwhsw6i88vhswuhcsuhMtBjMgthMsrg8srgss6is8qgcs8i9A9iMYtg8spgcoogMo7hcMngMonf8olfso4gr8kfck5iM8jfMk4iM8he8k1fro7itAgesk2hs8eecgzfLcofssdeMg0hc4cd8g2hcsxeLQbdsgZdcgxeLImfcszhM0vda4xgckzhM4xg84wf8Yxgs4udKsvfcQucqhUndROmdM1fK0wcZ8vb5w0eqpQm9MzeKhXoNVcpdYydKNWn9VZotVKltJFjsIwcJ1Rms9OlslLmtH///8+kc9epdYzd6dbo9VHkMM2f7FHmNBClM8ydqVcpNY9hro3gLM9hLczealQmcw3fa46f7A8gLMxc6I3eagyc6FIldJMl9JSnNRSntNNl9JPnNJFi75UnM9ZodVKksg8kM45jc09e6ZHltFBk883gbRBh7pDk9EwcaBzn784g7dKkcY2i81Om9M7j85Llc81is09g7Q4grY/j9A0eqxKmdFFltBEjcXf6fFImdBCiLxJl9FGlNFBi78yiMxVndEvbpo6js74+vx+psPP3+o/ks5HkcpGmNCjwdZCkNDM3ehYoNJEls+lxNkxh8xHks0+jdC1zd5Lg6r+/v/H2ufz9/o3jM3t8/edvdM/k89Th61OiLBSjbZklbaTt9BfptdjmL1AicBHj8hGk9FAgK1dkLNTjLRekrdClc/k7fM0icy0y9tgp9c4jc2NtM9Dlc8zicxeXZn3AAAAQ3RSTlMAHDdTb4yPA+LtnEQmC4L2EmHqB7XA0d0sr478x4/Yd5i1zOfyPkf1sLVq4Nh3FvjxopQ2/STNuFzUwFIwxKaejILpIBEV9wAABhVJREFUeF6s1NdyFEcY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',shadowUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAApCAQAAAACach9AAACMUlEQVR4Ae3ShY7jQBAE0Aoz/f9/HTMzhg1zrdKUrJbdx+Kd2nD8VNudfsL/Th///dyQN2TH6f3y/BGpC379rV+S+qqetBOxImNQXL8JCAr2V4iMQXHGNJxeCfZXhSRBcQMfvkOWUdtfzlLgAENmZDcmo2TVmt8OSM2eXxBp3DjHSMFutqS7SbmemzBiR+xpKCNUIRkdkkYxhAkyGoBvyQFEJEefwSmmvBfJuJ6aKqKWnAkvGZOaZXTUgFqYULWNSHUckZuR1HIIimUExutRxwzOLROIG4vKmCKQt364mIlhSyzAf1m9lHZHJZrlAOMMztRRiKimp/rpdJDc9Awry5xTZCte7FHtuS8wJgeYGrex28xNTd086Dik7vUMscQOa8y4DoGtCCSkAKlNwpgNtphjrC6MIHUkR6YWxxs6Sc5xqn222mmCRFzIt8lEdKx+ikCtg91qS2WpwVfBelJCiQJwvzixfI9cxZQWgiSJelKnwBElKYtDOb2MFbhmUigbReQBV0Cg4+qMXSxXSyGUn4UbF8l+7qdSGnTC0XLCmahIgUHLhLOhpVCtw4CzYXvLQWQbJNmxoCsOKAxSgBJno75avolkRw8iIAFcsdc02e9iyCd8tHwmeSSoKTowIgvscSGZUOA7PuCN5b2BX9mQM7S0wYhMNU74zgsPBj3HU7wguAfnxxjFQGBE6pwN+GjME9zHY7zGp8wVxMShYX9NXvEWD3HbwJf4giO4CFIQxXScH1/TM+04kkBiAAAAAElFTkSuQmCC'});
+
+</script>
 </body>
 </html>

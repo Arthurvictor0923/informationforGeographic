@@ -1,7 +1,67 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<script src="hetu-workflow.js"></script>
+<script data-bundled-from="hetu-workflow.js">
+
+// 浏览器限制本地存储时，在当前页面保留演示状态。
+window.HTPrototypeStorage = (() => {
+  const memory = new Map();
+  let storage;
+  try { storage = window.localStorage; } catch (_) {}
+  return {
+    getItem(key) {
+      key = String(key);
+      if (storage) { try { return storage.getItem(key); } catch (_) { storage = null; } }
+      return memory.has(key) ? memory.get(key) : null;
+    },
+    setItem(key, value) {
+      key = String(key); value = String(value); memory.set(key, value);
+      if (storage) { try { storage.setItem(key, value); } catch (_) { storage = null; } }
+    },
+    removeItem(key) {
+      key = String(key); memory.delete(key);
+      if (storage) { try { storage.removeItem(key); } catch (_) { storage = null; } }
+    }
+  };
+})();
+
+/* 本地原型数据：发布记录、要素图层、服务更新任务。仅模拟跨页交互。 */
+(function () {
+  'use strict';
+  const read = (key, fallback) => { try { return JSON.parse(HTPrototypeStorage.getItem(key)) || fallback; } catch (_) { return fallback; } };
+  const write = (key, data) => HTPrototypeStorage.setItem(key, JSON.stringify(data));
+  const id = prefix => prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const services = () => read('hetu_published_services_v2', []);
+  const layers = () => read('hetu_layers_v2', []);
+  const upsert = (key, record) => { const list = read(key, []); const i = list.findIndex(x => x.id === record.id); if (i < 0) list.unshift(record); else list[i] = record; write(key, list); return record; };
+  function complete(task) {
+    if (task.operation === 'publish' && task.serviceRecord) upsert('hetu_published_services_v2', {...task.serviceRecord, status:'正常'});
+    if (task.operation === 'update') {
+      const dates = read('hetu_service_updates_v2', {});
+      dates[task.serviceId] = new Date().toISOString().slice(0, 10);
+      write('hetu_service_updates_v2', dates);
+    }
+  }
+  function queueUpdate(service) {
+    const list = read('hetu_tasks_v1', []);
+    if (list.some(t => t.operation === 'update' && t.serviceId === service.id && ['queued','running'].includes(t.status))) return false;
+    const steps = ['数据解析','坐标转换','切片生成','建索引','更新服务'].map(name => ({name,status:'pending',progress:0,startAt:null,endAt:null,log:''}));
+    list.unshift({id:id('T'),type:'service',operation:'update',serviceId:service.id,title:'按需更新：'+service.title,target:service.asset || service.assetRef || service.title,status:'queued',progress:0,reason:null,log:'',createdTs:Date.now(),createdAt:new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false}),steps});
+    write('hetu_tasks_v1', list);
+    return true;
+  }
+  window.HTWorkflow = {read,write,id,esc,services,layers,complete,queueUpdate,saveLayer:record=>upsert('hetu_layers_v2',record)};
+})();
+
+/* Cross-page records for the existing prototype workflows. */
+Object.assign(HTWorkflow, {
+  maps:()=>HTWorkflow.read('hetu_maps_v3',[]),
+  saveMap(record){const all=this.maps(),i=all.findIndex(x=>x.id===record.id);if(i<0)all.unshift(record);else all[i]=record;this.write('hetu_maps_v3',all);return record;},
+  removeRecord(key,id){this.write(key,this.read(key,[]).filter(x=>x.id!==id));}
+});
+
+</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>要素图层编辑器</title>
@@ -1413,6 +1473,31 @@ body.hetu-portal {
 .temporal-preview .raster-timeline{max-height:calc(100% - 36px);overflow-y:auto}
 .temporal-preview .map-label{max-width:280px;white-space:normal}
 </style>
+<style id="map-settings-style">
+/* Map settings share one local confirmation boundary. */
+#pnl-settings:not(.hidden){display:flex;flex-direction:column;overflow:hidden}
+#pnl-settings .pnl-header{flex:none}
+.ms-scroll{flex:1;min-height:0;overflow:auto}
+.ms-field{margin:0 0 20px}.ms-field>label,.ms-angle-title>label{display:block;font-size:12px;font-weight:600;color:var(--text-1);margin-bottom:9px}
+.ms-field>.input{width:100%}.ms-summary{display:flex;gap:8px;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-2)}
+.ms-range{display:flex;align-items:center;gap:12px}.ms-range>input[type=range]{flex:1;width:0}.ms-range>.input{width:78px;flex:none}
+.ms-range-pair{display:flex;gap:9px;align-items:center;margin-top:8px}.ms-range-pair>.input,.ms-range-pair>input[type=range]{flex:1;width:0;min-width:0}.ms-range-caption{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3)}
+#pnl-settings input[type=range]{accent-color:var(--brand)}
+.ms-color{display:flex;align-items:center;gap:10px;font-size:12px}.ms-color>input{width:36px;height:32px;border:1px solid var(--border);padding:2px;border-radius:4px;background:white}.ms-check{margin-left:auto;display:flex;gap:5px;align-items:center;font-size:12px;color:var(--text-2)}
+.ms-note{font-size:11px;color:var(--text-3);line-height:1.7;margin-top:8px}.ms-dirty{font-size:11px;font-weight:400;color:#a86a18;background:#fff7e8;padding:3px 6px;border-radius:4px}
+.ms-footer{flex:none;display:flex;justify-content:flex-end;gap:8px;padding:14px 16px;border-top:1px solid var(--border);background:#fff}.ms-footer .btn:disabled{opacity:.45;cursor:default}
+.ms-view-drawer{position:absolute;left:calc(var(--tab-w) + var(--panel-w));top:0;bottom:0;width:360px;max-width:calc(100% - var(--tab-w) - var(--panel-w) - 46px);z-index:990;display:flex;flex-direction:column;background:#fff;border-right:1px solid var(--border);box-shadow:6px 0 18px rgba(21,53,45,.1);animation:ms-drawer-enter .18s ease-out}
+.ms-view-drawer[hidden]{display:none}
+.ms-view-head{display:flex;align-items:center;gap:8px;padding:16px;border-bottom:1px solid var(--border);font-size:13px;flex:none}.ms-view-head>b{flex:1;white-space:nowrap}.ms-view-head .btn{padding:0 8px}.ms-view-head .modal-close{font-size:18px;width:24px;height:28px;flex:none}
+.ms-view-content{flex:1;min-height:0;overflow-y:auto;padding:20px}
+.ms-view-drawer input[type=range]{accent-color:var(--brand)}
+@keyframes ms-drawer-enter{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
+@media(prefers-reduced-motion:reduce){.ms-view-drawer{animation:none}}
+.ms-angle-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}.ms-angle-title>label{margin:0}.ms-angle-row{display:flex;align-items:center;gap:20px}.ms-angle-controls{min-width:0;flex:1}.ms-angle-controls>input[type=range]{width:100%;margin-top:12px}.ms-unit{display:flex;align-items:center;gap:6px}.ms-unit>.input{width:100%;min-width:0}
+.ms-compass{position:relative;flex:none;width:86px;height:86px;border:1px solid #d4dfda;border-radius:50%;margin:8px;font-size:10px;color:#6d8378}.ms-compass>span{position:absolute}.ms-north{left:37px;top:-10px;background:white}.ms-east{right:-7px;top:35px;background:white}.ms-south{left:37px;bottom:-9px;background:white}.ms-west{left:-7px;top:35px;background:white}.ms-compass #msNeedle{inset:10px;display:flex;align-items:center;justify-content:center;font-size:41px;color:#168d77;transform-origin:center}
+.ms-pitch{width:102px;height:94px;flex:none}.ms-pitch text{font-size:10px;fill:#6d8378}.ms-pitch #msPitchNeedle{transform-origin:22px 15px}
+.ms-save-dialog{width:420px;max-width:calc(100vw - 40px)}
+</style>
 </head>
 <body class="hetu-portal hetu-editor">
 <div class="app">
@@ -1437,7 +1522,7 @@ body.hetu-portal {
       <div class="left-tabs">
         <button class="left-tab active" data-ltab="layer" onclick="switchLeftTab('layer')" title="图层"><span class="lt-icon">🗺</span><span class="lt-label">图层</span></button>
         <button class="left-tab" data-ltab="legend" onclick="switchLeftTab('legend')" title="图例"><span class="lt-icon">📋</span><span class="lt-label">图例</span></button>
-        <button class="left-tab" data-ltab="settings" onclick="switchLeftTab('settings')" title="设置"><span class="lt-icon">⚙</span><span class="lt-label">设置</span></button>
+        <button class="left-tab" data-ltab="settings" onclick="switchLeftTab('settings')" title="地图设置"><span class="lt-icon">⚙</span><span class="lt-label">地图设置</span></button>
         <div class="spacer"></div>
         <button class="collapser" id="collapseBtn" onclick="togglePanel()" title="收起面板">◀</button>
       </div>
@@ -1445,7 +1530,7 @@ body.hetu-portal {
       <div class="left-panel" id="leftPanel">
         <!-- 图层 -->
         <div class="pnl-body" id="pnl-layer">
-          <div class="pnl-header"><span>图层</span><button class="btn btn-primary" id="addDataBtn" onclick="openDataSelect()"><svg class="gs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>添加数据</button></div>
+          <div class="pnl-header"><span>图层</span><button class="btn btn-primary" id="addDataBtn" onclick="openDataSelect()"><svg class="gs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>添加服务</button></div>
           <section id="gsDataInfo" aria-label="数据信息"></section>
           <div class="pnl-section">
             <div id="groupedDataPanel"><div id="gsGroups"></div></div>
@@ -1522,23 +1607,35 @@ body.hetu-portal {
           </div>
         </div>
 
-        <!-- 设置 -->
+        <!-- 地图设置：试调与确认共用同一套参数 -->
         <div class="pnl-body hidden" id="pnl-settings">
-          <div class="pnl-header"><span>⚙ 设置</span><span class="pnl-hint">可操作项</span></div>
-          <div class="pnl-section">
-            <div class="sec-title" style="margin-top:0">画布底图源</div>
-            <div class="svc-pick">
-              <div class="sp-item sel" id="bmDefaultItem" onclick="setBasemapDemo('default')"><div><b>默认统一底图</b><span class="sp-desc">遥感影像 + 注记 · 选择即自动恢复</span></div><span class="sp-check">✓</span></div>
-              <div class="sp-item" id="bmExternalItem" onclick="setBasemapDemo('external')"><div><b>外部底图服务（覆盖默认）</b><span class="sp-desc">示例：矢量底图服务（外部注册 · role=底图）· 选择即自动覆盖默认底图</span></div><span class="sp-check"></span></div>
+          <div class="pnl-header"><span>地图设置</span><span class="ms-dirty" id="msDirty" hidden>未确认</span></div>
+          <div class="ms-scroll">
+            <div class="pnl-section" id="msOverview">
+              <div class="ms-field"><label>视野参数</label><div class="ms-summary"><span id="msCenterSummary"></span><button class="btn btn-sm" id="msOpenView" type="button" aria-controls="msView" aria-expanded="false" onclick="LayerMapSettings.openView()">设置</button></div></div>
+              <div class="ms-field"><label for="msZoom">缩放等级</label><div class="ms-range"><input id="msZoom" type="range" min="0" max="20" step="0.1" value="10" oninput="LayerMapSettings.set('zoom',this.value)"><input class="input" id="msZoomValue" type="number" min="0" max="20" step="0.1" value="10" aria-label="缩放等级数值" onchange="LayerMapSettings.set('zoom',this.value)"></div></div>
+              <div class="ms-field"><label for="msBackground">背景色</label><div class="ms-color"><input id="msBackground" type="color" value="#f5f7f8" oninput="LayerMapSettings.set('background',this.value)"><span id="msBackgroundText">#F5F7F8</span><label class="ms-check"><input id="msTransparent" type="checkbox" onchange="LayerMapSettings.set('transparent',this.checked)">透明</label></div></div>
+              <div class="ms-field"><label>背景可见范围</label><div class="ms-range-caption"><span>最小等级</span><span>最大等级</span></div><div class="ms-range-pair"><input class="input" id="msMin" type="number" min="0" max="20" step="0.1" value="0" aria-label="背景最小可见等级" onchange="LayerMapSettings.set('minZoom',this.value)"><span>—</span><input class="input" id="msMax" type="number" min="0" max="20" step="0.1" value="20" aria-label="背景最大可见等级" onchange="LayerMapSettings.set('maxZoom',this.value)"></div><div class="ms-range-pair"><input id="msMinRange" type="range" min="0" max="20" step="0.1" value="0" aria-label="调整背景最小等级" oninput="LayerMapSettings.set('minZoom',this.value)"><input id="msMaxRange" type="range" min="0" max="20" step="0.1" value="20" aria-label="调整背景最大等级" oninput="LayerMapSettings.set('maxZoom',this.value)"></div></div>
+
             </div>
-            <div style="font-size:11px;color:var(--text-3);margin-top:6px">当前：<b id="basemapSourceLabel">统一默认底图（遥感影像 + 注记）</b></div>
-            <div style="height:12px"></div>
-            <div class="meta-line"><span class="k">创建人</span><span>张工</span></div>
-            <div class="meta-line"><span class="k">创建时间</span><span>2026-08-19</span></div>
+
           </div>
+          <div class="ms-footer"><button class="btn" type="button" id="msCancel" onclick="LayerMapSettings.cancel()">取消修改</button><button class="btn btn-primary" type="button" id="msConfirm" onclick="LayerMapSettings.confirm()">确认修改</button></div>
         </div>
       </div>
     </div>
+
+    <aside class="ms-view-drawer" id="msView" role="region" aria-labelledby="msViewTitle" hidden>
+      <div class="ms-view-head"><b id="msViewTitle">视野参数设置</b><button class="btn btn-sm" type="button" onclick="LayerMapSettings.capture()">从当前地图获取</button><button class="modal-close" type="button" onclick="LayerMapSettings.closeView()" aria-label="关闭视野参数">×</button></div>
+      <div class="ms-view-content scroll-thin">
+              <div class="ms-field"><label for="msLng">经度</label><input class="input" id="msLng" type="number" min="-180" max="180" step="0.000001" onchange="LayerMapSettings.set('lng',this.value)"></div>
+              <div class="ms-field"><label for="msLat">纬度</label><input class="input" id="msLat" type="number" min="-90" max="90" step="0.000001" onchange="LayerMapSettings.set('lat',this.value)"></div>
+              <div class="ms-field"><label for="msFineZoom">层级</label><div class="ms-range"><input id="msFineZoom" type="range" min="0" max="20" step="0.1" oninput="LayerMapSettings.set('zoom',this.value)"><input class="input" id="msFineZoomValue" type="number" min="0" max="20" step="0.1" aria-label="精细层级数值" onchange="LayerMapSettings.set('zoom',this.value)"></div></div>
+              <div class="ms-field"><div class="ms-angle-title"><label for="msBearing">航向角</label><button class="btn btn-sm btn-ghost" type="button" onclick="LayerMapSettings.set('bearing',0)" aria-label="航向角复位">复位</button></div><div class="ms-angle-row"><div class="ms-compass" role="img" aria-label="航向角方向示意"><span class="ms-north">北</span><span class="ms-east">东</span><span class="ms-south">南</span><span class="ms-west">西</span><span id="msNeedle">↑</span></div><div class="ms-angle-controls"><div class="ms-unit"><input class="input" id="msBearing" type="number" min="0" max="360" step="0.1" onchange="LayerMapSettings.set('bearing',this.value)"><span>°</span></div><input id="msBearingRange" type="range" min="0" max="360" step="0.1" aria-label="调整航向角" oninput="LayerMapSettings.set('bearing',this.value)"></div></div></div>
+              <div class="ms-field"><div class="ms-angle-title"><label for="msPitch">俯仰角</label><button class="btn btn-sm btn-ghost" type="button" onclick="LayerMapSettings.set('pitch',0)" aria-label="俯仰角复位">复位</button></div><div class="ms-angle-row"><svg class="ms-pitch" viewBox="0 0 100 85" role="img" aria-label="俯仰角方向示意，0度为俯视"><path d="M22 15H85M22 15V70" stroke="#c6d5d0" stroke-dasharray="3 3" fill="none"/><path d="M22 65A50 50 0 0 0 72 15" stroke="#dce7e2" stroke-width="4" fill="none"/><path id="msPitchNeedle" d="M22 15V65" stroke="#168d77" stroke-width="3"/><circle cx="22" cy="15" r="4" fill="#168d77"/><text x="13" y="82">俯视</text><text x="73" y="12">平视</text></svg><div class="ms-angle-controls"><div class="ms-unit"><input class="input" id="msPitch" type="number" min="0" max="90" step="0.1" onchange="LayerMapSettings.set('pitch',this.value)"><span>°</span></div><input id="msPitchRange" type="range" min="0" max="90" step="0.1" aria-label="调整俯仰角" oninput="LayerMapSettings.set('pitch',this.value)"><span class="ms-note">0° 为俯视</span></div></div></div>
+              <p class="ms-note" id="msAngleSupport" hidden>当前预览引擎不支持角度预览，角度配置仍可保存。</p>
+      </div>
+    </aside>
 
     <!-- ===== 画布（真实地图，铺满中间 .map-area 弹性占位） ===== -->
     <div class="map-area" id="mapArea">
@@ -1990,7 +2087,7 @@ body.hetu-portal {
         <div class="gs-pagination"><span id="gsPageInfo"></span><select class="input" id="gsPageSize" aria-label="每页条数" onchange="GS.filter()"><option value="6">6 条/页</option><option value="12">12 条/页</option></select><button id="gsPagePrev" aria-label="上一页" onclick="GS.page(-1)">‹</button><span id="gsPageNumbers"></span><button id="gsPageNext" aria-label="下一页" onclick="GS.page(1)">›</button></div>
       </section>
     </div>
-    <div class="modal-foot"><span class="gs-selected-count" id="gsSelectedCount" aria-live="polite">已选 <b>0</b> 个地图服务</span><button class="btn" onclick="closeDataSelect()">取消</button><button class="btn btn-primary" id="gsConfirm" onclick="confirmServiceSelection()" disabled>确定</button></div>
+    <div class="modal-foot"><span class="gs-selected-count" id="gsSelectedCount" aria-live="polite">已选 <b>0</b> 个地图服务</span><button class="btn" onclick="closeDataSelect()">取消</button><button class="btn btn-primary" id="gsConfirm" onclick="confirmServiceSelection()" disabled>添加（0）</button></div>
   </div>
 </div>
 
@@ -2014,6 +2111,8 @@ body.hetu-portal {
   </div>
 </div>
 
+
+<div class="mask" id="msPendingMask"><div class="modal ms-save-dialog" role="dialog" aria-modal="true" aria-labelledby="msPendingTitle"><div class="modal-head"><span id="msPendingTitle">地图设置有未确认的修改</span><button class="modal-close" onclick="LayerMapSettings.returnToSettings()" aria-label="返回地图设置">×</button></div><div class="modal-body">请确认本轮地图设置后继续保存，或返回地图设置继续调整。</div><div class="modal-foot"><button class="btn" onclick="LayerMapSettings.returnToSettings()">返回地图设置</button><button class="btn btn-primary" onclick="LayerMapSettings.confirmAndSave()">确认设置并继续保存</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -2026,7 +2125,6 @@ const S = {
   current: 'fill',
   selectedNode: null,
   fillVisible: true,
-  basemapSource: 'default', // 'default'=统一默认底图 | 'external'=外部底图服务源覆盖
 };
 const $ = id => document.getElementById(id);
 
@@ -2043,11 +2141,11 @@ const STYLE = { fillColor: '#2bbaa0', fillOpacity: .8, boundaryColor: '#0f947c',
 function makeTDT(type) {
   return L.tileLayer(
     'https://t{s}.tianditu.gov.cn/DataServer?T=' + type + '&x={x}&y={y}&l={z}&tk=' + TIANDITU_KEY,
-    { subdomains: '01234567', maxZoom: 18 }
+    { subdomains: '01234567', maxZoom: 20, maxNativeZoom: 18 }
   );
 }
 
-/* 画布底图源：默认=统一默认底图；当图层/画布源为「外部底图服务（role=basemap 外部注册）」时，用该外部服务覆盖当前默认底图 */
+/* 保留原有地图底图渲染。 */
 function clearBasemap() {
   if (!map) return;
   map.eachLayer(function (l) { if (l instanceof L.TileLayer) map.removeLayer(l); });
@@ -2057,42 +2155,17 @@ function applyDefaultBasemap() {
   clearBasemap();
   makeTDT('img_w').addTo(map);   // 遥感影像
   makeTDT('cia_w').addTo(map);   // 影像注记
-  S.basemapSource = 'default';
-  const el = document.getElementById('basemapSourceLabel');
-  if (el) el.textContent = '统一默认底图（遥感影像 + 注记）';
 }
-function applyExternalBasemap(types) {
-  if (!map) return;
-  clearBasemap();
-  (types || ['img_w', 'cia_w']).forEach(function (t) { makeTDT(t).addTo(map); });
-  S.basemapSource = 'external';
-  const el = document.getElementById('basemapSourceLabel');
-  if (el) el.textContent = '外部底图服务 · 已覆盖默认底图';
-}
-function setBasemapDemo(kind) {
-  document.getElementById('bmDefaultItem').classList.toggle('sel', kind === 'default');
-  document.getElementById('bmExternalItem').classList.toggle('sel', kind === 'external');
-  document.querySelector('#bmDefaultItem .sp-check').textContent = kind === 'default' ? '✓' : '';
-  document.querySelector('#bmExternalItem .sp-check').textContent = kind === 'external' ? '✓' : '';
-  if (!map) return;
-  if (kind === 'external') {
-    // 演示：源为「外部底图服务」→ 用外部矢量底图服务覆盖默认底图
-    applyExternalBasemap(['vec_w', 'cva_w']);   // 天地图矢量（充当外部底图服务示例）
-  } else {
-    applyDefaultBasemap();
-  }
-}
-
 function initMap() {
   if (map) return;
   if (typeof L === 'undefined') { showToast('⚠ Leaflet 未加载（CDN 网络受限），无法显示底图'); return; }
   map = L.map('mapCanvas', {
     center: MAP_INIT.center, zoom: MAP_INIT.zoom,
-    minZoom: 3, maxZoom: 18, attributionControl: false, preferCanvas: true,
+    minZoom: 0, maxZoom: 20, zoomSnap: 0.1, zoomDelta: 0.5, attributionControl: false, preferCanvas: true,
     zoomControl: false,   // 对齐地图编辑器原型：不显示缩放控件，地图保持干净
   });
   L.control.attribution({ position: 'bottomleft', prefix: '© 天地图' }).addTo(map);
-  // 默认统一参考底图（遥感影像 + 注记）；当图层/画布源为「外部底图服务」时会覆盖为外部服务
+  // 沿用遥感影像和注记底图。
   applyDefaultBasemap();
 
   // 主体数据：中晚稻地块（真实经纬度，建三江一带）
@@ -2153,6 +2226,7 @@ function selectOnMap(layer) {
 
 /* ================= 左页签 + 折叠 ================= */
 function switchLeftTab(tab) {
+  if(tab!=='settings'&&window.LayerMapSettings)LayerMapSettings.closeView(false);
   if (S.activeLeftTab === tab && S.panelOpen) { collapsePanel(); return; }
   document.querySelectorAll('.left-tab').forEach(function (t) { t.classList.remove('active'); });
   document.querySelector('.left-tab[data-ltab="' + tab + '"]').classList.add('active');
@@ -2166,6 +2240,7 @@ function switchLeftTab(tab) {
 }
 function togglePanel() { S.panelOpen ? collapsePanel() : expandPanel(); }
 function collapsePanel() {
+  if(window.LayerMapSettings)LayerMapSettings.closeView(false);
   S.panelOpen = false;
   document.getElementById('leftPanel').classList.add('shut');
   document.getElementById('collapseBtn').classList.add('flip');
@@ -3651,6 +3726,7 @@ function saveRasterServiceStyle(i) {
 /* ================= 数据更新同步提示（真值 BR23）已移除：三种展示形态（栅格单张/栅格序列/矢量服务）均不提供「检测数据更新」 ================= */
 function copyUrl() { navigator.clipboard && navigator.clipboard.writeText($('shareUrl').value); showToast('链接已复制'); }
 function saveLayer() {
+  if (window.LayerMapSettings && !LayerMapSettings.beforeSave()) return;
   const n = $('infoLayerName') ? $('infoLayerName').textContent : '';
   const en = $('saveLayerName'); if (en) en.value = n;
   const ec = $('infoLayerCode'); if (ec) { const sc = $('saveLayerCode'); if (sc) sc.textContent = ec.textContent; }
@@ -4002,12 +4078,13 @@ const GS = (() => {
     $('gsServiceGrid').innerHTML=list.length?list.map(s=>{const added=selected.has(s.id),checked=added||pending.has(s.id);return '<label class="gs-service-card'+(checked?' selected':'')+(added?' added':'')+'" data-service="'+s.id+'"><input type="checkbox" aria-label="'+esc(s.data.name)+'" '+(checked?'checked ':'')+(added?'disabled ':'')+'onchange="GS.pick(\''+s.id+'\',this.checked)"><span class="gs-card-protocol">'+s.protocol+'</span><div class="gs-card-thumb">'+thumb(s)+'</div><div class="gs-card-body"><div class="gs-card-name" title="'+esc(s.data.name)+'">'+esc(s.data.name)+'</div><div class="gs-card-data">'+icon('data')+'<span>'+esc(s.dataset)+'</span></div><div class="gs-card-bottom"><span>'+esc(s.data.dataModel+(s.data.geometry?' · '+s.data.geometry:'')+' · '+s.data.crs)+'</span>'+(added?'<span class="gs-card-added">已添加</span>':'')+'</div></div></label>';}).join(''):'<div class="gs-picker-empty">未找到符合条件的地图服务</div>';
     const pickable=list.filter(s=>!selected.has(s.id)),n=pickable.filter(s=>pending.has(s.id)).length;
     $('gsPageAll').checked=!!pickable.length&&n===pickable.length;$('gsPageAll').indeterminate=n>0&&n<pickable.length;$('gsPageAll').disabled=!pickable.length;
-    $('gsPageInfo').textContent='共 '+all.length+' 条';$('gsPagePrev').disabled=pageNo===1;$('gsPageNext').disabled=pageNo===pages;
+    $('gsPageInfo').textContent='共 '+all.length+' 条 · 第 '+pageNo+' / '+pages+' 页';$('gsPagePrev').disabled=pageNo===1;$('gsPageNext').disabled=pageNo===pages;
     $('gsPageNumbers').innerHTML=Array.from({length:pages},(_,i)=>'<button class="'+(pageNo===i+1?'current':'')+'" onclick="GS.goPage('+(i+1)+')">'+(i+1)+'</button>').join(' ');
-    $('gsSelectedCount').innerHTML='已选 <b>'+pending.size+'</b> 个地图服务';$('gsConfirm').disabled=!pending.size;
+    $('gsSelectedCount').innerHTML='已选 <b>'+pending.size+'</b> 个地图服务';$('gsConfirm').disabled=!pending.size;$('gsConfirm').textContent='添加（'+pending.size+'）';
   }
   function open(){
     returnFocus=document.activeElement;pending=new Set();dataset='';pageNo=1;
+    $('gsTypeFilter').innerHTML='<option value="">全部服务类型</option>'+[...new Set(catalog.map(s=>s.protocol))].map(type=>'<option value="'+esc(type)+'">'+esc(type)+'</option>').join('');
     ['gsDataSearch','gsServiceSearch','gsTypeFilter'].forEach(id=>$(id).value='');
     renderDataFilter();renderPicker();$('dataMask').classList.add('on');$('gsDataSearch').focus();
   }
@@ -4276,6 +4353,149 @@ window.addEventListener('load',()=>{
   if(map){map.on('zoomend',syncTemporalVisibility);map.invalidateSize();map.fitBounds(RASTER_BBOX,{paddingTopLeft:[70,45],paddingBottomRight:[70,210],maxZoom:12,animate:false});}
 });
 </script>
-<script src="prototype-layer-links.js"></script>
+
+<script id="layer-map-settings">
+const LayerMapSettings = (() => {
+  const clone=value=>JSON.parse(JSON.stringify(value));
+  const initial={lng:MAP_INIT.center[1],lat:MAP_INIT.center[0],zoom:MAP_INIT.zoom,bearing:0,pitch:0,background:'#f5f7f8',transparent:false,minZoom:0,maxZoom:20};
+  let baseline=clone(initial),draft=clone(initial),ready=false;
+  const limits={lng:[-180,180],lat:[-90,90],zoom:[0,20],bearing:[0,360],pitch:[0,90],minZoom:[0,20],maxZoom:[0,20]};
+  const isDirty=()=>JSON.stringify(draft)!==JSON.stringify(baseline);
+  const hasBearing=()=>!!(map&&typeof map.getBearing==='function'&&typeof map.setBearing==='function');
+  const hasPitch=()=>!!(map&&typeof map.getPitch==='function'&&typeof map.setPitch==='function');
+  function render(){
+    const values={msLng:draft.lng,msLat:draft.lat,msZoom:draft.zoom,msZoomValue:draft.zoom,msFineZoom:draft.zoom,msFineZoomValue:draft.zoom,msBearing:draft.bearing,msBearingRange:draft.bearing,msPitch:draft.pitch,msPitchRange:draft.pitch,msMin:draft.minZoom,msMinRange:draft.minZoom,msMax:draft.maxZoom,msMaxRange:draft.maxZoom,msBackground:draft.background};
+    Object.entries(values).forEach(([id,v])=>{if($(id))$(id).value=v;});
+    $('msTransparent').checked=draft.transparent;$('msBackground').disabled=draft.transparent;
+    $('msBackgroundText').textContent=draft.transparent?'透明':draft.background.toUpperCase();
+    $('msCenterSummary').textContent=Number(draft.lng).toFixed(5)+', '+Number(draft.lat).toFixed(5);
+    $('msNeedle').style.transform='rotate('+draft.bearing+'deg)';$('msPitchNeedle').style.transform='rotate('+(-draft.pitch)+'deg)';
+    $('msDirty').hidden=!isDirty();$('msConfirm').disabled=!isDirty();$('msCancel').disabled=!isDirty();
+    $('msAngleSupport').hidden=hasBearing()&&hasPitch();
+  }
+  function paintBackground(){
+    const zoom=map?map.getZoom():draft.zoom;
+    $('mapCanvas').style.backgroundColor=!draft.transparent&&zoom>=draft.minZoom&&zoom<=draft.maxZoom?draft.background:'transparent';
+  }
+  function preview(move=true){
+    if(map){
+      if(move)map.setView([draft.lat,draft.lng],draft.zoom,{animate:false});
+      if(hasBearing())map.setBearing(draft.bearing);
+      if(hasPitch())map.setPitch(draft.pitch);
+    }
+    paintBackground();render();
+  }
+  function set(key,value){
+    if(Object.hasOwn(limits,key)){
+      if(value===''||!Number.isFinite(Number(value))){render();return;}
+      const [min,max]=limits[key];draft[key]=Math.max(min,Math.min(max,Number(value)));
+      if(key==='minZoom'&&draft.minZoom>draft.maxZoom)draft.maxZoom=draft.minZoom;
+      if(key==='maxZoom'&&draft.maxZoom<draft.minZoom)draft.minZoom=draft.maxZoom;
+    }else if(key==='background')draft.background=value;
+    else if(key==='transparent')draft.transparent=!!value;
+    preview(['lng','lat','zoom','bearing','pitch'].includes(key));
+  }
+  function confirm(quiet=false){baseline=clone(draft);render();if(!quiet)showToast('地图设置已确认');return true;}
+  function cancel(){draft=clone(baseline);preview();showToast('已取消本轮地图设置修改');}
+  function restore(value){
+    const next={...initial};
+    for(const key of Object.keys(initial)){if(value&&Object.hasOwn(value,key))next[key]=value[key];}
+    for(const [key,[min,max]] of Object.entries(limits)){const v=Number(next[key]);next[key]=Number.isFinite(v)?Math.max(min,Math.min(max,v)):initial[key];}
+    if(next.minZoom>next.maxZoom)next.maxZoom=next.minZoom;
+    if(!/^#[0-9a-f]{6}$/i.test(next.background))next.background=initial.background;
+    next.transparent=!!next.transparent;
+    baseline=clone(next);draft=clone(next);preview();
+  }
+  function openView(){
+    if(S.activeLeftTab!=='settings'||!S.panelOpen)switchLeftTab('settings');
+    $('msView').hidden=false;$('msOpenView').setAttribute('aria-expanded','true');$('msLng').focus();
+  }
+  function closeView(returnFocus=true){
+    $('msView').hidden=true;$('msOpenView').setAttribute('aria-expanded','false');
+    if(returnFocus&&S.activeLeftTab==='settings'&&S.panelOpen)$('msOpenView').focus();
+  }
+  function capture(){
+    if(!map){showToast('当前地图尚未就绪');return;}
+    const center=map.getCenter();draft.lng=+center.lng.toFixed(6);draft.lat=+center.lat.toFixed(6);draft.zoom=+map.getZoom().toFixed(1);
+    if(hasBearing())draft.bearing=map.getBearing();if(hasPitch())draft.pitch=map.getPitch();
+    render();showToast('已获取当前地图视野');
+  }
+  function beforeSave(){if(!isDirty())return true;$('msPendingMask').classList.add('on');return false;}
+  function returnToSettings(){
+    $('msPendingMask').classList.remove('on');
+    if(S.activeLeftTab!=='settings'||!S.panelOpen)switchLeftTab('settings');
+    $('msConfirm').focus();
+  }
+  function confirmAndSave(){confirm(true);$('msPendingMask').classList.remove('on');saveLayer();}
+  function init(){
+    if(ready)return;ready=true;
+    const record=typeof htLayerRecord!=='undefined'?htLayerRecord:null;
+    const saved=record?.mapSettings||record?.editorState?.mapSettings||record?.editor?.mapSettings;
+    if(!saved&&map){const center=map.getCenter();initial.lng=+center.lng.toFixed(6);initial.lat=+center.lat.toFixed(6);initial.zoom=+map.getZoom().toFixed(1);}
+    restore(saved||initial);
+    if(map)map.on('zoomend',paintBackground);
+  }
+  return {set,confirm,cancel,restore,openView,closeView,capture,beforeSave,returnToSettings,confirmAndSave,isDirty,state:()=>clone(baseline),draft:()=>clone(draft),init};
+})();
+window.LayerMapSettings=LayerMapSettings;
+$('msView').addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();LayerMapSettings.closeView();}});
+window.addEventListener('load',()=>LayerMapSettings.init());
+</script>
+<script data-bundled-from="prototype-layer-links.js">
+/* Persist service selections and editing controls without changing the editor layout. */
+(() => {
+'use strict';const W=HTWorkflow,clone=v=>JSON.parse(JSON.stringify(v));
+const requestedName=htLayerRecord?.name||htLayerParams.get('layer');let sequenceEmpty=false;
+// Add completed time-enabled services to their actual sequence, including services from different datasets.
+const customSequences=W.read('hetu_seq_custom',[]);
+const renderKeys={standard:'rgb',falsecolor:'rgb',analysis:'enhance',graded:'classify',moisture:'classify'};
+customSequences.forEach(s=>{const previous=SERVICE_SEQUENCES[s.id]||{};SERVICE_SEQUENCES[s.id]={...previous,name:s.name,dates:previous.dates||[],members:previous.members||[],templateKeys:[...new Set(s.tpls.map(t=>renderKeys[t]).filter(Boolean))],defaultTemplate:renderKeys[s.defaultTpl]||'rgb'};});
+const published=W.services().filter(s=>s.timeEnabled&&s.sequence&&s.timestamp).map(s=>({...s,sequence:s.sequenceId||customSequences.find(c=>c.name===s.sequence)?.id||s.sequence}));
+for(const seqId of new Set(published.map(s=>s.sequence))){
+ const services=published.filter(s=>s.sequence===seqId).sort((a,b)=>a.timestamp.localeCompare(b.timestamp));
+ const seq=SERVICE_SEQUENCES[seqId]||(SERVICE_SEQUENCES[seqId]={name:seqId,dates:[],members:[],templateKeys:['rgb','enhance','classify'],defaultTemplate:'rgb'});
+ for(const s of services){const dataId=s.assetId||'asset-'+s.asset;SEQUENCE_DATASETS[dataId]={...SERVICE_CATALOG.find(d=>d.persistId===s.id),dataId,dataName:s.asset,bandList:'R/G/B',dataModel:'栅格'};SEQUENCE_SERVICES[s.id]={serviceId:s.id,dataId,name:s.title,type:s.type+' 服务'};if(!seq.members.some(m=>m.serviceId===s.id))seq.members.push({id:s.id,serviceId:s.id,date:s.timestamp});}
+ seq.members.sort((a,b)=>a.date.localeCompare(b.date));seq.dates=seq.members.map(m=>m.date);
+ if(!SERVICE_CATALOG.some(d=>d.sequenceId===seqId&&!d.persistId))SERVICE_CATALOG.push({...SEQUENCE_DATASETS[services[0].assetId||'asset-'+services[0].asset],persistId:undefined,name:seq.name,type:'WMS 服务',timeSeries:true,sequenceId:seqId,scenes:seq.members.length});
+}
+const originalPreset=applyUrlPreset;
+window.applyUrlPreset=function(){
+ const name=htLayerRecord?.temporalState?.catalogName||htLayerRecord?.services?.[0]?.catalogName||htLayerParams.get('svc');
+ if(htLayerRecord?.timeSeries||htLayerParams.get('ts')==='true'){
+  const i=SERVICE_CATALOG.findIndex(d=>d.name===name&&d.sequenceId);svcMainIdx=i>=0?i:SERVICE_CATALOG.findIndex(d=>d.sequenceId&&!d.persistId);if(svcMainIdx>=0)loadCatalogService(true);
+ }else originalPreset();
+};
+function metadata(){if(!requestedName&&!htLayerRecord)return;const name=htLayerRecord?.name||requestedName;$('infoLayerName').textContent=name;$('topbarTitle').textContent=name;if(htLayerRecord?.code)$('infoLayerCode').textContent=htLayerRecord.code;}
+function recordServices(){
+ if(currentRasterTimeSeries){saveRasterServiceStyle(rasterActiveService);return rasterMembers.map((m,i)=>({key:m.service.serviceId,name:m.service.name,catalogName:SERVICE_CATALOG[svcMainIdx].name,asset:m.data.dataName,dataModel:'栅格',protocol:m.service.type.split(' ')[0],crs:m.data.crs,timestamp:m.date,sequence:rasterSequenceId,visible:rasterServiceStyles[i]?.timeVisible!==false,style:{kind:'raster',values:clone(rasterServiceStyles[i])}}));}
+ return GS.state().selected.map(s=>({key:s.data.persistId||s.id,name:s.name,catalogName:s.name,asset:s.dataset,dataModel:s.data.dataModel,geometry:s.data.geometry,protocol:s.data.type.split(' ')[0],crs:s.data.crs,visible:s.visible,style:{kind:s.data.dataModel==='栅格'?'raster':'vector',values:s.state?.style},editorState:s.state,data:s.data}));
+}
+window.confirmSave=function(){const name=$('saveLayerName').value.trim();if(!name){showToast('请填写图层名称');return;}if(W.layers().some(l=>l.name===name&&l.id!==htLayerRecord?.id)){showToast('已存在同名要素图层');return;}
+ const services=sequenceEmpty?[]:recordServices();
+ htLayerRecord={...htLayerRecord,id:htLayerRecord?.id||W.id('layer-'),originalName:htLayerRecord?.originalName||requestedName,name,code:$('infoLayerCode').textContent,org:htLayerRecord?.org||'北大荒集团',tags:htLayerRecord?.tags||[],timeSeries:currentRasterTimeSeries||htLayerRecord?.timeSeries||false,services,mapSettings:window.LayerMapSettings?.state()||htLayerRecord?.mapSettings,updated:new Date().toISOString().slice(0,10),gsState:currentRasterTimeSeries?null:GS.state(),temporalState:currentRasterTimeSeries?{catalogName:SERVICE_CATALOG[svcMainIdx].name,styles:clone(rasterServiceStyles),active:rasterActiveService}:null};
+ try{W.saveLayer(htLayerRecord);}catch(_){showToast('保存失败，请检查浏览器本地存储空间');return;}metadata();closeSave();history.replaceState(null,'','?layerId='+encodeURIComponent(htLayerRecord.id));showToast('要素图层已保存：'+W.esc(name));
+};
+function openSequencePicker(){
+ let panel=$('htSequencePicker');if(panel)panel.remove();panel=document.createElement('div');panel.id='htSequencePicker';panel.className='modal-mask on';panel.style.zIndex=2000;
+ panel.innerHTML='<div style="background:white;width:640px;max-height:80vh;overflow:auto;border-radius:8px;padding:24px"><h3 style="margin:0 0 18px">选择服务序列</h3><div id="htSequenceRows"></div><div style="display:flex;justify-content:flex-end;margin-top:20px"><button class="btn" id="htSequenceCancel">取消</button></div></div>';document.body.append(panel);
+ const rows=panel.querySelector('#htSequenceRows');SERVICE_CATALOG.forEach((d,i)=>{if(!d.sequenceId||d.persistId||!SERVICE_SEQUENCES[d.sequenceId]||W.read('hetu_seq_hidden',[]).includes(d.sequenceId))return;const b=document.createElement('button');b.className='radio-card';b.style.cssText='width:100%;text-align:left;margin-bottom:10px';b.textContent=d.name+' · '+SERVICE_SEQUENCES[d.sequenceId].members.length+' 个服务';b.onclick=()=>{svcMainIdx=i;loadCatalogService(true);sequenceEmpty=false;$('rasterTimeline').style.display='';metadata();$('legacyDataPanel').hidden=false;panel.remove();};rows.append(b);});panel.querySelector('#htSequenceCancel').onclick=()=>panel.remove();
+}
+const originalOpen=openDataSelect;
+window.openDataSelect=function(){if(htLayerRecord?.timeSeries||htLayerParams.get('ts')==='true'||currentRasterTimeSeries)openSequencePicker();else originalOpen();};
+window.addEventListener('load',()=>{
+ if(htLayerRecord&&!htLayerRecord.timeSeries&&(!htLayerRecord.legacy||htLayerRecord.gsState||htLayerRecord.services?.length))GS.restore(htLayerRecord.gsState||{selected:(htLayerRecord.services||[]).map(s=>({name:s.name,data:s.data,state:s.editorState,dataset:s.asset,visible:s.visible}))});
+ if(htLayerRecord?.temporalState){const st=htLayerRecord.temporalState;rasterServiceStyles=clone(st.styles);setRasterActive(Math.min(st.active||0,rasterMembers.length-1),false);renderTemporalMembers();syncTemporalVisibility();}
+ if((htLayerRecord?.timeSeries||htLayerParams.get('ts')==='true')&&!htLayerRecord?.services?.length){sequenceEmpty=true;hideVectorLayers();removeRaster();$('legacyDataPanel').hidden=true;$('temporalServices').hidden=true;$('rasterTimeline').style.display='none';}
+ if(currentRasterTimeSeries){$('addDataBtn').hidden=false;$('addDataBtn').textContent='+ 选择服务序列';}
+ if(htLayerRecord?.mapSettings&&window.LayerMapSettings)LayerMapSettings.restore(htLayerRecord.mapSettings);
+ metadata();
+ const back=document.createElement('button');back.className='btn';back.textContent='返回列表';back.onclick=()=>location.href='要素图层.html';document.querySelector('.topbar').insertBefore(back,document.querySelector('.topbar').firstChild);
+});
+})();
+// Symbols created in the symbol library remain available in the layer picker.
+(() => {const W=HTWorkflow,library=W.read('hetu_symbol_library_v3',null);if(library)library.spriteSets.forEach(s=>{const entry={name:s.name,owner:s.project,icons:s.icons};const i=LAYER_SPRITE_SETS.findIndex(x=>x.name===s.name);if(i<0)LAYER_SPRITE_SETS.push(entry);else LAYER_SPRITE_SETS[i]=entry;});const images=W.read('hetu_custom_icons_v3',{}),original=iconSVG;window.iconSVG=(name,size,color)=>images[name]?'<img alt="'+W.esc(images[name].name)+'" src="'+images[name].data+'" style="width:'+(size||'20px')+';height:'+(size||'20px')+';object-fit:contain">':original(name,size,color);})();
+if(window.L)L.Icon.Default.mergeOptions({iconUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAApCAYAAADAk4LOAAAFgUlEQVR4Aa1XA5BjWRTN2oW17d3YaZtr2962HUzbDNpjszW24mRt28p47v7zq/bXZtrp/lWnXr337j3nPCe85NcypgSFdugCpW5YoDAMRaIMqRi6aKq5E3YqDQO3qAwjVWrD8Ncq/RBpykd8oZUb/kaJutow8r1aP9II0WmLKLIsJyv1w/kqw9Ch2MYdB++12Onxee/QMwvf4/Dk/Lfp/i4nxTXtOoQ4pW5Aj7wpici1A9erdAN2OH64x8OSP9j3Ft3b7aWkTg/Fm91siTra0f9on5sQr9INejH6CUUUpavjFNq1B+Oadhxmnfa8RfEmN8VNAsQhPqF55xHkMzz3jSmChWU6f7/XZKNH+9+hBLOHYozuKQPxyMPUKkrX/K0uWnfFaJGS1QPRtZsOPtr3NsW0uyh6NNCOkU3Yz+bXbT3I8G3xE5EXLXtCXbbqwCO9zPQYPRTZ5vIDXD7U+w7rFDEoUUf7ibHIR4y6bLVPXrz8JVZEql13trxwue/uDivd3fkWRbS6/IA2bID4uk0UpF1N8qLlbBlXs4Ee7HLTfV1j54APvODnSfOWBqtKVvjgLKzF5YdEk5ewRkGlK0i33Eofffc7HT56jD7/6U+qH3Cx7SBLNntH5YIPvODnyfIXZYRVDPqgHtLs5ABHD3YzLuespb7t79FY34DjMwrVrcTuwlT55YMPvOBnRrJ4VXTdNnYug5ucHLBjEpt30701A3Ts+HEa73u6dT3FNWwflY86eMHPk+Yu+i6pzUpRrW7SNDg5JHR4KapmM5Wv2E8Tfcb1HoqqHMHU+uWDD7zg54mz5/2BSnizi9T1Dg4QQXLToGNCkb6tb1NU+QAlGr1++eADrzhn/u8Q2YZhQVlZ5+CAOtqfbhmaUCS1ezNFVm2imDbPmPng5wmz+gwh+oHDce0eUtQ6OGDIyR0uUhUsoO3vfDmmgOezH0mZN59x7MBi++WDL1g/eEiU3avlidO671bkLfwbw5XV2P8Pzo0ydy4t2/0eu33xYSOMOD8hTf4CrBtGMSoXfPLchX+J0ruSePw3LZeK0juPJbYzrhkH0io7B3k164hiGvawhOKMLkrQLyVpZg8rHFW7E2uHOL888IBPlNZ1FPzstSJM694fWr6RwpvcJK60+0HCILTBzZLFNdtAzJaohze60T8qBzyh5ZuOg5e7uwQppofEmf2++DYvmySqGBuKaicF1blQjhuHdvCIMvp8whTTfZzI7RldpwtSzL+F1+wkdZ2TBOW2gIF88PBTzD/gpeREAMEbxnJcaJHNHrpzji0gQCS6hdkEeYt9DF/2qPcEC8RM28Hwmr3sdNyht00byAut2k3gufWNtgtOEOFGUwcXWNDbdNbpgBGxEvKkOQsxivJx33iow0Vw5S6SVTrpVq11ysA2Rp7gTfPfktc6zhtXBBC+adRLshf6sG2RfHPZ5EAc4sVZ83yCN00Fk/4kggu40ZTvIEm5g24qtU4KjBrx/BTTH8ifVASAG7gKrnWxJDcU7x8X6Ecczhm3o6YicvsLXWfh3Ch1W0k8x0nXF+0fFxgt4phz8QvypiwCCFKMqXCnqXExjq10beH+UUA7+nG6mdG/Pu0f3LgFcGrl2s0kNNjpmoJ9o4B29CMO8dMT4Q5ox8uitF6fqsrJOr8qnwNbRzv6hSnG5wP+64C7h9lp30hKNtKdWjtdkbuPA19nJ7Tz3zR/ibgARbhb4AlhavcBebmTHcFl2fvYEnW0ox9xMxKBS8btJ+KiEbq9zA4RthQXDhPa0T9TEe69gWupwc6uBUphquXgf+/FrIjweHQS4/pduMe5ERUMHUd9xv8ZR98CxkS4F2n3EUrUZ10EYNw7BWm9x1GiPssi3GgiGRDKWRYZfXlON+dfNbM+GgIwYdwAAAAASUVORK5CYII=',iconRetinaUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAABSCAMAAAAhFXfZAAAC91BMVEVMaXEzeak2f7I4g7g3g7cua5gzeKg8hJo3grY4g7c3grU0gLI2frE0daAubJc2gbQwd6QzeKk2gLMtd5sxdKIua5g1frA2f7IydaM0e6w2fq41fK01eqo3grgubJgta5cxdKI1f7AydaQydaMxc6EubJgvbJkwcZ4ubZkwcJwubZgubJcydqUydKIxapgubJctbJcubZcubJcvbJYubJcvbZkubJctbJctbZcubJg2f7AubJcrbZcubJcubJcua5g3grY0fq8ubJcubJdEkdEwhsw6i88vhswuhcsuhMtBjMgthMsrg8srgss6is8qgcs8i9A9iMYtg8spgcoogMo7hcMngMonf8olfso4gr8kfck5iM8jfMk4iM8he8k1fro7itAgesk2hs8eecgzfLcofssdeMg0hc4cd8g2hcsxeLQbdsgZdcgxeLImfcszhM0vda4xgckzhM4xg84wf8Yxgs4udKsvfcQucqhUndROmdM1fK0wcZ8vb5w0eqpQm9MzeKhXoNVcpdYydKNWn9VZotVKltJFjsIwcJ1Rms9OlslLmtH///8+kc9epdYzd6dbo9VHkMM2f7FHmNBClM8ydqVcpNY9hro3gLM9hLczealQmcw3fa46f7A8gLMxc6I3eagyc6FIldJMl9JSnNRSntNNl9JPnNJFi75UnM9ZodVKksg8kM45jc09e6ZHltFBk883gbRBh7pDk9EwcaBzn784g7dKkcY2i81Om9M7j85Llc81is09g7Q4grY/j9A0eqxKmdFFltBEjcXf6fFImdBCiLxJl9FGlNFBi78yiMxVndEvbpo6js74+vx+psPP3+o/ks5HkcpGmNCjwdZCkNDM3ehYoNJEls+lxNkxh8xHks0+jdC1zd5Lg6r+/v/H2ufz9/o3jM3t8/edvdM/k89Th61OiLBSjbZklbaTt9BfptdjmL1AicBHj8hGk9FAgK1dkLNTjLRekrdClc/k7fM0icy0y9tgp9c4jc2NtM9Dlc8zicxeXZn3AAAAQ3RSTlMAHDdTb4yPA+LtnEQmC4L2EmHqB7XA0d0sr478x4/Yd5i1zOfyPkf1sLVq4Nh3FvjxopQ2/STNuFzUwFIwxKaejILpIBEV9wAABhVJREFUeF6s1NdyFEcY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',shadowUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAApCAQAAAACach9AAACMUlEQVR4Ae3ShY7jQBAE0Aoz/f9/HTMzhg1zrdKUrJbdx+Kd2nD8VNudfsL/Th///dyQN2TH6f3y/BGpC379rV+S+qqetBOxImNQXL8JCAr2V4iMQXHGNJxeCfZXhSRBcQMfvkOWUdtfzlLgAENmZDcmo2TVmt8OSM2eXxBp3DjHSMFutqS7SbmemzBiR+xpKCNUIRkdkkYxhAkyGoBvyQFEJEefwSmmvBfJuJ6aKqKWnAkvGZOaZXTUgFqYULWNSHUckZuR1HIIimUExutRxwzOLROIG4vKmCKQt364mIlhSyzAf1m9lHZHJZrlAOMMztRRiKimp/rpdJDc9Awry5xTZCte7FHtuS8wJgeYGrex28xNTd086Dik7vUMscQOa8y4DoGtCCSkAKlNwpgNtphjrC6MIHUkR6YWxxs6Sc5xqn222mmCRFzIt8lEdKx+ikCtg91qS2WpwVfBelJCiQJwvzixfI9cxZQWgiSJelKnwBElKYtDOb2MFbhmUigbReQBV0Cg4+qMXSxXSyGUn4UbF8l+7qdSGnTC0XLCmahIgUHLhLOhpVCtw4CzYXvLQWQbJNmxoCsOKAxSgBJno75avolkRw8iIAFcsdc02e9iyCd8tHwmeSSoKTowIgvscSGZUOA7PuCN5b2BX9mQM7S0wYhMNU74zgsPBj3HU7wguAfnxxjFQGBE6pwN+GjME9zHY7zGp8wVxMShYX9NXvEWD3HbwJf4giO4CFIQxXScH1/TM+04kkBiAAAAAElFTkSuQmCC'});
+
+</script>
 </body>
 </html>
