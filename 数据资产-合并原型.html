@@ -1239,6 +1239,24 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
 @media(max-width:600px){#ndMetadataRow{grid-template-columns:1fr}.asset-time-part{padding:0 7px}}
 
 </style>
+
+<style id="publish-source-summary-style">
+#publishModal .publish-source-card{width:min(860px,100%);margin:0 auto 24px;padding:16px 20px;display:flex;gap:14px;align-items:flex-start;background:#f6f9f7;border:1px solid #e0e9e3;border-radius:6px;}
+#publishModal .publish-source-icon{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;color:#34977e;background:#e5f1e9;border-radius:7px;}
+#publishModal .publish-source-icon svg{width:23px;height:23px;}
+#publishModal #publishSourceInfo{flex:1;min-width:0;}
+#publishModal .publish-source-heading{display:flex;align-items:center;gap:10px;margin-bottom:5px;}
+#publishModal .publish-source-label{font-size:12px;color:#718077;line-height:1.5;}
+#publishModal .publish-source-type{display:inline-block;font-size:11px;line-height:18px;padding:0 7px;border:1px solid #d8e5dc;border-radius:3px;color:#577565;background:#edf4ef;}
+#publishModal #publishSourceType[hidden]{display:none;}
+#publishModal #publishSourceName{font-size:15px;font-weight:600;line-height:1.6;color:#2e4036;margin:0 0 11px;overflow-wrap:anywhere;}
+#publishModal #publishSourceMeta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 24px;margin:0;}
+#publishModal #publishSourceMeta>div{min-width:0;}
+#publishModal #publishSourceMeta dt{font-size:12px;line-height:1.5;color:#7b877f;margin:0 0 3px;}
+#publishModal #publishSourceMeta dd{font-size:12px;line-height:1.6;color:#45564b;margin:0;overflow-wrap:anywhere;}
+#publishModal #publishSourceDescription{font-size:12px;line-height:1.7;color:#6d7c72;margin:10px 0 0;overflow-wrap:anywhere;}
+@media(max-width:650px){#publishModal .publish-source-card{padding:14px;gap:11px;margin-bottom:20px;}#publishModal .publish-source-icon{width:32px;height:32px;flex-basis:32px;}#publishModal .publish-source-icon svg{width:20px;height:20px;}#publishModal #publishSourceName{font-size:14px;}#publishModal #publishSourceMeta{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;}}
+</style>
 </head>
 <body class="bg-page-bg text-gray-800 text-sm h-screen overflow-hidden flex flex-col hetu-portal hetu-catalog">
 
@@ -1608,6 +1626,15 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
       <li id="publishStepIndicator2" class="publish-step"><span class="publish-step-number">2</span><span>填写服务信息</span></li>
     </ol>
     <div id="publishWizardBody" class="publish-dialog-body flex-1 overflow-y-auto scroll-thin">
+      <section id="publishDataSummary" class="publish-source-card" aria-label="数据简介">
+        <div class="publish-source-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Z"></path><path d="m3 12 9 5 9-5M3 16l9 5 9-5"></path></svg></div>
+        <div id="publishSourceInfo">
+          <div class="publish-source-heading"><span class="publish-source-label">数据简介</span><span id="publishSourceType" class="publish-source-type"></span></div>
+          <h3 id="publishSourceName">—</h3>
+          <dl id="publishSourceMeta"></dl>
+          <p id="publishSourceDescription" hidden></p>
+        </div>
+      </section>
       <section id="publishStep1" class="publish-flow-content" aria-labelledby="publishServiceTypeLabel">
         <h3 id="publishServiceTypeLabel" class="publish-section-title">选择服务类型</h3>
         <div id="publishTypeSection">
@@ -1625,14 +1652,6 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
         <div class="publish-detail-fields space-y-4">
 <div id="uxServiceNameRow" class="ux-field"><label for="uxServiceName">服务名称 <span class="ux-required">*</span></label><input id="uxServiceName" class="ux-control" type="text" required aria-describedby="uxServiceNameHelp" autocomplete="off"><p id="uxServiceNameHelp" class="ux-help">已生成默认名称，可手动修改。</p><div id="uxServiceNameError" class="ux-error" role="alert"></div></div>
 <div id="publishTitleField"><label for="publishTitle" class="block text-sm font-medium mb-2">服务标题 <span class="text-red-500">*</span></label><input id="publishTitle" class="w-full border border-line rounded-lg px-3 py-2 text-sm" placeholder="填写服务标题"></div>
-<div class="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
-        <span class="text-xl"><svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96 12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg></span>
-        <div id="publishSourceInfo">
-          <div class="text-sm font-medium text-gray-800">数据：<span id="publishSourceName">——</span></div>
-          <div class="text-xs text-gray-500" id="publishSourceMeta">——</div>
-        </div>
-      </div>
-<p class="text-xs text-gray-500">同一数据可发布多组服务；数据变更后，在地图服务中按需更新。</p>
 <section id="publishRenderSection" class="hidden"><div class="flex items-center justify-between mb-2"><label for="pubRasterTrigger" class="text-sm font-medium">选择栅格 <span class="text-xs font-normal text-gray-400">（单选）</span></label><span id="pubRasterCount" class="text-xs text-gray-400"></span></div><div id="publishRasterPickBody" class="space-y-2"></div></section>
 <section id="publishVectorExprSection"><div class="text-sm font-medium mb-2">发布内容</div><div id="publishExprBody" class="flex flex-wrap gap-2"></div></section>
 <div>
@@ -2327,7 +2346,16 @@ try {
 // 全局卡片存储（支持删除持久化）
 
 function assetDataTime(c){const value=String(c.dataTime||'');return /^\d{4}年?$/.test(value)?value.slice(0,4)+'年':/^\d{4}-\d{2}$/.test(value)?value.slice(0,4)+'年'+Number(value.slice(5))+'月':value;}
-function assetDataOrigin(c){if(Object.hasOwn(c,'dataOrigin'))return c.dataOrigin||'';return c.dataSource||(c.spId?'数据空间化':'');}
+function assetDataOrigin(c){if(Object.hasOwn(c,'dataOrigin'))return c.dataOrigin||'';return c.dataSource||'';}
+function assetIngestMethod(c){
+  const labels={file:'文件上传',draw:'在线绘制',db:'数据库导入',spatial:'数据空间化'};
+  if(labels[c.ingestMethod])return labels[c.ingestMethod];
+  if(labels[c.createMethod])return labels[c.createMethod];
+  if(c.spId)return labels.spatial;
+  if(/^(DbTable|DbSQL)$/i.test(c.fmt||''))return labels.db;
+  if((c.datasetFiles||[]).some(f=>f.rel==='上传'))return labels.file;
+  return '';
+}
 function assetMetadataHTML(c){const E=HTWorkflow.esc;return '<div class="asset-card-metadata"><div><span>数据时间</span><b title="'+E(assetDataTime(c)||'—')+'">'+E(assetDataTime(c)||'—')+'</b></div><div><span>数据来源</span><b title="'+E(assetDataOrigin(c)||'—')+'">'+E(assetDataOrigin(c)||'—')+'</b></div></div>';}
 
 const moduleConfigs = {
@@ -4916,24 +4944,32 @@ function getPublishCard(title) {
   return (moduleConfigs.data.cards || []).find(c => c.title === t);
 }
 // （矢量「内容显示设置」已移出发布阶段：图层显隐在「要素图层编辑器 / 专题图」消费端配置）
+// Shared source summary stays above both publishing steps.
+function renderPublishDataSummary(card) {
+  const source = card || {};
+  const esc = HTWorkflow.esc;
+  const bytes = window.HTLightData ? HTLightData.bytes(source) : null;
+  const statedSize = String(source.sub || '').match(/(?:^|[·\s])(\d+(?:\.\d+)?\s*(?:TB|GB|MB|KB|B))(?=\s*(?:·|$))/i);
+  const size = bytes !== null ? HTLightData.formatBytes(bytes) : (statedSize ? statedSize[1] : '—');
+  document.getElementById('publishSourceName').textContent = source.title || publishTarget || '—';
+  const type = document.getElementById('publishSourceType');
+  type.textContent = source.type || '';
+  type.hidden = !source.type;
+  const fields = [
+    ['数据格式', source.fmt || '—'], ['坐标系', source.crs || '—'], ['数据大小', size],
+    ['数据时间', assetDataTime(source) || '—'], ['数据来源', assetDataOrigin(source) || '—'], ['接入方式', assetIngestMethod(source) || '—']
+  ];
+  document.getElementById('publishSourceMeta').innerHTML = fields.map(([label, value]) =>
+    '<div><dt>' + esc(label) + '</dt><dd>' + esc(value) + '</dd></div>'
+  ).join('');
+  const description = document.getElementById('publishSourceDescription');
+  description.textContent = String(source.description || '').trim();
+  description.hidden = !description.textContent;
+}
 // 初始化发布内容区：矢量按源数据几何类型，栅格选择单张影像。
 function initPublishContent() {
   const card = getPublishCard();
-  // L1：信息卡动态渲染（真实数据卡）
-  const nameEl = document.getElementById('publishSourceName');
-  const metaEl = document.getElementById('publishSourceMeta');
-  if (nameEl) nameEl.textContent = card ? card.title : '——';
-  if (metaEl) {
-    const type = (card && card.type) || '数据';
-    const fmt = (card && card.fmt) || '';
-    const crs = (card && card.crs) || '';
-    const files = (card && card.datasetFiles) || [];
-    const isPkg = files.some(f => f.isPackage || (f.children && f.children.length));
-    const cnt = getDataGeomType(card ? card.title : '') === 'raster' ? gatherRasterSheets(card).length : (isPkg ? ((files[0] && files[0].children || []).length || files.length) : files.length);
-    metaEl.textContent = (type + (fmt ? ' · ' + fmt : ''))
-      + (crs ? ' · ' + crs : '')
-      + (files.length > 1 || isPkg ? ' · ' + cnt + ' 份数据' : (files.length === 1 ? ' · 单份数据' : ''));
-  }
+  renderPublishDataSummary(card);
   const geom = getDataGeomType(card ? card.title : '');
   publishDataForm = geom === 'raster' ? 'raster' : 'vector';
   const rSec = document.getElementById('publishRenderSection');
@@ -6642,24 +6678,21 @@ const subsetHeader=$('publishAdvancedPanel').querySelector('.text-xs.font-medium
 const advancedSection=$('publishAdvancedToggle').parentElement;
 advancedSection.hidden=true;advancedSection.style.display='none';
 $('publishAdvancedToggle').hidden=true;$('publishAdvancedPanel').hidden=true;
-$('publishStep1').insertAdjacentHTML('afterbegin','<div class="ux-source-summary">来源数据 <span id="uxPublishSource"></span></div>');
 $('publishWizardBody').insertAdjacentHTML('beforeend','<div id="publishFormError" class="ux-error" role="alert"></div>');
-const sourceRow=$('publishSourceInfo').parentElement;sourceRow.classList.add('hidden');
-sourceRow.nextElementSibling?.remove();
 function setCoverPreview(){const el=$('uxCoverPreview');el.innerHTML=cover?'<img alt="服务封面" style="width:64px;height:42px;object-fit:cover;border-radius:4px" src="'+cover+'">':HTProduction.serviceArt(publishSelectedType);}
 $('uxCoverFile').onchange=e=>{const file=e.target.files[0];if(!file)return;if(!file.type.startsWith('image/')){showNotification('','请选择图片文件');return;}const reader=new FileReader();reader.onload=()=>{cover=reader.result;setCoverPreview();};reader.readAsDataURL(file);};
 $('uxCoverReset').onclick=()=>{cover='';$('uxCoverFile').value='';setCoverPreview();};
 const nativeOpen=openPublishFor;
 window.openPublishFor=function(title){
  nativeOpen(title);cover='';clearErrors();
- const c=getPublishCard();$('uxPublishSource').textContent=c?.title||title;
+ const c=getPublishCard();
  $('uxPubOrg').innerHTML=options([...new Set([c?.org||'北大荒农垦集团有限公司(86)','北大荒农垦集团有限公司(86)','XXX农场'])],c?.org||'北大荒农垦集团有限公司(86)');
  $('uxPubCatalog').innerHTML=options([...new Set([c?.cat||'全部数据','全部数据','基础地理信息数据','遥感','耕地','水利'])],c?.cat||'全部数据');
  $('uxPubDesc').value=c?.description||'';$('uxPubTags').value='';$('uxPubMore').open=false;$('uxCoverFile').value='';setCoverPreview();
 };
 // Spatial-result publishing uses its own entry; initialize the same metadata there.
 const nativeSpatialPublish=HTMerge.openPublish;
-HTMerge.openPublish=function(id){nativeSpatialPublish(id);cover='';clearErrors();const c=getPublishCard();$('uxPublishSource').textContent=c?.title||'';$('uxPubOrg').innerHTML=options([c?.org||'北大荒农垦集团有限公司(86)'],c?.org||'北大荒农垦集团有限公司(86)');$('uxPubCatalog').innerHTML=options([...new Set([c?.cat||'全部数据','全部数据','耕地','遥感'])],c?.cat||'全部数据');$('uxPubDesc').value='';$('uxPubTags').value='';$('uxPubMore').open=false;setCoverPreview();};
+HTMerge.openPublish=function(id){nativeSpatialPublish(id);cover='';clearErrors();const c=getPublishCard();$('uxPubOrg').innerHTML=options([c?.org||'北大荒农垦集团有限公司(86)'],c?.org||'北大荒农垦集团有限公司(86)');$('uxPubCatalog').innerHTML=options([...new Set([c?.cat||'全部数据','全部数据','耕地','遥感'])],c?.cat||'全部数据');$('uxPubDesc').value='';$('uxPubTags').value='';$('uxPubMore').open=false;setCoverPreview();};
 window.confirmPublish=function(){
  if(publishStep!==2){publishNextStep();return;}
  if(!validProtocol()){setPublishStep(1);return;}
@@ -6708,7 +6741,7 @@ window.submitUpload=function(){
  const timeMetadata=HTAssetTime.read('ndDataTime');if(!timeMetadata)return;
  const files=[...(pickedInput()?.files||[])],ext=files[0]?.name.split('.').pop().toLowerCase(),raster=['tif','tiff','png','jpg','jpeg'].includes(ext),date=new Date().toISOString().slice(0,10),db=currentCreateMethod==='db';
  const card={id:HTWorkflow.id('data-'),title:name,sub:files.length?files.length+' 份数据':db?'数据库表':'绘制数据',tag:[...selectedTags][0]||'',tags:[...selectedTags],cat:$('ndCatalog').value,org:$('ndOrg').value,description:$('ndDesc').value.trim(),dataSource:db?$('dbSource').value:'',
-  ...timeMetadata,dataOrigin:$('ndDataOrigin').value.trim(),
+  ...timeMetadata,dataOrigin:$('ndDataOrigin').value.trim(),ingestMethod:db?'db':currentCreateMethod==='draw'&&!files.length?'draw':'file',
   created:date,updated:date,type:db?'数据库表':raster?'影像图片':nonSpatialTable()?'表格数据':'矢量数据',fmt:db?'DbTable':ext==='tif'||ext==='tiff'?'GeoTIFF':ext==='geojson'||ext==='json'?'GeoJSON':(ext||'数据').toUpperCase(),crs,mine:true,svcCount:0,pendingRange:true,dataAssetType:'static',
   datasetFiles:db?[...document.querySelectorAll('.db-table-cb:checked')].map(cb=>({f:cb.value,d:date,latest:true})):files.map(f=>({f:f.name,d:date,ver:'当前数据',rel:'上传',latest:true,size:f.size})),thumb:'from-green-100 to-green-200',icon:ICO_BAR};
  moduleConfigs.data.cards.unshift(card);HTWorkflow.write('hetu_data_cards_v3',moduleConfigs.data.cards.filter(c=>!c.spId));addTask({type:'data',title:'入库：'+name,target:name});

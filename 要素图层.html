@@ -998,8 +998,8 @@ Object.assign(HTWorkflow, {
           </select>
         </div>
       </div>
-      <!-- Row 4: 标签 + 图标 -->
-      <div class="grid grid-cols-2 gap-4">
+      <!-- Row 4: 标签 -->
+      <div class="grid grid-cols-1 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">地图标签</label>
           <div class="flex items-center gap-1.5">
@@ -1016,7 +1016,7 @@ Object.assign(HTWorkflow, {
           </div>
           <div id="lwTags" class="flex flex-wrap gap-1.5 mt-2"></div>
         </div>
-        <div>
+        <div id="lwIconField" class="hidden" hidden>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">地图图标</label>
           <div class="flex items-center gap-2">
             <div class="flex items-center gap-2 px-3 py-2.5 border border-line rounded-lg bg-gray-50 flex-1 cursor-pointer" onclick="cycleLwIcon()">

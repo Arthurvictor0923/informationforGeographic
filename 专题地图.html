@@ -983,7 +983,7 @@ Object.assign(HTWorkflow, {
           </select>
         </div>
       </div>
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">标签</label>
           <select id="cmTag" class="w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand" onchange="addCreateMapTag(this.value);this.value=''">
@@ -996,7 +996,7 @@ Object.assign(HTWorkflow, {
           </select>
           <div id="cmTags" class="flex flex-wrap gap-1.5 mt-2"></div>
         </div>
-        <div>
+        <div id="cmIconField" class="hidden" hidden>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">图标</label>
           <div class="flex items-center gap-2 px-3 py-2.5 border border-line rounded-lg bg-gray-50">
             <span id="cmIconDisplay" class="text-xl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15.061"/><path d="M9 3.236v15.062"/></svg></span>
