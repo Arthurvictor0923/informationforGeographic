@@ -1236,7 +1236,7 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
 .asset-time-weekdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));margin-bottom:4px;color:#94a097;text-align:center;font-size:12px;line-height:26px}
 .asset-time-footer{border-top:1px solid #edf1ee;padding-top:7px;margin-top:8px;display:flex;justify-content:flex-end}.asset-time-footer button{border:0;border-radius:3px;background:transparent;color:#168b72;font:inherit;padding:5px 8px;cursor:pointer}.asset-time-footer button:hover{background:#f0f8f4}
 .asset-time-legacy{font-size:12px;color:#8b968f;margin-top:6px}
-@media(max-width:600px){#ndMetadataRow{grid-template-columns:1fr}.asset-time-part{padding:0 7px}}
+@media(max-width:600px){.asset-time-part{padding:0 7px}}
 
 </style>
 
@@ -1578,17 +1578,6 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
               </select>
             </div>
           </div>
-          <div id="ndMetadataRow" class="grid grid-cols-2 gap-3">
-            <div>
-              <label for="ndDataTimeYear" class="block text-sm font-medium text-gray-700 mb-1.5">数据时间 <span class="text-xs text-gray-400 font-normal">（选填）</span></label>
-              <div id="ndDataTimeControl"></div>
-              <p class="text-xs text-gray-400 mt-1.5">数据对应的采集时间或业务时期。</p>
-            </div>
-            <div>
-              <label for="ndDataOrigin" class="block text-sm font-medium text-gray-700 mb-1.5">数据来源 <span class="text-xs text-gray-400 font-normal">（选填）</span></label>
-              <input type="text" id="ndDataOrigin" placeholder="填写数据提供单位、系统或采集来源" class="w-full px-3 py-2 border border-line rounded-lg text-sm focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 bg-white">
-            </div>
-          </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1.5">标签 <span class="text-xs text-gray-400 font-normal">（可多选）</span></label>
             <div id="ndTags" class="flex flex-wrap gap-2"></div>
@@ -1650,8 +1639,8 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
       <section id="publishStep2" class="publish-flow-content hidden" aria-label="填写服务信息">
         <div class="publish-selected-service"><div class="publish-selected-icon" aria-hidden="true"><svg viewbox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 17 17-9 17 9-17 9-17-9Z"></path><path d="m7 25 17 9 17-9M7 33l17 9 17-9"></path><path d="M24 8v18" opacity=".35"></path></svg></div><div><strong id="publishSelectedServiceType"></strong><span id="publishSelectedServiceName"></span></div></div>
         <div class="publish-detail-fields space-y-4">
-<div id="uxServiceNameRow" class="ux-field"><label for="uxServiceName">服务名称 <span class="ux-required">*</span></label><input id="uxServiceName" class="ux-control" type="text" required aria-describedby="uxServiceNameHelp" autocomplete="off"><p id="uxServiceNameHelp" class="ux-help">已生成默认名称，可手动修改。</p><div id="uxServiceNameError" class="ux-error" role="alert"></div></div>
 <div id="publishTitleField"><label for="publishTitle" class="block text-sm font-medium mb-2">服务标题 <span class="text-red-500">*</span></label><input id="publishTitle" class="w-full border border-line rounded-lg px-3 py-2 text-sm" placeholder="填写服务标题"></div>
+<div id="uxServiceNameRow" class="ux-field"><label for="uxServiceName">服务名称 <span class="ux-required">*</span></label><input id="uxServiceName" class="ux-control" type="text" required aria-describedby="uxServiceNameHelp" autocomplete="off"><p id="uxServiceNameHelp" class="ux-help">已生成默认名称，可手动修改。</p><div id="uxServiceNameError" class="ux-error" role="alert"></div></div>
 <section id="publishRenderSection" class="hidden"><div class="flex items-center justify-between mb-2"><label for="pubRasterTrigger" class="text-sm font-medium">选择栅格 <span class="text-xs font-normal text-gray-400">（单选）</span></label><span id="pubRasterCount" class="text-xs text-gray-400"></span></div><div id="publishRasterPickBody" class="space-y-2"></div></section>
 <section id="publishVectorExprSection"><div class="text-sm font-medium mb-2">发布内容</div><div id="publishExprBody" class="flex flex-wrap gap-2"></div></section>
 <div>
@@ -1907,7 +1896,7 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
  document.addEventListener('focusin',e=>{if(activeId&&!popup.contains(e.target)&&!trigger()?.contains(e.target))close();});
  window.addEventListener('keydown',e=>{if(activeId&&e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();close(true);}},true);
  window.addEventListener('resize',()=>close());document.addEventListener('scroll',e=>{if(activeId&&!popup.contains(e.target))close();},true);
- window.HTAssetTime={render,read,clear,reset,open};const host=$('ndDataTimeControl');if(host)host.innerHTML=render('ndDataTime');
+ window.HTAssetTime={render,read,clear,reset,open};
 })();
 
 </script>
@@ -4886,11 +4875,10 @@ function submitUpload() {
 // 提交成功后重置抽屉表单
 function resetUploadDrawer() {
   selectedTags.clear();
-  ['ndName','ndDataTime','ndDataOrigin','ndCrs','ndCrsOther','ndOrg','ndCatalog','ndDesc'].forEach(id => {
+  ['ndName','ndCrs','ndCrsOther','ndOrg','ndCatalog','ndDesc'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
-  HTAssetTime.reset('ndDataTime');
   const fb = document.getElementById('fbInput');
   if (fb) fb.value = '';
   const list = document.getElementById('fbFileList');
@@ -4957,7 +4945,7 @@ function renderPublishDataSummary(card) {
   type.hidden = !source.type;
   const fields = [
     ['数据格式', source.fmt || '—'], ['坐标系', source.crs || '—'], ['数据大小', size],
-    ['数据时间', assetDataTime(source) || '—'], ['数据来源', assetDataOrigin(source) || '—'], ['接入方式', assetIngestMethod(source) || '—']
+    ['数据时间', assetDataTime(source) || '—'], ['数据来源', assetDataOrigin(source) || '—']
   ];
   document.getElementById('publishSourceMeta').innerHTML = fields.map(([label, value]) =>
     '<div><dt>' + esc(label) + '</dt><dd>' + esc(value) + '</dd></div>'
@@ -6705,7 +6693,7 @@ $('publishTitleField').querySelector('label').innerHTML='服务标题 <span clas
 $('publishTitle').placeholder='请输入便于识别的服务标题';
 $('uxServiceName').addEventListener('input',readPublishServiceName);
 $('publishTitleField').insertAdjacentHTML('beforeend','<div id="publishTitleError" class="ux-error" role="alert"></div>');
-$('publishTitleField').insertAdjacentHTML('afterend','<div class="ux-row"><div class="ux-field"><label for="uxPubOrg">组织机构 <span class="ux-required">*</span></label><select id="uxPubOrg" class="ux-control"></select></div><div class="ux-field"><label for="uxPubCatalog">所属目录 <span class="ux-required">*</span></label><select id="uxPubCatalog" class="ux-control"></select></div></div>');
+$('uxServiceNameRow').insertAdjacentHTML('afterend','<div class="ux-row"><div class="ux-field"><label for="uxPubOrg">组织机构 <span class="ux-required">*</span></label><select id="uxPubOrg" class="ux-control"></select></div><div class="ux-field"><label for="uxPubCatalog">所属目录 <span class="ux-required">*</span></label><select id="uxPubCatalog" class="ux-control"></select></div></div>');
 const extra=document.createElement('div');extra.id='uxPubMore';extra.className='light-publish-meta';extra.innerHTML='<div><div class="ux-field"><label for="uxPubDesc">描述</label><textarea id="uxPubDesc" rows="2" class="ux-control" placeholder="补充服务的内容或用途"></textarea></div><div class="ux-field"><label for="uxPubTags">标签</label><input id="uxPubTags" class="ux-control" placeholder="输入标签，多个标签用逗号分隔"></div><div class="ux-field"><label>封面</label><div style="display:flex;align-items:center;gap:12px"><span id="uxCoverPreview"></span><button type="button" class="btn btn-sm btn-default" onclick="document.getElementById(\'uxCoverFile\').click()">修改封面</button><button type="button" id="uxCoverReset" class="ux-link">恢复默认</button><input hidden id="uxCoverFile" type="file" accept="image/*"></div></div></div>';
 $('publishTimeBlock').before(extra);
 $('publishStepIndicator1').lastElementChild.textContent='选择类型与配置';$('publishStepIndicator2').lastElementChild.textContent='确认服务信息';
@@ -6778,10 +6766,9 @@ window.submitUpload=function(){
  if(moduleConfigs.data.cards.some(c=>c.title===name)){showNotification('','已存在同名数据，请调整名称');$('ndName').focus();return;}
  const crs=nonSpatialTable()?'':wizCrsValue();if(!nonSpatialTable()&&!crs){showNotification('','请选择原始数据的坐标系');$('ndCrs').focus();return;}
  if(!$('ndOrg').value||!$('ndCatalog').value){showNotification('','请选择组织机构和所属目录');return;}
- const timeMetadata=HTAssetTime.read('ndDataTime');if(!timeMetadata)return;
  const files=[...(pickedInput()?.files||[])],ext=files[0]?.name.split('.').pop().toLowerCase(),raster=['tif','tiff','png','jpg','jpeg'].includes(ext),date=new Date().toISOString().slice(0,10),db=currentCreateMethod==='db';
  const card={id:HTWorkflow.id('data-'),title:name,sub:files.length?files.length+' 份数据':db?'数据库表':'绘制数据',tag:[...selectedTags][0]||'',tags:[...selectedTags],cat:$('ndCatalog').value,org:$('ndOrg').value,description:$('ndDesc').value.trim(),dataSource:db?$('dbSource').value:'',
-  ...timeMetadata,dataOrigin:$('ndDataOrigin').value.trim(),ingestMethod:db?'db':currentCreateMethod==='draw'&&!files.length?'draw':'file',
+  ingestMethod:db?'db':currentCreateMethod==='draw'&&!files.length?'draw':'file',
   created:date,updated:date,type:db?'数据库表':raster?'影像图片':nonSpatialTable()?'表格数据':'矢量数据',fmt:db?'DbTable':ext==='tif'||ext==='tiff'?'GeoTIFF':ext==='geojson'||ext==='json'?'GeoJSON':(ext||'数据').toUpperCase(),crs,mine:true,svcCount:0,pendingRange:true,dataAssetType:'static',
   datasetFiles:db?[...document.querySelectorAll('.db-table-cb:checked')].map(cb=>({f:cb.value,d:date,latest:true})):files.map(f=>({f:f.name,d:date,ver:'当前数据',rel:'上传',latest:true,size:f.size})),thumb:'from-green-100 to-green-200',icon:ICO_BAR};
  moduleConfigs.data.cards.unshift(card);HTWorkflow.write('hetu_data_cards_v3',moduleConfigs.data.cards.filter(c=>!c.spId));addTask({type:'data',title:'入库：'+name,target:name});
