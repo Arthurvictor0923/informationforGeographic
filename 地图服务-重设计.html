@@ -1232,6 +1232,27 @@ body:has(.production-screen:not(.hidden)) #helpFab{display:none}
 @media(max-width:650px){.service-reg-platforms{grid-template-columns:repeat(2,minmax(0,1fr))}.service-reg-catalog{grid-template-columns:1fr}.service-reg-list{border-right:0;border-bottom:1px solid #e0e8e2;max-height:200px}.service-reg-type-grid{grid-template-columns:1fr}.service-reg-head{padding:0 16px}.service-reg-steps>span{width:50px}}
 
 </style>
+<style data-source="task-float.css">
+/* 任务入口仅由数据资产、地图服务页面挂载；底部留出分页空间。 */
+#taskBellWrap{position:fixed;right:24px;bottom:80px;z-index:40}
+#taskBellWrap[hidden],#taskPanel.hidden,#taskBadge.hidden{display:none!important}
+#taskBell{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:56px;height:56px;padding:0;border:1px solid #d3e3dc;border-radius:12px;background:#fff;color:#005653;box-shadow:0 4px 16px #123d2d1f;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s}
+#taskBell:hover,#taskBell[aria-expanded="true"]{background:#edf6f2;border-color:#91b5a5;box-shadow:0 5px 18px #123d2d29}
+#taskBell:focus-visible,#taskPanel a:focus-visible{outline:2px solid #005653;outline-offset:3px}
+#taskBell>svg{width:21px;height:21px;flex:none}
+#taskBell .task-float-label{font-size:12px;font-weight:500;line-height:16px}
+#taskBadge{position:absolute;top:-6px;right:-6px;display:flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;border:2px solid #fff;border-radius:10px;background:#ef4444;color:#fff;font-size:10px;font-weight:600;line-height:1}
+#taskPanel{position:absolute;right:0;bottom:68px;display:flex;flex-direction:column;width:360px;max-width:calc(100vw - 48px);max-height:calc(100dvh - 172px);overflow:hidden;border:1px solid #dce5e0;border-radius:10px;background:#fff;box-shadow:0 8px 30px #123d2d24}
+#taskPanel .task-float-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;border-bottom:1px solid #edf0ed;flex:none}
+#taskPanel .task-float-title{font-size:14px;font-weight:600;color:#20352b}
+#taskPanel .task-float-all{font-size:12px;color:#005653;white-space:nowrap}
+#taskPanel .task-float-all:hover{text-decoration:underline}
+#taskPanelBody{min-height:0;max-height:320px;overflow-y:auto;overscroll-behavior:contain}
+#taskPanel .task-float-foot{padding:9px 16px;border-top:1px solid #edf0ed;background:#f8faf9;font-size:11px;color:#8a968e;line-height:18px;flex:none}
+body[data-task-float-visible="true"] #helpFab{right:28px!important;bottom:148px!important;z-index:39}
+body[data-task-float-visible="true"] #helpPanel{bottom:208px!important}
+@media(max-width:640px){#taskBellWrap{right:16px}#taskPanel{max-width:calc(100vw - 32px)}body[data-task-float-visible="true"] #helpFab{right:20px!important}}
+</style>
 </head>
 <body class="bg-page-bg text-gray-800 text-sm h-screen overflow-hidden flex flex-col hetu-portal hetu-catalog">
 
@@ -2347,6 +2368,116 @@ modal.addEventListener('keydown',e=>{if(modal.classList.contains('hidden'))retur
 model=defaults();render();renderAll();
 })();
 
+</script>
+<script data-source="task-float.js">
+function getTasks() {
+  const list = HTWorkflow.read('hetu_tasks_v1', []);
+  return Array.isArray(list) ? list : [];
+}
+function runningCount() { return getTasks().filter(t => t.status === 'queued' || t.status === 'running').length; }
+// ── 数据资产 / 地图服务：右下角任务入口 ──────────────────
+function injectTaskBell() {
+  if (document.getElementById('taskBellWrap')) return;
+  document.body.insertAdjacentHTML('beforeend', `
+  <div id="taskBellWrap" hidden>
+    <button id="taskBell" type="button" onclick="toggleTaskPanel()" title="任务中心" aria-label="任务中心" aria-controls="taskPanel" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 1 3.4 0"/></svg>
+      <span class="task-float-label">任务</span>
+      <span id="taskBadge" class="hidden" aria-hidden="true">0</span>
+    </button>
+    <section id="taskPanel" class="hidden" aria-label="任务中心">
+      <div class="task-float-head">
+        <span class="task-float-title">任务中心</span>
+        <a href="任务中心.html" class="task-float-all">查看全部 →</a>
+      </div>
+      <div id="taskPanelBody" class="scroll-thin"></div>
+      <div class="task-float-foot">数据入库、服务发布均为异步任务，可并发执行</div>
+    </section>
+  </div>`);
+  document.addEventListener('click', event => {
+    if (!document.getElementById('taskBellWrap').contains(event.target)) toggleTaskPanel(false);
+  });
+  document.addEventListener('keydown', event => {
+    const panel = document.getElementById('taskPanel');
+    if (event.key === 'Escape' && !panel.classList.contains('hidden')) {
+      toggleTaskPanel(false);
+      document.getElementById('taskBell').focus();
+    }
+  });
+  document.addEventListener('hetu-asset-view', event => syncTaskFloatVisibility(event.detail === 'data' ? 'data' : 'tools'));
+  window.addEventListener('storage', event => { if (event.key === 'hetu_tasks_v1' || event.key === null) updateTaskBadge(); });
+  window.addEventListener('focus', updateTaskBadge);
+  syncTaskFloatVisibility();
+  updateTaskBadge();
+}
+function syncTaskFloatVisibility(module) {
+  const wrap = document.getElementById('taskBellWrap');
+  if (!wrap) return;
+  const current = module || document.querySelector('#topNav .nav-btn.active')?.dataset.module || (typeof activeModule !== 'undefined' ? activeModule : '');
+  const dataPanel = document.getElementById('dataManagementPanel');
+  const visible = ['data', 'service'].includes(current) && !(current === 'data' && dataPanel?.hidden);
+  wrap.hidden = !visible;
+  document.body.dataset.taskFloatVisible = String(visible);
+  if (!visible) toggleTaskPanel(false);
+}
+function toggleTaskPanel(force) {
+  const panel = document.getElementById('taskPanel');
+  const wrap = document.getElementById('taskBellWrap');
+  if (!panel || !wrap) return;
+  const willShow = !wrap.hidden && (typeof force === 'boolean' ? force : panel.classList.contains('hidden'));
+  if (willShow) renderTaskPanelBody();
+  panel.classList.toggle('hidden', !willShow);
+  document.getElementById('taskBell').setAttribute('aria-expanded', String(willShow));
+}
+function renderTaskPanelBody() {
+  const body = document.getElementById('taskPanelBody');
+  if (!body) return;
+  const all = getTasks();
+  const running = all.filter(t => t.status === 'queued' || t.status === 'running');
+  const recent = all.filter(t => t.status === 'success' || t.status === 'failed').slice(0, 3);
+  const items = [...running, ...recent].slice(0, 6);
+  if (!items.length) { body.innerHTML = '<div class="text-center py-8 text-sm text-gray-400">暂无任务</div>'; return; }
+  body.innerHTML = items.map(t => taskRowHTML(t)).join('');
+}
+function taskTypeChip(type) {
+  return type === 'data'
+    ? '<span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-[10px] font-medium">入库</span>'
+    : '<span class="px-1.5 py-0.5 rounded bg-brand-light text-brand-dark text-[10px] font-medium">发布</span>';
+}
+function taskStatusChip(status) {
+  const map = {
+    queued:  ['排队中', 'bg-gray-100 text-gray-500'],
+    running: ['处理中', 'bg-brand-light text-brand-dark'],
+    success: ['成功', 'bg-green-50 text-green-700'],
+    failed:  ['失败', 'bg-red-50 text-red-600'],
+  };
+  const [label, cls] = map[status] || ['未知', 'bg-gray-100 text-gray-500'];
+  return `<span class="px-2 py-0.5 rounded-full text-[10px] font-medium ${cls}">${label}</span>`;
+}
+function taskRowHTML(t) {
+  return `<div class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50">
+    <div class="flex items-center gap-2">
+      ${taskTypeChip(t.type)}
+      <span class="text-sm text-gray-800 truncate flex-1">${HTWorkflow.esc(t.title)}</span>
+      ${taskStatusChip(t.status)}
+    </div>
+    <div class="text-[11px] text-gray-400 mt-1">${HTWorkflow.esc(t.createdAt || '')}</div>
+  </div>`;
+}
+function updateTaskBadge() {
+  const badge = document.getElementById('taskBadge');
+  if (!badge) return;
+  const n = runningCount();
+  badge.textContent = n > 9 ? '9+' : String(n);
+  badge.classList.toggle('hidden', n === 0);
+  const label = n > 0 ? '任务中心，' + n + ' 个任务进行中' : '任务中心';
+  const button = document.getElementById('taskBell');
+  button.setAttribute('aria-label', label);
+  button.title = label;
+  if (!document.getElementById('taskPanel').classList.contains('hidden')) renderTaskPanelBody();
+}
+
+injectTaskBell();
 </script>
 </body>
 </html>
