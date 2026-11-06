@@ -2,11 +2,7 @@
 (() => {
   const nav=document.getElementById('topNav');
   if(!nav)return;
-  const tool=document.createElement('a');
-  tool.href='工具箱.html';tool.dataset.module='tools';
-  tool.className='nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5';
-  tool.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V3h8v4M3 12h18M9 12v3h6v-3"/></svg>工具箱';
-  if(!nav.querySelector('[data-module="tools"]'))nav.insertBefore(tool,nav.querySelector('[data-module="task"]'));
+  // 「工具箱」自 2026-11-02 起为固定七项一级导航之一，已由页面静态写入，不再运行时注入。
   if(!window.HTSpatial)return;
   const panel=document.getElementById('spatialPanel');
   panel.classList.add('ux-tools-layout');

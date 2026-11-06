@@ -701,18 +701,23 @@ function switchModule(m) {
   selectMode = false;
   selectedSet.clear();
   uiFilter = { tree: '*', treePath: '', kw: '', type: '全部', status: '全部', mine: false, formal: true, page: 1, view: 'card', serviceRole: '全部', source: '全部', crs: '全部' };
-  // Update nav
-  document.querySelectorAll('.nav-btn').forEach(b => {
-    b.classList.remove('text-brand-hover', 'active');
-    const bar = b.querySelector('.active-bar');
-    if (bar) bar.remove();
-    if (b.dataset.module === m) {
-      b.classList.add('text-brand-hover', 'active');
-      const span = document.createElement('span');
-      span.className = 'active-bar absolute bottom-0 left-0 right-0 h-0.5 bg-brand-hover';
-      b.appendChild(span);
-    }
-  });
+  // Update nav：仅当当前模块存在对应一级导航项时才调整高亮。
+  // 页面静态归属态（如符号库页归属「配置管理」）不应被模块切换逻辑清空。
+  const navBtns = document.querySelectorAll('.nav-btn');
+  const navHasModule = Array.prototype.some.call(navBtns, b => b.dataset.module === m);
+  if (navHasModule) {
+    navBtns.forEach(b => {
+      b.classList.remove('text-brand-hover', 'active');
+      const bar = b.querySelector('.active-bar');
+      if (bar) bar.remove();
+      if (b.dataset.module === m) {
+        b.classList.add('text-brand-hover', 'active');
+        const span = document.createElement('span');
+        span.className = 'active-bar';
+        b.appendChild(span);
+      }
+    });
+  }
 
   // Remove existing tip silently (user didn't click "知道了")
   removeModuleTip();
@@ -1153,18 +1158,9 @@ function getHetuRole() {
 function setHetuRole(role) {
   try { localStorage.setItem('hetu_role', role === 'admin' ? 'admin' : 'user'); } catch (e) {}
 }
-function ensureSeqNav() {
-  if (getHetuRole() !== 'admin') return;
-  const nav = document.getElementById('topNav');
-  if (!nav || nav.querySelector('[data-module="seq"]')) return;
-  const a = document.createElement('a');
-  a.href = '服务序列管理.html';
-  a.setAttribute('data-module', 'seq');
-  a.className = 'nav-btn px-3.5 h-16 text-gray-600 hover:text-brand-hover relative font-medium transition-colors text-sm flex items-center gap-1.5';
-  a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg> 服务序列';
-  nav.appendChild(a);
-}
-ensureSeqNav(); // 登录身份为管理员时注入「服务序列」导航 tab（业务人员不可见）
+// 「服务序列」自 2026-11-02 起归入「配置管理」二级入口，不再作为一级导航 tab 注入。
+// 角色读写能力（getHetuRole / setHetuRole）保留：服务序列管理.html 仍据此做权限门控。
+function ensureSeqNav() { /* 一级导航不再注入服务序列入口 */ }
 
 function closeWizard(id) {
   document.getElementById(id).classList.add('hidden');

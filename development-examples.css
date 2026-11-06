@@ -1,0 +1,41 @@
+.ht-docs-content{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column}
+.ht-example-gallery{flex:1;min-height:0;overflow-y:auto;padding:24px;background:#fff;border:1px solid var(--border);border-radius:8px}
+.ht-gallery-toolbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:22px}
+.ht-gallery-toolbar .ht-page-heading{margin:0}
+.ht-gallery-toolbar input{width:240px;border:1px solid var(--border);padding:8px 12px;background:#fff}
+.ht-example-categories{display:flex;gap:8px;padding-bottom:18px;border-bottom:1px solid var(--border-light)}
+.ht-example-categories button{border:0;background:transparent;color:var(--text-secondary);padding:7px 18px;border-radius:4px;font-size:14px}
+.ht-example-categories button[aria-selected="true"]{background:#e8f4ed;color:#006f64;font-weight:600}
+.ht-gallery-caption{display:flex;align-items:center;gap:10px;margin:22px 0 16px}
+.ht-gallery-caption h2{font-size:16px;font-weight:600;margin:0}
+.ht-gallery-caption span{color:var(--text-muted);font-size:13px}
+.ht-example-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.ht-example-card{display:flex;flex-direction:column;text-align:left;min-width:0;overflow:hidden;background:#fff;border:1px solid var(--border);border-radius:7px;transition:border-color .15s,box-shadow .15s;padding:0}
+.ht-example-card:hover{border-color:#87b4a4;box-shadow:0 3px 12px rgba(0,86,83,.08)}
+.ht-example-card:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+.ht-example-thumbnail{position:relative;height:160px;width:100%;overflow:hidden;background:#e7efeb}
+.ht-thumb-map{position:absolute;inset:-30px -10px;background-image:url('https://tile.openstreetmap.org/4/13/6.png');background-position:center;background-size:cover;filter:saturate(.7);opacity:.88}
+.ht-example-thumbnail svg{position:absolute;inset:0;width:100%;height:100%}
+.ht-example-card>span:last-child{padding:14px 16px;font-weight:500;color:var(--text);font-size:14px;border-top:1px solid var(--border-light)}
+.ht-example-editor{display:flex;flex:1;min-height:0;flex-direction:column;background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.ht-editor-toolbar{display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid var(--border)}
+.ht-example-back{border:0;background:transparent;color:var(--brand);white-space:nowrap;font-size:13px;padding:6px 0}
+.ht-editor-toolbar h1{font-size:15px;font-weight:600;margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ht-editor-actions{margin-left:auto;display:flex;gap:8px;flex-shrink:0}
+.ht-editor-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);flex:1;min-height:0}
+.ht-editor-source,.ht-editor-preview{display:flex;min-width:0;min-height:0;flex-direction:column}
+.ht-editor-source{border-right:1px solid var(--border)}
+.ht-editor-label{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;font-size:12px;color:var(--text-secondary);background:#f8faf9;border-bottom:1px solid var(--border-light)}
+.ht-editor-label span{color:var(--text-muted);font-size:11px}
+.ht-source-wrap{display:flex;flex:1;min-height:0;overflow:hidden;background:#fff}
+#lineNumbers{box-sizing:border-box;flex:0 0 44px;margin:0;padding:12px 9px;text-align:right;overflow:hidden;line-height:21px;font-size:12px;color:#98a59f;background:#f8faf9;border-right:1px solid #edf1ee;user-select:none;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.hetu-portal #exampleSource{flex:1;min-width:0;min-height:0;resize:none;border:0;outline:0;box-shadow:none!important;border-radius:0;padding:12px;white-space:pre;overflow:auto;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:21px;color:#233d52;tab-size:2}
+#examplePreview{width:100%;flex:1;border:0;background:#eef4f0;min-height:0}
+.ht-example-status{padding:8px 14px;color:var(--text-muted);font-size:12px;border-top:1px solid var(--border-light);min-height:35px}
+.ht-example-status[data-error="true"]{color:#c23b3b;background:#fff8f8}
+.ht-docs-content [hidden]{display:none!important}
+@media(min-width:1650px){.ht-example-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:1100px){.ht-example-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ht-editor-toolbar{flex-wrap:wrap}.ht-editor-actions{margin-left:auto}}
+@media(max-width:800px){.ht-example-gallery{padding:16px}.ht-gallery-toolbar{align-items:flex-start;flex-direction:column;gap:12px}.ht-gallery-toolbar input{width:100%}.ht-example-categories{gap:2px}.ht-example-categories button{padding:7px 10px}.ht-example-grid{grid-template-columns:1fr}.ht-editor-body{grid-template-columns:1fr;grid-template-rows:minmax(240px,1fr) minmax(240px,1fr);overflow-y:auto}.ht-editor-source{border-right:0;border-bottom:1px solid var(--border)}.ht-example-editor{overflow-y:auto}}
+.ht-section-nav .ht-example-categories{flex-direction:column;align-items:stretch;gap:4px;padding:16px 0 0 12px;margin-top:12px;border-top:1px solid var(--border-light);border-bottom:0}
+.ht-section-nav .ht-example-categories button{text-align:left;padding:9px 12px;font-size:13px}

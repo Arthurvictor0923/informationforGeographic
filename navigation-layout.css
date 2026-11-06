@@ -1,0 +1,22 @@
+/* 统一模块二级菜单；沿用工具箱的白色侧栏、浅绿选中态。 */
+.hetu-catalog :is(#appShell,.app-shell)>header{flex-wrap:nowrap!important;gap:16px;padding-inline:24px}
+.hetu-catalog header>div:first-child>div:first-child{margin-right:20px}
+.hetu-catalog #topNav{width:auto!important;height:64px!important;flex:1;overflow-x:auto}
+.hetu-catalog #topNav .nav-btn{height:64px!important;padding-inline:12px}
+.hetu-catalog #appShell>.ht-module-layout,.hetu-catalog .app-shell>.ht-module-layout{display:flex;flex:1;min-height:0;overflow:hidden;padding:16px 24px 24px;gap:16px}
+.hetu-catalog :is(#appShell,.app-shell) .ht-section-nav{width:210px;flex:0 0 210px;align-self:stretch;background:#fff;border:1px solid #e0e8e2;border-radius:8px;padding:18px 12px;overflow-y:auto;box-shadow:none}
+.ht-section-nav h2{font-size:13px;color:#738579;padding:2px 12px 17px;font-weight:500;margin:0}
+.ht-section-nav nav{display:flex;flex-direction:column;gap:4px}
+.ht-section-nav nav>a{display:flex;align-items:center;min-height:44px;padding:11px 12px;border-radius:6px;color:var(--text-secondary,#526078);font-size:14px;line-height:22px;white-space:nowrap}
+.ht-section-nav nav>a:hover{background:#f3f8f5;color:#006f64}
+.ht-section-nav nav>a[aria-current="page"]{background:#e8f4ed;color:#006f64;font-weight:600}
+.ht-module-content{display:flex;gap:16px;flex:1;min-width:0;min-height:0;overflow:hidden}
+.ht-module-content>.sider,.ht-module-content>aside{width:230px!important;flex:0 0 230px!important}
+.ht-module-content>main{flex:1;min-width:0}
+.ht-module-content .ht-local-content{flex:1;min-width:0;min-height:0;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:8px;padding:24px}
+.ht-page-heading{margin:0 0 24px;font-size:18px;line-height:26px;font-weight:600;color:var(--text)}
+.ht-empty-page{height:calc(100% - 50px);min-height:240px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-muted);font-size:14px}
+.ht-empty-page svg{width:44px;height:44px;color:#a8bdb5}
+.ht-module-content .ht-mvt-tabs{margin-top:0}
+@media(max-width:1200px){.hetu-catalog header>div:first-child>div:first-child>span{font-size:17px}.hetu-catalog #topNav .nav-btn{padding-inline:9px}.hetu-catalog :is(#appShell,.app-shell) .ht-section-nav{width:184px;flex-basis:184px}.ht-module-content>.sider,.ht-module-content>aside{width:200px!important;flex-basis:200px!important}}
+@media(max-width:800px){.hetu-catalog :is(#appShell,.app-shell)>header{padding-inline:12px}.hetu-catalog header>div:first-child>div:first-child{margin-right:10px}.hetu-catalog header>div:first-child>div:first-child>span{font-size:14px}.hetu-catalog header>div:last-child>span{display:none}.hetu-catalog #appShell>.ht-module-layout,.hetu-catalog .app-shell>.ht-module-layout{padding:12px;gap:12px}.hetu-catalog :is(#appShell,.app-shell) .ht-section-nav{width:152px;flex-basis:152px;padding:14px 8px}.ht-section-nav nav>a{font-size:13px;padding-inline:9px}.ht-module-content{overflow:auto}.ht-module-content>.sider,.ht-module-content>aside{width:180px!important;flex-basis:180px!important}}
